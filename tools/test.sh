@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 TESTBED=${TESTBED:-/opt/contrail/utils/fabfile/testbeds/testbed.py}
-CI_REPO=${CI_REPO:-https://github.com/Juniper/contrail-test-ci.git}
+CI_REPO=${CI_REPO:-https://github.com/tungstenfabric/tf-test-ci.git}
 CI_REF=${CI_REF:-master}
 FAB_REPO=${FAB_REPO:-https://github.com/tungstenfabric/tf-fabric-utils.git}
 FAB_REF=${FAB_REF:-master}
