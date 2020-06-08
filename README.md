@@ -82,7 +82,7 @@ One can also custom build base and test containers
 * Pull the test container image from dockerhub
 * Execute the testrunner.sh script
 ```
-    $> wget https://github.com/Juniper/contrail-test/raw/master/testrunner.sh
+    $> wget https://github.com/tungstenfabric/tf-test/raw/master/testrunner.sh
     $> docker pull opencontrailnightly/contrail-test-test:ocata-bld-1
     $> ./testrunner.sh run -P /path/to/contrail_test_input.yaml contrail-test-test:ocata-bld-1
 ```
