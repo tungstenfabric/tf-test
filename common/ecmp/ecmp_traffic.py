@@ -16,6 +16,7 @@ class ECMPTraffic(VerifySvcChain):
             dst_ip = dst_vm_list[0].vm_ip
         traffic_objs = self.start_multiple_streams(src_vm, dst_vm_list,
             src_ip=src_ip, dst_ip=dst_ip, flow_count=flow_count)
+        self.sleep(10)
         self.verify_flow_thru_si(si_fix, src_vn, ecmp_hash, flow_count)
         self.verify_flow_records(src_vm, src_ip, dst_ip, flow_count)
         self.stop_multiple_streams(traffic_objs)
