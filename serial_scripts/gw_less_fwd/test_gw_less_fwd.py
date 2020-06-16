@@ -9,7 +9,7 @@ from common.servicechain.mirror.verify import VerifySvcMirror
 import test
 from tcutils.util import *
 from time import sleep
-from copy import deepcopy
+from copy import copy
 
 class TestGWLessFWD(GWLessFWDTestBase):
 
@@ -1786,8 +1786,10 @@ class TestGWLessFWD(GWLessFWDTestBase):
             assert result, "Ping from VM: %s to VM: %s is NOT successful" %(
                 src_vm_ip, vm_fixtures['vm1'].vm_ip) 
 
-        #all the vms should should reach the vhost0 of all the computes
-        new_dict = deepcopy(obj_dict)
+        #all the vms should should reach the vhost1 of all the computes
+        new_dict = {}
+        for k, v in obj_dict.items():
+            new_dict[k] = copy(v)
         del new_dict['vm_fixtures']['vm4']
         del new_dict['vmi_fixtures']['vmi4']
         self.verify_ping_from_vms_to_vhosts(ret_dict = new_dict)
