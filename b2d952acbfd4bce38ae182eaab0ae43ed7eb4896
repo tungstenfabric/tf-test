@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "575d0ab7_0ce330b7",
+        "filename": "common/ecmp/ecmp_traffic.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-16T14:26:32Z",
+      "side": 1,
+      "message": "can\u0027t we avoid sleep?",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 12
+      },
+      "revId": "b2d952acbfd4bce38ae182eaab0ae43ed7eb4896",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff98606c_d553a919",
+        "filename": "common/servicechain/config.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 624,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-16T14:26:32Z",
+      "side": 1,
+      "message": "do we really need this if else statement?",
+      "range": {
+        "startLine": 624,
+        "startChar": 12,
+        "endLine": 624,
+        "endChar": 39
+      },
+      "revId": "b2d952acbfd4bce38ae182eaab0ae43ed7eb4896",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "038b95f3_0ea383cc",
+        "filename": "common/servicechain/verify.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-16T14:26:32Z",
+      "side": 1,
+      "message": "sorry i didn\u0027t under how is it different than the previous if statement?",
+      "range": {
+        "startLine": 361,
+        "startChar": 8,
+        "endLine": 361,
+        "endChar": 54
+      },
+      "revId": "b2d952acbfd4bce38ae182eaab0ae43ed7eb4896",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a116801b_e712a27f",
+        "filename": "scripts/ecmp/test_ecmp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-16T14:26:32Z",
+      "side": 1,
+      "message": "this should be changed to TCP \u0026 icmp.\nBut i didn\u0027t understand the problem here. why icmp should be allowed?",
+      "range": {
+        "startLine": 138,
+        "startChar": 102,
+        "endLine": 138,
+        "endChar": 148
+      },
+      "revId": "b2d952acbfd4bce38ae182eaab0ae43ed7eb4896",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "877901e3_7dad8e91",
+        "filename": "scripts/ecmp/test_ecmp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-16T14:26:32Z",
+      "side": 1,
+      "message": "same as previous comment",
+      "range": {
+        "startLine": 175,
+        "startChar": 102,
+        "endLine": 175,
+        "endChar": 147
+      },
+      "revId": "b2d952acbfd4bce38ae182eaab0ae43ed7eb4896",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "937ba5a1_95a2a349",
+        "filename": "scripts/ecmp/test_ecmp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-16T14:26:32Z",
+      "side": 1,
+      "message": "i guess this should be udp \u0026 icmp allow",
+      "range": {
+        "startLine": 177,
+        "startChar": 51,
+        "endLine": 177,
+        "endChar": 73
+      },
+      "revId": "b2d952acbfd4bce38ae182eaab0ae43ed7eb4896",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
