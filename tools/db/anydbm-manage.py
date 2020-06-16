@@ -1,8 +1,5 @@
-from __future__ import print_function
-from builtins import str
-from builtins import object
 import os
-import anydbm
+import dbm
 import argparse
 import logging
 
@@ -27,22 +24,22 @@ class AnyDBMManager(object):
 
     def list_entries(self):
         try:
-            db_h = anydbm.open(self.dbfile, 'r')
-            for k,v in db_h.items():
-                print(k,v)
+            db_h = dbm.open(self.dbfile, 'r')
+            for k in db_h.keys():
+                print(k,db_h[k])
         finally:
             db_h.close()
 
     def set_entry(self, key, value):
         try:
-            db_h = anydbm.open(self.dbfile, 'c')
-            db_h[str(key)] = str(value)
+            db_h = dbm.open(self.dbfile, 'c')
+            db_h[key] = value
         finally:
             db_h.close()
 
     def delete_entry(self, key):
         try:
-            db_h = anydbm.open(self.dbfile, 'w')
+            db_h = dbm.open(self.dbfile, 'w')
             del db_h[key]
         finally:
             db_h.close()
@@ -50,12 +47,12 @@ class AnyDBMManager(object):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(
         description='''
-Manage anydbm db
+Manage dbm db
 Example : to add/delete testcase run-times in testrepository
 
-python anydbm-manage.py -p /tmp/times.dbm -d scripts.pbb_evpn.test_pbb_evpn.TestPbbEvpnMacLearning.test_mac[cb_sanity,sanity]
+python3 anydbm-manage.py -p /tmp/times.dbm -d scripts.pbb_evpn.test_pbb_evpn.TestPbbEvpnMacLearning.test_mac[cb_sanity,sanity]
 
-python anydbm-manage.py -p /tmp/times.dbm -s scripts.pbb_evpn.test_pbb_evpn.TestPbbEvpnMacLearning.test_mac[cb_sanity,sanity] 306.15
+python3 anydbm-manage.py -p /tmp/times.dbm -s scripts.pbb_evpn.test_pbb_evpn.TestPbbEvpnMacLearning.test_mac[cb_sanity,sanity] 306.15
 ''')
     ap.add_argument('-p', '--path', type=str,
                     help='path to anydbm db file')
