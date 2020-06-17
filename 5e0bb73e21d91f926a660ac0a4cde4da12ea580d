@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09fde1e1_8e20b182",
+        "filename": "tools/collect_bts.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-17T15:15:04Z",
+      "side": 1,
+      "message": "do you want to hardcore this?",
+      "range": {
+        "startLine": 47,
+        "startChar": 19,
+        "endLine": 47,
+        "endChar": 26
+      },
+      "revId": "5e0bb73e21d91f926a660ac0a4cde4da12ea580d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ba5c1184_95d8c8cf",
+        "filename": "tools/db/anydbm-manage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-06-17T15:15:04Z",
+      "side": 1,
+      "message": "same comment python3 hardcoding?",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 7
+      },
+      "revId": "5e0bb73e21d91f926a660ac0a4cde4da12ea580d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
