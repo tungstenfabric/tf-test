@@ -169,7 +169,7 @@ end
 
 def build_contrail_software
     sh("mkdir -p sandbox")
-    sh("cd sandbox && repo init -u git@github.com:Juniper/contrail-vnc-private -m mainline/ubuntu-14-04/manifest-juno.xml")
+    sh("cd sandbox && repo init -u git@github.com:tungstenfabric/tf-vnc-private -m mainline/ubuntu-14-04/manifest-juno.xml")
     sh("cd sandbox && repo sync && python third_party/fetch_packages.py&& python distro/third_party/fetch_packages.py && BUILD_ONLY=1 scons -j32 src/bgp:bgp_stress_test && BUILD_ONLY=1 tools/packaging/build/packager.py --fail-on-error")
 end
 
