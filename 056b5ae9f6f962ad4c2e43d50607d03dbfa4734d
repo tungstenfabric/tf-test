@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3003e2ed_256d2cd0",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 577
+      },
+      "writtenOn": "2020-06-18T11:20:36Z",
+      "side": 1,
+      "message": "Checks for bms3 is not done (run_dhclient).",
+      "range": {
+        "startLine": 75,
+        "startChar": 12,
+        "endLine": 76,
+        "endChar": 27
+      },
+      "revId": "056b5ae9f6f962ad4c2e43d50607d03dbfa4734d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "344907f9_0d13a6d3",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 577
+      },
+      "writtenOn": "2020-06-18T11:20:36Z",
+      "side": 1,
+      "message": "1)Giving detail about error will help in reading execution logs during failure ( print reason for assert) . 2) If we print steps , it will help in reading logs.",
+      "range": {
+        "startLine": 111,
+        "startChar": 22,
+        "endLine": 112,
+        "endChar": 54
+      },
+      "revId": "056b5ae9f6f962ad4c2e43d50607d03dbfa4734d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fcd880f5_5b379687",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 577
+      },
+      "writtenOn": "2020-06-18T11:20:36Z",
+      "side": 1,
+      "message": "Should we run dhclient to see if bms is getting IP , before cleanup?",
+      "range": {
+        "startLine": 201,
+        "startChar": 7,
+        "endLine": 201,
+        "endChar": 50
+      },
+      "revId": "056b5ae9f6f962ad4c2e43d50607d03dbfa4734d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
