@@ -3801,6 +3801,34 @@ class ContrailVncApi(object):
         self._log.debug('Deleting card %s' % kwargs)
         return self._vnc.card_delete(**kwargs)
 
+    def create_control_node_zone(self,name):
+        '''name : name of control node zone'''
+        gsc_obj = self.read_global_system_config()
+        cnz = ControlNodeZone(name=name, parent_obj=gsc_obj)
+        return self._vnc.control_node_zone_create(cnz)
+
+    def read_control_node_zone(self,**kwargs):
+        return self._vnc.control_node_zone_read(**kwargs)
+
+    def delete_control_node_zone(self,**kwargs):
+        return self._vnc.control_node_zone_delete(**kwargs)
+
+    def attach_zone_to_bgpaas(self,zone_id,zone_attr,**kwargs):
+        '''
+            zone_attr =  "primary" or "secondary"
+        '''
+        bgpaas_obj = self._vnc.bgp_as_a_service_read(**kwargs)
+        cnz_obj = self._vnc.control_node_zone_read(id=zone_id)
+        attr = BGPaaSControlNodeZoneAttributes(zone_attr)
+        bgpaas_obj.add_control_node_zone(cnz_obj, attr)
+        return self._vnc.bgp_as_a_service_update(bgpaas_obj)
+
+    def detach_zone_from_bgpaas(self,zone_id,**kwargs):
+        bgpaas_obj = self._vnc.bgp_as_a_service_read(**kwargs)
+        cnz_obj = self._vnc.control_node_zone_read(id=zone_id)
+        bgpaas_obj.del_control_node_zone(cnz_obj)
+        return self._vnc.bgp_as_a_service_update(bgpaas_obj)
+
 class LBFeatureHandles(with_metaclass(Singleton, object)):
     def __init__(self, vnc, log):
         self._vnc = vnc
