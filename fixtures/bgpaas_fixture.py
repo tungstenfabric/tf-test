@@ -17,7 +17,7 @@ class BGPaaSFixture(vnc_api_test.VncLibFixture):
         self.uuid = kwargs.get('uuid', None)
         self.asn = kwargs.get('autonomous_system') or 64512
         self.ip = kwargs.get('bgpaas_ip_address') or None
-        self.shared = kwargs.get('bgpaas_shared') or False
+        self.shared = kwargs.get('bgpaas_shared') or None 
         self.address_families = ['inet', 'inet6']
         self.local_autonomous_system = kwargs.get(
             'local_autonomous_system') or None
@@ -161,13 +161,18 @@ class BGPaaSFixture(vnc_api_test.VncLibFixture):
         return True
 
     @retry(delay=6, tries=10)
-    def verify_not_in_control_node(self, bgpaas_vm):
-        for ctrl_node in bgpaas_vm.get_control_nodes():
+    def verify_not_in_control_node(self, bgpaas_vm=None, control_nodes=None, peer_address=None):
+        result = True
+        if not control_nodes:
+            control_nodes = bgpaas_vm.get_control_nodes()
+        if not peer_address :
+            peer_address = self.ip
+        for ctrl_node in control_nodes:
             result = True
             cn_bgp_entry = self.connections.get_control_node_inspect_handle(
                 ctrl_node).get_cn_bgp_neigh_entry(encoding='BGP')
             for entry in cn_bgp_entry:
-                if entry['peer_address'] == self.ip and entry['state'] == 'Established':
+                if entry['peer_address'] == peer_address and entry['state'] == 'Established':
                     self.logger.error(
                         'BGPaaS session still seen in control-node %s' %
                         ctrl_node)
@@ -175,16 +180,44 @@ class BGPaaSFixture(vnc_api_test.VncLibFixture):
         return result
 
     @retry(delay=6, tries=10) #vSRX takes a long time to come up and start rpd
-    def verify_in_control_node(self, bgpaas_vm):
+    def verify_in_control_node(self, bgpaas_vm=None, control_nodes=None, peer_address=None):
+        if not control_nodes:
+            control_nodes = bgpaas_vm.get_control_nodes()
+        if not peer_address :
+            peer_address = self.ip
         result = False
-        for ctrl_node in  bgpaas_vm.get_control_nodes():
+        for ctrl_node in control_nodes:
             cn_bgp_entry = self.connections.get_control_node_inspect_handle(
                 ctrl_node).get_cn_bgp_neigh_entry(encoding='BGP')
             for entry in cn_bgp_entry:
-                if entry['peer_address'] == self.ip and entry['state'] == 'Established':
+                if entry['peer_address'] == peer_address and entry['state'] != 'Established':
                     self.logger.info(
                         'BGPaaS session seen in control-node %s' % ctrl_node)
                     result = True
+                    break
+        return result
+
+    @retry(delay=6,tries=10)
+    def verify_in_control_nodes(self,control_nodes=None,peer_address=None,count=2):
+        result = True
+        bgpaas_ctrl_nodes = []
+        if not peer_address:
+            peer_address = self.ip
+        if not control_nodes:
+            control_nodes = self.inputs.bgp_ips
+        for ctrl_node in control_nodes:
+            cn_bgp_entry = self.connections.get_control_node_inspect_handle(
+                ctrl_node).get_cn_bgp_neigh_entry(encoding='BGP')
+            for entry in cn_bgp_entry:
+                if entry['peer_address'] == peer_address and entry['state'] == 'Established':
+                    self.logger.info('BGPaaS session seen in control-node %s' % ctrl_node)
+                    bgpaas_ctrl_nodes.append(ctrl_node)
+                    break
+            if count == len(bgpaas_ctrl_nodes):
+                break
+        if count != len(bgpaas_ctrl_nodes):
+            self.logger.info('Not enough BGPaaS sessions seen in control-nodes %s' % control_nodes)
+            result = False
         return result
 
     def attach_vmi(self, vmi):
@@ -202,3 +235,18 @@ class BGPaaSFixture(vnc_api_test.VncLibFixture):
     def detach_shc(self, shc_id):
         result = self.vnc_h.detach_shc_from_bgpaas(self.uuid, shc_id)
         return result
+
+    def update_zones_to_bgpaas(self,pri_zone,sec_zone,**kwargs):
+        if pri_zone:
+            self.pri_zone = pri_zone
+            self.vnc_h.attach_zone_to_bgpaas(zone_id=self.pri_zone.uuid,zone_attr='primary',fq_name=self.fq_name,**kwargs)
+        if sec_zone:
+            self.sec_zone = sec_zone
+            self.vnc_h.attach_zone_to_bgpaas(zone_id=self.sec_zone.uuid,zone_attr='secondary',fq_name=self.fq_name,**kwargs)
+
+    def delete_zones_to_bgpaas(self,primary,secondary):
+        if primary :
+            self.vnc_h.detach_zone_from_bgpaas(zone_id=self.pri_zone.uuid,fq_name=self.fq_name)
+        if secondary:
+            self.vnc_h.detach_zone_from_bgpaas(zone_id=self.sec_zone.uuid,fq_name=self.fq_name)
+
