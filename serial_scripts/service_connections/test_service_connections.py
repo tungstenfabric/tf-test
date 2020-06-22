@@ -283,6 +283,66 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
     #end test_add_remove_collector_from_config_nodemgr
     
     @preposttest_wrapper
+    def test_control_convergence_on_agent_restart(self):
+        '''
+        This test case verifies that on bringing down a Controller connected
+        to contrail-vrouter-agent, it should immediately switch to new controller.
+        Steps:
+        1. Check that agent is connected to controller
+        2. Stop the agent
+        3. Check that controller is not able to detect it down in 7 secs
+        4. Bring up agent node
+        5. Change xmpp hold time to 5 secs
+        6. Stop the agent
+        7. Check that controller is able to detect it in 7 secs
+        8. Start the agent
+        '''
+        self.skip_if_setup_incompatible("agent", 1, "control", 1)
+        in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent",
+                                            "contrail-vrouter-agent",
+                                            self.inputs.compute_control_ips[0])
+        ip = self.inputs.compute_control_ips[0]
+        self.inputs.run_cmd_on_server(ip, "kill -STOP `pidof contrail-vrouter-agent`",
+                                self.inputs.host_data[ip]['username'],
+                                self.inputs.host_data[ip]['password'],
+                                pty=True, as_sudo=True)
+        hold_time = 5
+        self.sleep(hold_time + 2)
+        agent_peer = \
+            self.cn_inspect[in_use_servers[0]].get_cn_bgp_nighbor_state(\
+                            ip, 'XMPP')
+        if agent_peer != 'Established':
+            assert False, "Agent was detected gone down in %s seconds" \
+                           %hold_time
+
+        # change the xmpp hold time to 5 and bring up agent
+        self.update_xmpp_hold_time(hold_time)
+        self.inputs.restart_service("contrail-vrouter-agent", [ip],
+                                    container = "agent")
+        self.sleep(5)
+        self.skip_if_setup_incompatible("agent", 1, "control", 1)
+
+        self.inputs.run_cmd_on_server(ip, "kill -STOP `pidof contrail-vrouter-agent`",
+                                self.inputs.host_data[ip]['username'],
+                                self.inputs.host_data[ip]['password'],
+                                pty=True, as_sudo=True)
+        #self.inputs.stop_service("contrail-vrouter-agent",
+                                 #[self.inputs.compute_control_ips[0]],
+                                 #container = "agent")
+        # we can not gurantee exact timing so adding 2 secs buffer
+        self.sleep(hold_time + 2)
+        agent_peer = \
+            self.cn_inspect[in_use_servers[0]].get_cn_bgp_nighbor_state(\
+                            ip, 'XMPP')
+        if agent_peer == 'Established':
+            assert False, "Agent was not detected gone down in %s seconds" \
+                           %hold_time
+        self.disable_fast_convergence()
+        self.inputs.restart_service("contrail-vrouter-agent", [ip],
+                                    container = "agent")
+    #end test_control_convergence_on_agent_restart
+
+    @preposttest_wrapper
     def test_control_agent_connection_on_control_restart(self):
         '''
         This test case verifies that on bringing down a Controller connected
