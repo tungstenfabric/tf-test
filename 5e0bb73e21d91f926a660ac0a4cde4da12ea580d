@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3e6748ee_ae127896",
+        "filename": "tools/collect_bts.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-22T17:08:38Z",
+      "side": 1,
+      "message": "Yes. Even when tests are run with python2, these scripts can be run with python3.",
+      "parentUuid": "09fde1e1_8e20b182",
+      "range": {
+        "startLine": 47,
+        "startChar": 19,
+        "endLine": 47,
+        "endChar": 26
+      },
+      "revId": "5e0bb73e21d91f926a660ac0a4cde4da12ea580d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ba5c1184_95d8c8cf",
         "filename": "tools/db/anydbm-manage.py",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2020-06-17T15:15:04Z",
       "side": 1,
       "message": "same comment python3 hardcoding?",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 7
+      },
+      "revId": "5e0bb73e21d91f926a660ac0a4cde4da12ea580d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6d50fe7_0d35e7f3",
+        "filename": "tools/db/anydbm-manage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-22T17:08:38Z",
+      "side": 1,
+      "message": "Yes. Even when tests are run with python2, these scripts can be run with python3.",
+      "parentUuid": "ba5c1184_95d8c8cf",
       "range": {
         "startLine": 53,
         "startChar": 0,
