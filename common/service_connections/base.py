@@ -5,6 +5,7 @@ import testtools
 
 import ast
 from tcutils.contrail_status_check import ContrailStatusChecker
+from vnc_api.gen.resource_xsd import FastConvergenceParametersType
 
 class BaseServiceConnectionsTest(GenericTestBase):
 
@@ -240,6 +241,30 @@ class BaseServiceConnectionsTest(GenericTestBase):
         return server_addr_list, server_addr_status, server_port
     # end get_all_in_use_servers
     
+    def update_xmpp_hold_time(self, tout):
+        self.logger.info("UPDATE_XMPP_HOLD_TIME " + str(tout) )
+        gsc_obj = self.vnc_lib.global_system_config_read(
+            fq_name=['default-global-system-config'])
+        fc_params = gsc_obj.get_fast_convergence_parameters()
+        if not fc_params:
+            fc_params = FastConvergenceParametersType()
+        fc_params.enable = True
+        fc_params.xmpp_hold_time = tout
+        gsc_obj.set_fast_convergence_parameters(fc_params)
+        self.vnc_lib.global_system_config_update(gsc_obj)
+
+    def disable_fast_convergence(self):
+        self.logger.info("DISABLE_FAST_CONVERGENCE ")
+        gsc_obj = self.vnc_lib.global_system_config_read(
+            fq_name=['default-global-system-config'])
+        fc_params = gsc_obj.get_fast_convergence_parameters()
+        if not fc_params:
+            fc_params = FastConvergenceParametersType()
+        fc_params.enable = False
+        fc_params.xmpp_hold_time = 90
+        gsc_obj.set_fast_convergence_parameters(fc_params)
+        self.vnc_lib.global_system_config_update(gsc_obj)
+
     def add_remove_server(self, operation, server_ip, section, option,
                            client_role, client_process, container_name, index = 0):
         ''' This function add or remove an entry from list of servers 

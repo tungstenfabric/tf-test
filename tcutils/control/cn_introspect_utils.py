@@ -22,6 +22,16 @@ class ControlNodeInspect (VerificationUtilBase):
         """Joins the args with ':'"""
         return ':'.join(args)
 
+    def http_get(self, path):
+        response = None
+        while True:
+            response = self.dict_get(path)
+            if response != None:
+                break
+            print("Retry http get for %s after a second" % (path))
+            time.sleep(1)
+        return response
+
     def _get_if_map_table_entry(self, match):
         d = None
         #Changes to paging will require fetching particular element rather than entire data
@@ -144,6 +154,35 @@ class ControlNodeInspect (VerificationUtilBase):
         xpath = '/ShowRoutingInstanceResp/instances/list/ShowRoutingInstance'
         p = self.dict_get(path)
         return EtreeToDict(xpath).get_all_entry(p)
+
+    def get_cn_bgp_nighbor_state(self, ip_address, encoding=''):
+        '''Returns a list of BPG peers for the control node
+           format example: http://10.84.7.28:8083/Snh_BgpNeighborReq?domain=&ip_address=10.84.7.250
+        '''
+        path = 'Snh_BgpNeighborReq?domain=&ip_address=%s' % ip_address
+        xpath = '/BgpNeighborListResp/neighbors/list/BgpNeighborResp'
+
+        # print EtreeToDict(xpath).get_all_entry(self.http_get(path))
+
+        # Get peer info
+        tbl = self.http_get(path)
+        table_list = EtreeToDict(xpath).get_all_entry(tbl)
+
+        # Check if the peer with the propper encoding is found, if so return
+        # the state
+        return_val = 'PeerNotFound'
+        print("table of peers is %s" %table_list)
+        for index in range(len(table_list)):
+            if re.search(ip_address, table_list[index]['peer_address'], re.IGNORECASE):
+                return_val = table_list[index]['state']
+                if encoding:
+                    if re.search(encoding, table_list[index]['encoding'], re.IGNORECASE):
+                        break
+                    else:
+                        return_val = "PeerFound_ButWrongEncoding_found_%s" % table_list[
+                            index]['encoding']
+
+        return return_val
 
     def get_cn_routing_instance_list(self):
         '''Returns a list of routing instance dictionaries.
