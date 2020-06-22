@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8722b986_e4b83462",
+        "filename": "fixtures/bgpaas_fixture.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-22T23:13:48Z",
+      "side": 1,
+      "message": "It should be \u003d\u003d Established right, why was it changed to !\u003d",
+      "revId": "a2a7cc4808bb074ad8c4896c18c287d84497494a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46323583_03833074",
+        "filename": "scripts/bgpaas/test_bgpaas_zone.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-22T23:13:48Z",
+      "side": 1,
+      "message": "Move everything to serial_scripts",
+      "revId": "a2a7cc4808bb074ad8c4896c18c287d84497494a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3e441548_2819bb74",
+        "filename": "scripts/bgpaas/test_bgpaas_zone.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-22T23:13:48Z",
+      "side": 1,
+      "message": "Mark this testcase as sanity testcase",
+      "revId": "a2a7cc4808bb074ad8c4896c18c287d84497494a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
