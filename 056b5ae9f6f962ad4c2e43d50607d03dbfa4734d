@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "d102b2fc_cca5f43a",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-22T15:22:55Z",
+      "side": 1,
+      "message": "dhclient for bms3 is done as part of create_bms routine so it wasnt done explicitly.",
+      "parentUuid": "3003e2ed_256d2cd0",
+      "range": {
+        "startLine": 75,
+        "startChar": 12,
+        "endLine": 76,
+        "endChar": 27
+      },
+      "revId": "056b5ae9f6f962ad4c2e43d50607d03dbfa4734d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "344907f9_0d13a6d3",
         "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "67d4e16d_4e1e84ea",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-22T15:22:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "344907f9_0d13a6d3",
+      "range": {
+        "startLine": 111,
+        "startChar": 22,
+        "endLine": 112,
+        "endChar": 54
+      },
+      "revId": "056b5ae9f6f962ad4c2e43d50607d03dbfa4734d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fcd880f5_5b379687",
         "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2020-06-18T11:20:36Z",
       "side": 1,
       "message": "Should we run dhclient to see if bms is getting IP , before cleanup?",
+      "range": {
+        "startLine": 201,
+        "startChar": 7,
+        "endLine": 201,
+        "endChar": 50
+      },
+      "revId": "056b5ae9f6f962ad4c2e43d50607d03dbfa4734d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff697ed1_dbcc86f5",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_dhcp_relay.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-22T15:22:55Z",
+      "side": 1,
+      "message": "bms3 get ip via dhclient as part of create_bms routine",
+      "parentUuid": "fcd880f5_5b379687",
       "range": {
         "startLine": 201,
         "startChar": 7,
