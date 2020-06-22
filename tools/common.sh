@@ -41,9 +41,6 @@ function prepare {
     export TEST_CONFIG_FILE=`basename "$config_file"`
   fi
 
-  if [ ! -f "$config_file" ]; then
-    python tools/configure.py $(readlink -f .) -p $contrail_fab_path
-  fi
   ssh_key_gen
   start_ssh_agent
   source_file_ssh_agent

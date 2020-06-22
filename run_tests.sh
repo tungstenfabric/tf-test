@@ -436,20 +436,6 @@ if [ $? -eq 0 ];then
 fi
 }
 
-function stop_on_failure {
-    files='result*'
-    if [[ $failure_threshold ]];then
-        limit=$failure_threshold
-        result=`python tools/stop_on_fail.py --files ${files} --threshold ${limit}`
-        if [[ $result =~ 'Failures within limit' ]]; then
-            return 0
-        else
-            return $(echo $a | awk '{printf "%d", $3}')
-        fi
-    fi
-    return 0
-}
-
 function parse_results {
     ${PYTHON} tools/parse_result.py $result_xml $REPORT_DETAILS_FILE
     ${PYTHON} tools/parse_result.py $serial_result_xml $REPORT_DETAILS_FILE
@@ -559,14 +545,9 @@ upload_to_web_server
 sleep 2
 send_mail $TEST_CONFIG_FILE $REPORT_FILE $REPORT_DETAILS_FILE
 retval=$?
-stop_on_failure ; rv_stop_on_fail=$?
-if [[ $rv_stop_on_fail > 0 ]]; then
-    exit $rv_stop_on_fail
+# exit value more than 300 or so will revert the exit value in bash to a lower number, so checking that.
+if [ $retval -lt 101 ]; then
+    exit $((100+$retval))
 else
-    # exit value more than 300 or so will revert the exit value in bash to a lower number, so checking that.
-    if [ $retval -lt 101 ]; then
-        exit $((100+$retval))
-    else
-        exit $retval
-    fi
+    exit $retval
 fi

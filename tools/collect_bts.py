@@ -44,7 +44,7 @@ if __name__ == "__main__":
             init_obj.run_cmd_on_server(host_ip, 'rm -f %s' % (log_pattern))
 
             # Get the traceback files
-            cmd = 'python %s/%s -p %s -i %s/%s' % (dest,
+            cmd = 'python3 %s/%s -p %s -i %s/%s' % (dest,
                                                    script_file,
                                                    dest,
                                                    dest,
