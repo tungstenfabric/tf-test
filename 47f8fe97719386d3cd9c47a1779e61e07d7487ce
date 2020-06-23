@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22dfce54_b357db59",
+        "filename": "common/fabric_utils.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T18:52:48Z",
+      "side": 1,
+      "message": "This would need retry wrapper.",
+      "revId": "47f8fe97719386d3cd9c47a1779e61e07d7487ce",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5eb76ba_79dff1e0",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_gdo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T18:52:48Z",
+      "side": 1,
+      "message": "chassis is repeated twice.\nThe supported types are documented here.\nhttps://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/show_chassis_info_schema.json#L16\n\nAlso unfortunately we need to test all GDO operations and validate their output. Can you raise a ticket for Q3 or later and we shall work on it as time permits.",
+      "revId": "47f8fe97719386d3cd9c47a1779e61e07d7487ce",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9e18f7b_71a44419",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_gdo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T18:52:48Z",
+      "side": 1,
+      "message": "chassis is repeated twice",
+      "revId": "47f8fe97719386d3cd9c47a1779e61e07d7487ce",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
