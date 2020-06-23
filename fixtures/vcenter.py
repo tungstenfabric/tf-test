@@ -406,7 +406,10 @@ class VcenterOrchestrator(Orchestrator):
                 _wait_for_task(vm_obj.PowerOff())
             _wait_for_task(vm_obj.Destroy())
 
-    @retry(tries=30, delay=5)
+     #######################################
+     # Increasing The Retries 
+     #######################################
+    @retry(tries=35, delay=5)
     def wait_till_vm_is_active(self, vm_obj, **kwargs):
         vm = self._find_obj(self._dc, 'vm', {'name' : vm_obj.name})
         return vm.runtime.powerState == 'poweredOn'
