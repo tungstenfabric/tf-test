@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06c5e5ba_e603e794",
+        "filename": "common/service_connections/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "suggestion, pls feel free to ignore\n  - self.connections.vnc_lib.global_system_config_read(\n  + self.vnc_lib.global_system_config_read(",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f03e49c_0990d1fb",
+        "filename": "common/service_connections/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "same as above",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6fc731f9_d98ebdad",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "Push restart service to cleanup stack, to ensure system is restored to clean state incase of test failure\n  + self.addCleanup(self.inputs.restart_service, \"contrail-vrouter-agent\", [ip], container\u003d\"control\")",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09b20bb5_fd19253a",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "Push disable_fast_convergence to cleanup stack, same reason as above\n  + self.addCleanup(self.disable_fast_convergence)",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3cc7106_0e2d3c17",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "call to skip_if_setup_incompatible is not required",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be4ff6a3_471c29cc",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "Is the selection of control-node after agent restart, deterministic? if not, need to invoke get_all_in_use_servers to get current active control-node for that agent",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35e84ec4_d4a7174a",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "Calls to disable_fast_convergence \u0026 restart_service are not required if cleanup stack is used",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d1da37a_af223d71",
+        "filename": "tcutils/control/cn_introspect_utils.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-06-23T09:27:26Z",
+      "side": 1,
+      "message": "Reason to retry is not clear. If the service is up \u0026 running, the introspect should return data at the first request. If retry is unavoidable, pls consider using retry decorator from tcutils/util.py",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
