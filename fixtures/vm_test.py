@@ -2367,6 +2367,12 @@ class VMFixture(fixtures.Fixture):
         return vm_ip
     # end def
 
+    #######################################
+    # Some how VM takes little longer to comeup and testcases are failing due to this.
+    # Adding The retry Logic so that the script would retry few times before Asserting.
+    #######################################
+    
+    @retry(delay=6, tries=5)
     def wait_till_vm_is_up(self, refresh=False):
         if self.is_vm_up == True and not refresh:
             return True
