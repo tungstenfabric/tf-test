@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3b6a82c3_5b1a84a2",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T01:38:33Z",
+      "side": 1,
+      "message": "Can we add this as part of the existing testcases rather than adding new testcases to test this feature?\n\nFor example, we can pick one or two testcases in every feature and can validate the same.\nThis way we can reduce the runtime of the tests.",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d388f1a2_a08af690",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T01:38:33Z",
+      "side": 1,
+      "message": "now-10m may be less provided if there were 10 odd devices in the cluster and it could take more than 10minutes to both onboard and assign roles plus additional sleeps added by testcode.\n\nYou may set script start time in setUp and send the start_time as arg to _verify_log_entry and subsequently post_query, if start_time is set otherwise use now-10m.",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f5cb8d33_c372d258",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T01:38:33Z",
+      "side": 1,
+      "message": "why are we picking the second node?",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e46940e_652addb8",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T01:38:33Z",
+      "side": 1,
+      "message": "add assert before every self._verify_log_entry call",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2ab2902_be5f5391",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-23T01:38:33Z",
+      "side": 1,
+      "message": "Dont make vnc api calls inside the testcase, it would become hard to manage.\nPlease use the PhysicalDeviceFixture and define a routine there which inturn can use fixtures/contrailapi.py which has wrappers for vnc-api calls.\nRefer https://github.com/tungstenfabric/tf-test/blob/master/fixtures/physical_device_fixture.py#L322 as an example.",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
