@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d299b5db_a0fce9f2",
+        "filename": "common/service_connections/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06c5e5ba_e603e794",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2f03e49c_0990d1fb",
         "filename": "common/service_connections/base.py",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "002ea7e502561128fd252295df18945e51cfbb12",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0832320c_8c5885f6",
+        "filename": "common/service_connections/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f03e49c_0990d1fb",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "d469fb18_57d4ad34",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fc731f9_d98ebdad",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09b20bb5_fd19253a",
         "filename": "serial_scripts/service_connections/test_service_connections.py",
         "patchSetId": 1
@@ -67,6 +121,24 @@
       "revId": "002ea7e502561128fd252295df18945e51cfbb12",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68a7d18a_3b7bd7c5",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09b20bb5_fd19253a",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "565aea5f_ec28e86e",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3cc7106_0e2d3c17",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "be4ff6a3_471c29cc",
         "filename": "serial_scripts/service_connections/test_service_connections.py",
         "patchSetId": 1
@@ -101,6 +191,24 @@
       "revId": "002ea7e502561128fd252295df18945e51cfbb12",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0738d5c2_68548f58",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be4ff6a3_471c29cc",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "5601b0f4_3d7d01e4",
+        "filename": "serial_scripts/service_connections/test_service_connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35e84ec4_d4a7174a",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0d1da37a_af223d71",
         "filename": "tcutils/control/cn_introspect_utils.py",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2020-06-23T09:27:26Z",
       "side": 1,
       "message": "Reason to retry is not clear. If the service is up \u0026 running, the introspect should return data at the first request. If retry is unavoidable, pls consider using retry decorator from tcutils/util.py",
+      "revId": "002ea7e502561128fd252295df18945e51cfbb12",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abcfddd4_eab7e948",
+        "filename": "tcutils/control/cn_introspect_utils.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 213
+      },
+      "writtenOn": "2020-06-23T10:22:29Z",
+      "side": 1,
+      "message": "This is copied as it is from other file.",
+      "parentUuid": "0d1da37a_af223d71",
       "revId": "002ea7e502561128fd252295df18945e51cfbb12",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
