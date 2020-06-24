@@ -253,6 +253,7 @@ class TestNetworkPolicy(BaseK8sTest):
                        tag_obj_name='vn')
     # end intra_vn_intra_compute_tag_tier_tagat_vn
 
+    @test.attr(type=['k8s_sanity'])
     @preposttest_wrapper
     def test_intra_vn_intra_compute_tag_deployment_tagat_vn(self):
          self.run_test(vn1_name='vn1',
