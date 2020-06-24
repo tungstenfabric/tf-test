@@ -1,5 +1,6 @@
 from netaddr import *
 import re
+import time
 import vnc_api_test
 from pif_fixture import PhysicalInterfaceFixture
 from common.device_connection import ConnectionFactory
@@ -329,3 +330,48 @@ class PhysicalDeviceFixture(vnc_api_test.VncLibFixture):
                 obj.get_hardware_inventorys() or []]
         return self.hw_inventorys
 # end PhysicalDeviceFixture
+
+    def is_spine_replicator(self,prouter_ip=None):
+        found = False
+        self.netconf.clear_interfaces_statistics()
+        time.sleep(5)
+        vtep_intf_list = self.netconf.get_interfaces_vtep()
+        for intf in vtep_intf_list:
+            if int(intf['traffic-statistics']['input-packets']) > 100 and intf['vtep-info']['vtep-address'].strip() == str(prouter_ip):
+                return True
+        return found
+
+    @retry(tries=6, delay=5)
+    def validate_AR_role(self):
+        output  = self.netconf.get_assisted_replicated_role()
+        if output == []:
+            return False
+        elif output['evpn-ar-role'] ==  'AR Leaf':
+            return True
+        return False
+
+    def validate_vtep_interfaces_input_packets(self, prouter_ip=None, spines = None):
+        found = False
+        self.netconf.clear_interfaces_statistics()
+        time.sleep(5)
+        vtep_intf_list = self.netconf.get_interfaces_vtep()
+        for intf in vtep_intf_list:
+            if int(intf['traffic-statistics']['input-packets']) > 100:
+                if intf['vtep-info']['vtep-address'].strip() in spines:
+                    found = True
+                else:
+                    return False
+        return found
+
+    def validate_vtep_interfaces_output_packets(self, spines = None, leafs = None):
+        found = False
+        self.netconf.clear_interfaces_statistics()
+        time.sleep(5)
+        vtep_intf_list = self.netconf.get_interfaces_vtep()
+        for intf in vtep_intf_list:
+            if int(intf['traffic-statistics']['output-packets']) > 100:
+                if intf['vtep-info']['vtep-address'].strip() in spines or intf['vtep-info']['vtep-address'].strip() in leafs:
+                    found = True
+                else:
+                    return False
+        return found
