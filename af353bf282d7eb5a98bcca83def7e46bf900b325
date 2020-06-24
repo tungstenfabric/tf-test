@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "90f9c963_e2259942",
+        "filename": "fixtures/vm_test.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2375,
+      "author": {
+        "id": 216
+      },
+      "writtenOn": "2020-06-24T06:23:47Z",
+      "side": 1,
+      "message": "lets increase delay in wait_till_vm_active in vcenter.py\nthere we are waiting for 30 retries with 5 sec delay,\nsometime ubuntu-traffic might be taking more time",
+      "revId": "af353bf282d7eb5a98bcca83def7e46bf900b325",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
