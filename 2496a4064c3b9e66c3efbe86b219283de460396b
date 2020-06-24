@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94384e23_b7c4840a",
+        "filename": "common/bgpaas/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 605,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-24T06:13:57Z",
+      "side": 1,
+      "message": "We would break out of the loop and wont check the secondary zone right?",
+      "revId": "2496a4064c3b9e66c3efbe86b219283de460396b",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "062164ed_6aa2ccb7",
+        "filename": "common/bgpaas/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 610,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-24T06:13:57Z",
+      "side": 1,
+      "message": "Here we would be overwriting the result\u003dFalse so please change the logic here",
+      "revId": "2496a4064c3b9e66c3efbe86b219283de460396b",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d79aa658_1f5bd704",
+        "filename": "fixtures/bgpaas_fixture.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-24T06:13:57Z",
+      "side": 1,
+      "message": "Use something like this rather than result \u003d True and checking the same outside\nfor entry in cn_bgp_entry:\n...\nelse:\n    return False",
+      "revId": "2496a4064c3b9e66c3efbe86b219283de460396b",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
