@@ -52,6 +52,24 @@
       "revId": "af353bf282d7eb5a98bcca83def7e46bf900b325",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "116f91cb_fce52525",
+        "filename": "fixtures/vm_test.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2375,
+      "author": {
+        "id": 949
+      },
+      "writtenOn": "2020-06-24T09:55:31Z",
+      "side": 1,
+      "message": "Ohh .. Yes I missed that Nested call .. Ok then Let me increase the 5 more retries to wait_till_vm_is_active in vcenter.py.\n\nThanks !!",
+      "parentUuid": "e4e86dc7_586af840",
+      "revId": "af353bf282d7eb5a98bcca83def7e46bf900b325",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
