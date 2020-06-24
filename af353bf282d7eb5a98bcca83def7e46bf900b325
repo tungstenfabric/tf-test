@@ -16,6 +16,24 @@
       "revId": "af353bf282d7eb5a98bcca83def7e46bf900b325",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eeed7990_0c5e6a33",
+        "filename": "fixtures/vm_test.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2375,
+      "author": {
+        "id": 949
+      },
+      "writtenOn": "2020-06-24T08:48:36Z",
+      "side": 1,
+      "message": "This Function is only hit if it calls by \"self.orch.wait_till_vm_is_active()\" in some of Testcases \"wait_till_vm_is_up\" function is directly called and this function does not calls wait_till_vm_is_active in vcenter.py.\n\nOnly following functions Internally calls wait_till_vm_is_active in vcenter.py\n\n1: wait_till_vm_is_active\n2: reboot\n3: read\n4: verify_on_setup\n\nwait_till_vm_is_up Does not call wait_till_vm_is_active in vcenter.py thats why the retry logic does not gets applied.\n\nFor Example : Testcase \u003d\u003d\u003e test_vcenter_vm_moveout_and_backin\n\nFor VM2 it directly calls \"wait_till_vm_is_up\"\n\nassert vm1_fixture.wait_till_vm_is_up()\nassert vm1_fixture.verify_on_setup()\nassert vm2_fixture.wait_till_vm_is_up()\n\nand code for wait_till_vm_up is :\n\n    def wait_till_vm_is_up(self, refresh\u003dFalse):\n        if self.is_vm_up \u003d\u003d True and not refresh:\n            return True\n        self.logger.info(\u0027Waiting for VM %s to be up..\u0027 %(self.vm_name))\n        self.refresh \u003d refresh\n        status \u003d self.wait_till_vm_up()\n        self.refresh \u003d False\n        if not status:\n            self.logger.error(\u0027VM %s does not seem to be fully up. Check logs\u0027\n                %(self.vm_name))\n        return_status \u003d None\n        if type(status) \u003d\u003d tuple:\n            return_status \u003d status[0]\n        elif type(status) \u003d\u003d bool:\n            return_status \u003d status\n\n        # Get the console output in case of failures\n        if not return_status:\n            self.logger.debug(self.get_console_output())\n        return return_status\n\nBut I Think as suggested if we are using 30 retries in vcenter.py .. I could increase the retry from 5 to may be 30 as well..\n\nLet me know if this sound good.. then I can resolve it by increasing the retry to 30.",
+      "parentUuid": "90f9c963_e2259942",
+      "revId": "af353bf282d7eb5a98bcca83def7e46bf900b325",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
     }
   ]
 }
