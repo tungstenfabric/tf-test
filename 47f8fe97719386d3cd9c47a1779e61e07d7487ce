@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7fea09f0_31af5536",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_gdo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-25T14:30:45Z",
+      "side": 1,
+      "message": "1. AFAIK https://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/show_chassis_info_schema.json#L16 is the schema for GDO of chassis operations and i dont see the same repeated twice. If it is so then please raise a P2 to fix the same.\n\n---\n\n2. There are many more GDO opeartions \nhttps://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/check_multicast_schema.json\nhttps://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/search_ip_mac_schema.json\nhttps://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/show_config_schema.json\nhttps://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/show_interface_details_schema.json\nhttps://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/show_mac_mob_schema.json\nhttps://github.com/Juniper/contrail-controller/blob/master/src/config/fabric-ansible/ansible-playbooks/schema/show_ops_info_schema.json\nWe can address these later in a different ticket.\nIf possible, we need to check if the response is correct.",
+      "parentUuid": "a79ee15e_1a5e409b",
+      "revId": "47f8fe97719386d3cd9c47a1779e61e07d7487ce",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d9e18f7b_71a44419",
         "filename": "serial_scripts/fabric_overlay/test_fabric_gdo.py",
         "patchSetId": 2
