@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8223e594_5d2bbe86",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 510
+      },
+      "writtenOn": "2020-06-25T16:36:49Z",
+      "side": 1,
+      "message": "Yes. We thought about combining some of the tests together to reduce the run time. We will re-evaluate.",
+      "parentUuid": "3b6a82c3_5b1a84a2",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d388f1a2_a08af690",
         "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2020-06-23T01:38:33Z",
       "side": 1,
       "message": "now-10m may be less provided if there were 10 odd devices in the cluster and it could take more than 10minutes to both onboard and assign roles plus additional sleeps added by testcode.\n\nYou may set script start time in setUp and send the start_time as arg to _verify_log_entry and subsequently post_query, if start_time is set otherwise use now-10m.",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af8915ea_929b232c",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 510
+      },
+      "writtenOn": "2020-06-25T16:36:49Z",
+      "side": 1,
+      "message": "Good idea. We will do this.",
+      "parentUuid": "d388f1a2_a08af690",
       "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "f0205ac5_8fa5c74e",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 510
+      },
+      "writtenOn": "2020-06-25T16:36:49Z",
+      "side": 1,
+      "message": "This needs to be fixed. This was done because the other node was broken.",
+      "parentUuid": "f5cb8d33_c372d258",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8e46940e_652addb8",
         "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "a0057861_45a0173a",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 510
+      },
+      "writtenOn": "2020-06-25T16:36:49Z",
+      "side": 1,
+      "message": "I assume you mean *after* each _verify_log_entry call",
+      "parentUuid": "8e46940e_652addb8",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c2ab2902_be5f5391",
         "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2020-06-23T01:38:33Z",
       "side": 1,
       "message": "Dont make vnc api calls inside the testcase, it would become hard to manage.\nPlease use the PhysicalDeviceFixture and define a routine there which inturn can use fixtures/contrailapi.py which has wrappers for vnc-api calls.\nRefer https://github.com/tungstenfabric/tf-test/blob/master/fixtures/physical_device_fixture.py#L322 as an example.",
+      "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "573156ef_094f7b60",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_trans.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 510
+      },
+      "writtenOn": "2020-06-25T16:36:49Z",
+      "side": 1,
+      "message": "Will look into this",
+      "parentUuid": "c2ab2902_be5f5391",
       "revId": "b72d86fa06e883e2defa3ed22e71a67dd70e5f49",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
