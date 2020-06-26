@@ -3,7 +3,7 @@ from builtins import str
 from builtins import object
 import uuid
 import logging
-
+import json
 from tcutils.util import *
 from vnc_api.vnc_api import *
 from loadbalancer_vnc_api import *
@@ -3743,6 +3743,24 @@ class ContrailVncApi(object):
             pif_obj.del_port(port_obj)
             self._vnc.physical_interface_update(pif_obj)
         return self._vnc.port_delete(**kwargs)
+
+    def update_role_config_params(self, np_uuid, snmp_configs=None,
+            ntp_servers=None, dns_domain_name=None, dns_servers=None):
+        np_obj = self._vnc.node_profile_read(id=np_uuid)
+        role_config_id = np_obj.get_role_configs()[0]['uuid']
+        role_config_obj = self._vnc.role_config_read(id=role_config_id)
+        rc_dict = dict()
+        if snmp_configs is not None:
+            rc_dict['snmp'] = snmp_configs
+        if ntp_servers is not None:
+            rc_dict['ntp'] = {'ntp_servers': ntp_servers}
+        if dns_domain_name is not None:
+            rc_dict['domain_name'] = dns_domain_name
+        if dns_servers is not None:
+            rc_dict['name_servers'] = dns_servers
+        role_config_str = json.dumps(rc_dict)
+        role_config_obj.set_role_config_config(role_config_str)
+        self._vnc.role_config_update(role_config_obj)
 
     def create_node(self, name):
         bms_info = BaremetalServerInfo(network_interface='neutron',
