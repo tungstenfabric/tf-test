@@ -11,6 +11,10 @@ from common.contrail_fabric.base import BaseFabricTest
 from common.base import GenericTestBase
 from netaddr import IPNetwork, IPAddress
 from vnc_api.vnc_api import *
+DEFAULT_NTP_SERVERS = ["4.14.24.34"]
+DEFAULT_DNS_SERVERS = ["8.8.8.8"]
+DEFAULT_SNMP = {"communities":[{"readonly": False,
+                "name": "contrailsnmpaccess"}]}
 
 class TestSPStyleFabric(BaseFabricTest):
     enterprise_style = False
@@ -1055,6 +1059,13 @@ class TestFabricOverlay(TestSPStyleFabric):
                 vn_fixture=vn, tor_port_vlan_tag=10))
         vm1.wait_till_vm_is_up()
         self.do_ping_mesh(bms_fixtures+[vm1])
+
+    @preposttest_wrapper
+    def test_fabric_ntp_snmp_dns_basic(self):
+        self.change_role_config_params(self.leafs, DEFAULT_SNMP,
+            DEFAULT_NTP_SERVERS, 'englab.juniper.net', DEFAULT_DNS_SERVERS)
+        self.change_role_config_params([self.leafs[0]],
+            dns_domain_name='test.domain.name', dns_servers=['1.2.3.4'])
 
 class TestVxlanID(GenericTestBase):
     @preposttest_wrapper
