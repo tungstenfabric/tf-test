@@ -440,6 +440,31 @@ class FabricUtils(object):
             self.logger.warn('Query failed for table ObjectJobExecutionTable. Will retry...')
         return False
 
+    def change_role_config_params(self):
+
+        for phy_rou in self.vnc_lib.physical_routers_list()['physical-routers']:
+            node_profile_uuid = self.vnc_lib.physical_router_read(id = phy_rou['uuid']).node_profile_refs[0]['uuid']
+            role_config_uuid = self.vnc_lib.node_profile_read(id = node_profile_uuid).get_role_configs()[0]['uuid']
+            role_config_obj = self.vnc_lib.role_config_read(id = role_config_uuid)
+            role_config_str = '{"ntp":{"ntp_servers":["52.62.78.26"]},"name_servers":["15.26.36.24"],"domain_name":"contrailroledomain","snmp":{"communities":[{"readonly":false,"name":"contrailsnmpaccess"}]}}'
+            role_config_obj.set_role_config_config(role_config_str)
+            self.vnc_lib.role_config_update(role_config_obj)
+
+    @retry(delay=10, tries=10)
+    def check_role_config_params(self):
+
+        start_time='now-5m'
+        ops_h = self.connections.ops_inspects[self.inputs.collector_ips[0]]
+        table = 'ObjectJobTemplateTable'
+        query = '(Messagetype=JobLog)'
+        response = ops_h.post_query(table, start_time=start_time,end_time='now',select_fields=['MessageTS', 'Messagetype', 'ObjectLog'],where_clause=query)
+        if response:
+            for resp in response:
+                dct = str(elem2dict(etree.fromstring(resp['ObjectLog'])))
+                if "52.62.78.26" in dct and "15.26.36.24" in dct and "contrailsnmpaccess" in dct and "contrailroledomain" in dct:
+                    return True
+        return False
+
     def create_bms(self, bms_name, **kwargs):
         self.logger.info('Creating bms %s'%bms_name)
         kwargs['fabric_fixture'] = kwargs.get('fabric_fixture') or self.fabric
