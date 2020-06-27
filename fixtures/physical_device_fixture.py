@@ -88,6 +88,7 @@ class PhysicalDeviceFixture(vnc_api_test.VncLibFixture):
         self.peer_ip = obj.physical_router_dataplane_ip
         self.role = obj.physical_router_role
         self.model = obj.physical_router_product_name
+        self.version = obj.physical_router_os_version
         self.dm_managed = obj.physical_router_vnc_managed
         self.hw_inventorys = [entry['uuid'] for entry in
             obj.get_hardware_inventorys() or []]

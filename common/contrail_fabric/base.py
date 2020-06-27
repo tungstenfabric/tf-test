@@ -380,3 +380,30 @@ class BaseFabricTest(BaseNeutronTest, FabricUtils):
         prouter = self.get_associated_prouters(bms_node, [intf])[0]
         prouter.configure_interface(intf['tor_port'], gw_ip, mask)
         self.addCleanup(prouter.delete_interface, intf['tor_port'])
+
+    def get_to_be_installed_version(self, device):
+        versions = self.swift_h.get_available_versions(device.model)
+        if not versions or len(versions) < 2:
+            raise Exception("Couldnt find a available version for %s"%(
+                            device.model))
+        device.read()
+        possible_versions = list(set(versions) - set([device.version]))
+        return possible_versions[0]
+
+    def check_and_create_image_for_device(self, devices):
+        device_images = dict()
+        for device in devices:
+            version = self.get_to_be_installed_version(device)
+            img_details = self.swift_h.get_image_details(device.model, version)
+            self.addCleanup(self.swift_h.delete_image, img_details)
+            name = img_details['name']
+            public_url = img_details['public_url']
+            device_family = img_details['device_family']
+            supported_platforms = img_details['supported_platforms']
+            self.vnc_h.check_and_create_device_image(name, public_url,
+                supported_platforms=supported_platforms,
+                device_family=device_family,
+                os_version=version)
+            self.addCleanup(self.vnc_h.delete_device_image, name)
+            device_images[device] = name
+        return device_images
