@@ -12,7 +12,7 @@ class BarbicanHelper(object):
     def create_secrets(self, name, payload, payload_content_type):
         secrets = self.barbican.secrets.create()
         secrets.name = name
-        secrets.payload = payload
+        secrets.payload = payload.decode()
         secrets.payload_content_type = payload_content_type
         secrets.store()
         return secrets
