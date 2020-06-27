@@ -10,6 +10,7 @@ from storm_control_profile import StormControlProfileFixture
 from tcutils.util import retry, get_random_name
 from lxml import etree
 from tcutils.verification_util import elem2dict
+from collections import defaultdict
 import time
 
 NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
@@ -17,6 +18,45 @@ NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
 VALID_OVERLAY_ROLES = ['dc-gateway', 'crb-access', 'dci-gateway',
                        'ar-client', 'crb-gateway', 'erb-ucast-gateway',
                        'crb-mcast-gateway', 'ar-replicator','route-reflector']
+DEFAULT_UPGRADE_PARAMS = {
+    'bulk_device_upgrade_count': 4,
+    'health_check_abort': True,
+    'Juniper': {
+        'bgp': {
+            'bgp_flap_count': 15,
+            'bgp_flap_count_check': True,
+            'bgp_down_peer_count': 0,
+            'bgp_down_peer_count_check': True,
+            'bgp_peer_state_check': True
+        },
+        'alarm': { # Disabling alarm since it fails most of the time
+          'system_alarm_check': False,
+          'chassis_alarm_check': False
+        },
+        'interface': {
+          'interface_error_check': True,
+          'interface_drop_count_check': True,
+          'interface_carrier_transition_count_check': True
+        },
+        'routing_engine': {
+          'routing_engine_cpu_idle': 40,
+          'routing_engine_cpu_idle_check': True
+        },
+        'fpc': {
+          'fpc_cpu_5min_avg': 50,
+          'fpc_cpu_5min_avg_check': True,
+          'fpc_memory_heap_util': 45,
+          'fpc_memory_heap_util_check': True
+        },
+        'active_route_count_check': True,
+        'l2_total_mac_count_check': True,
+        'storm_control_flag_check': True,
+        'lacp': {
+          'lacp_down_local_check': True,
+          'lacp_down_peer_check': True
+        }
+    }
+}
 
 class FabricUtils(object):
 
@@ -473,3 +513,46 @@ class FabricUtils(object):
     def create_sc_profile(self, **kwargs):
         return self.useFixture(StormControlProfileFixture(
                                connections=self.connections, **kwargs))
+
+    def hitless_upgrade_strategy(self, device_images, fabric, advanced_params=None,
+                                 upgrade_mode='upgrade', wait_for_finish=True):
+        payload = dict()
+        payload['fabric_uuid'] = fabric.uuid
+        payload['upgrade_mode'] = upgrade_mode
+        payload['advanced_parameters'] = advanced_params or DEFAULT_UPGRADE_PARAMS
+        device_list = list()
+        images_devices_dict = defaultdict(list)
+        for device, image in device_images.items():
+            image_id = self.vnc_h.get_device_image(image).uuid
+            images_devices_dict[image_id].append(device.uuid)
+            device_list.append(device.uuid)
+        payload['image_devices'] = [{'image_uuid': image_id,
+                                     'device_list': devices}
+            for image_id, devices in images_devices_dict.items()]
+        fq_name = ['default-global-system-config', 'hitless_upgrade_strategy_template']
+        execution_id = self.vnc_h.execute_job(fq_name, payload, device_list)
+        self.logger.info('Started hitless_upgrade_strategy %s' % device_list)
+        if wait_for_finish:
+            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            if not status and upgrade_mode == 'upgrade':
+                status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            assert status, 'job %s to hitless_upgrade_strategy failed' %(execution_id)
+            return execution_id, status
+        return execution_id, None
+
+    def activate_maintenance_mode(self, device, fabric, mode=None,
+                                  advanced_params=None, wait_for_finish=True):
+        payload = dict()
+        payload['mode'] = mode
+        payload['fabric_uuid'] = fabric.uuid
+        payload['device_uuid'] = device.uuid
+        payload['advanced_parameters'] = advanced_params
+        fq_name = ['default-global-system-config', 'maintenance_mode_activate_template']
+        device_list = [device.uuid]
+        execution_id = self.vnc_h.execute_job(fq_name, payload, device_list)
+        self.logger.info('Started activate_maintenance_mode %s' % devices)
+        if wait_for_finish:
+            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            assert status, 'job %s to activate_maintenance_mode failed' %(execution_id)
+            return execution_id, status
+        return execution_id, None

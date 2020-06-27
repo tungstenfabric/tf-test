@@ -3825,6 +3825,40 @@ class ContrailVncApi(object):
         self._log.debug('Deleting card %s' % kwargs)
         return self._vnc.card_delete(**kwargs)
 
+    def get_device_image(self, name=None, **kwargs):
+        if name:
+            kwargs['fq_name'] = ['default-global-system-config', name]
+        self._log.debug('Read device image %s' % kwargs)
+        return self._vnc.device_image_read(**kwargs)
+
+    def check_and_create_device_image(self, name, *args, **kwargs):
+        try:
+            uuid = self.get_device_image(name).uuid
+        except NoIdError:
+            return self.create_device_image(name, *args, **kwargs)
+
+    def create_device_image(self, name, image_uri, vendor_name='juniper',
+                            supported_platforms=None, device_family=None,
+                            os_version=None, md5=None, sha1=None):
+        supported_platforms_obj = DevicePlatformListType(supported_platforms)
+        device_image_obj = DeviceImage(name=name,
+                        device_image_file_uri=image_uri,
+                        device_image_os_version=os_version,
+                        device_image_supported_platforms=supported_platforms_obj,
+                        device_image_device_family=device_family,
+                        device_image_vendor_name=vendor_name)
+        self._log.debug('Creating device image %s' % name)
+        return self._vnc.device_image_create(device_image_obj)
+
+    def delete_device_image(self, name=None, **kwargs):
+        self._log.debug('Deleting device image %s' % kwargs)
+        if name:
+            kwargs['fq_name'] = ['default-global-system-config', name]
+        try:
+            return self._vnc.device_image_delete(**kwargs)
+        except NoIdError:
+            pass
+
 class LBFeatureHandles(with_metaclass(Singleton, object)):
     def __init__(self, vnc, log):
         self._vnc = vnc
