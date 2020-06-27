@@ -764,10 +764,12 @@ class GenericTestBase(test_v1.BaseTestCase_v1, _GenericTestBaseMethods):
         ping_h.start()
         return ping_h
 
-    def stop_ping(self, ping_h, expectation=True):
+    def stop_ping(self, ping_h, expectation=True, partial=False):
         (stats, ping_log) = ping_h.stop()
         self.logger.debug('Ping log : %s' % (ping_log))
-        if expectation:
+        if partial:
+            assert int(stats['loss']) >= 10, ('Expect atleast 10% packet loss')
+        elif expectation:
             assert int(stats['loss']) != 100, ('Pings failed to VM')
         else:
             assert int(stats['loss']) == 100, ('Ping should have failed to VM')
@@ -786,9 +788,11 @@ class GenericTestBase(test_v1.BaseTestCase_v1, _GenericTestBaseMethods):
                                  **kwargs)
         return traffic_obj
 
-    def stop_traffic(self, traffic_obj, expectation=True, unidirection=False):
+    def stop_traffic(self, traffic_obj, expectation=True,
+                     unidirection=False, partial=False):
         if isinstance(traffic_obj, Ping):
-            return self.stop_ping(traffic_obj, expectation=expectation)
+            return self.stop_ping(traffic_obj, expectation=expectation,
+                                  partial=partial)
         sent, recv, server_sent, server_recv = traffic_obj.stop()
         if sent is None:
             return False
@@ -797,13 +801,17 @@ class GenericTestBase(test_v1.BaseTestCase_v1, _GenericTestBaseMethods):
         msg = "transferred between %s and %s, proto %s sport %s and dport %s"%(
                traffic_obj.src_ip, traffic_obj.dst_ip, traffic_obj.proto,
                traffic_obj.sport, traffic_obj.dport)
-        if not expectation:
-            assert sent or traffic_obj.proto == 'tcp', "Packets not %s"%msg
-            assert recv == 0, "Packets %s"%msg
-        else:
+        if partial:
+            assert sent and recv, "Packets not %s"%msg
+            if recv*100/float(sent) > 98:
+                assert False, "No drops observed in packets %s"%msg
+        elif expectation:
             assert sent and recv, "Packets not %s"%msg
             if recv*100/float(sent) < 90:
                 assert False, "Packets not %s"%msg
+        else:
+            assert sent or traffic_obj.proto == 'tcp', "Packets not %s"%msg
+            assert recv == 0, "Packets %s"%msg
         return True
 
     def verify_traffic(self, src_vm_fixture, dst_vm_fixture, proto, sport=0,
