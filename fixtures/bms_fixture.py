@@ -568,6 +568,7 @@ class BMSFixture(fixtures.Fixture):
             self.logger.debug("Configuring static ip as requested")
             self.assign_static_ip(v4_ip=self.bms_ip, v4_gw_ip=self.bms_gw_ip,
                                   v6_ip=self.bms_ip6, v6_gw_ip=self.bms_gw_ip6)
+            time.sleep(30) # Adding 30s sleep for the access config to be pushed
             return (True, None)
         self.run('pkill -9 dhclient')
         if self.bms_ip or self.external_dhcp_server:
