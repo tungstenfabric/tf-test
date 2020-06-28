@@ -172,6 +172,39 @@ class FabricUtils(object):
             self.logger.info('Job %s got aborted as expected'%execution_id)
         time.sleep(30)
 
+    #routine to fetch the gdo info from the nodes
+    def get_chassis_gdo_info(self, fabric_dict, wait_for_finish=True,
+                                cleanup=False,
+                                gdo_type="chassis hardware"):
+        fq_name = ['default-global-system-config',
+                   'show_chassis_info_template']
+        payload = {'chassis_detail': gdo_type
+                   }
+        self.logger.info('Fetching info from the fabric nodes')
+        execution_id = self.vnc_h.execute_job(fq_name, payload)
+        status = self.check_gdo_details(gdo_type)
+        assert status, 'Mismatch between the fabric info and the details fetched from the nodes'
+
+    @retry(delay=10, tries=10)
+    #confirm that the gdo info matches the expected result
+    def check_gdo_details(self, gdo_type):
+        #todo: skiranh . Check if the response is correct instead of the below routine
+        start_time='now-5m'
+        ops_h = self.connections.ops_inspects[self.inputs.collector_ips[0]]
+        table = 'ObjectJobExecutionTable'
+        query = '(Messagetype=JobLog)'
+        response = ops_h.post_query(table, start_time=start_time,end_time='now',select_fields=['MessageTS', 'Messagetype', 'ObjectLog'],where_clause=query)
+        gdo_occurence = 0
+        if response:
+            for resp in response:
+                dct = elem2dict(etree.fromstring(resp['ObjectLog']))
+                if "Imported system info for juniper device" in dct:
+                    gdo_occurence = gdo_occurence + 1
+        if gdo_occurence != len(self.fabric.devices):
+            return True
+        else:
+            return False
+
     def cleanup_fabric(self, fabric, devices=None, interfaces=None,
                        verify=True, wait_for_finish=True, retry=True):
         fq_name = ['default-global-system-config', 'fabric_deletion_template']
