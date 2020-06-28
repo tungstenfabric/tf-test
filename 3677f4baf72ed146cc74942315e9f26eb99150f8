@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e91e7e0e_70f8d18c",
+        "filename": "common/fabric_utils.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-28T02:40:36Z",
+      "side": 1,
+      "message": "Can you define these hardcoded IPAddresses, domain name and snmp params at the top of the file and refer the same here and at verify routine?\n\nAlso would recommend to create a dict for role_config_str and then convert the same to str via json.dump or str()(if str take care of python3)",
+      "revId": "3677f4baf72ed146cc74942315e9f26eb99150f8",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e8034d43_f6e79788",
+        "filename": "common/fabric_utils.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-28T02:40:36Z",
+      "side": 1,
+      "message": "We also need to validate the config pushed to the device. May be raise another ticket to enhance the routine to validate the config pushed to the device and we shall take care of it in Q3.",
+      "revId": "3677f4baf72ed146cc74942315e9f26eb99150f8",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c63f74b_85572f06",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_ntp_snmp_dns.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-28T02:40:36Z",
+      "side": 1,
+      "message": "Can we move this testcase as part of test_fabric_intravn.py\nJust to save time with creating a new fabric to test this functionality.\n\nAlso add another step in the testcase to update the created values, especially SNMP.",
+      "revId": "3677f4baf72ed146cc74942315e9f26eb99150f8",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
