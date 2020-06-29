@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c1dbc985_6b6d29c4",
+        "filename": "serial_scripts/bgpvpn/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-29T16:44:38Z",
+      "side": 1,
+      "message": "Is this reqd?",
+      "revId": "d2fe0a3c98b1bab373ad1538a30acee1e5e1e4c4",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e38e5cf6_310dc9c8",
+        "filename": "serial_scripts/bgpvpn/test_bgpvpn.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-29T16:44:38Z",
+      "side": 1,
+      "message": "Do we need to do these for every testcase or can we do it as part of setUpClass?",
+      "revId": "d2fe0a3c98b1bab373ad1538a30acee1e5e1e4c4",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1348fbd8_ca5ca945",
+        "filename": "serial_scripts/bgpvpn/test_bgpvpn.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-29T16:44:38Z",
+      "side": 1,
+      "message": "Since we didnt add the RT to BGPVPN, the RT shouldnt be in control-node right?",
+      "revId": "d2fe0a3c98b1bab373ad1538a30acee1e5e1e4c4",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "51d05a3b_61653d7d",
+        "filename": "serial_scripts/bgpvpn/test_bgpvpn.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-29T16:44:38Z",
+      "side": 1,
+      "message": "Shouldnt the RT be associated here?",
+      "revId": "d2fe0a3c98b1bab373ad1538a30acee1e5e1e4c4",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9865156_91895309",
+        "filename": "serial_scripts/bgpvpn/test_bgpvpn.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-29T16:44:38Z",
+      "side": 1,
+      "message": "Can you please add a success validation after the above line.\nassert self.ping_from_mx(mx_params[\u0027mgmt_ip\u0027], [ping_cmd])",
+      "revId": "d2fe0a3c98b1bab373ad1538a30acee1e5e1e4c4",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
