@@ -4,15 +4,10 @@ declare -a pids
 trap resume_pids 10 1 2 3 6
 source tools/common.sh
 
-PYTHON=/usr/bin/python
-TESTR=/usr/bin/testr
-SUBUNIT2JUNIT=/usr/bin/subunit2junitxml
-if [ ${PYTHON3} -eq 1 ]; then
-    PYTHON=/usr/bin/python3
-    TESTR=/usr/local/bin/testr
-    SUBUNIT2JUNIT=/usr/local/bin/subunit2junitxml
-    rm -rf .testrepository
-fi
+PYTHON=/usr/bin/python3
+TESTR=/usr/local/bin/testr
+SUBUNIT2JUNIT=/usr/local/bin/subunit2junitxml
+rm -rf .testrepository
 export PYTHON=${PYTHON}
 
 function wait_till_process_state
@@ -365,14 +360,12 @@ function apply_patches {
 }
 
 function apply_subunitfilters_patch { 
-    if [[ ${PYTHON3} ]]; then
-        patch_path=$PWD/tools/patches
-        filepath=/usr/local/lib/python3.6/site-packages/subunit
-        (patch -p0 -N --dry-run --silent $filepath/filters.py < $patch_path/subunit-filters.patch 2>/dev/null)
-        if [ $? -eq 0 ]; then
-            echo 'Applied subunit-filter patch for python3'
-            (patch -p0 -N $filepath/filters.py < $patch_path/subunit-filters.patch)
-        fi
+    patch_path=$PWD/tools/patches
+    filepath=/usr/local/lib/python3.6/site-packages/subunit
+    (patch -p0 -N --dry-run --silent $filepath/filters.py < $patch_path/subunit-filters.patch 2>/dev/null)
+    if [ $? -eq 0 ]; then
+        echo 'Applied subunit-filter patch for python3'
+        (patch -p0 -N $filepath/filters.py < $patch_path/subunit-filters.patch)
     fi
 }
 
@@ -401,13 +394,11 @@ function apply_junitxml_patch {
         (cd $filepath; patch -p0 -N < $patch_path/junitxml.patch)
     fi
 
-    if [[ ${PYTHON3} ]]; then
-        filepath=/usr/local/lib/python3.6/site-packages/junitxml
-        (patch -d $filepath -p0 -N --dry-run --silent < $patch_path/junitxml.patch 2>/dev/null)
-        if [ $? -eq 0 ]; then
-            echo 'Applied patch for python3'
-            (cd $filepath; patch -p0 -N < $patch_path/junitxml.patch)
-        fi
+    filepath=/usr/local/lib/python3.6/site-packages/junitxml
+    (patch -d $filepath -p0 -N --dry-run --silent < $patch_path/junitxml.patch 2>/dev/null)
+    if [ $? -eq 0 ]; then
+        echo 'Applied patch for python3'
+        (cd $filepath; patch -p0 -N < $patch_path/junitxml.patch)
     fi
 }
 
