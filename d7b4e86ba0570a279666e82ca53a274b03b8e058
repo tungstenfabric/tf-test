@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5d8a154a_0555ab49",
+        "filename": "fixtures/bgpaas_fixture.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-30T01:56:59Z",
+      "side": 1,
+      "message": "dont return True, rather do break and have else condition for \u0027for loop\u0027 and return False there.",
+      "revId": "d7b4e86ba0570a279666e82ca53a274b03b8e058",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
