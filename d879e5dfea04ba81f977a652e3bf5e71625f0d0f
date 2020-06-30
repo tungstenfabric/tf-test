@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "53e9b075_f70c4429",
+        "filename": "serial_scripts/fabric_underlay/test_hitless_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 113
+      },
+      "writtenOn": "2020-06-30T05:23:48Z",
+      "side": 1,
+      "message": "You don\u0027t want this test to be executed ?",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 36
+      },
+      "revId": "d879e5dfea04ba81f977a652e3bf5e71625f0d0f",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
