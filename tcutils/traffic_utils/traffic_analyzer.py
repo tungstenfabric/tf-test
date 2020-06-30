@@ -262,18 +262,14 @@ class TrafficAnalyzer(object):
                 if isinstance(mpls_exp,int):
                     try:
                         if self.encap_type == "MPLSoUDP" or not self.encap_type:
-                            actual_mpls_exp = int((ether.ip.data.data)\
-                                                  .encode("hex")[5:6], 16) >> 1
+                            actual_mpls_exp = int(ether.ip.data.data.hex()[5:6],16) >> 1
                         elif self.encap_type == "MPLSoGRE":
-                            actual_mpls_exp = int(ether.ip.data.\
-                                                  encode("hex")[13:14],16) >> 1
+                            actual_mpls_exp = int(ether.ip.gre.data.hex()[5]) >> 1
                         elif self.encap_type == "MPLS_any":
                             try:
-                                actual_mpls_exp = int((ether.ip.data.data)\
-                                                  .encode("hex")[5:6], 16) >> 1
+                                actual_mpls_exp = int(ether.ip.data.data.hex()[5:6], 16) >> 1
                             except:
-                                actual_mpls_exp = int(ether.ip.data.\
-                                                   encode("hex")[13:14],16) >> 1
+                                actual_mpls_exp = int(ether.ip.data.hex()[13:14],16) >> 1
                         elif self.encap_type == "VxLAN":
                             self.logger.error("VxLAN encapslation does "
                                               "not have exp")
@@ -295,25 +291,26 @@ class TrafficAnalyzer(object):
                 else:
                     self.logger.error("Mpls exp to be compared not mentioned")
                     return False
+        f.close()
         self.logger.info('Packet QoS marking validation passed')
         return True
     # end verify_packets
 
     def verify_encap_type(self, expected_encap, file_name):
-        f = open(file_name, 'r')
+        f = open(file_name, 'rb')
         pcap = dpkt.pcap.Reader(f)
         for ts,buff in pcap:
             ether = dpkt.ethernet.Ethernet(buff)
             try:
-                if ether.ip.data.encode("hex")[0:8] == '00008847':
+                if hex(ether.ip.data.p) == '0x8847':
                     actual_encap = 'MPLSoGRE'
                     break
             except AttributeError as e:
                 self.logger.debug(e)
                 self.logger.debug("Packet different from GRE encap")  
-            if ether.ip.data.data.encode("hex")[0:8] == '08000000':
+            if ether.ip.data.data.hex()[0:8] == '08000000':
                 actual_encap = 'VxLAN'
-            elif ether.ip.data.data.encode("hex")[0:8] != '08000000'\
+            elif ether.ip.data.data.hex()[0:8] != '08000000'\
                 and ether.ip.data.sport:
                 actual_encap = 'MPLSoUDP'
             else:
@@ -321,6 +318,7 @@ class TrafficAnalyzer(object):
                 self.logger.error("Unable to find the encapsulation type")
                 return False
             break
+        f.close()
         if actual_encap == expected_encap:
             self.logger.debug("Encapsulation same as expected")
             return True
