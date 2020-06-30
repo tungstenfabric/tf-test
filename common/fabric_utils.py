@@ -116,7 +116,8 @@ class FabricUtils(object):
             self.addCleanup(self.cleanup_fabric, fabric, devices, interfaces)
         if wait_for_finish:
             try:
-                status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+                status = self.wait_for_job_to_finish(':'.join(fq_name),
+                    execution_id)[0]
             except AssertionError:
                 self.cleanup_fabric(fabric, verify=False)
                 raise
@@ -172,7 +173,8 @@ class FabricUtils(object):
             self.addCleanup(self.cleanup_fabric, fabric, devices, interfaces)
         if wait_for_finish:
             try:
-                status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+                status = self.wait_for_job_to_finish(':'.join(fq_name),
+                    execution_id)[0]
                 assert status, 'job %s to create fabric failed'%execution_id
             except AssertionError:
                 self.cleanup_fabric(fabric, verify=False)
@@ -206,7 +208,8 @@ class FabricUtils(object):
                        'role_assignment_template']
         self.vnc_h.abort_job(job_execution_ids=execution_id, abort_mode=abort_mode)
         try:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             assert not status, 'job %s didnt get aborted'%execution_id
         except AssertionError:
             self.logger.info('Job %s got aborted as expected'%execution_id)
@@ -252,7 +255,8 @@ class FabricUtils(object):
         execution_id = self.vnc_h.execute_job(fq_name, payload)
         self.logger.info('Started cleanup of fabric %s'%(fabric.name))
         if wait_for_finish:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             if retry and not status:
                 self.cleanup_fabric(fabric, verify=False, retry=False)
             assert status, 'job %s to cleanup fabric failed'%execution_id
@@ -276,7 +280,8 @@ class FabricUtils(object):
                          fabric.name))
         self.addCleanup(self.cleanup_discover, fabric, devices)
         if wait_for_finish:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             assert status, 'job %s to discover devices failed'%execution_id
             for device in fabric.fetch_associated_devices() or []:
                 device_fixture = PhysicalDeviceFixture(connections=self.connections,
@@ -300,7 +305,8 @@ class FabricUtils(object):
 
         execution_id = self.vnc_h.execute_job(fq_name, payload)
         if wait_for_finish:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             self.logger.info('cleanup discover status after wait_for_job_to_finish : %s' % status)
             assert status, 'job %s to delete devices %s failed'%(
                    execution_id, device_list)
@@ -326,7 +332,8 @@ class FabricUtils(object):
         execution_id = self.vnc_h.execute_job(fq_name, payload, device_list)
         self.logger.info('Started onboarding devices %s'%devices)
         if wait_for_finish:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             assert status, 'job %s to onboard devices failed'%execution_id
             for device in devices:
                 for port in device.get_physical_ports():
@@ -360,7 +367,8 @@ class FabricUtils(object):
         execution_id = self.vnc_h.execute_job(fq_name, payload, device_list)
         self.logger.info('Started configuring devices %s'%devices)
         if wait_for_finish:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             assert status, 'job %s to configure underlay failed'%execution_id
             return execution_id, status
         return execution_id, None
@@ -372,7 +380,8 @@ class FabricUtils(object):
         execution_id = self.vnc_h.execute_job(fq_name, payload, device_list)
         self.logger.info('Fetching hardware inventory for devices %s'%devices)
         if wait_for_finish:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             assert status, 'job %s to fetch hw inventory failed'%execution_id
             return execution_id, status
         return execution_id, None
@@ -479,7 +488,8 @@ class FabricUtils(object):
         execution_id = self.vnc_h.execute_job(fq_name, payload)
         self.logger.info('Started assigning roles for %s'%devices)
         if wait_for_finish:
-            status = self.wait_for_job_to_finish(':'.join(fq_name), execution_id)
+            status = self.wait_for_job_to_finish(':'.join(fq_name),
+                execution_id)[0]
             assert status, 'job %s to assign roles failed'%execution_id
             #ToDo: Adding sleep since assign roles triggers internal playbook
             #which we are not able to track till completion
@@ -504,14 +514,51 @@ class FabricUtils(object):
                     log['execution_id'] == execution_id:
                     if log['status'].upper() == 'SUCCESS':
                         self.logger.debug('job %s with exec id %s finished'%(job_name, execution_id))
-                        return True
+                        return (True, log)
                     elif log['status'].upper() == 'FAILURE':
                         assert False, 'job %s with exec id %s failed'%(job_name, execution_id)
             else:
                 self.logger.warn('job %s with exec id %s hasnt completed'%(job_name, execution_id))
         else:
             self.logger.warn('Query failed for table ObjectJobExecutionTable. Will retry...')
-        return False
+        return (False, None)
+
+    def change_role_config_params(self, prouters, snmp_configs=None,
+             ntp_servers=None, dns_domain_name='juniper.net', dns_servers=None):
+        for prouter in prouters:
+            np_uuid = prouter.node_profile
+            self.vnc_h.update_role_config_params(np_uuid,
+                snmp_configs=snmp_configs,
+                ntp_servers=ntp_servers,
+                dns_domain_name=dns_domain_name,
+                dns_servers=dns_servers)
+        time.sleep(30)
+        assert self.check_role_config_params(prouters, ntp_servers,
+                                             dns_domain_name,
+                                             dns_servers, snmp_configs)
+
+    @retry(delay=5, tries=10)
+    def check_role_config_params(self, devices, ntp_servers=None,
+            dns_domain_name=None, dns_servers=None, snmp_configs=None):
+        payload = {"config_type": "current", "config_filter": "all",
+                   "compare_configurations": False}
+        fq_name = ['default-global-system-config', 'show_config_template']
+        device_list = [device.uuid for device in devices]
+        execution_id = self.vnc_h.execute_job(fq_name, payload, device_list)
+        status, dct = self.wait_for_job_to_finish(':'.join(fq_name),
+                                                  execution_id)
+        if not status:
+            return False
+        log = str(dct)
+        if (ntp_servers and ntp_servers[0] not in log):
+            return False
+        if dns_servers and dns_servers[0] not in log:
+            return False
+        if dns_domain_name and dns_domain_name not in log:
+            return False
+        if snmp_configs and snmp_configs["communities"][0]["name"] not in log:
+            return False
+        return True
 
     def create_bms(self, bms_name, **kwargs):
         self.logger.info('Creating bms %s'%bms_name)
