@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c50caa78_9b78b473",
+        "filename": "fixtures/physical_device_fixture.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-30T19:36:52Z",
+      "side": 1,
+      "message": "Just so you know, you can return True right away. Dont have to iterate thru all the VTEPs.",
+      "revId": "1ea2481e8f3d988ee5223e4f96d3467e2bb27375",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2de5b7bb_390e1163",
+        "filename": "fixtures/physical_device_fixture.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-30T19:36:52Z",
+      "side": 1,
+      "message": "Add retry like @retry(tries\u003d12, delay\u003d5)",
+      "revId": "1ea2481e8f3d988ee5223e4f96d3467e2bb27375",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dcb54906_36b7ec9d",
+        "filename": "fixtures/physical_device_fixture.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-30T19:36:52Z",
+      "side": 1,
+      "message": "if output is None or {} return False",
+      "revId": "1ea2481e8f3d988ee5223e4f96d3467e2bb27375",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ad3776c_8f861c48",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_ar.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-06-30T19:36:52Z",
+      "side": 1,
+      "message": "Before stop_broadcast_traffic please add a tcpdump validation here on the destination BMS host",
+      "revId": "1ea2481e8f3d988ee5223e4f96d3467e2bb27375",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
