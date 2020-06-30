@@ -46,9 +46,7 @@ def send_mail(config_file, file_to_send, report_details):
     fp = open(file_to_send, 'rb')
     val = fp.read()
     fp.close()
-    if sys.version_info[0] == 3:
-        val = val.decode()
-    msg = MIMEText(val, 'html')
+    msg = MIMEText(val.decode(), 'html')
 
     msg['Subject'] = '[Build %s] ' % (
          distro_sku) + logScenario + ' Report'
