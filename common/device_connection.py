@@ -194,7 +194,17 @@ class NetconfConnection(AbstractConnection):
             ip_address, self.host)) 
         return None
     # end get_mac_in_arp_table 
-        
+
+    def get_assisted_replicated_role(self):
+        output = self.handle.rpc.get_evpn_multicast_snooping_ar_replicators_data()
+        return EtreeToDict('evpn-multicast-snooping-ar-replicators-per-instance').get_all_entry(output)
+
+    def get_interfaces_vtep(self):
+        output = self.handle.rpc.get_interface_information(interface_name='vtep')
+        return EtreeToDict('physical-interface/logical-interface').get_all_entry(output)
+
+    def clear_interfaces_statistics(self):
+        return self.handle.rpc.clear_interfaces_statistics_all() 
 
 # end NetconfConnection
 
