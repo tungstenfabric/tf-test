@@ -5,7 +5,6 @@ from floating_ip import FloatingIPFixture
 from tcutils.wrappers import preposttest_wrapper
 import test
 from tcutils.util import skip_because
-import time
 
 class TestIngressClusterIp(BaseK8sTest):
 
@@ -54,14 +53,14 @@ class TestIngressClusterIp(BaseK8sTest):
                                                connections=self.connections,
                                                inputs=self.inputs,
                                                option="contrail"))
+            assert vn_fixture.verify_on_setup()
             fip_pool_fixture = self.useFixture(FloatingIPFixture(
                                             project_name=self.inputs.project_name,
                                             inputs=self.inputs,
                                             connections=self.connections,
                                             pool_name='__fip_pool_public__',
                                             vn_id=vn_fixture.vn_id))
-            # Wait for setup virtual network for k8s 1.14
-            time.sleep(10)
+            assert fip_pool_fixture.verify_on_setup()
 
         ingress = self.setup_simple_nginx_ingress(service.name,
                                                   namespace=namespace.name)
