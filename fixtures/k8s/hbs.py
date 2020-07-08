@@ -218,7 +218,7 @@ class HbsFixture(fixtures.Fixture):
               "--docker-username=%s --docker-password=%s" \
               " -n%s" %(pullsecret , docker_username ,docker_password, self.namespace)
 
-        secretoutput = self.inputs.run_cmd_on_server(self.inputs.cfgm_ip, cmd, self.username, self.password,
+        secretoutput = self.inputs.run_cmd_on_server(self.inputs.k8s_master_ip, cmd, self.username, self.password,
                                                    as_sudo=True)
         getsecret = "kubectl get secret -n %s" %self.namespace
         secretkey = self.inputs.run_cmd_on_server(self.inputs.k8s_master_ip,\

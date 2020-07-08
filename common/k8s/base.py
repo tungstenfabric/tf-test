@@ -1261,7 +1261,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         cmd = "kubectl create secret docker-registry %s " \
               "--docker-server=hub.juniper.net/security " \
               "--docker-username=%s --docker-password=%s" %(pullsecret , docker_username ,docker_password)
-        secretoutput = self.inputs.run_cmd_on_server(self.inputs.cfgm_ip, cmd, username, password,
+        secretoutput = self.inputs.run_cmd_on_server(self.inputs.k8s_master_ip, cmd, username, password,
                                                    as_sudo=True)
         getsecret = "kubectl get secret"
         secretkey = self.inputs.run_cmd_on_server(self.inputs.k8s_master_ip,\
