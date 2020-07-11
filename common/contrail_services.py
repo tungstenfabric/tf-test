@@ -90,6 +90,51 @@ _CONTRAIL_SERVICES_CONTAINER_MAP = {
     'strongswan':  ['strongswan_strongswan']
 }
 
+# Container names for Helm deployer
+_CONTRAIL_SERVICES_HELM_CONTAINER_MAP = {
+    'api-server': ['contrail-config-api'],
+    'schema': ['contrail-schema-transformer'],
+    'svc-monitor': ['contrail-svcmonitor'],
+    'device-manager': ['contrail-devicemgr'],
+    'control': ['control_contrail-control'],
+    'dns': ['contrail-dns'],
+    'named': ['contrail-named'],
+    'analytics-api': ['contrail-analytics-api'],
+    'query-engine': ['contrail-query-engine'],
+    'collector': ['contrail-collector'],
+    'snmp-collector': ['contrail-snmp-collector'],
+    'snmp-topology': ['contrail-topology'],
+    'alarmgen': ['contrail-alarm-gen'],
+    'agent-dpdk': ['agent-dpdk'],
+    'agent': ['k8s_contrail-vrouter-agent'],
+    'webui': ['contrail-webui_contrail-webui'],
+    'webui-middleware': ['contrail-webui-middleware'],
+    'config-rabbitmq': ['k8s_rabbitmq_contrail-rabbitmq'],
+    'config-zookeeper': ['zookeeper_contrail-config-zookeeper'],
+    'config-cassandra': ['contrail-configdb_contrail-configdb'],
+    'analytics-cassandra': ['contrail-analyticsdb_contrail-analyticsdb'],
+    'nova': ['osapi_nova-api-osapi'],
+    'nova-compute': ['nova-compute_nova-compute'],
+    'nova-conductor': ['nova-conductor_nova-conductor'],
+    'nova-scheduler': ['nova-scheduler_nova-scheduler'],
+    'glance': ['glance_api', 'glance-api_glance-api'],
+    'rabbitmq': ['rabbitmq'],
+    'haproxy': ['haproxy'],
+    'keystone': ['keystone-api'],
+    'neutron': ['neutron-server'],
+    'mysql': ['mariadb'],
+    'redis': ['contrail-redis'],
+    'stunnel': ['stunnel'],
+    'vrouter-nodemgr': ['vrouter-nodemgr'],
+    'config-nodemgr': ['config-nodemgr'],
+    'analytics-nodemgr': ['analytics-nodemgr'],
+    'control-nodemgr': ['control-nodemgr'],
+    'analyticsdb-nodemgr': ['analyticsdb-nodemgr'],
+    'contrail-kube-manager': ['contrail-kube-manager', 'kubemanager'],
+    'kube-apiserver':  ['kube-apiserver'],
+    'strongswan':  ['strongswan_strongswan']
+}
+
 # Separate container names for JuJu deployer
 _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP = {
     # Vrouter
@@ -256,5 +301,7 @@ def get_contrail_services_map(inputs):
         return _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP
     elif inputs.deployer == 'rhosp':
         return _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP
+    elif inputs.deployer == 'helm':
+        return _CONTRAIL_SERVICES_HELM_CONTAINER_MAP
     else:
         return _CONTRAIL_SERVICES_CONTAINER_MAP
