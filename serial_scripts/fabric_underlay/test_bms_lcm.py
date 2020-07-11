@@ -304,6 +304,7 @@ class TestBmsLcm(BaseFabricTest):
 
 class TestBmsLcmSPStyle(TestBmsLcm):
     enterprise_style=False
+    @test.attr(type=['lcm_sanity'])
     @preposttest_wrapper
     def test_bms_all_parallel(self):
         '''
@@ -316,7 +317,8 @@ class TestBmsLcmSPStyle(TestBmsLcm):
         bms_nodes_filtered = self.bms_node_add_delete("all")
         time.sleep(60)
         self.bms_vm_add_delete(bms_count=3,bms_nodes_filtered=bms_nodes_filtered)
-
+    
+    @test.attr(type=['lcm_sanity'])
     @preposttest_wrapper
     def test_bms_all_serial(self):
         '''
@@ -331,7 +333,9 @@ class TestBmsLcmSPStyle(TestBmsLcm):
         self.skip_test_bms_single_interface(skip_delete)
         self.skip_test_bms_multi_homing(skip_delete)
         self.skip_test_bms_lag(skip_delete)
-
+ 
+    @test.attr(type=['lcm_sanity'])
+    @preposttest_wrapper
     def test_bms_serial_one_instance(self):
         self.vm_fixture = None
         self.vn_fixture = None
@@ -343,6 +347,7 @@ class TestBmsLcmSPStyle(TestBmsLcm):
 
 class TestBmsLcmEPStyle(TestBmsLcm):
     enterprise_style=True
+    @test.attr(type=['lcm_sanity'])
     @preposttest_wrapper
     def test_bms_all_parallel(self):
         '''
@@ -356,6 +361,7 @@ class TestBmsLcmEPStyle(TestBmsLcm):
         time.sleep(60)
         self.bms_vm_add_delete(bms_count=3,bms_nodes_filtered=bms_nodes_filtered)
 
+    @test.attr(type=['lcm_sanity'])
     @preposttest_wrapper
     def test_bms_all_serial(self):
         '''
@@ -371,6 +377,8 @@ class TestBmsLcmEPStyle(TestBmsLcm):
         self.skip_test_bms_multi_homing(skip_delete)
         self.skip_test_bms_lag(skip_delete)
 
+    @test.attr(type=['lcm_sanity'])
+    @preposttest_wrapper
     def test_bms_serial_one_instance(self):
         self.vm_fixture = None
         self.vn_fixture = None
