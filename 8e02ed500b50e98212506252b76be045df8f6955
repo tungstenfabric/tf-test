@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "08bfe150_198bfcac",
+        "filename": "docker/base/entrypoint.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-07-12T01:44:30Z",
+      "side": 1,
+      "message": "where is this test variable defined?",
+      "revId": "8e02ed500b50e98212506252b76be045df8f6955",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
