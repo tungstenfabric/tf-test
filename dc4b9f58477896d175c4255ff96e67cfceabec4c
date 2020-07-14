@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "826c2c11_efb00fca",
+        "filename": "scripts/ecmp/test_ecmp_subInt.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-07-14T22:29:31Z",
+      "side": 1,
+      "message": "has to be validate()",
+      "revId": "dc4b9f58477896d175c4255ff96e67cfceabec4c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "62b55a21_1b743073",
+        "filename": "scripts/lbaasv2/test_lbaasv2.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-07-14T22:29:31Z",
+      "side": 1,
+      "message": "Shouldnt we be checking the old lb method before modifying?\nbelieve we need to call before update_lbaas_pool\n        assert self.verify_lb_method(client_vm1_fixture, lb_pool_servers, si_listener.fip_ip,",
+      "revId": "dc4b9f58477896d175c4255ff96e67cfceabec4c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
