@@ -146,11 +146,21 @@ class VncLibFixture(fixtures.Fixture):
             self.logger = self.logger or contrail_logging.getLogger(__name__)
             if self.insecure:
                 self._update_vnc_api_ini(insecure=True)
+            if self.inputs:
+                username = self.inputs.vnc_auth_user or self.username
+                password = self.inputs.vnc_auth_password or self.password
+                tenant = self.inputs.vnc_auth_tenant or self.project_name
+                domain = self.inputs.vnc_auth_domain or self.orch_domain
+            else:
+                username = self.username
+                password = self.password
+                tenant = self.project_name
+                domain = self.orch_domain
             self.vnc_api_h = TestVncApi(
-                              username=self.username,
-                              password=self.password,
-                              tenant_name=self.project_name,
-                              domain_name=self.orch_domain,
+                              username=username,
+                              password=password,
+                              tenant_name=tenant,
+                              domain_name=domain,
                               api_server_host=self.cfgm_ip,
                               api_server_port=self.api_server_port,
                               api_server_url=self.api_server_url,

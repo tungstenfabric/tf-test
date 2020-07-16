@@ -611,6 +611,10 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.ci_flavor = test_configs.get('ci_image_flavor')
         self.key_filename = test_configs.get('nova_keypair_private_key_filename')
         self.pubkey_filename = test_configs.get('nova_keypair_public_key_filename')
+        self.vnc_auth_user = test_configs.get('vnc_auth_user')
+        self.vnc_auth_password = test_configs.get('vnc_auth_password')
+        self.vnc_auth_tenant = test_configs.get('vnc_auth_tenant')
+        self.vnc_auth_domain = test_configs.get('vnc_auth_domain')
 
         self.fixture_cleanup = test_configs.get('fixture_cleanup', 'yes')
         self.http_proxy = test_configs.get('http_proxy')
