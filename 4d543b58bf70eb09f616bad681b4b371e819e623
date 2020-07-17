@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "23c4d6d1_da26e7d8",
+        "filename": "common/contrail_test_init.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-07-17T20:52:50Z",
+      "side": 1,
+      "message": "Cant we use keystone_configs section itself? however the orchestrator would be k8s.\nWouldnt it work?\nIf we arent going via keystone_configs then we need to support auth_host, keystone version, region name etal attributes too.",
+      "revId": "4d543b58bf70eb09f616bad681b4b371e819e623",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
