@@ -94,7 +94,7 @@ Use launchpad [http://bugs.launchpad.net/juniperopenstack](http://bugs.launchpad
 It will be useful to include the test run log file. 
 
 For post-analysis of a cluster, a fab task ``attach_logs_cores`` can collect the logs and cassandra logs.
-
+#test
 ### Queries
 Mail to
 dev@lists.opencontrail.org and
