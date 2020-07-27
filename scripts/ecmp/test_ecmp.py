@@ -22,6 +22,8 @@ from common.ecmp.ecmp_test_resource import ECMPSolnSetup
 import test
 from common.neutron.base import BaseNeutronTest
 import time
+from common.intf_mirroring.verify import VerifyIntfMirror
+
 
 class TestECMPSanity(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic, ECMPVerify):
     @test.attr(type=['cb_sanity', 'sanity'])
@@ -1113,7 +1115,8 @@ class TestMultiInlineSVC(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTra
 
     # end test_three_stage_SC_with_traffic
 
-class TestECMPSanityIPv6(TestECMPSanity):
+class TestECMPSanityIPv6(BaseNeutronTest, TestECMPSanity, VerifyIntfMirror):
+
 
     @classmethod
     def setUpClass(cls):
@@ -1134,6 +1137,56 @@ class TestECMPSanityIPv6(TestECMPSanity):
     @skip_because(min_nodes=3)
     def test_ecmp_svc_in_network_with_3_instance(self):
         super(TestECMPSanityIPv6,self).test_ecmp_svc_in_network_with_3_instance()
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_fragments_packet_mode(self):
+        self.verify_svc_chain_with_fragments(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              packet_mode=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_fragments(self):
+        self.verify_svc_chain_with_fragments(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror_packet_mode(self):
+        self.verify_svc_chain_with_mirror(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              packet_mode=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror(self):
+        self.verify_svc_chain_with_mirror(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror_aap_packet_mode(self):
+        self.verify_svc_chain_with_mirror_aap(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror_aap(self):
+        self.verify_svc_chain_with_mirror_aap(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
 
     @preposttest_wrapper
     def test_ecmp_svc_in_network_with_static_route_no_policy(self):
