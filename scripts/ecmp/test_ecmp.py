@@ -22,6 +22,8 @@ from common.ecmp.ecmp_test_resource import ECMPSolnSetup
 import test
 from common.neutron.base import BaseNeutronTest
 import time
+from common.intf_mirroring.verify import VerifyIntfMirror
+
 
 class TestECMPSanity(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic, ECMPVerify):
     @test.attr(type=['cb_sanity', 'sanity'])
@@ -43,7 +45,7 @@ class TestECMPSanity(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic
                               create_svms=True,
                               **self.common_args)
     # end test_ecmp_svc_v2_transparent_with_3_instance
-
+    
     @preposttest_wrapper
     def test_ecmp_svc_in_network_with_3_instance(self):
         """
@@ -236,12 +238,12 @@ class TestECMPFeature(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffi
         """
          Description: Validate ECMP with v2 service chaining in-network-nat mode datapath having service instance
          Test steps:
-           1.   Creating vm's - vm1 and vm2 in networks vn1 and vn2.
-           2.   Creating a service instance in in-network-nat mode with 3 instances and
+           1.	Creating vm's - vm1 and vm2 in networks vn1 and vn2.
+           2.	Creating a service instance in in-network-nat mode with 3 instances and
                 left-interface of the service instances sharing the IP and enabled for static route.
 
-           3.   Creating a service chain by applying the service instance as a service in a policy between the VNs.
-           4.   Checking for ping and tcp traffic between vm1 and vm2.
+           3.	Creating a service chain by applying the service instance as a service in a policy between the VNs.
+           4.	Checking for ping and tcp traffic between vm1 and vm2.
          Pass criteria: Ping between the VMs should be successful and TCP traffic should reach vm2 from vm1.
          Maintainer : ganeshahv@juniper.net
         """
@@ -342,8 +344,8 @@ class TestECMPFeature(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffi
         Test steps:
                     1.  Creating vm's - vm1 and vm2 in networks vn1 and vn2.
                     2.  Creating a service instance in in-network-nat mode with 3 instances and
-                        left-interface of the service instances sharing the IP and enabled for static route.
-                    3.  Start traffic and send 3 different streams, one each to a DIP.
+                         left-interface of the service instances sharing the IP and enabled for static route.
+                    3.   Start traffic and send 3 different streams, one each to a DIP.
                     4.  Creating a service chain by applying the service instance as a service in a policy b
          etween the VNs.
                     5.  Checking for ping and tcp traffic between vm1 and vm2.
@@ -637,7 +639,7 @@ class TestECMPwithSVMChange(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMP
             for svm in svms:
                 if svm.id == to_be_deleted_svm.vm_id:
                     svms.remove(svm)
-            si_fixture.verify_svm()
+            si_fixture.verify_svm()        
             svms = self.get_svms_in_si(si_fixture)
             new_count = len(svms)
             errmsg = 'The SVMs count has not decreased'
@@ -1115,6 +1117,7 @@ class TestMultiInlineSVC(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTra
 
 class TestECMPSanityIPv6(TestECMPSanity):
 
+
     @classmethod
     def setUpClass(cls):
         cls.set_af('v6')
@@ -1139,12 +1142,75 @@ class TestECMPSanityIPv6(TestECMPSanity):
     def test_ecmp_svc_in_network_with_static_route_no_policy(self):
         super(TestECMPSanityIPv6,self).test_ecmp_svc_in_network_with_static_route_no_policy()
 
+class TestECMPIPv6Fragments(BaseNeutronTest, TestECMPSanity, VerifyIntfMirror):
+
+    @classmethod
+    def setUpClass(cls):
+        #cls.set_af('v6')
+        cls.image_name='ubuntu-traffic'
+        super(TestECMPIPv6Fragments, cls).setUpClass()
+
+    def is_test_applicable(self):
+        if not self.connections.orch.is_feature_supported('ipv6'):
+            return(False, 'IPv6 tests not supported in this environment ')
+        return (True, None)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_fragments_packet_mode(self):
+        self.verify_svc_chain_with_fragments(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              packet_mode=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_fragments(self):
+        self.verify_svc_chain_with_fragments(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror_packet_mode(self):
+        self.verify_svc_chain_with_mirror(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              packet_mode=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror(self):
+        self.verify_svc_chain_with_mirror(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror_aap_packet_mode(self):
+        self.verify_svc_chain_with_mirror_aap(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
+
+    @preposttest_wrapper
+    @skip_because(min_nodes=3)
+    def test_ecmp_svc_in_network_with_mirror_aap(self):
+        self.verify_svc_chain_with_mirror_aap(max_inst=2,
+                              service_mode='in-network',
+                              create_svms=True,
+                              **self.common_args)
+
 class TestECMPVro(TestECMPSanity):
     @classmethod
     def setUpClass(cls):
         cls.vro_based = True
         super(TestECMPVro, cls).setUpClass()
-
+    
     def is_test_applicable(self):
         if self.inputs.orchestrator == 'vcenter' and not self.inputs.vro_based:
            return(False, 'Skipping Test Vro server not present on vcenter setup')
