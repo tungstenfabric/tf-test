@@ -559,10 +559,20 @@ class VerifyIntfMirror(VerifySvcMirror):
             result, msg = self.validate_vn(vn_fq_name=vn3_fq_name)
             assert result, msg
 
-        if sub_intf:
-            src_vm_ip = src_port.obj['fixed_ips'][0]['ip_address']
-            dst_vm_ip = dst_port.obj['fixed_ips'][0]['ip_address']
-            analyzer_vm_ip = analyzer_port.obj['fixed_ips'][0]['ip_address']
+        if sub_intf and not ipv6:
+            src_vm_ip = src_port.get_ip_addresses()[0]
+            dst_vm_ip = dst_port.get_ip_addresses()[0]
+            analyzer_vm_ip = analyzer_port.get_ip_addresses()[0]
+        elif sub_intf and ipv6:
+            for ip in src_port.get_ip_addresses():
+                if 'v6' in get_af_type(ip):
+                    src_vm_ip = ip
+            for ip in dst_port.get_ip_addresses():
+                if 'v6' in get_af_type(ip):
+                    dst_vm_ip = ip
+            for ip in analyzer_port.get_ip_addresses():
+                if 'v6' in get_af_type(ip):
+                    analyzer_vm_ip = ip
         else:
             src_vm_ip = src_vm_fixture.get_vm_ips(src_vn_fq_name)[0]
             dst_vm_ip = dst_vm_fixture.get_vm_ips(dst_vn_fq_name)[0]
@@ -578,21 +588,6 @@ class VerifyIntfMirror(VerifySvcMirror):
         sport = None
 
         if sub_intf:
-            if self.inputs.get_af() in ['v6', 'dual']:
-                for ip in src_port.obj['fixed_ips']:
-                    if get_af_type(ip.get('ip_address')) in ['v6', 'dual']:
-                        src_vm_ip = ip['ip_address']
-                        break
-                for ip in dst_port.obj['fixed_ips']:
-                    if get_af_type(ip.get('ip_address')) in ['v6', 'dual']:
-                        dst_vm_ip = ip['ip_address']
-                        break
-                for ip in analyzer_port.obj['fixed_ips']:
-                    if get_af_type(ip.get('ip_address')) in ['v6', 'dual']:
-                        analyzer_vm_ip = ip['ip_address']
-                        break
-                self.logger.info("Compute/VM: IPv6 SRC : %s / %s, -> IPv6 DST: %s / %s => IPv6 ANALYZER: %s / %s" %
-                    (src_compute, src_vm_ip, dst_compute, dst_vm_ip, analyzer_compute, analyzer_vm_ip))
             intf_type = 'src'
             cmds = ['sudo vconfig add eth0 101','sudo ifconfig eth0.101 up','sudo udhcpc -i eth0.101']
             if ipv6: cmds = ['sudo vconfig add eth0 101','sudo ifconfig eth0.101 up','sudo ifconfig eth0.101 inet6 add ' + src_vm_ip + '/' + src_mask]
