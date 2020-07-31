@@ -34,7 +34,7 @@ class BMSFixture(fixtures.Fixture):
         self.mgmt_ip = kwargs.get('mgmt_ip') or bms_dict['mgmt_ip'] # Host IP, optional
         self.username = kwargs.get('username') or bms_dict['username']
         self.password = kwargs.get('password') or bms_dict['password']
-        self.namespace = get_random_name('ns')
+        self.namespace = kwargs.get('namespace') or get_random_name('ns')
         self.bms_ip = kwargs.get('bms_ip')   # BMS VMI IP
         self.bms_ip6 = kwargs.get('bms_ip6')   # BMS VMI IPv6
         self.bms_ip_netmask = kwargs.get('bms_ip_netmask', None)
@@ -48,6 +48,7 @@ class BMSFixture(fixtures.Fixture):
         self.fabric_fixture = kwargs.get('fabric_fixture')
         self.security_groups = kwargs.get('security_groups') or list()
         self.external_dhcp_server = kwargs.get('external_dhcp_server', False)
+        self.assign_ip = kwargs.get('assign_ip', True)
         self.vnc_h = connections.orch.vnc_h
         self.vlan_id = self.port_fixture.vlan_id if self.port_fixture else \
                        kwargs.get('vlan_id') or 0
@@ -67,6 +68,7 @@ class BMSFixture(fixtures.Fixture):
         self.ironic_node_id = None
         self.is_collapsed_spine = kwargs.get('is_collapsed_spine', False)
         self.copied_files = dict()
+        self.virtual_port_group_type = kwargs.get('port_group_type', "access")
     # end __init__
 
     def read_ironic_node_obj(self):
@@ -140,6 +142,7 @@ class BMSFixture(fixtures.Fixture):
             bms_info.append(intf_dict)
         binding_profile = {'local_link_information': bms_info}
         security_groups = None if self.ep_style else self.security_groups
+        create_iip = not self.external_dhcp_server and self.assign_ip
         self.port_fixture = PortFixture(
                                  connections=self.connections,
                                  vn_id=self.vn_fixture.uuid,
@@ -151,8 +154,7 @@ class BMSFixture(fixtures.Fixture):
                                  binding_profile=binding_profile,
                                  port_group_name=self._port_group_name,
                                  tor_port_vlan_tag=self.tor_port_vlan_tag,
-                                 create_iip=not self.external_dhcp_server,
-                             )
+                                 create_iip=create_iip)
         self.port_fixture.setUp()
         self.add_port_profiles(self.port_profiles)
         if self.ep_style:
@@ -276,7 +278,8 @@ class BMSFixture(fixtures.Fixture):
         if not self._vpg_fixture:
             self._vpg_fixture = VPGFixture(self.fabric_fixture.name,
                                            connections=self.connections,
-                                           name=self.port_group_name)
+                                           name=self.port_group_name,
+                                           virtual_port_group_type=self.virtual_port_group_type)
             self._vpg_fixture.setUp()
         return self._vpg_fixture
 
@@ -760,3 +763,4 @@ class BMSFixture(fixtures.Fixture):
             self.vpg_fixture.delete_security_groups(security_groups)
         else:
             self.port_fixture.delete_security_groups(security_groups)
+

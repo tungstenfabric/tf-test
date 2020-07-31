@@ -22,6 +22,7 @@ class VPGFixture(vnc_api_test.VncLibFixture):
         self.port_profiles = kwargs.get('port_profiles') or list()
         self.security_groups = kwargs.get('security_groups') or list()
         self.created = False
+        self.virtual_port_group_type = kwargs.get('virtual_port_group_type', "access")
 
     def setUp(self):
         super(VPGFixture, self).setUp()
@@ -58,7 +59,8 @@ class VPGFixture(vnc_api_test.VncLibFixture):
                 self.uuid = obj.uuid
             except NoIdError:
                 self.uuid = self.vnc_h.create_virtual_port_group(
-                    fq_name=self.fq_name)
+                    fq_name=self.fq_name,
+                    virtual_port_group_type=slef.virtual_port_group_type)
                 self.created = True
                 self.logger.info('Created VPG %s(%s)'%(self.name,
                                                        self.uuid))
@@ -109,6 +111,12 @@ class VPGFixture(vnc_api_test.VncLibFixture):
             pif_obj = self.vnc_h.read_physical_interface(**kwargs)
             self.vnc_h.disassociate_physical_interface(self.uuid, pif_obj)
             self.pif_uuids.remove(pif_obj.uuid)
+
+    def add_vmi(self, vmi_id):
+        lr_obj = self._vnc.logical_router_read(id=lr_id)
+        vmi_obj = self._vnc.virtual_machine_interface_read(id=vmi_id)
+        lr_obj.add_virtual_machine_interface(vmi_obj)
+        return self._vnc.logical_router_update(lr_obj)
 
     def delete(self):
         self.logger.info('Deleting VPG %s(%s)'%(self.name, self.uuid))
