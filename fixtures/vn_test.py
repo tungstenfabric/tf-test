@@ -141,6 +141,7 @@ class VNFixture(fixtures.Fixture):
         self.virtual_network_category = kwargs.get('virtual_network_category', None)
         self.ip_fabric = kwargs.get('ip_fabric', None)
         self.max_flows = max_flows
+        self.virtual_network_routed_properties = kwargs.get('virtual_network_routed_properties', None)
 
 
         self.vnc_lib_fixture = connections.vnc_lib_fixture
@@ -2043,6 +2044,23 @@ class VNFixture(fixtures.Fixture):
         vn_uuid = self.orchestrator.get_vn_id(self.obj)
         result = self.vnc_lib_fixture.vnc_h.detach_shc_from_vn(vn_uuid, shc_id)
         return result
+
+    def update_vn_network_category(self, virtual_network_category=None):
+        vn_obj = self.vnc_lib_h.virtual_network_read(id=self.uuid)
+        vn_obj.set_virtual_network_category(virtual_network_category)
+        return self.vnc_lib_h.virtual_network_update(vn_obj)
+
+    def update_vn_routed_properties(self, routed_properties=None):
+        if not routed_properties:
+            return
+        vn_obj = self.vnc_lib_h.virtual_network_read(id=self.uuid)
+        vn_routed_properties = \
+            vn_obj.get_virtual_network_routed_properties(
+        ) or VirtualNetworkRoutedPropertiesType()
+
+        vn_routed_properties.add_routed_properties(routed_properties)
+        vn_obj.set_virtual_network_routed_properties(vn_routed_properties)
+        return self.vnc_lib_h.virtual_network_update(vn_obj)
 
 # end VNFixture
 

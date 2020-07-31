@@ -849,7 +849,7 @@ class ContrailVncApi(object):
                 return True
     # end delete_proto_based_flow_aging_time
 
-    def create_interface_route_table(self, name, parent_obj=None, prefixes=[]):
+    def create_interface_route_table(self, name, parent_obj=None, prefixes=[], community_action=None):
         '''
         Create and return InterfaceRouteTable object
 
@@ -867,7 +867,14 @@ class ContrailVncApi(object):
             rt_routes = intf_route_table.get_interface_route_table_routes()
             routes = rt_routes.get_route()
             for prefix in prefixes:
-                rt1 = RouteType(prefix=prefix)
+                if community_action:
+                    community_attributes = CommunityAttributes()
+                    community_attributes.add_community_attribute(
+                        community_action)
+                    rt1 = RouteType(prefix=prefix,
+                                    community_attributes=community_attributes)
+                else:
+                    rt1 = RouteType(prefix=prefix)
                 routes.append(rt1)
             intf_route_table.set_interface_route_table_routes(rt_routes)
         uuid = self._vnc.interface_route_table_create(intf_route_table)
@@ -3922,6 +3929,99 @@ class ContrailVncApi(object):
         cnz_obj = self._vnc.control_node_zone_read(id=zone_id)
         bgpaas_obj.del_control_node_zone(cnz_obj)
         return self._vnc.bgp_as_a_service_update(bgpaas_obj)
+
+    @staticmethod
+    def create_static_route_props(pr_uuid, lr_uuid, interface_ip, irt_uuid,
+                                   irt_next_hope):
+
+        static_route_params = StaticRouteParameters(
+            interface_route_table_uuid=[irt_uuid],
+            next_hop_ip_address=[irt_next_hope]
+        )
+        return RoutedProperties(
+            logical_router_uuid=lr_uuid,
+            physical_router_uuid=pr_uuid,
+            routed_interface_ip_address=interface_ip,
+            routing_protocol='static-routes',
+            bgp_params=None,
+            static_route_params=static_route_params,
+            routing_policy_params=None,
+            bfd_params=None)
+
+    @staticmethod
+    def create_bgp_routed_properties(pr_uuid, lr_uuid, interface_ip,
+                                      peer_ip, peer_asn, local_asn,
+                                      auth_type=None, auth_key=None,
+                                      auth_key_id=None, import_rp=None, export_rp=None):
+
+        auth_props = None
+        if auth_key or auth_type or auth_key_id:
+            auth_props = AuthenticationData(
+                key_type=auth_type, key_items=[
+                    AuthenticationKeyItem(key_id=auth_key_id,
+                                          key=auth_key)])
+        bgp_params = BgpParameters(
+            peer_autonomous_system=peer_asn,
+            peer_ip_address_list=[peer_ip],
+            auth_data= auth_props,
+            local_autonomous_system=local_asn,
+            hold_time=90)
+
+        rp_params = RoutingPolicyParameters(
+            import_routing_policy_uuid=import_rp,
+            export_routing_policy_uuid=export_rp)
+
+        return RoutedProperties(
+            logical_router_uuid=lr_uuid,
+            physical_router_uuid=pr_uuid,
+            routed_interface_ip_address=interface_ip,
+            routing_protocol='bgp',
+            bgp_params=bgp_params,
+            bfd_params=BfdParameters(
+                time_interval=10,
+                detection_time_multiplier=4),
+            static_route_params=None,
+            routing_policy_params=rp_params)
+
+    def create_routing_policy(self, rp_name, policy_term, term_t='network-device'):
+        rp = RoutingPolicy(name=rp_name, term_type=term_t)
+        rp.set_routing_policy_entries(PolicyStatementType(term=[policy_term]))
+        rp_uuid = self._vnc.routing_policy_create(rp)
+        return rp_uuid
+    # end _create_routing_policy
+
+    def create_routing_policy_term(self, protocols=[], prefixs=[],
+                                   prefixtypes=[], extcommunity_list=[],
+                                   extcommunity_match_all = False,
+                                   community_match_all = False, action="accept",
+                                   local_pref=None, med=None, asn_list=[],
+                                   routes=[], route_types=[], route_values=[]):
+        prefix_list = []
+        for i in range(len(prefixs)):
+            prefix_list.append(PrefixMatchType(prefix=prefixs[i],
+                                               prefix_type=prefixtypes[i]))
+        route_filter = None
+        for i in range(len(routes)):
+            if route_filter is None:
+                route_filter = RouteFilterType()
+            route_filter.add_route_filter_properties(
+                RouteFilterProperties(route=routes[i],
+                                      route_type=route_types[i],
+                                      route_type_value=route_values[i]))
+        tcond = TermMatchConditionType(
+            protocol=protocols, prefix=prefix_list,
+            community_match_all=community_match_all,
+            extcommunity_list=extcommunity_list,
+            extcommunity_match_all=extcommunity_match_all,
+            route_filter=route_filter)
+        aspath = ActionAsPathType(expand=AsListType(asn_list=asn_list))
+        updateo = ActionUpdateType(as_path=aspath, local_pref=local_pref,
+                                   med=med)
+        taction = TermActionListType(action=action, update=updateo)
+        term = PolicyTermType(term_match_condition=tcond,
+                              term_action_list=taction)
+        return term
+    # end _create_routing_policy_term
 
 class LBFeatureHandles(with_metaclass(Singleton, object)):
     def __init__(self, vnc, log):
