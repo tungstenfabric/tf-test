@@ -849,7 +849,7 @@ class ContrailVncApi(object):
                 return True
     # end delete_proto_based_flow_aging_time
 
-    def create_interface_route_table(self, name, parent_obj=None, prefixes=[]):
+    def create_interface_route_table(self, name, parent_obj=None, prefixes=[], community_action=None):
         '''
         Create and return InterfaceRouteTable object
 
@@ -867,7 +867,14 @@ class ContrailVncApi(object):
             rt_routes = intf_route_table.get_interface_route_table_routes()
             routes = rt_routes.get_route()
             for prefix in prefixes:
-                rt1 = RouteType(prefix=prefix)
+                if community_action:
+                    community_attributes = CommunityAttributes()
+                    community_attributes.add_community_attribute(
+                        community_action)
+                    rt1 = RouteType(prefix=prefix,
+                                    community_attributes=community_attributes)
+                else:
+                    rt1 = RouteType(prefix=prefix)
                 routes.append(rt1)
             intf_route_table.set_interface_route_table_routes(rt_routes)
         uuid = self._vnc.interface_route_table_create(intf_route_table)
@@ -2809,9 +2816,10 @@ class ContrailVncApi(object):
             self._vnc.virtual_machine_interface_read(
                 id=vmi['uuid']) for vmi in vmis]
 
-    def create_virtual_port_group(self, fq_name):
+    def create_virtual_port_group(self, fq_name, virtual_port_group_type='access'):
         obj = VirtualPortGroup(fq_name[-1], fq_name=fq_name,
                                parent_type='fabric')
+        obj.set_virtual_port_group_type(virtual_port_group_type)
         self._log.debug('Creating VPG %s'%fq_name)
         return self._vnc.virtual_port_group_create(obj)
 
@@ -3894,3 +3902,4 @@ class LBFeatureHandles(with_metaclass(Singleton, object)):
 
 # vn.get_floating_ip_pools()
 # floating_ip_pool_delete
+
