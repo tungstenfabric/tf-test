@@ -16,6 +16,7 @@ class InterfaceRouteTableFixture(vnc_api_test.VncLibFixture):
         self.vnc_h = None
         self.verify_is_run = False
         self.prefixes = kwargs.get('prefixes', None)
+        self.community_action = kwargs.get('community_action', None)
         self.name = kwargs.get('name', get_random_name('intf-rtb'))
         self.project_id = kwargs.get('project_id', None)
         self.uuid = kwargs.get('uuid', None)
@@ -50,7 +51,8 @@ class InterfaceRouteTableFixture(vnc_api_test.VncLibFixture):
             intf_rtb_obj = self.vnc_h.create_interface_route_table(
                 self.name,
                 parent_obj=self.parent_obj,
-                prefixes=self.prefixes)
+                prefixes=self.prefixes,
+                community_action=self.community_action)
             self._populate_attr(intf_rtb_obj)
     # end create
 
