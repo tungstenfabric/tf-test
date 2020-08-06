@@ -778,7 +778,7 @@ class GenericTestBase(test_v1.BaseTestCase_v1, _GenericTestBaseMethods):
     def start_traffic(self, src_vm_fixture, dst_vm_fixture, proto, sport=None,
                       dport=None, src_vn_fqname=None, dst_vn_fqname=None,
                       fip_ip=None, **kwargs):
-        if proto == 'icmp':
+        if proto == 'icmp' or proto == 'icmp6':
             return self.start_ping(src_vm_fixture, dst_vm=dst_vm_fixture,
                                    dst_ip=fip_ip)
         traffic_obj = BaseTraffic.factory(tool=SOCKET, proto=proto)
