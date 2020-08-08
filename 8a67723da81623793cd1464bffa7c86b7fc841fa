@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06610848_368f54f9",
+        "filename": "fixtures/bms_fixture.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "Rather if static_ip is set to True then lets not create instance ip.",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "783743c0_f368a62c",
+        "filename": "fixtures/contrailapi.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "Can IRT be created without community-action and is it mandatory for DeviceManager to push configs?",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91bc7338_6b50f92f",
+        "filename": "fixtures/contrailapi.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2822,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "If a VPG has both routed and Tenant VNs what should be the type and do we support such things.\nIn ML2 there was a requirement to support both InfraVN and Tenant-VN on the same VPG.",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "20c02fd4_d677205e",
+        "filename": "fixtures/virtual_port_group.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "VPG add VMI shouldnt have LR update which should be in RouterFixture",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "911a3ca5_84147e54",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_unmanaged_pnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "Can you move this to contrail_fabric/base.py",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7be7604_0e564503",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_unmanaged_pnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "All the VNCApi interaction code typically resides in contrailapi.py except for legacy ones like vn_test.py etal. \nIs it possible to move this to either contrailapi.py or fixtures/vn_test.py\nBetter if its fixtures/vn_test.py since all the other VN props are in fixtures/vn_test.py",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4dcdecd9_c91a61ca",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_unmanaged_pnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "Same here",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bae24c92_37603357",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_unmanaged_pnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "Can you move this to contrailapi.py and call the same from contrail_fabric/base.py",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ee99c5c_1b81c421",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_unmanaged_pnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "ideal place is contrail_api.py",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ddb925fe_b50f781c",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_unmanaged_pnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "add this to either tcutils/util.py or common/base.py and it has to be exhaustive to take list of peers which could be either bgp or ospf.",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "980240d0_5897b9ef",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_unmanaged_pnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-08T23:27:53Z",
+      "side": 1,
+      "message": "Please take care of the tabs",
+      "revId": "8a67723da81623793cd1464bffa7c86b7fc841fa",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
