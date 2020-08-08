@@ -158,7 +158,7 @@ class PodFixture(fixtures.Fixture):
         # TODO
         return True
 
-    @retry(delay=5, tries=10)
+    @retry(delay=5, tries=30)
     def verify_pod_not_in_contrail_agent(self):
         if not self.host_ip:
             self.logger.debug('Pod %s may not have launched at all..no need to '
