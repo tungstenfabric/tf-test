@@ -493,6 +493,8 @@ class RbacLbassv2(BaseRbac):
             return (False, 'Skipping Test. Openstack required')
         if self.inputs.get_build_sku().lower()[0] < 'l':
             return (False, 'Skipping Test. LBaasV2 is supported only on liberty and up')
+        if self.inputs.get_build_sku().lower()[0] >= 't':
+            return (False, 'Skipping Test. LBaasV2 deprecated from train onwards')
         return (True, None)
 
     @preposttest_wrapper
