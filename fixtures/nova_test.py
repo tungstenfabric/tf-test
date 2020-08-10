@@ -308,7 +308,7 @@ class NovaHelper(object):
                     flavor = self.obj.flavors.find(name=name)
                 except novaException.Forbidden:
                     flavor = self.admin_obj.obj.flavors.find(name=name)
-                flavor.set_keys({'hw:mem_page_size': 'any'})
+                flavor.set_keys({'hw:mem_page_size': 'large'})
         except Exception as e:
             self.logger.exception('Exception adding flavor %s' % (name))
             raise e
