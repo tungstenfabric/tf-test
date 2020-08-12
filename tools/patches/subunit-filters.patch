@@ -6,7 +6,7 @@ diff -r 24a2465c9236 filters.py
          output_to = sys.stdout
      else:
 -        output_to = file(output_path, 'wb')
-+        output_to = open(output_path, 'w')
++        output_to = open(output_path, 'w', encoding='utf-8')
  
      try:
          result = result_factory(output_to)
