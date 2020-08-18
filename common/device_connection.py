@@ -121,10 +121,11 @@ class NetconfConnection(AbstractConnection):
             except Exception as e:
                 pass
 
-    def get_config(self, mode='set'):
-        configs = self.handle.rpc.get_config(options={'database' : 'committed',
+    def get_config(self, mode='set',filter=None):
+        configs = self.handle.rpc.get_config(filter_xml=filter,options={'database' : 'committed',
                                                       'format': mode})
         return configs.text
+
 
     def get_interfaces(self, terse=True):
         output = self.handle.rpc.get_interface_information(terse=terse)
@@ -135,8 +136,17 @@ class NetconfConnection(AbstractConnection):
         return EtreeToDict('peer-count').get_all_entry(output)
 
     def config(self, stmts=[], commit=True, merge=True, overwrite=False,
-               path=None, ignore_errors=False, timeout=30):
-        if path:
+               path=None, ignore_errors=False, timeout=30, url=None):
+
+        if url:
+            try:
+                self.config_handle.load(url=url,format='text',overwrite=True)
+                self.config_handle.commit(override=True)
+            except RpcTimeoutError as e:
+                self.logger.debug('Exception %s ignored' % (e))
+                return (True, None)
+
+        elif path:
             self.config_handle.load(path=path, overwrite=overwrite,
                                     timeout=timeout)
         else:
