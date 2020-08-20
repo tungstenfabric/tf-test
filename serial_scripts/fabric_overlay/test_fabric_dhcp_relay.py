@@ -182,7 +182,8 @@ class TestFabricDHCPRelay(BaseFabricTest):
         lr1 = self.create_logical_router([vn1, vn2],
             dhcp_relay_servers=[get_an_ip(dhcp_server_vn, offset=2)],
             devices=self.server_leafs)
-        self.start_dhcp_server([vn1, vn2], bms_node=bms_nodes[0])
+        self.start_dhcp_server([vn1, vn2], bms_node=bms_nodes[0],
+            namespace='dhcp_test')
         bms1 = self.create_bms(bms_nodes[1], vlan_id=5,
             vn_fixture=vn1, external_dhcp_server=True)
         bms2 = self.create_bms(bms_nodes[1], vlan_id=6,
