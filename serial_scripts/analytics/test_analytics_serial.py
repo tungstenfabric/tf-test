@@ -296,16 +296,9 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
                     'ModuleId',
                     'MessageTS'],
                 where_clause=query)
-#            self.logger.info("query output : %s"%(self.res1))
             if not self.res1:
-                self.logger.info("query output : %s" % (self.res1))
-                st = self.analytics_obj.ops_inspect[self.inputs.collector_ips[0]].\
-                    send_trace_to_database\
-                    (node=self.inputs.collector_names[0],
-                     module='QueryEngine', trace_buffer_name='QeTraceBuf')
-                self.logger.info("status: %s" % (st))
+                self.logger.info("Verifying ObjectXmppPeerInfo failed")
                 result = result and False
-
             start_time = self.analytics_obj.getstarttime(
                 self.inputs.compute_ips[0])
             time.sleep(2)
@@ -333,13 +326,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
                 where_clause=query)
 #            self.logger.info("query output : %s"%(self.res1))
             if not self.res1:
-                self.logger.info("query output : %s" % (self.res1))
-                st = self.analytics_obj.ops_inspect[
-                    self.inputs.collector_ips[0]].send_trace_to_database(
-                    node=self.inputs.collector_names[0],
-                    module='QueryEngine',
-                    trace_buffer_name='QeTraceBuf')
-                self.logger.info("status: %s" % (st))
+                self.logger.info("Verifying ObjectXmppPeerInfo after restart failed")
                 result = result and False
 
         except Exception as e:
