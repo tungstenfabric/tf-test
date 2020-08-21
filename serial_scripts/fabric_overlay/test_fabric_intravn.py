@@ -860,8 +860,19 @@ class TestFabricOverlay(TestSPStyleFabric):
         mh_nodes = self.get_bms_nodes(bms_type='multi_homing')
         sc1 = self.create_sc_profile(action='interface-shutdown',
                                      bandwidth=1, recovery_timeout=60)
-        pp1 = self.create_port_profile(storm_control_profiles=[sc1.uuid])
-        pp2 = self.create_port_profile()
+        pp1 = self.create_port_profile(
+            storm_control_profiles=[sc1.uuid]
+        )
+        pp2 = self.create_port_profile(
+            flow_control=True,
+            bpdu_loop_protection=True,
+            port_cos_untrust=True,
+            lacp_enable=True,
+            lacp_interval="fast",
+            lacp_mode="active",
+            port_desc="sample port desc",
+            port_mtu=340,
+            port_disable=False)
         sc2 = self.create_sc_profile(
             action='interface-shutdown',
             bandwidth=40, recovery_timeout=60,
@@ -874,12 +885,14 @@ class TestFabricOverlay(TestSPStyleFabric):
                 vn_fixture=vn, tor_port_vlan_tag=10, port_profiles=[pp1.uuid])
             lag_prouters = self.get_associated_prouters(lag_nodes[0])
             assert sc1.validate_config_pushed(lag_prouters, lag_bms.interfaces)
+            assert pp1.validate_config_pushed(lag_prouters, lag_bms.interfaces)
             pp = pp1; sc = sc1; bms = lag_bms; prouters = lag_prouters
         if mh_nodes:
             mh_bms = self.create_bms(bms_name=mh_nodes[0],
                 vn_fixture=vn, vlan_id=10, port_profiles=[pp2.uuid])
             mh_prouters = self.get_associated_prouters(mh_nodes[0])
             assert sc2.validate_config_pushed(mh_prouters, mh_bms.interfaces)
+            assert pp2.validate_config_pushed(mh_prouters, mh_bms.interfaces)
             pp = pp2; sc = sc2; bms = mh_bms; prouters = mh_prouters
         other_nodes = set(bms_nodes) - set(lag_nodes or []) - set(mh_nodes or [])
 #        other_nodes = bms_nodes
@@ -892,6 +905,7 @@ class TestFabricOverlay(TestSPStyleFabric):
             single_bms.add_port_profiles([pp1.uuid])
             single_prouters = self.get_associated_prouters(node, interfaces)
             assert sc1.validate_config_pushed(single_prouters, single_bms.interfaces)
+            assert pp1.validate_config_pushed(single_prouters, single_bms.interfaces)
             pp = pp1; sc = sc1; bms = single_bms; prouters = single_prouters
         if mh_nodes:
             assert sc2.validate_config_pushed(mh_prouters, mh_bms.interfaces)
@@ -899,16 +913,22 @@ class TestFabricOverlay(TestSPStyleFabric):
             assert sc1.validate_config_pushed(lag_prouters, lag_bms.interfaces)
         pp.delete_storm_control_profiles([sc.uuid])
         assert sc.validate_config_pushed(prouters, bms.interfaces, exp=False)
+        assert pp.validate_config_pushed(prouters, bms.interfaces, exp=False)
         if lag_nodes and other_nodes:
             assert sc.validate_config_pushed(lag_prouters, lag_bms.interfaces, exp=False)
+            assert pp.validate_config_pushed(lag_prouters, lag_bms.interfaces, exp=False)
         pp.add_storm_control_profiles([sc.uuid])
         assert sc.validate_config_pushed(prouters, bms.interfaces)
+        assert pp.validate_config_pushed(prouters, bms.interfaces)
         if lag_nodes and other_nodes:
             assert sc.validate_config_pushed(lag_prouters, lag_bms.interfaces)
+            assert pp.validate_config_pushed(lag_prouters, lag_bms.interfaces)
         bms.delete_port_profiles([pp.uuid])
         assert sc.validate_config_pushed(prouters, bms.interfaces, exp=False)
+        assert pp.validate_config_pushed(prouters, bms.interfaces, exp=False)
         bms.add_port_profiles([pp.uuid])
         assert sc.validate_config_pushed(prouters, bms.interfaces)
+        assert pp.validate_config_pushed(prouters, bms.interfaces)
         sc.update(action=list(), no_broadcast=False)
         assert sc.validate_config_pushed(prouters, bms.interfaces)
         if lag_nodes and other_nodes:

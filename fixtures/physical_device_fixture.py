@@ -315,6 +315,64 @@ class PhysicalDeviceFixture(vnc_api_test.VncLibFixture):
             dct['no_unknown_unicast'] = True
         return dct
 
+    def get_port_profile_config(self, interface, prouter_config):
+        dct = dict()
+
+        match = re.search('%s .*description (.*)'%interface, prouter_config)
+        if match:
+            desc_string  = match.group(1).replace('"', '')
+            dct['port_description'] = desc_string
+
+        match = re.search('%s .*mtu ([0-9]+)'%interface,
+                          prouter_config)
+        if match:
+            dct['port_mtu'] = int(match.group(1))
+
+        match = re.search('%s .*disable'%interface,
+                          prouter_config)
+        if match:
+            dct['port_disable'] = True
+
+        match = re.search('%s .*flow-control' % interface,
+                          prouter_config)
+        if match:
+            dct['flow-control'] = True
+
+        match = re.search('%s .*IP-UNTRUST' % interface,
+                          prouter_config)
+        if match:
+            dct['port_cos_untrust'] = True
+
+        match = re.search('rstp bpdu-block-on-edge',
+                          prouter_config)
+        if match:
+            lp_prt_match = re.search('rstp .*%s' % interface,
+                                     prouter_config)
+            if lp_prt_match:
+                dct['bpdu_loop_protection'] = True
+
+        match = re.search('%s .*lacp$' % interface, prouter_config)
+        if match:
+            dct['lacp_enable'] = True
+
+        match = re.search('%s .*lacp periodic fast' % interface, prouter_config)
+        if match:
+            dct['lacp_interval'] = "fast"
+
+        match = re.search('%s .*lacp periodic slow' % interface, prouter_config)
+        if match:
+            dct['lacp_interval'] = "slow"
+
+        match = re.search('%s .*lacp active' % interface, prouter_config)
+        if match:
+            dct['lacp_mode'] = "active"
+
+        match = re.search('%s .*lacp passive' % interface, prouter_config)
+        if match:
+            dct['lacp_mode'] = "passive"
+
+        return dct
+
     def get_connection_obj(self, *args, **kwargs):
         self.conn_obj = ConnectionFactory.get_connection_obj(
             *args, **kwargs)

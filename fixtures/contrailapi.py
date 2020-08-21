@@ -3637,9 +3637,67 @@ class ContrailVncApi(object):
         self._log.debug('Reading storm control profile %s' % kwargs)
         return self._vnc.storm_control_profile_read(**kwargs)
 
-    def create_port_profile(self, fq_name):
+    def update_port_profile(self, uuid=None, fq_name=None, **kwargs):
+        obj = self.read_port_profile(id=uuid, fq_name=fq_name)
+        params = obj.get_port_profile_params() or PortProfileParameters()
+        if 'bpdu_loop_protection' in kwargs:
+            params.set_bpdu_loop_protection(kwargs['bpdu_loop_protection'])
+        if 'flow_control' in kwargs:
+            params.set_flow_control(kwargs['flow_control'])
+        if 'port_cos_untrust' in kwargs:
+            params.set_port_cos_untrust(kwargs['port_cos_untrust'])
+
+        lacp_params = params.get_lacp_params() or LacpParams()
+        if 'lacp_enable' in kwargs:
+            lacp_params.set_lacp_enable(kwargs['lacp_enable'])
+        if 'lacp_interval' in kwargs:
+            lacp_params.set_lacp_interval(kwargs['lacp_interval'])
+        if 'lacp_mode' in kwargs:
+            lacp_params.set_lacp_mode(kwargs['lacp_mode'])
+        params.set_lacp_params(lacp_params)
+
+        port_params = params.get_port_params() or PortParameters()
+        if 'port_disable' in kwargs:
+            port_params.set_port_disable(kwargs['port_disable'])
+        if 'port_desc' in kwargs:
+            port_params.set_port_description(kwargs['port_desc'])
+        if 'port_mtu' in kwargs:
+            port_params.set_port_mtu(kwargs['port_mtu'])
+        params.set_port_params(port_params)
+
+        obj.set_port_profile_params(params)
+        self._vnc.port_profile_update(obj)
+
+    def create_port_profile(self, fq_name, port_desc=None, port_mtu=None,
+                            port_disable=False, flow_control=False,
+                            lacp_enable=False, lacp_interval=None,
+                            lacp_mode=None, bpdu_loop_protection=False,
+                            port_cos_untrust=False):
         obj = PortProfile(name=fq_name[-1], parent_type='project',
                           fq_name=fq_name)
+        pp_params = PortProfileParameters()
+        pp_params.set_flow_control(flow_control)
+        pp_params.set_bpdu_loop_protection(bpdu_loop_protection)
+        pp_params.set_port_cos_untrust(port_cos_untrust)
+        if port_desc or port_mtu or port_disable:
+            port_params = PortParameters()
+            if port_disable:
+                port_params.set_port_disable(port_disable)
+            if port_desc:
+                port_params.set_port_description(port_desc)
+            if port_mtu:
+                port_params.set_port_mtu(port_mtu)
+            pp_params.set_port_params(port_params)
+        if lacp_enable or lacp_interval or lacp_mode:
+            lacp_params = LacpParams()
+            if lacp_enable:
+                lacp_params.set_lacp_enable(lacp_enable)
+            if lacp_interval:
+                lacp_params.set_lacp_interval(lacp_interval)
+            if lacp_mode:
+                lacp_params.set_lacp_mode(lacp_mode)
+            pp_params.set_lacp_params(lacp_params)
+        obj.set_port_profile_params(pp_params)
         return self._vnc.port_profile_create(obj)
 
     def delete_port_profile(self, **kwargs):
@@ -3657,7 +3715,7 @@ class ContrailVncApi(object):
             :param fq_name_str : fqname of the object in string notation
             :param id : uuid of the object
         '''
-        self._log.debug('Deleting port profile %s' % kwargs)
+        self._log.debug('Reading port profile %s' % kwargs)
         return self._vnc.port_profile_read(**kwargs)
 
     def read_security_group(self, **kwargs):
@@ -3666,7 +3724,7 @@ class ContrailVncApi(object):
             :param fq_name_str : fqname of the object in string notation
             :param id : uuid of the object
         '''
-        self._log.debug('Deleting port profile %s' % kwargs)
+        self._log.debug('Reading security group %s' % kwargs)
         return self._vnc.security_group_read(**kwargs)
 
     def assoc_sc_to_port_profile(self, pp_uuid, sc_uuid):
