@@ -306,7 +306,8 @@ class AnalyticsTestSanityWithResource(
                 right_vn_fixture=self.vn2_fixture,
                 max_inst=max_inst,
                 st_name=self.st_name,
-                service_mode=svc_mode)
+                service_mode=svc_mode,
+                create_svms=True)
             self.st_fixture = svc_chain_info['st_fixture']
             self.si_fixture = svc_chain_info['si_fixture']
 
@@ -365,7 +366,8 @@ class AnalyticsTestSanityWithResource(
                 result = result and False
 
             si_uuids = []
-            for el in self.si_fixture.si_obj.get_virtual_machine_back_refs():
+            back_refs = self.si_fixture.si_obj.get_virtual_machine_back_refs() or []
+            for el in back_refs:
                 si_uuids.append(el['uuid'])
 
             for si_uuid in si_uuids:
@@ -662,116 +664,6 @@ class AnalyticsTestSanityWithResource(
         assert self.analytics_obj.verify_connected_networks_in_vn_uve(
             vn2_fq_name,
             vn1_fq_name)
-        return True
-
-    @preposttest_wrapper
-    def test_verify_flow_series_table_query_range(self):
-        ''' Test to validate flow series table for query range
-
-        '''
-        # installing traffic package in vm
-        self.res.vn1_vm1_fixture.install_pkg("Traffic")
-        self.res.vn1_vm2_fixture.install_pkg("Traffic")
-        self.setup_flow_export_rate(10)
-        self.tx_vm_node_ip = self.res.vn1_vm1_fixture.vm_node_ip
-        self.rx_vm_node_ip = self.res.vn1_vm2_fixture.vm_node_ip
-        self.tx_local_host = Host(
-            self.tx_vm_node_ip, self.inputs.host_data[
-                self.tx_vm_node_ip]['username'], self.inputs.host_data[
-                self.tx_vm_node_ip]['password'])
-        self.rx_local_host = Host(
-            self.rx_vm_node_ip, self.inputs.host_data[
-                self.rx_vm_node_ip]['username'], self.inputs.host_data[
-                self.rx_vm_node_ip]['password'])
-
-        self.send_host = Host(self.res.vn1_vm1_fixture.local_ip,
-                              self.res.vn1_vm1_fixture.vm_username,
-                              self.res.vn1_vm1_fixture.vm_password)
-        self.recv_host = Host(self.res.vn1_vm2_fixture.local_ip,
-                              self.res.vn1_vm2_fixture.vm_username,
-                              self.res.vn1_vm2_fixture.vm_password)
-
-        # Create traffic stream
-        start_time = self.analytics_obj.getstarttime(self.tx_vm_node_ip)
-        self.logger.info("start time= %s" % (start_time))
-        self.logger.info("Creating streams...")
-        dport = 11000
-        stream = Stream(
-            protocol="ip",
-            proto="udp",
-            src=self.res.vn1_vm1_fixture.vm_ip,
-            dst=self.res.vn1_vm2_fixture.vm_ip,
-            dport=dport)
-
-        startport = 10000
-        profile = ContinuousSportRange(
-            stream=stream,
-            listener=self.res.vn1_vm2_fixture.vm_ip,
-            startport=10000,
-            endport=dport,
-            pps=100)
-        sender = Sender(
-            'sname',
-            profile,
-            self.tx_local_host,
-            self.send_host,
-            self.inputs.logger)
-        receiver = Receiver(
-            'rname',
-            profile,
-            self.rx_local_host,
-            self.recv_host,
-            self.inputs.logger)
-        receiver.start()
-        sender.start()
-        time.sleep(30)
-        sender.stop()
-        receiver.stop()
-        print(sender.sent, receiver.recv)
-        time.sleep(1)
-
-        vm_node_ip = self.res.vn1_vm1_fixture.vm_node_data_ip
-        vm_host = self.inputs.host_data[vm_node_ip]['service_name'][vm_node_ip]
-        time.sleep(30)
-        # Verifying flow series table
-        src_vn = 'default-domain' + ':' + \
-            self.inputs.project_name + ':' + self.res.vn1_name
-        dst_vn = 'default-domain' + ':' + \
-            self.inputs.project_name + ':' + self.res.vn1_name
-        # creating query: '(sourcevn=default-domain:admin:vn1) AND
-        # (destvn=default-domain:admin:vn2)'
-        query = '(sourcevn=%s) AND (destvn=%s) AND protocol= 17 AND (sport = 10500 < 11000)' % (
-            src_vn, dst_vn)
-        for ip in self.inputs.collector_ips:
-            self.logger.info('setup_time= %s' % (start_time))
-            # Quering flow sreies table
-
-            self.logger.info(
-                "Verifying flowSeriesTable through opserver %s" %
-                (ip))
-            self.res1 = self.analytics_obj.ops_inspect[ip].post_query(
-                'FlowSeriesTable',
-                start_time=start_time,
-                end_time='now',
-                select_fields=[
-                    'sourcevn',
-                    'sourceip',
-                    'destvn',
-                    'destip',
-                    'SUM(packets)',
-                    'sport',
-                    'dport',
-                    'T=1'],
-                where_clause=query)
-            assert self.res1
-            for elem in self.res1:
-                if ((elem['sport'] < 10500) or (elem['sport'] > 11000)):
-                    self.logger.warn(
-                        "Out of range element (range:sport > 15500 and sport < 16000):%s" %
-                        (elem))
-                    self.logger.warn("Test Failed")
-                    result = False
-                    assert result
         return True
 
     @preposttest_wrapper
@@ -1196,8 +1088,7 @@ class AnalyticsTestSanityWithResource(
                     'T=1'],
                 where_clause=query,
                 sort=2,
-                limit=5,
-                sort_fields=['SUM(packets)'])
+                limit=5)
             assert self.res1
     
     @preposttest_wrapper
