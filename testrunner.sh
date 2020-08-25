@@ -240,8 +240,6 @@ docker_run () {
     # Keep the container
     if [[ $rm ]]; then
         arg_rm=" --rm=true "
-    else
-        arg_rm=" --rm=false "
     fi
 
     add_contrail_env
