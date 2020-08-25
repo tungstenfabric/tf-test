@@ -241,7 +241,7 @@ docker_run () {
     if [[ $rm ]]; then
         arg_rm=" --rm=true "
     else
-        arg_rm=" --rm=false "
+        arg_rm=""
     fi
 
     add_contrail_env
