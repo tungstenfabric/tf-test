@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f4f4f093_1f0e4400",
+        "filename": "common/contrail_fabric/ztp_base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-27T23:08:27Z",
+      "side": 1,
+      "message": "rather than port we should look for device[\u0027console\u0027] since SVL servers wont have port mappings rather ip address assigned directly.",
+      "revId": "af18a4cfee1da998186d13ee5c4debfbd80638cf",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a1557329_14f43189",
+        "filename": "common/contrail_fabric/ztp_base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-08-27T23:08:27Z",
+      "side": 1,
+      "message": "Same here",
+      "revId": "af18a4cfee1da998186d13ee5c4debfbd80638cf",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
