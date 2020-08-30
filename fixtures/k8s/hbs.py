@@ -50,7 +50,7 @@ class HbsFixture(fixtures.Fixture):
         self.leftnad  = None
         self.rightnad  = None
         self.connections = connections
-        self.vnc_lib = connections.get_vnc_lib_h()
+        self.vnc_lib = connections.vnc_lib
         self.agent_inspect = connections.agent_inspect
         self.username = "root"
         self.password = "c0ntrail123"
