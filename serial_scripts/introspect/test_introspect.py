@@ -369,8 +369,14 @@ class IntrospectSslTest(BaseIntrospectSsl):
         server_key, server_csr, server_cert = self.create_cert(
             subject=subject, subjectAltName=subjectAltName)
 
-        services = ['contrail-api', 'contrail-schema', 'contrail-svc-monitor',
-            'contrail-control', 'contrail-dns']
+        if len(self.inputs.cfgm_names) > 1:
+            # don't test schema dns services in multi-controller setup,
+            # restarting the service, induces mastership siwtchover
+            services = ['contrail-api', 'contrail-control', 'contrail-dns']
+        else:
+            services = ['contrail-api', 'contrail-schema', 'contrail-svc-monitor',
+                        'contrail-control', 'contrail-dns']
+
         for service in services:
             inspect = self.get_introspect_for_service(service, host_ip)
             cntr = CONTRAIL_SERVICE_CONTAINER[service]
@@ -421,21 +427,6 @@ class IntrospectSslTest(BaseIntrospectSsl):
         port = CONTRAIL_INTROSPECT_PORTS[service]
 
         ssl_enable = 'true'
-        #case 1. Non-existent certs path
-        server_cert = '/tmp/' + DEFAULT_CERT.split('/')[-1]
-        server_key = '/tmp/' + DEFAULT_PRIV_KEY.split('/')[-1]
-        ca_cert = '/tmp/' + DEFAULT_CA.split('/')[-1]
-        assert not self.update_config_file_and_restart_service(host_ip,
-            CONTRAIL_CONF_FILES[service], ssl_enable, server_key,
-            server_cert, ca_cert, service, container, tries=3, delay=2)
-
-        url = 'http://%s:%s' % (host_name, port)
-        output_http = inspect.dict_get(url=url, raw_data=True)
-        assert (output_http == None)
-        url = 'https://%s:%s' % (host_name, port)
-        output_http = inspect.dict_get(url=url, raw_data=True)
-        assert (output_http == None)
-
         #Case 2. client cert not signed by provided CA list, https query should fail
         subject = '/CN=%s' % host_name
         subjectAltName = 'IP:%s,DNS:%s,DNS:%s' % (host_ip, host_fqname, host_name)
