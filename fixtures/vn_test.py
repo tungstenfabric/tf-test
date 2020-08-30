@@ -58,7 +58,7 @@ class VNFixture(fixtures.Fixture):
         self.logger = self.connections.logger
         self.orchestrator = kwargs.get('orch', self.connections.orch)
         self.quantum_h = self.connections.quantum_h
-        self.vnc_lib_h = self.connections.get_vnc_lib_h()
+        self.vnc_lib_h = self.connections.vnc_lib
         self.api_s_inspect = self.connections.api_server_inspect
         self.agent_inspect = self.connections.agent_inspect
         self.cn_inspect = self.connections.cn_inspect
@@ -66,7 +66,6 @@ class VNFixture(fixtures.Fixture):
         self.domain_name = self.connections.domain_name
         self.project_name = project_name or self.connections.project_name
         self.vn_name = vn_name or get_random_name(self.project_name)
-        self.project_id = self.connections.get_project_id()
         self.uuid = uuid
         self.obj = None
         self.ipam_fq_name = ipam_fq_name or NetworkIpam().get_fq_name()
@@ -297,6 +296,7 @@ class VNFixture(fixtures.Fixture):
         return af
 
     def _create_vn_orch(self):
+        self.project_id = self.connections.get_project_id()
         try:
             self.obj = self.orchestrator.get_vn_obj_if_present(self.vn_name,
                                          project_id=self.project_id)

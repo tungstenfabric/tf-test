@@ -102,7 +102,7 @@ class NamespaceFixture(fixtures.Fixture):
     @retry(delay=2, tries=10)
     def verify_namespace_in_contrail_api(self):
         self.project_name = self.get_project_name_for_namespace()
-        self.project_fq_name = '%s:%s' %(self.inputs.admin_domain,
+        self.project_fq_name = '%s:%s' %(self.connections.domain_name,
                                          self.project_name)
         try:
             self.api_s_obj = self.vnc_api_h.project_read(

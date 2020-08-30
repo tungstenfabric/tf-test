@@ -541,7 +541,10 @@ class TestInputs(with_metaclass(Singleton, object)):
         test_configs = self.config.get('test_configuration') or {}
         self.orchestrator = deployment_configs.get('orchestrator') or 'openstack'
         self.slave_orchestrator = deployment_configs.get('slave_orchestrator',None)
+        self.additional_orchestrator = deployment_configs.get('additional_orchestrator', None)
         if self.deployer == 'openshift':
+            kube_config_file = OPENSHIFT_CONFIG_FILE
+        elif self.deployer == 'juju' or self.additional_orchestrator == 'kubernetes':
             kube_config_file = OPENSHIFT_CONFIG_FILE
         else:
             kube_config_file = K8S_CONFIG_FILE
@@ -598,6 +601,8 @@ class TestInputs(with_metaclass(Singleton, object)):
             self.admin_tenant = self.k8s_cluster_name + '-default'
         elif self.slave_orchestrator == 'kubernetes':
             self.k8s_clusters = test_configs['k8s_nested']['clusters']
+        elif self.additional_orchestrator == 'kubernetes':
+            self.k8s_cluster_name = contrail_configs.get('KUBERNETES_CLUSTER_NAME') or "k8s"
 
         # test specific configs
         self.auth_url = test_configs.get('auth_url') or os.getenv('OS_AUTH_URL',
@@ -1051,7 +1056,7 @@ class ContrailTestInit(object):
         # address_family = read_config_option(self.config,
         #                      'Basic', 'AddressFamily', 'dual')
         self.address_family = 'v4'
-        if self.orchestrator == 'kubernetes':
+        if self.orchestrator == 'kubernetes' or self.additional_orchestrator == 'kubernetes':
             if not os.path.exists(self.kube_config_file):
                  self.copy_file_from_server(self.k8s_master_ip,
                         self.kube_config_file, self.kube_config_file)

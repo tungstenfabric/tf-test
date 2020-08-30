@@ -28,7 +28,7 @@ class NetworkAttachmentFixture(fixtures.Fixture):
         self.spec = {} if spec is None else spec
         self.already_exists = None
         self.connections = connections
-        self.vnc_lib = connections.get_vnc_lib_h()
+        self.vnc_lib = connections.vnc_lib
         self.agent_inspect = connections.agent_inspect
     # end __init__
 

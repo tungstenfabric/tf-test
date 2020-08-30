@@ -23,8 +23,6 @@ class FloatingIPFixture(fixtures.Fixture):
                  option=None, uuid=None):
         self.connections = connections
         self.inputs = inputs or connections.inputs
-        if not project_name:
-            project_name = self.inputs.project_name
         self.api_s_inspect = self.connections.api_server_inspect
         self.orch = self.connections.orch
         self.quantum_h = self.connections.quantum_h
@@ -33,7 +31,7 @@ class FloatingIPFixture(fixtures.Fixture):
         self.vnc_lib_h = self.connections.vnc_lib
         self.analytics_obj = self.connections.analytics_obj
 
-        self.project_name = project_name
+        self.project_name = project_name or self.connections.project_name
         self.domain_name = self.connections.domain_name
         self.vn_id = vn_id
         self.vn_name = vn_name

@@ -48,14 +48,13 @@ class TestIngressClusterIp(BaseK8sTest):
                                           labels=labels)
 
         if not getattr(self.public_vn, 'public_vn_fixture', None):
-            vn_fixture = self.useFixture(VNFixture(project_name=self.inputs.project_name,
+            vn_fixture = self.useFixture(VNFixture(
                                                vn_name='__public__',
                                                connections=self.connections,
                                                inputs=self.inputs,
                                                option="contrail"))
             assert vn_fixture.verify_on_setup()
             fip_pool_fixture = self.useFixture(FloatingIPFixture(
-                                            project_name=self.inputs.project_name,
                                             inputs=self.inputs,
                                             connections=self.connections,
                                             pool_name='__fip_pool_public__',
