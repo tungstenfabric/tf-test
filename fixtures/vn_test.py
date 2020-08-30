@@ -58,7 +58,7 @@ class VNFixture(fixtures.Fixture):
         self.logger = self.connections.logger
         self.orchestrator = kwargs.get('orch', self.connections.orch)
         self.quantum_h = self.connections.quantum_h
-        self.vnc_lib_h = self.connections.get_vnc_lib_h()
+        self.vnc_lib_h = self.connections.vnc_lib
         self.api_s_inspect = self.connections.api_server_inspect
         self.agent_inspect = self.connections.agent_inspect
         self.cn_inspect = self.connections.cn_inspect
