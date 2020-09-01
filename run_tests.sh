@@ -6,8 +6,8 @@ trap resume_pids 10 1 2 3 6
 source tools/common.sh
 
 PYTHON=/usr/bin/python3
-TESTR=/usr/local/bin/testr
-SUBUNIT2JUNIT=/usr/local/bin/subunit2junitxml
+TESTR=$(which testr)
+SUBUNIT2JUNIT=$(which subunit2junitxml)
 rm -rf .testrepository
 export PYTHON=${PYTHON}
 
