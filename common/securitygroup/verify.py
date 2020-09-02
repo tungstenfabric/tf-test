@@ -87,9 +87,9 @@ class VerifySecGroup(BaseVrouterTest):
                 return (False, errmsg)
 
     def start_traffic_scapy(self, sender_vm, receiver_vm, proto,
-				sport, dport, count=None, fip=None,
-				payload=None, icmp_type=None, icmp_code=None,
-				recvr=True):
+                sport, dport, count=None, fip=None,
+                payload=None, icmp_type=None, icmp_code=None,
+                recvr=True):
         # Create stream and profile
         if fip:
             stream = Stream(

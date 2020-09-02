@@ -231,7 +231,7 @@ class VNFixture(fixtures.Fixture):
                     vrf_id_dict.update({ip:vrf_id})
             self._vrf_ids = vrf_id_dict
         return self._vrf_ids
-	# end get_vrf_ids
+    # end get_vrf_ids
 
     @property
     def vrf_ids(self):

@@ -107,7 +107,7 @@ def create_sg_quantum(self):
             msg = []
             self.secgrp_fixture[sg_name] = self.useFixture(
                 SecurityGroupFixture(
-		    connections=self.project_connections,
+                    connections=self.project_connections,
                     domain_name=self.topo.domain,
                     project_name=self.topo.project,
                     secgrp_name=sg_name,

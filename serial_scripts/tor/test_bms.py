@@ -907,7 +907,7 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
             tor_agent_node = self.get_mgmt_ip_of_node(
                 tor_agent_dict['tor_tsn_ip'])
             self.inputs.restart_service(tor_agent_service, [tor_agent_node],
-										container='agent')
+                                        container='agent')
             self.do_reachability_checks()
     # end test_routing_with_tor_agent_restarts
             

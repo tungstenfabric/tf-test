@@ -47,13 +47,13 @@ class TestHbsFirewall(BaseK8sTest):
         assert cls._connections.k8s_client.set_label_for_hbf_nodes(labels={"type":None}), \
               "Error : could not label the nodes"
     def run_test(self,
-		vn1_name,
-		tag_type,
-		tag_value,
-		tag_obj_name,
-		vn2_name=None,
-		tag2_value=None,
-		inter_compute=False,
+        vn1_name,
+        tag_type,
+        tag_value,
+        tag_obj_name,
+        vn2_name=None,
+        tag2_value=None,
+        inter_compute=False,
                 cleanup=True):
         project_name = "k8s-" + self.namespace.name
         isolated_creds = IsolatedCreds(
@@ -67,10 +67,10 @@ class TestHbsFirewall(BaseK8sTest):
         proj_inputs = isolated_creds.get_inputs(proj_fix)
         proj_connection = isolated_creds.get_connections(proj_inputs)
 
-	# Create VNs
+    # Create VNs
         vn1 = self.setup_vn(project_name =project_name,
                          connections=proj_connection, inputs=proj_inputs,
-			 vn_name = vn1_name)
+                    vn_name = vn1_name)
         vn1_dict = {"domain": vn1.domain_name,
                    "project" : vn1.project_name,
                    "name": vn1.vn_name}
@@ -78,10 +78,10 @@ class TestHbsFirewall(BaseK8sTest):
         if vn2_name != None:
              vn2 = self.setup_vn(project_name = project_name,
                          connections=proj_connection, inputs=proj_inputs,
-			 vn_name = vn2_name)
+                     vn_name = vn2_name)
              vn2_dict = {"domain": vn2.domain_name,
-                   	"project" : vn2.project_name,
-                   	"name": vn2.vn_name}
+                    "project" : vn2.project_name,
+                    "name": vn2.vn_name}
 
              # Attach policy btw vn1 and vn2 to allow all traffic
              pol_rules_vn1_vn2 = [
@@ -120,14 +120,14 @@ class TestHbsFirewall(BaseK8sTest):
              compute_selector_2 = compute_selector_1
 
         pod1 = self.setup_busybox_pod(namespace=namespace_name,
-		 custom_isolation=True, fq_network_name=vn1_dict,
-		 compute_node_selector=compute_selector_1)
+            custom_isolation=True, fq_network_name=vn1_dict,
+            compute_node_selector=compute_selector_1)
         assert pod1.verify_on_setup()
         self.addCleanup(self.perform_cleanup, pod1)
         pod2 = self.setup_busybox_pod(namespace=namespace_name,
-		 custom_isolation=True,
-		 fq_network_name = (vn2_dict or vn1_dict),
-		 compute_node_selector=compute_selector_2)
+            custom_isolation=True,
+            fq_network_name = (vn2_dict or vn1_dict),
+            compute_node_selector=compute_selector_2)
         assert pod2.verify_on_setup()
         self.addCleanup(self.perform_cleanup, pod2)
         assert pod1.ping_with_certainty(pod2.pod_ip)
@@ -145,7 +145,7 @@ class TestHbsFirewall(BaseK8sTest):
         self.addCleanup(self.perform_cleanup, pod4)
         assert pod3.ping_with_certainty(pod4.pod_ip)
 
-	# Create tags
+    # Create tags
         fq_name1 = ['default-domain', project_name,
                     '%s=%s'%(tag_type, tag_value)]
         tag1 = self.create_tag(fq_name=fq_name1,
@@ -153,7 +153,7 @@ class TestHbsFirewall(BaseK8sTest):
                                parent_type='project')
         self.addCleanup(self.vnc_h.delete_tag, id=tag1)
         if tag2_value != None:
-       	     fq_name2 = ['default-domain', project_name,
+            fq_name2 = ['default-domain', project_name,
                          '%s=%s'%(tag_type, tag2_value)]
              tag2 = self.create_tag(fq_name=fq_name1,
                                     tag_type=tag_type, tag_value=tag2_value,
@@ -161,7 +161,7 @@ class TestHbsFirewall(BaseK8sTest):
              self.addCleanup(self.vnc_h.delete_tag, id=tag2)
         app_tag_name = 'myk8s'
         fq_name3 = ['default-domain', project_name,
-			 '%s=%s'%('application', 'myk8s')]
+            '%s=%s'%('application', 'myk8s')]
         apptag = self.create_tag(fq_name=fq_name3,
                                  tag_type='application',
                                  tag_value=app_tag_name, parent_type='project')
@@ -253,7 +253,7 @@ class TestHbsFirewall(BaseK8sTest):
         assert pod1.ping_with_certainty(pod2.pod_ip, expectation=True, count='5', hbf_enabled=True)
         assert pod3.ping_with_certainty(pod4.pod_ip, expectation=False, count='5', hbf_enabled=True)
 
-	# Cleanups
+    # Cleanups
         for tag_obj in tag_obj_list:
             self.addCleanup(self.vnc_h.unset_tag,
                             tag_type=tag_type, obj=tag_obj)

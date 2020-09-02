@@ -19,7 +19,7 @@ class TestOcDockerRestart(BaseK8sTest):
 
 
     def post_restart_verifications(self):
-	
+
         self.logger.info('Checking contrail status')
         assert self.inputs.verify_state(retries=15, rfsh=True),'contrail-status \
             is not good,some processess are already down'
@@ -57,7 +57,7 @@ class TestOcDockerRestart(BaseK8sTest):
     def test_oc_docker_restart_k8s_backup(self):
         '''
         This tests valid only on HA setup with events on non-test container host and test-logic ensures this
-	        1  Execute Docker restart on the host which has "contrail-kube-manager" in backup state
+            1. Execute Docker restart on the host which has "contrail-kube-manager" in backup state
             2. Verify desired and available counts of kube-system daemonsets
             3. Verify all Openshift Sytem pods are in running state 
             4. Verify contrail-status are active for all contrail processes
@@ -67,12 +67,12 @@ class TestOcDockerRestart(BaseK8sTest):
         if len(contrail_k8s_backup_nodes) != 2:
             assert False, "This is not HA setup"
 
-    	# Avoid restarting Docker on test-container node
+        # Avoid restarting Docker on test-container node
         if contrail_k8s_backup_nodes[0] != socket.gethostbyaddr(socket.gethostname())[2][0]:
             restart_node = contrail_k8s_backup_nodes[0]
         else:
             restart_node = contrail_k8s_backup_nodes[1]
-    	
+
         # Restart the docker host
         self.inputs.run_cmd_on_server(restart_node, 'systemctl restart docker')
 
@@ -113,7 +113,7 @@ class TestOcDockerRestart(BaseK8sTest):
         # Restart the docker host
         self.inputs.run_cmd_on_server(restart_node, 'systemctl restart docker')
 
-    	# Verifications after restart
+        # Verifications after restart
         self.post_restart_verifications()
 
     ## end-of test_oc_docker_restart_k8s_active 
@@ -180,7 +180,7 @@ class TestOcDockerRestart(BaseK8sTest):
         # Restart the docker host
         self.inputs.run_cmd_on_server(restart_node, 'systemctl restart docker')
 
-    	# Verifications after restart
+        # Verifications after restart
         self.post_restart_verifications()
 
     ## end-of test_oc_docker_restart_dm_active 
@@ -247,7 +247,7 @@ class TestOcDockerRestart(BaseK8sTest):
         # Restart the docker host
         self.inputs.run_cmd_on_server(restart_node, 'systemctl restart docker')
 
-    	# Verifications after restart
+        # Verifications after restart
         self.post_restart_verifications()
 
     ## end-of test_oc_docker_restart_schema_active 
