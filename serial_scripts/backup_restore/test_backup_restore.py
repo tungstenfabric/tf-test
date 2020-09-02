@@ -21,7 +21,7 @@ class TestBackupRestore(BackupRestoreBaseTest,VerifyFeatureTestCases):
     def setUpClass(cls):
         super(TestBackupRestore, cls).setUpClass()
         cls.res.setUp(cls.inputs , cls.connections, cls.logger)
-        
+
     @classmethod
     def tearDownClass(cls):
         cls.res.cleanUp()
@@ -30,7 +30,7 @@ class TestBackupRestore(BackupRestoreBaseTest,VerifyFeatureTestCases):
     def runTest(self):
         pass
     #end runTest
-    
+
     @preposttest_wrapper
     def test_fiptraffic_before_backup(self):
         ''' Test to create policy, security group  and floating ip rules on common resources and checking if they work fine
@@ -50,36 +50,36 @@ class TestBackupRestore(BackupRestoreBaseTest,VerifyFeatureTestCases):
                 password = password, warn_only=True, abort_on_prompts=False, debug=True):
 
             fab_path = os.environ.get('FABRIC_UTILS_PATH', '/opt/contrail/utils')
-            backup_cmd = "cd " +fab_path +";fab backup_data " 
-            restore_cmd = "cd " +fab_path +";fab restore_data " 
+            backup_cmd = "cd " +fab_path +";fab backup_data "
+            restore_cmd = "cd " +fab_path +";fab restore_data "
             reset_cmd = "cd " +fab_path +";fab reset_config "
-            
+
             self.logger.info("Starting backup")
             status = run(backup_cmd)
             self.logger.debug("LOG for fab backup_data : %s" % status)
             assert not(status.return_code), 'Failed while running  backup_data'
             result = result and not(status.return_code)
             self.logger.info("Backup completed")
-            
+
             self.logger.info("Starting reset config")
             status = run(reset_cmd)
             self.logger.debug("LOG for fab reset_config : %s" % status)
             assert not(status.return_code), 'Failed while running reset_config'
             result = result and not(status.return_code)
             self.logger.info("Reset configuration completed")
-            
+
             self.logger.info("Starting restore")
             status = run(restore_cmd)
             self.logger.debug("LOG for fab restore_data: %s" % status)
             assert not(status.return_code), 'Failed while running restore_data'
             result=result and not(status.return_code)
-            self.logger.info("Restore of data and configuration completed")  
+            self.logger.info("Restore of data and configuration completed")
         return result
-    #end test_backup_restore   
-    
+    #end test_backup_restore
+
     @preposttest_wrapper
     def test_traffic_after_restore(self):
         '''Test to test traffic after restore using previouly defined  policy and floating ip and then adding new policy,fip to new resources also  validate service chaining in network  datapath and security group
         '''
         return self.verify_config_after_feature_test()
-    #end test_traffic_after_restore        
+    #end test_traffic_after_restore

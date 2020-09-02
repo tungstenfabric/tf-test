@@ -19,7 +19,7 @@ class BaseEvpnTest(test_v1.BaseTestCase_v1):
     @classmethod
     def tearDownClass(cls):
         super(BaseEvpnTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
     def remove_from_cleanups(self, fix):
         for cleanup in self._cleanups:

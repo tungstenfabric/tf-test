@@ -43,7 +43,7 @@ class TestECMPSanity(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic
                               create_svms=True,
                               **self.common_args)
     # end test_ecmp_svc_v2_transparent_with_3_instance
-    
+
     @preposttest_wrapper
     def test_ecmp_svc_in_network_with_3_instance(self):
         """
@@ -236,12 +236,12 @@ class TestECMPFeature(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffi
         """
          Description: Validate ECMP with v2 service chaining in-network-nat mode datapath having service instance
          Test steps:
-           1.	Creating vm's - vm1 and vm2 in networks vn1 and vn2.
-           2.	Creating a service instance in in-network-nat mode with 3 instances and
+           1.   Creating vm's - vm1 and vm2 in networks vn1 and vn2.
+           2.   Creating a service instance in in-network-nat mode with 3 instances and
                 left-interface of the service instances sharing the IP and enabled for static route.
 
-           3.	Creating a service chain by applying the service instance as a service in a policy between the VNs.
-           4.	Checking for ping and tcp traffic between vm1 and vm2.
+           3.   Creating a service chain by applying the service instance as a service in a policy between the VNs.
+           4.   Checking for ping and tcp traffic between vm1 and vm2.
          Pass criteria: Ping between the VMs should be successful and TCP traffic should reach vm2 from vm1.
          Maintainer : ganeshahv@juniper.net
         """
@@ -342,8 +342,8 @@ class TestECMPFeature(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffi
         Test steps:
                     1.  Creating vm's - vm1 and vm2 in networks vn1 and vn2.
                     2.  Creating a service instance in in-network-nat mode with 3 instances and
-                         left-interface of the service instances sharing the IP and enabled for static route.
-                    3.   Start traffic and send 3 different streams, one each to a DIP.
+                        left-interface of the service instances sharing the IP and enabled for static route.
+                    3.  Start traffic and send 3 different streams, one each to a DIP.
                     4.  Creating a service chain by applying the service instance as a service in a policy b
          etween the VNs.
                     5.  Checking for ping and tcp traffic between vm1 and vm2.
@@ -637,7 +637,7 @@ class TestECMPwithSVMChange(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMP
             for svm in svms:
                 if svm.id == to_be_deleted_svm.vm_id:
                     svms.remove(svm)
-            si_fixture.verify_svm()        
+            si_fixture.verify_svm()
             svms = self.get_svms_in_si(si_fixture)
             new_count = len(svms)
             errmsg = 'The SVMs count has not decreased'
@@ -1144,7 +1144,7 @@ class TestECMPVro(TestECMPSanity):
     def setUpClass(cls):
         cls.vro_based = True
         super(TestECMPVro, cls).setUpClass()
-    
+
     def is_test_applicable(self):
         if self.inputs.orchestrator == 'vcenter' and not self.inputs.vro_based:
            return(False, 'Skipping Test Vro server not present on vcenter setup')

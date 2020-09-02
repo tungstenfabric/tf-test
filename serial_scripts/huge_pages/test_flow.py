@@ -325,7 +325,7 @@ class TestFlowNoHugePage(BaseTestFlow):
 
     def is_test_applicable(self):
         compute_ip = self.compute_ips[0]
-        if ((self.is_dpdk_compute(compute_ip) == False) and 
+        if ((self.is_dpdk_compute(compute_ip) == False) and
             ((self.is_hugepage_configured(compute_ip, "2MB") == True) or
              (self.is_hugepage_configured(compute_ip, "1GB") == True))):
              return (False, 'Kernel compute with Hugepages configured ' + compute_ip)

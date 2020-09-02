@@ -144,7 +144,7 @@ def _OpResultGet(dct, p1, p2, match=None):
                                     if ((match[0] == k)and (match[1] == v)):
                                         ret2.append(elem)
                                         ret = ret2
-                                        return 
+                                        return
                                     elif (isinstance(v, dict)):
                                         if (match[0] in list(v.keys()) and (match[1] in list(v.values())or (int(match[1]) in list(v.values())))):
                                             ret2.append(elem)

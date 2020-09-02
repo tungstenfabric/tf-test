@@ -34,7 +34,7 @@ class Command(object):
             self.stop()
 
     def stop(self):
-        """Stops the background process and exits. 
+        """Stops the background process and exits.
 
         Return tuple of (RC, stdout, stderr)."""
         rc = self.execprocess.poll()

@@ -440,8 +440,8 @@ class WebuiCommon(object):
                     pass
                 return False
             self.logger.info(
-	        "Click on save button %s successful" %
-	        (element_type))
+            "Click on save button %s successful" %
+            (element_type))
         else:
             self.logger.info("Click on icon + %s successful" % (element_type))
         return True
@@ -2245,7 +2245,7 @@ class WebuiCommon(object):
         time.sleep(2)
         return self.check_error_msg("configure service template")
     # end click_configure_service_template
-    
+
     def click_configure_service_health_check(self):
         self._click_on_config_dropdown(self.browser, 5)
         self.click_element(['config_service_healthchk', 'a'], ['id', 'tag'])
@@ -2954,7 +2954,7 @@ class WebuiCommon(object):
                         list_out.append(dictn)
                         break
             elif value is None:
-                dictn = {} 
+                dictn = {}
                 dictn['key'] = key
                 dictn['value'] = None
                 list_out.append(dictn)
@@ -3462,7 +3462,7 @@ class WebuiCommon(object):
                     break
         return value1
     # end get_value_of_key
-    
+
     def get_api_detail(self, uuid, option):
         self.vn_api_url = option + uuid
         return self._get_list_api(self.vn_api_url)
@@ -4007,7 +4007,7 @@ class WebuiCommon(object):
                         imp_route_target = self.find_element('user_created_import_route_targets', \
                                                      elements=True)
                     minus = self.find_element('fa-minus', 'class', elements=True)
-                    index = len(minus) - 3 
+                    index = len(minus) - 3
                     minus[index].click()
                 self.wait_till_ajax_done(self.browser)
                 self.click_element('configure-networkbtn1')

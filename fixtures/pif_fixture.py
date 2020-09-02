@@ -47,7 +47,7 @@ class PhysicalInterfaceFixture(vnc_api_test.VncLibFixture):
                 connections = kwargs.get('connections', None)
                 self.webui = WebuiTest(connections, self.inputs)
         except Exception as e:
-            pass 
+            pass
      # end __init__
 
     def read(self):
@@ -113,7 +113,7 @@ class PhysicalInterfaceFixture(vnc_api_test.VncLibFixture):
     def delete_pif(self):
         self.logger.info('Deleting physical port %s:' % (
             self.fq_name))
-        self.vnc_h.delete_physical_interface(id=self.uuid) 
+        self.vnc_h.delete_physical_interface(id=self.uuid)
     # end delete_pif
 
     def get_logical_ports(self):

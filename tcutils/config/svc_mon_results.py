@@ -19,7 +19,7 @@ class CsSvcInstance (Result):
 
     def standby_vrouter(self):
         return self.get_vrouter_name('standby')
- 
+
     def is_launched(self):
         return self.xpath('si_state') == 'active'
 

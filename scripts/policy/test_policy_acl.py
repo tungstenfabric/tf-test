@@ -61,7 +61,7 @@ class TestPolicyAcl(BasePolicyTest):
                 inputs=self.inputs,
                 subnets=[get_random_cidr(af='v4')],
                 ipam_fq_name=self.ipam1_obj.fq_name,orch=self.orchestrator))
-        
+
         self.VN1_fixture.read()
 
         self.VN2_fixture = self.useFixture(
@@ -114,7 +114,7 @@ class TestPolicyAcl(BasePolicyTest):
         assert self.VM11_fixture.wait_till_vm_is_up()
         assert self.VM21_fixture.wait_till_vm_is_up()
         assert self.VM31_fixture.wait_till_vm_is_up()
-    
+
     # end setup_vm
 
     @attr(type=['cb_sanity', 'sanity', 'vcenter', 'vrouter_gw', 'vcenter_compute'])
@@ -163,7 +163,7 @@ class TestPolicyAcl(BasePolicyTest):
                 inputs=self.inputs,
                 connections=self.connections, api=True))
 
-        
+
         rules = []
         rules = [{'direction': '<>',
                   'protocol': 'any',
@@ -513,7 +513,7 @@ class TestPolicyAcl(BasePolicyTest):
 
         return result
 
-    # end test_policy_inheritance_src_pol_dst_any 
+    # end test_policy_inheritance_src_pol_dst_any
 
     @tcutils.wrappers.preposttest_wrapper
     def test_policy_cidr_src_policy_dst_cidr(self):

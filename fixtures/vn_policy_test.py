@@ -39,7 +39,7 @@ class VN_Policy_Fixture(fixtures.Fixture):
         if self.inputs.verify_thru_gui():
             self.browser = self.connections.browser
             self.browser_openstack = self.connections.browser_openstack
-            self.webui = WebuiTest(self.connections, self.inputs)  
+            self.webui = WebuiTest(self.connections, self.inputs)
     # end __init__
 
     def setUp(self):

@@ -45,8 +45,8 @@ class TestBGPaasZone(BaseBGPaaS):
             self.bgpaas_fixtures.append(self.create_and_attach_bgpaas(self.cnzs,
                                        self.vn,self.vms[1],self.local_as,self.vip,ctrl_zone))
         for vm in self.vms:
-            assert self.verify_bgpaas_in_control_nodes_and_agent(self.bgpaas_fixtures[cnt],vm) 
-            cnt += 1 
+            assert self.verify_bgpaas_in_control_nodes_and_agent(self.bgpaas_fixtures[cnt],vm)
+            cnt += 1
         msg = 'ping from %s to %s failed'%(self.client_vm.name, self.vip)
         assert self.client_vm.ping_with_certainty(self.vip)
         return True
@@ -73,7 +73,7 @@ class TestBGPaasZone(BaseBGPaaS):
         cnt = 0
         for vm in self.vms:
             assert self.verify_bgpaas_in_control_nodes_and_agent(self.bgpaas_fixtures[cnt],vm)
-            cnt += 1 
+            cnt += 1
         assert self.client_vm.ping_with_certainty(self.vip)
         return
 
@@ -100,7 +100,7 @@ class TestBGPaasZone(BaseBGPaaS):
         assert self.verify_bgpaas_in_control_nodes_and_agent(bgpaas_fixtures[0],vms[0])
         msg = 'ping from %s to %s failed'%(client_vm.name, vip)
         assert client_vm.ping_with_certainty(vip)
-        # stop one bgp control node zone 
+        # stop one bgp control node zone
         self.inputs.stop_container(host_ips=self.inputs.bgp_ips[:-1],container='control')
         self.flap_bgpaas_peering(vms)
         self.inputs.start_container(host_ips=self.inputs.bgp_ips,container='control')

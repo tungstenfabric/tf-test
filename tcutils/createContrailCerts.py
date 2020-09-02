@@ -113,7 +113,7 @@ authorityKeyIdentifier=keyid:always,issuer:always
 '''
 
 def create_certificate():
-    
+
     output = subprocess.Popen([MKDIR, '-p', './working/cfg'], stdout=subprocess.PIPE)
     ##time.sleep(2)
     ##if os.path.isdir('./working'):
@@ -123,7 +123,7 @@ def create_certificate():
 
     check_file_dir_exists('./working')
     os.chdir('working')
-    
+
     subprocess.Popen([TOUCH, './cfg/openssl.cfg'], stdout=subprocess.PIPE)
     with open("./cfg/openssl.cfg", "w") as cfg_file:
         cfg_file.write(OPENSSL_CFG)
@@ -187,11 +187,11 @@ def create_certificate():
     cmd = 'cat key/privatep8.key'
     output = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     retVal.append(output.communicate()[0])
-    
+
     os.chdir('..')
     cmd = RM + ' -fr working'
     output = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
-    
+
     return retVal
 
 def check_file_dir_exists(file_dir, tries=5):

@@ -38,7 +38,7 @@ class ContrailVncApi(object):
             return self._vnc.project_read(project_fq_name)
         if project_id:
             return self._vnc.project_read(id=project_id)
-    
+
     def create_multicast_policy(self, name, policyList):
 
         multicast_policy = MulticastPolicy(name,self.vnc_project)

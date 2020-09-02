@@ -9,7 +9,7 @@ def main():
     with open(sys.argv[1],'w') as f:
         for line in content:
             test=line.split('[')[0]
-            f.write(test+'\n') 
+            f.write(test+'\n')
 
 if __name__ == "__main__":
     main()

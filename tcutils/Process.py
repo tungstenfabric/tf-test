@@ -14,7 +14,7 @@ from common import log_orig as logging
 LOG = logging.getLogger(__name__)
 
 def wrapper(func):
-    ''' Decorator to create n tasks 
+    ''' Decorator to create n tasks
     Optional:
     :param max_process: No of concurrent processes to create to handle the tcount tasks (default 30)
     :param tcount : No of tasks to create if less than 1 run the task in the current process context (default 1)

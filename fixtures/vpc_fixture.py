@@ -12,7 +12,7 @@ from floating_ip import *
 
 class VPCFixture(fixtures.Fixture):
 
-    '''Fixture to create, verify and delete VPC, Subnet, Instance, 
+    '''Fixture to create, verify and delete VPC, Subnet, Instance,
        Floating IP allocation and association
        Flow: Euca2ools -> Boto -> Nova
     '''

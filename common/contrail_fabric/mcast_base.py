@@ -253,7 +253,7 @@ for i in range(0,$numgrp):
 
         python_code = python_code.substitute(dst_ip=dip,group=group,numgrp=numgrp,type=type)
 
-        rcv_vm_fixture.run_python_code(python_code) 
+        rcv_vm_fixture.run_python_code(python_code)
 
 
     def verify_igmp_report(self, vm_fixture, vrf_id, igmp, expectation=True):
@@ -445,7 +445,7 @@ for i in range(0,$numgrp):
                     igmp: IGMP Report details
                 optional args:
         '''
-     
+
         self.logger.info('Sending IGMPv3 report as per configuration')
         result = self.send_igmp_reportsv2(vm_fixtures, traffic, igmp)
 
@@ -511,7 +511,7 @@ for i in range(0,$numgrp):
                     igmp: IGMP Report details
                 optional args:
         '''
-     
+
         self.logger.info('Sending IGMPv3 report as per configuration')
         result = self.send_igmp_reportsv2(vm_fixtures, traffic, igmp)
 
@@ -566,7 +566,7 @@ for i in range(0,$numgrp):
                     igmp: IGMP Report details
                 optional args:
         '''
-     
+
 
         ctrl_node =  self.inputs.bgp_control_ips[0]
 
@@ -612,7 +612,7 @@ for i in range(0,$numgrp):
         cmd.append('activate groups __contrail_overlay_evpn_ucast_gateway__ protocols igmp-snooping')
         for prouter in prouters:
             prouter.netconf.config(stmts=cmd, timeout=120)
-    
+
     def configure_igmp_on_vmi(self,vmi,flag):
         '''
             Configure IGMP on VMI:
@@ -644,7 +644,7 @@ class Evpnt6TopologyBase(Evpnt6base):
             compute_1 = host_list[0]
             compute_2 = host_list[1]
             compute_3 = host_list[2]
-            
+
         vm1_name = get_random_name('evpnvm1')
         vm2_name = get_random_name('evpnvm2')
         vm3_name = get_random_name('evpnvm3')
@@ -677,7 +677,7 @@ class Evpnt6TopologyBase(Evpnt6base):
 
         time.sleep(60)
 
-        vn1_fixture = self.vn1_fixture 
+        vn1_fixture = self.vn1_fixture
         vm_fixtures = {'vm1':vm1_fixture,'vm2':vm2_fixture,'vm3':vm3_fixture,'bms':bms_fixture, 'vn1':vn1_fixture}
 
         return vm_fixtures
@@ -705,17 +705,17 @@ class Evpnt6MultiVnBase(Evpnt6base):
 
         self.vxlan_id = vxlan
         bms =self.get_bms_nodes(rb_role='erb_ucast_gw')
-        
+
         vn_ip = str('5.1.1.0', "utf-8")
         vn_ip = ipaddress.ip_address(vn_ip)
         vm_fixtures = {}
         for i in range(1,vn_count):
-    
+
             bms_name = 'bms'+str(i)
             vm_name = 'vm'+str(i)
             vn_name = 'vn'+str(i)
             vn_subnet = str(vn_ip) +'/24'
-            vn_subnets = [vn_subnet] 
+            vn_subnets = [vn_subnet]
 
             self.vn_fixture = self.create_vn(vn_name=vn_name, vn_subnets=vn_subnets ,vxlan_id=self.vxlan_id)
             self.vn_fixture.set_igmp_config()

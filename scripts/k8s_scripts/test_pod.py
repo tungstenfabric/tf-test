@@ -16,7 +16,7 @@ class TestPod(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     @test.attr(type=['openshift_1'])
     @preposttest_wrapper
     def test_add_delete_pod(self):
@@ -44,9 +44,9 @@ class TestPod(BaseK8sTest):
     @preposttest_wrapper
     def test_ping_between_pods_accross_namespace(self):
         '''
-        Test ping between 2 PODs created in 2 different namespace 
+        Test ping between 2 PODs created in 2 different namespace
         Ping should pass in default mode
-        Ping should fail when namespace isolation enabled 
+        Ping should fail when namespace isolation enabled
         '''
         expectation = True
         namespace1 = self.setup_namespace()

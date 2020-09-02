@@ -49,7 +49,7 @@ class TestInterASGRE(BaseInterAS):
             vn['vn2']={}
             vn['vn2']['subnet']='10.10.10.0/24'
             vn_fixtures = self.setup_vns(vn)
-    
+
             vmi = {'count': 2,
                'vmi1': {'vn': 'vn2'},
                'vmi2': {'vn': 'vn1','parent':'vmi1','vlan':20}
@@ -57,7 +57,7 @@ class TestInterASGRE(BaseInterAS):
 
             vmi_fixtures = self.setup_vmis(vn_fixtures, vmi)
             vm = {'count':1,
-              'vm1':{'vn':['vn2'], 'vmi':['vmi1'], 'userdata':{ 
+              'vm1':{'vn':['vn2'], 'vmi':['vmi1'], 'userdata':{
                   'vlan': str(vmi['vmi2']['vlan'])}}
             }
             vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm)

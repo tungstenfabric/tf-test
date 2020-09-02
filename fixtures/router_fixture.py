@@ -11,7 +11,7 @@ import copy
 class LogicalRouterFixture(vnc_api_test.VncLibFixture):
 
     '''Fixture to handle Logical Router object
-    
+
     Optional:
     :param name : name of the logical router
     :param uuid : UUID of the logical router
@@ -19,8 +19,8 @@ class LogicalRouterFixture(vnc_api_test.VncLibFixture):
     :param private: dict of list of private vn_ids or subnet_ids or port_ids
                     {'vns': ['...', '...'], 'subnets': ['...'], 'ports':['...']}
     :param api_type     : one of 'neutron'(default) or 'contrail'
-    :param vni    : vxlan network identifier 
-    :param route_targets      : route targets as list input 
+    :param vni    : vxlan network identifier
+    :param route_targets      : route targets as list input
     :param physical_router    : physical router id (uuid)
 
     Inherited optional parameters:
@@ -67,9 +67,9 @@ class LogicalRouterFixture(vnc_api_test.VncLibFixture):
             self.logger.info('Skipping deletion of Logical Router %s :'
                               %(self.lr_fq_name))
         else:
-            self.remove_interface(self.vn_ids) 
+            self.remove_interface(self.vn_ids)
             self.delete()
-    
+
     def read(self):
         self.logger.debug('Fetching information about Logical Router %s'%self.uuid)
         obj = self.vnc_api_h.logical_router_read(id=self.uuid)
@@ -133,7 +133,7 @@ class LogicalRouterFixture(vnc_api_test.VncLibFixture):
         self.vnc_h.set_logical_router_vni(lr_id=self.uuid, vni=str(vni))
         self.vni = vni
         self.logger.debug('configured routing VNI: %s'%(vni))
-   
+
     def delete_vni(self):
         self.logger.debug('Deleting routing VNI %s on Logical Router %s ...'%(self.vni,self.name))
         self.vnc_h.delete_logical_router_vni(lr_id=self.uuid)
@@ -198,7 +198,7 @@ class LogicalRouterFixture(vnc_api_test.VncLibFixture):
     def remove_interface(self, vn_ids):
         for vn_id in list(set(vn_ids).intersection(self.get_vn_ids())):
             vmi_fixture = self.vmi_fixtures[vn_id]
-            self.vnc_h.remove_interface_from_lr(lr_id=self.uuid, vmi_id=vmi_fixture.uuid) 
+            self.vnc_h.remove_interface_from_lr(lr_id=self.uuid, vmi_id=vmi_fixture.uuid)
             vmi_fixture.cleanUp(force=True)
             self.vn_ids.remove(vn_id)
             del self.vmi_fixtures[vn_id]
@@ -404,7 +404,7 @@ if __name__ == "__main__":
     obj.cleanUp()
     obj.verify_on_cleanup()
     stop = str(input('press enter after checking cleanup...'))
-    
+
     #obj = LogicalRouterFixture(api_type='neutron', uuid='a8395987-8882-41b4-898f-e43085c0f889', connections=setup_test_infra())
     obj.add_physical_router('b9b21cfb-ac15-40b7-90e9-4b037d3e4548')
     stop = str(input('press enter after verifying physical router addition...'))

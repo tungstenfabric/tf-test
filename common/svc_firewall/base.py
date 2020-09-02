@@ -19,5 +19,5 @@ class BaseSvc_FwTest(GenericTestBase):
     @classmethod
     def tearDownClass(cls):
         super(BaseSvc_FwTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 

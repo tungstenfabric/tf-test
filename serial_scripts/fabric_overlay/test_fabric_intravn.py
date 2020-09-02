@@ -1018,7 +1018,7 @@ class TestFabricOverlay(TestSPStyleFabric):
         #    "All devices are not onboarded"
         # Workflow to remove/add device.
         self.logger.info("Workflow to remove/Add device.")
-        
+
         mgmt_ip =list()
         # Workflow to remove spine.
         if len(self.spines) > 1:

@@ -30,7 +30,7 @@ key_mapping = {
 
 class AttributeDict(dict):
     '''
-         To make nested dictionary accessible as object attributes as well 
+         To make nested dictionary accessible as object attributes as well
     '''
     def __getattr__(self, attr):
         return self.get(attr)
@@ -103,7 +103,7 @@ class Client(api_client.Client):
                          ip_fabric_snat=False, network_fqname=None):
         '''
             Creates new namespace and returns response
-            returns: 
+            returns:
                 ResourceInstance instance
         '''
         body = self.get_template('namespace')
@@ -124,7 +124,7 @@ class Client(api_client.Client):
 
     def read_namespace(self, name):
         '''
-        returns: 
+        returns:
             ResourceInstance instance
         '''
         resp = self.namespace_h.get(name=name)
@@ -156,7 +156,7 @@ class Client(api_client.Client):
         name: Name of the POD
         containers_list: List of dict specify the details of container.
                          format [{'pod_name':'value','image':'value'}]
-        returns: 
+        returns:
             ResourceInstance instance
 
         '''
@@ -184,16 +184,16 @@ class Client(api_client.Client):
 
     def delete_pod(self, namespace, name, grace_period_seconds=0, orphan_dependents=False):
         '''
-        grace_period_seconds: Type  int , The duration in seconds before the object 
-                              should be deleted. Value must be non-negative integer. 
-                              The value zero indicates delete immediately. If this 
+        grace_period_seconds: Type  int , The duration in seconds before the object
+                              should be deleted. Value must be non-negative integer.
+                              The value zero indicates delete immediately. If this
                               value is nil, the default grace period for the specified
                               type will be used. Defaults to a per object value if not
                               specified. zero means delete immediately. (optional)
 
-        orphan_dependents:    Type bool | Should the dependent objects be orphaned. 
-                              If true/false, the \"orphan\" finalizer will be added 
-                              to/removed from the object's finalizers list. (optional)         
+        orphan_dependents:    Type bool | Should the dependent objects be orphaned.
+                              If true/false, the \"orphan\" finalizer will be added
+                              to/removed from the object's finalizers list. (optional)
         '''
         self.logger.info('Deleting pod %s:%s' % (namespace, name))
         return self.pod_h.delete(name, namespace,
@@ -202,11 +202,11 @@ class Client(api_client.Client):
 
     def read_pod(self, name, namespace='default'):
         '''
-        exact = Type bool | Should the export be exact.  Exact export maintains 
+        exact = Type bool | Should the export be exact.  Exact export maintains
                             cluster-specific fields like 'Namespace' (optional)
-        export = Type bool | Should this value be exported.  Export strips fields 
+        export = Type bool | Should this value be exported.  Export strips fields
                             that a user can not specify. (optional)
-        returns: 
+        returns:
             ResourceInstance instance
         '''
         resp = self.pod_h.get(name=name, namespace=namespace)
@@ -218,7 +218,7 @@ class Client(api_client.Client):
     def read_pod_status(self, name, namespace='default', exact=True, export=True):
         '''
         Get the POD status
-        returns: 
+        returns:
             ResourceInstance instance
         '''
         resp = self.pod_h.status.get(name, namespace)
@@ -233,7 +233,7 @@ class Client(api_client.Client):
                               spec=None,
                               **kwargs):
         '''
-        returns: 
+        returns:
             ResourceInstance instance
         '''
         resp = self.network_policy_h.replace(self,
@@ -254,7 +254,7 @@ class Client(api_client.Client):
                               spec=None,
                               **kwargs):
         '''
-        returns: 
+        returns:
             ResourceInstance instance
         '''
         body = self.get_template('network_policy')
@@ -267,7 +267,7 @@ class Client(api_client.Client):
         if spec:
             modified_spec = deepcopy(spec)
             self._replace_key(modified_spec)
-            body['spec'] = modified_spec 
+            body['spec'] = modified_spec
         resp = self.network_policy_h.create(body=body,
                    namespace=namespace)
         if resp:
@@ -288,7 +288,7 @@ class Client(api_client.Client):
                           metadata=None,
                           spec=None):
         '''
-        returns: 
+        returns:
             ResourceInstance instance
         '''
         if metadata is None: metadata = {}
@@ -341,7 +341,7 @@ class Client(api_client.Client):
                                         "targetPort": 9376
                                 }
                         ]
-        returns: 
+        returns:
             ResourceInstance instance
         '''
 
@@ -368,12 +368,12 @@ class Client(api_client.Client):
                        namespace,
                        name):
         self.logger.info('Deleting service : %s' % (name))
-        return self.service_h.delete(name=name, namespace=namespace) 
+        return self.service_h.delete(name=name, namespace=namespace)
 
     def read_pods_namespace(self, namespace='default'):
         '''
         Get all pods in a given namespace
-        returns: 
+        returns:
             ResourceInstance instance
         '''
         resp = self.pod_h.get(namespace=namespace)
@@ -381,8 +381,8 @@ class Client(api_client.Client):
 
     def read_daemonsets(self, namespace=''):
         '''
-        Returns daemon sets from the mentioned namespace. 
-        returns: 
+        Returns daemon sets from the mentioned namespace.
+        returns:
             ResourceInstance instance
         '''
         if namespace:

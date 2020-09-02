@@ -5,7 +5,7 @@ from tcutils.wrappers import preposttest_wrapper
 from tcutils.contrail_status_check import ContrailStatusChecker
 
 class TestVrouterDetach(BaseNeutronTest):
-    
+
     @classmethod
     def setUpClass(cls):
         super(TestVrouterDetach, cls).setUpClass()
@@ -39,7 +39,7 @@ class TestVrouterDetach(BaseNeutronTest):
         status.wait_till_contrail_cluster_stable([compute_ip])
         assert result,'Xconnect mode not enabled'
     #end test_vrouter_xconnect
-  
+
     @preposttest_wrapper
     def test_vrouter_kernal_module_unload_reload(self):
         '''

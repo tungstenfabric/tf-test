@@ -78,7 +78,7 @@ def createProject(self):
     self.project_inputs = self.project_connections.inputs
     #update the af type for the new project
     self.project_inputs.set_af(self.inputs.get_af())
-    #update new connection in project fixture 
+    #update new connection in project fixture
     self.project_parent_fixt = self.useFixture(
         ProjectTestFixtureGen(self.vnc_lib, project_name=self.topo.project))
     if self.skip_verify == 'no':
@@ -107,7 +107,7 @@ def create_sg_quantum(self):
             msg = []
             self.secgrp_fixture[sg_name] = self.useFixture(
                 SecurityGroupFixture(
-		    connections=self.project_connections,
+                    connections=self.project_connections,
                     domain_name=self.topo.domain,
                     project_name=self.topo.project,
                     secgrp_name=sg_name,
@@ -358,7 +358,7 @@ def attachPolicytoVN(self, option='contrail'):
 def createVNContrail(self):
     self.vn_fixture = {}
     self.vn_of_cn = {}
-    
+
     for vn in self.topo.vnet_list:
         router_asn = None
         rt_number = None
@@ -714,7 +714,7 @@ def checkNAddAdminRole(self):
         self.logger.info("Adding user 'admin' to non-default tenant %s with admin role" %self.topo.project)
         self.user_fixture.add_user_to_tenant(self.topo.project, 'admin', 'admin')
     return self
-#end checkNAddAdminRole 
+#end checkNAddAdminRole
 
 def checkNAddAdminRole(self):
     if not (

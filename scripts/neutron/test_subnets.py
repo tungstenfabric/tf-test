@@ -263,7 +263,7 @@ class TestSubnets(BaseNeutronTest):
                                      image_name='cirros')
         assert vm1_fixture.wait_till_vm_up(),\
             'VM not able to boot'
-            
+
         # Update subnet to disable dhcp
         vn1_subnet_dict = {'enable_dhcp': False}
         vn1_fixture.update_subnet(vn1_fixture.vn_subnet_objs[0]['id'],

@@ -11,7 +11,7 @@ from .verify import VerifySriovCases
 import test
 
 class TestSriov(base.BaseSriovTest, VerifySriovCases):
-     
+
     @classmethod
     def setUpClass(cls):
         super(TestSriov, cls).setUpClass()
@@ -25,7 +25,7 @@ class TestSriov(base.BaseSriovTest, VerifySriovCases):
         '''
         Configure two SRIOV VM in Same phynets and same VN.
         VMs are configure across compute node.
-        Verify the commonication over SRIOV NIC. 
+        Verify the commonication over SRIOV NIC.
         '''
         return self.communication_between_two_sriov_vm()
 
@@ -40,7 +40,7 @@ class TestSriov(base.BaseSriovTest, VerifySriovCases):
         '''
         Verify Nova can schdule VM to all the VF of a PF.
         Nova should though error when VF is exhausted.
-        After clearing one VF that should be rsusable   
+        After clearing one VF that should be rsusable
         '''
         return self.virtual_function_exhaustion_and_resue()
 

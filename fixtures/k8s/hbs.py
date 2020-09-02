@@ -16,9 +16,9 @@ import pprint
 
 class HbsFixture(fixtures.Fixture):
     '''
-     Fixture to imaplecwments HBF object creation and deletion and reading of the hbs objcts 
+     Fixture to imaplecwments HBF object creation and deletion and reading of the hbs objcts
       -Tags the compute nodes
-      -create a daemon set for csrx with a given version based on the compute node tagging 
+      -create a daemon set for csrx with a given version based on the compute node tagging
       -configure the csrx for HBF
     '''
 
@@ -80,7 +80,7 @@ class HbsFixture(fixtures.Fixture):
         try:
             self.project = self.project_read(fq_name=[self.domain_name, 'k8s-'+self.namespace])
             self.hbs_created =  True
-            return self.hbs_created 
+            return self.hbs_created
         except ApiException as e:
             self.logger.debug('hbs object %s not present' % (self.name))
             self.hbs_created =  False
@@ -106,7 +106,7 @@ class HbsFixture(fixtures.Fixture):
            self.vnc_lib.host_based_service_create(self.hbs)
         else:
            self.vnc_lib.host_based_service_update(self.hbs)
-        return self.hbs_created 
+        return self.hbs_created
     # end create
 
     def delete(self):
@@ -138,11 +138,11 @@ class HbsFixture(fixtures.Fixture):
            return False
         try:
            self.hbs = self.vnc_lib.host_based_service_read(fq_name=self.project.fq_name + [self.name])
-           return True 
-        except NoIdError: 
+           return True
+        except NoIdError:
            self.logger.info('hbs object doesnt exist in config API')
            return False
-        
+
     def verify_hbs_obj_not_in_contrail_api(self):
         try:
            self.hbs = self.vnc_lib.host_based_service_read(fq_name=self.project.fq_name + [self.name])
@@ -153,7 +153,7 @@ class HbsFixture(fixtures.Fixture):
            return True
     # end verify_hbs_obj_not_in_contrail_api
     def create_hbs_nads(self):
-        ''' Creates network attachment definitions 
+        ''' Creates network attachment definitions
             -left and
             -right
         '''
@@ -164,7 +164,7 @@ class HbsFixture(fixtures.Fixture):
         metadata["name"] = "leftnet"
         self.annotate= {'domain':'default-domain',
                         'project':'k8s-%s'%self.namespace,
-                        'name':'__%s-hbf-left__' %self.name} 
+                        'name':'__%s-hbf-left__' %self.name}
         self.annotate=json.dumps(self.annotate)
         metadata["annotations"]["opencontrail.org/network"] = self.annotate
         self.leftnad=self.useFixture(NetworkAttachmentFixture(
@@ -174,7 +174,7 @@ class HbsFixture(fixtures.Fixture):
                               spec=spec))
         self.annotate1= {'domain':'default-domain',
                         'project':'k8s-%s'%self.namespace,
-                        'name':'__%s-hbf-right__' %self.name} 
+                        'name':'__%s-hbf-right__' %self.name}
         metadata1["annotations"]={}
         self.annotate1=json.dumps(self.annotate1)
         metadata1["name"]="rightnet"
@@ -186,7 +186,7 @@ class HbsFixture(fixtures.Fixture):
                               spec=spec))
     def create_hbs_ds(self):
         '''
-          Create hbs Daemon set 
+          Create hbs Daemon set
         '''
         self.ds_name = get_random_name('hbs-ds')
         template_metadata = {}
@@ -199,7 +199,7 @@ class HbsFixture(fixtures.Fixture):
         template_metadata['annotations'] = {}
         template_metadata["annotations"]["k8s.v1.cni.cncf.io/networks"] = {}
         #template_metadata["labels"]= {'type': 'hbf'}
-        template_metadata["labels"]= self.pod_label 
+        template_metadata["labels"]= self.pod_label
         left_net = {"name": self.leftnad.metadata["name"]}
         right_net = {"name": self.rightnad.metadata["name"]}
         nets = [left_net, right_net]
@@ -237,12 +237,12 @@ class HbsFixture(fixtures.Fixture):
                         "name": "CSRX_FORWARD_MODE",
                         "value": "wire" }],
                  'name':'csrx',
-                 'security_context': {"privileged": True} 
+                 'security_context': {"privileged": True}
                  }
             ],
             "image_pull_secrets": [{ "name": pullsecret}],
             'restart_policy': 'Always',
-            "node_selector":  self.node_label 
+            "node_selector":  self.node_label
         }
         spec= {"selector" :self.match_label
               }
@@ -264,16 +264,16 @@ class HbsFixture(fixtures.Fixture):
         '''
           configuring the csrx pod for the hbf support
         '''
-        podslist=[] 
-        cmd = "kubectl get pods --selector type=hbf -n %s | awk '{print $1}'" %self.namespace 
+        podslist=[]
+        cmd = "kubectl get pods --selector type=hbf -n %s | awk '{print $1}'" %self.namespace
         podslist=self.inputs.run_cmd_on_server(self.inputs.k8s_master_ip,\
-                                                  cmd, self.username, self.password, as_sudo=True)  
+                                                  cmd, self.username, self.password, as_sudo=True)
         if len(podslist) != 0:
               podslist = podslist.split("\r\n")
               podslist.remove('NAME')
               cmd='edit'
               cmd+=';set interfaces ge-0/0/1.0'
-              cmd+=';set interfaces ge-0/0/0.0' 
+              cmd+=';set interfaces ge-0/0/0.0'
               cmd+=';set security policies default-policy permit-all'
               cmd+=';set security zones security-zone trust interfaces ge-0/0/0.0'
               cmd+=';set security zones security-zone untrust interfaces ge-0/0/1.0'

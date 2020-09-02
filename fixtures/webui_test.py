@@ -204,7 +204,7 @@ class WebuiTest(object):
                 self.ui.click_on_select2_arrow('s2id_extNetworkUUID_dropdown')
                 self.ui.select_from_dropdown(gateway)
             if not snat:
-                self.ui.click_element('checkSNAT')    
+                self.ui.click_element('checkSNAT')
             if networks:
                 if not self.ui.click_select_multiple('s2id_connectedNetwork_dropdown', networks):
                     self.ui.click_on_cancel_if_failure('cancelBtn')
@@ -7212,7 +7212,7 @@ class WebuiTest(object):
         self.ui.click_on_cancel_if_failure('cancelBtn')
         return result
     # end create_floatingip_pool
-    
+
     def alloc_and_assoc_fip(
             self,
             fixture,
@@ -7232,7 +7232,7 @@ class WebuiTest(object):
         else:
             self.assoc_fip(fixture, fip_pool_vn_id, vm_id, vm_ip, vm_name, vn_name, pool_name)
     # end alloc_and_assoc_fip
-      
+
     def alloc_fip(
             self,
             fixture,
@@ -7277,7 +7277,7 @@ class WebuiTest(object):
         self.ui.click_on_cancel_if_failure('cancelBtn')
         return result
     # end alloc_fip
-        
+
     def assoc_fip(
             self,
             fixture,
@@ -7338,9 +7338,9 @@ class WebuiTest(object):
         pool_name = fixture.pool_name
         if assoc:
             self.disassoc_fip(fixture, vm_id, vm_ip, pool_name)
-        self.ui.delete_element(fixture, 'disassociate_fip') 
+        self.ui.delete_element(fixture, 'disassociate_fip')
     # end disassoc_disalloc_fip
-    
+
     def disassoc_fip(self, fixture, vm_id, vm_ip, pool_name):
         result = True
         try:

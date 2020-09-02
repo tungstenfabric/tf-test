@@ -14,7 +14,7 @@ class TestQosScaling(QosTestBase):
     def tearDownClass(cls):
         super(TestQosScaling, cls).tearDownClass()
     # end tearDownClass
-    
+
     @preposttest_wrapper
     def test_forwarding_class_scaling(self):
         '''

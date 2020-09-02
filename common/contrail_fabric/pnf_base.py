@@ -54,7 +54,7 @@ class BaseL3PnfTest(BaseFabricTest):
         super(BaseL3PnfTest, self).setUp()
 
     def create_l3pnf(self, left_lr, right_lr,
-                     pnf_device, 
+                     pnf_device,
                      left_svc_vlan='1000',
                      right_svc_vlan='2000',
                      left_svc_asn_srx='65000',

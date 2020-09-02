@@ -38,41 +38,41 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_interface(self):
         '''
         1. Create a routing policy with interface match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
         ret_dict = self.config_basic()
         vn_fixture = ret_dict['vn_fixture']
         test_vm = ret_dict['test_vm']
         test2_vm = ret_dict['test2_vm']
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'to_term':'community', 'sub_to':'64512:55555'} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'to_term':'community', 'sub_to':'64512:55555'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_value = '55555'), 'Search term not found in introspect'
         assert test_vm.ping_with_certainty(test2_vm.vm_ip)
-         
+
     @test.attr(type=['sanity'])
     @preposttest_wrapper
     def test_rp_interface_static(self):
         '''
         1. Create a routing policy with interface-static match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
 
         ret_dict,random_cidr = self.create_interface_static_routes()
         config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'interface-static', 'to_term':'community', 'sub_to':'64512:55555'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(ret_dict['vn_fixture'], ret_dict['test_vm'], search_value = '55555', search_ip = random_cidr), 'Search term not found in introspect'
-        assert ret_dict['test_vm'].ping_with_certainty(ret_dict['test2_vm'].vm_ip) 
+        assert ret_dict['test_vm'].ping_with_certainty(ret_dict['test2_vm'].vm_ip)
 
     @preposttest_wrapper
     def test_rp_service_interface(self):
         '''
         1. Create a routing policy with service-interface match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
-        
+
         ret_dict = self.verify_svc_chain(service_mode='in-network',
                                          create_svms=True, max_inst=1)
         si_fixture = ret_dict['si_fixture']
@@ -123,7 +123,7 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
         self.allow_default_sg_to_allow_all_on_project(self.inputs.project_name)
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
         mx_rt = self.inputs.mx_rt
-        
+
         if self.inputs.config['test_configuration'].get('router_asn',False):
            router_asn = self.inputs.config['test_configuration'].get('router_asn')
         else:
@@ -172,7 +172,7 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
 
         self.allow_default_sg_to_allow_all_on_project(self.inputs.project_name)
         mx_rt = self.inputs.mx_rt
-        
+
         if self.inputs.config['test_configuration'].get('router_asn',False):
            router_asn = self.inputs.config['test_configuration'].get('router_asn')
         else:
@@ -233,10 +233,10 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_bgpaas(self):
         '''
         1. Create a routing policy with bgpaas match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
-        
+
         ret_dict = self.create_bgpaas_routes()
         config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'bgpaas', 'to_term':'community', 'sub_to':'64512:55555'}
         rp = self.configure_term_routing_policy(config_dicts)
@@ -249,18 +249,18 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_interface_ext_community(self):
         '''
         1. Create a routing policy with interface match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
         ret_dict = self.config_basic()
         vn_fixture = ret_dict['vn_fixture']
         test_vm = ret_dict['test_vm']
         test2_vm = ret_dict['test2_vm']
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_value = 'target:64512:44444'), 'Search term not found in introspect'
         assert test_vm.ping_with_certainty(test2_vm.vm_ip)
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_value = 'target:64512:33333'), 'Search term not found in introspect'
 
@@ -268,41 +268,41 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_interface_static_ext_community(self):
         '''
         1. Create a routing policy with interface-static match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
 
         ret_dict,random_cidr = self.create_interface_static_routes()
-        config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'interface-static', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'} 
+        config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'interface-static', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(ret_dict['vn_fixture'], ret_dict['test_vm'], search_value = 'target:64512:44444',search_ip = random_cidr), 'Search term not found in introspect'
-        assert ret_dict['test_vm'].ping_with_certainty(ret_dict['test2_vm'].vm_ip) 
-        config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'interface-static', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'} 
+        assert ret_dict['test_vm'].ping_with_certainty(ret_dict['test2_vm'].vm_ip)
+        config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'interface-static', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(ret_dict['vn_fixture'], ret_dict['test_vm'], search_value = 'target:64512:33333',search_ip = random_cidr), 'Search term not found in introspect'
-    
+
     @preposttest_wrapper
     def test_rp_service_interface_ext_community(self):
         '''
         1. Create a routing policy with service-interface match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
-        
+
         ret_dict = self.verify_svc_chain(service_mode='in-network',
                                          create_svms=True, max_inst=1)
         si_fixture = ret_dict['si_fixture']
         left_vm_fixture = ret_dict['left_vm_fixture']
         right_vm_fixture = ret_dict['right_vm_fixture']
         left_vn_fixture = ret_dict['left_vn_fixture']
-        config_dicts = {'vn_fixture':left_vn_fixture, 'from_term':'protocol', 'sub_from':'service-interface', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'} 
+        config_dicts = {'vn_fixture':left_vn_fixture, 'from_term':'protocol', 'sub_from':'service-interface', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(left_vn_fixture, left_vm_fixture, search_ip = str(self.vnc_lib.routing_instance_read(id = str(self.vnc_lib.virtual_network_read(id = left_vn_fixture.uuid).get_routing_instances()[1]['uuid'])).get_service_chain_information().service_chain_address), search_value = 'target:64512:44444')
         assert left_vm_fixture.ping_with_certainty(right_vm_fixture.vm_ip)
-        config_dicts = {'vn_fixture':left_vn_fixture, 'from_term':'protocol', 'sub_from':'service-interface', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'} 
+        config_dicts = {'vn_fixture':left_vn_fixture, 'from_term':'protocol', 'sub_from':'service-interface', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(left_vn_fixture, left_vm_fixture, search_ip = str(self.vnc_lib.routing_instance_read(id = str(self.vnc_lib.virtual_network_read(id = left_vn_fixture.uuid).get_routing_instances()[1]['uuid'])).get_service_chain_information().service_chain_address), search_value = 'target:64512:33333')
-    
+
     @preposttest_wrapper
     def test_rp_service_chain_ext_community(self):
         '''
@@ -321,7 +321,7 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(left_vn_fixture, left_vm_fixture, search_ip = str(right_vm_fixture.vm_ip), search_value = 'target:64512:44444')
         assert left_vm_fixture.ping_with_certainty(right_vm_fixture.vm_ip)
-        config_dicts = {'vn_fixture':left_vn_fixture, 'si_fixture':si_fixture, 'from_term':'protocol', 'sub_from':'service-chain', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'} 
+        config_dicts = {'vn_fixture':left_vn_fixture, 'si_fixture':si_fixture, 'from_term':'protocol', 'sub_from':'service-chain', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(left_vn_fixture, left_vm_fixture, search_ip = str(right_vm_fixture.vm_ip), search_value = 'target:64512:33333'), 'Search term not found in introspect'
 
@@ -329,16 +329,16 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_bgpaas_ext_community(self):
         '''
         1. Create a routing policy with bgpaas match.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
-        
+
         ret_dict = self.create_bgpaas_routes()
         config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'bgpaas', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'}
         rp = self.configure_term_routing_policy(config_dicts)
         sleep(90)
         assert self.verify_policy_in_control(ret_dict['vn_fixture'], ret_dict['test_vm'], search_ip = str(ret_dict['vn_fixture'].get_subnets()[0]['cidr']), search_value = 'target:64512:44444')
-        config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'bgpaas', 'to_term':'set_ext_community', 'sub_to':'target:64512:44444'} 
+        config_dicts = {'vn_fixture':ret_dict['vn_fixture'], 'from_term':'protocol', 'sub_from':'bgpaas', 'to_term':'set_ext_community', 'sub_to':'target:64512:44444'}
         rp = self.configure_term_routing_policy(config_dicts)
         sleep(90)
         assert self.verify_policy_in_control(ret_dict['vn_fixture'], ret_dict['test_vm'], search_ip = str(ret_dict['vn_fixture'].get_subnets()[0]['cidr']), search_value = 'target:64512:44444'), 'Search term not found in introspect'
@@ -347,8 +347,8 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_interface_matrix(self):
         '''
         1. Create a routing policy with interface match and different "to" conditions:med, as-path, local-pref, community.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
 
         ret_dict = self.config_basic()
@@ -371,8 +371,8 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_interface_static_matrix(self):
         '''
         1. Create a routing policy with interface-static match and different "to" conditions:med, as-path, local-pref, community.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
 
         ret_dict = self.config_basic()
@@ -407,8 +407,8 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_service_interface_matrix(self):
         '''
         1. Create a routing policy with service-interface match and different "to" conditions:med, as-path, local-pref, community.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
 
         ret_dict = self.verify_svc_chain(service_mode='in-network',
@@ -432,8 +432,8 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_bgpaas_matrix(self):
         '''
         1. Create a routing policy with bgpaas match and different "to" conditions:med, as-path, local-pref, community.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
 
         ret_dict = self.create_bgpaas_routes()
@@ -480,8 +480,8 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_xmpp_matrix(self):
         '''
         1. Create a routing policy with interface match and different "to" conditions:med, as-path, local-pref, community.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
 
         ret_dict = self.config_basic()
@@ -495,7 +495,7 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
         config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'xmpp', 'to_term':'add_ext_community', 'sub_to':'target:64512:55555'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_value = 'target:64512:55555')
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'xmpp', 'to_term':'set_ext_community', 'sub_to':'target:64512:44444'} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'xmpp', 'to_term':'set_ext_community', 'sub_to':'target:64512:44444'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_value = 'target:64512:44444'), 'Search term not found in introspect'
         config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'xmpp', 'to_term':'med', 'sub_to':'444'}
@@ -542,7 +542,7 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
         config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'static', 'to_term':'add_ext_community', 'sub_to':'target:64512:44444'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_ip = random_cidr, search_value = 'target:64512:44444')
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'static', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'static', 'to_term':'set_ext_community', 'sub_to':'target:64512:33333'}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_ip = random_cidr, search_value = 'target:64512:33333'), 'Search term not found in introspect'
         config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'static', 'to_term':'med', 'sub_to':'444'}
@@ -560,21 +560,21 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
     def test_rp_ext_community_list_match_all_reject(self):
         '''
         1. Create a routing policy with ext_community_list ,interface match and then reject.
-        2. Launch VMs. 
-        3. Attach policy to VN and confirm if policy takes hold. 
+        2. Launch VMs.
+        3. Attach policy to VN and confirm if policy takes hold.
         '''
         ret_dict = self.config_basic()
         vn_fixture = ret_dict['vn_fixture']
         test_vm = ret_dict['test_vm']
         test2_vm = ret_dict['test2_vm']
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'from_term_community':'ext_community_list', 'sub_from_community':['encapsulation:gre','encapsulation:udp'], 'action': 'reject', 'to_term': None} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'from_term_community':'ext_community_list', 'sub_from_community':['encapsulation:gre','encapsulation:udp'], 'action': 'reject', 'to_term': None}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_value = 'RoutingPolicyReject'), 'Search term not found in introspect'
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'from_term_community':'ext_community_list', 'sub_from_community':['encapsulation:gre','encapsulation:udp'], 'action': 'reject', 'to_term': None, 'match_all': True} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'from_term_community':'ext_community_list', 'sub_from_community':['encapsulation:gre','encapsulation:udp'], 'action': 'reject', 'to_term': None, 'match_all': True}
         rp = self.configure_term_routing_policy(config_dicts)
         assert self.verify_policy_in_control(vn_fixture, test_vm, search_value = 'RoutingPolicyReject'), 'Search term not found in introspect'
         #give wrong communinty value and check match_all
-        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'from_term_community':'ext_community_list', 'sub_from_community':['encapsulation:gre','encapsulation:uuup'], 'action': 'reject', 'to_term': None, 'match_all': True} 
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'interface', 'from_term_community':'ext_community_list', 'sub_from_community':['encapsulation:gre','encapsulation:uuup'], 'action': 'reject', 'to_term': None, 'match_all': True}
         rp = self.configure_term_routing_policy(config_dicts)
         assert not self.verify_policy_in_control(vn_fixture, test_vm, search_value = 'RoutingPolicyReject'), 'Search term found in introspect'
 
@@ -627,4 +627,4 @@ class TestRP(RPBase, BaseBGPaaS, BaseHC, VerifySvcFirewall):
         self.attach_vmi_to_bgpaas(port1['id'], bgpaas_fixture)
         self.addCleanup(self.detach_vmi_from_bgpaas,port1['id'], bgpaas_fixture)
         return ret_dict
- 
+

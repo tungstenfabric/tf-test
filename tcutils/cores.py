@@ -30,10 +30,10 @@ def get_cores(inputs):
         password = inputs.host_data[host]['password']
         core = get_cores_node(host, username, password, logger=inputs.logger)
         if core:
-            cores.update({host: core.split()}) 
+            cores.update({host: core.split()})
     # end for
     return cores
-        
+
 
 def get_cores_node(node_ip, user, password, logger=None):
     """Get the list of cores in one of the nodes in the test setup.
@@ -79,7 +79,7 @@ def get_service_crashes(inputs):
         if service_crash:
             crashes.update({node_ip: service_crash})
     return crashes
-                 
+
 
 @retry(tries=10, delay=3)
 def _run(cmd):

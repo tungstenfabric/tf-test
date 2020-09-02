@@ -92,7 +92,7 @@ class TestSvcHC(BaseHC, VerifySvcFirewall):
             left_vn_fq_name, si_fixture, right_vm_fixture, 'left')[0]
     # end test_svc_hc_e2e_fail_svm
 
-    
+
     @preposttest_wrapper
     def test_svc_trans_segment_hc_fail_svm(self):
         ret_dict = self.verify_svc_chain(service_mode='transparent',
@@ -141,7 +141,7 @@ class TestSvcHC(BaseHC, VerifySvcFirewall):
         ''' test to attach and validate link local svc hc to an in-net svc right VMI.
             1. Attach the SHC to the VMI of the SVM.
             2. Bring down the interface and validate the svc action
-            3. Bring up the interface and validate the svc action 
+            3. Bring up the interface and validate the svc action
         Maintainer : ankitja@juniper.net
         '''
         assert self.svc_hc_fail_svm_common(svc_mode='in-network', hc_type='link-local', intf='right' )
@@ -150,7 +150,7 @@ class TestSvcHC(BaseHC, VerifySvcFirewall):
         ''' test to attach and validate link local svc hc to an in-net svc left VMI.
             1. Attach the SHC to the VMI of the SVM.
             2. Bring down the interface and validate the svc action
-            3. Bring up the interface and validate the svc action 
+            3. Bring up the interface and validate the svc action
         Maintainer : ankitja@juniper.net
         '''
         assert self.svc_hc_fail_svm_common(svc_mode='in-network', hc_type='link-local', intf='left' )
@@ -159,7 +159,7 @@ class TestSvcHC(BaseHC, VerifySvcFirewall):
         ''' test to attach and validate link local svc hc to an in-net-nat svc left VMI.
             1. Attach the SHC to the VMI of the SVM.
             2. Bring down the interface and validate the svc action
-            3. Bring up the interface and validate the svc action 
+            3. Bring up the interface and validate the svc action
         Maintainer : ankitja@juniper.net
         '''
         assert self.svc_hc_fail_svm_common(svc_mode='in-network-nat', hc_type='link-local', intf='left' )
@@ -169,7 +169,7 @@ class TestSvcHC(BaseHC, VerifySvcFirewall):
         ''' test to attach and validate end to endsvc hc to an in-net svc right VMI.
             1. Attach the SHC to the VMI of the SVM.
             2. Bring down the interface and validate the svc action
-            3. Bring up the interface and validate the svc action 
+            3. Bring up the interface and validate the svc action
         Maintainer : ankitja@juniper.net
         '''
 

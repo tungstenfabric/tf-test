@@ -93,7 +93,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
             server_port_list = [elem.split(':')[1] for elem in server_ip_port_list] # removing port info
         return server_ip_list, server_port_list
     # end get_all_configured_serversget_all_configured_servers
-    
+
     def get_all_configured_servers_for_webui(self, service_name):
         ''' This function gets list of all applicable servers for
         ContrailWebUI  client
@@ -118,7 +118,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
                               % (service_name, server_list))
         return server_list
     # end get_all_configured_servers_for_webui
-    
+
     def get_all_in_use_servers(self, service_name, client_role, client_process, client_ip):
         ''' This function gets list of all applicable servers for
         a particular client.
@@ -126,7 +126,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
         1. IP of the server connected to the client
         2. Status of that server (Up/ Down)
         3. Port number of that server
-        It reads .conf file to get the list 
+        It reads .conf file to get the list
         Values to argument "service_name" can be:
                     "collector", "xmpp", "dns" or "rabbitmq"
         Values to argument "client_role" can be:
@@ -207,7 +207,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
                 rabbitmq_server_address = self.dns_inspect[client_ip].\
                                         get_connected_rabbitmq()
             self.logger.info("Client process '%s' running on node '%s' is connected"
-                          " to '%s' server running on IP %s" % (client_process, 
+                          " to '%s' server running on IP %s" % (client_process,
                             client_node_name, service_name, rabbitmq_server_address))
             return rabbitmq_server_address
         for connections in connection_info:
@@ -235,12 +235,12 @@ class BaseServiceConnectionsTest(GenericTestBase):
                                         'server_addrs'][0].split(':')[1])
         self.logger.info("Client process '%s' running on node '%s' is connected"
                           " to '%s' server running on IPs %s and ports %s with"
-                          " status %s" % (client_process, client_node_name, 
+                          " status %s" % (client_process, client_node_name,
                             service_name, server_addr_list, server_port,
                             server_addr_status))
         return server_addr_list, server_addr_status, server_port
     # end get_all_in_use_servers
-    
+
     def update_xmpp_hold_time(self, tout):
         self.logger.info("UPDATE_XMPP_HOLD_TIME " + str(tout) )
         gsc_obj = self.vnc_lib.global_system_config_read(
@@ -267,7 +267,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
 
     def add_remove_server(self, operation, server_ip, section, option,
                            client_role, client_process, container_name, index = 0):
-        ''' This function add or remove an entry from list of servers 
+        ''' This function add or remove an entry from list of servers
         configured in .conf file of the client.
         It reads .conf file to get the list.
         It then searches if entry already exist or not and do the operation
@@ -354,7 +354,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
                 self.logger.debug("IP removed from the list on node %s"
                                   % client_ip)
         return server_list
-    
+
     def configure_server_list(self, client_ip, client_process,
                                section, option, server_list, config_file, container_name,
                                container, verify_service=True):
@@ -379,12 +379,12 @@ class BaseServiceConnectionsTest(GenericTestBase):
                 break
             else:
                 index = index+1
-        return index          
-    
+        return index
+
     def skip_if_setup_incompatible(self, client_node_type, min_client_count,
                                    server_node_type, min_server_count):
         '''
-        This function skips the test case if expected number of clients and 
+        This function skips the test case if expected number of clients and
         servers are not running
         **client_node_type can be "agent", "control", "analytics", "config"
         and "database"
@@ -425,9 +425,9 @@ class BaseServiceConnectionsTest(GenericTestBase):
                 result = False
         if not result:
             self.logger.debug("Expected number of '%s' servers or '%s' clients "
-                              " are not present in the topology" % 
+                              " are not present in the topology" %
                               (server_node_type, client_node_type))
             skip = True
             msg = "Skipping because setup requirements are not met"
             raise testtools.TestCase.skipException(msg)
-        
+
