@@ -1783,6 +1783,26 @@ class VNFixture(fixtures.Fixture):
         return True
     # end set_igmp_config
 
+    def set_mac_ip_learning(self, mac_ip_learning_enable=True, verify=True):
+        ''' Configure mac_ip_learning flag on virtual network
+        '''
+        self.logger.debug('Updating mac_ip_learning flag on VN %s to %s' % (
+            self.vn_fq_name, mac_ip_learning_enable))
+        vn_obj = self.vnc_lib_h.virtual_network_read(id = self.uuid)
+        vn_obj.set_mac_ip_learning_enable(mac_ip_learning_enable)
+        self.vnc_lib_h.virtual_network_update(vn_obj)
+
+        if verify:
+            vn_in_api = self.api_s_inspect.get_cs_vn_by_id(vn_id=self.uuid, refresh=True)
+            if vn_in_api['virtual-network']['mac_ip_learning_enable'] != mac_ip_learning_enable:
+                self.logger.error("mac_ip_learning flag in API is not what"
+                    " was set, actual: %s, expected: %s" % (
+                    vn_in_api['virtual-network']['mac_ip_learning_enable'],
+                    mac_ip_learning_enable))
+                return False
+
+        return True
+    # end set_mac_ip_learning
 
     def get_pbb_evpn_enable(self):
         ''' Get PBB EVPN on virtual network '''
