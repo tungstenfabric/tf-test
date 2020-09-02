@@ -127,19 +127,19 @@ class VcenterGatewayOrch(VcenterOrchestrator):
                 self.delete_vm(vm)
                 raise
         return vm_objs
-    
+ 
     def create_vn_vmi_for_stp_bpdu_to_be_flooded(self,**kwargs):
         self.plug_api.create_network_in_contrail_cluster(name='stp_vn',subnet=[{'cidr':'122.121.123.0/24'}],**kwargs)
-       	#The below code is needed for not to 
-        #create the stp vmi port if already exists 
-        #		
+        #The below code is needed for not to
+        #create the stp vmi port if already exists
+        #
         interfaces = self._vnc.virtual_machine_interfaces_list()
         for intf in interfaces['virtual-machine-interfaces']:
             uuid = intf['uuid']
             intf_obj = self._vnc.virtual_machine_interface_read(id=uuid)
             mac_obj = intf_obj.get_virtual_machine_interface_mac_addresses()
-            macs = mac_obj.mac_address 
-            if macs: 
+            macs = mac_obj.mac_address
+            if macs:
                 for mac in macs:
                     if mac == '02:02:03:04:05:06':
                         return

@@ -12,13 +12,13 @@ class BaseSriovTest(test.BaseTestCase):
     def setUpClass(cls):
         super(BaseSriovTest, cls).setUpClass()
         cls.isolated_creds = isolated_creds.IsolatedCreds(cls.__name__, \
-				cls.inputs, input_file = cls.input_file, \
-				logger = cls.logger)
+                cls.inputs, input_file = cls.input_file, \
+                logger = cls.logger)
         cls.isolated_creds.setUp()
-        cls.project = cls.isolated_creds.create_tenant() 
+        cls.project = cls.isolated_creds.create_tenant()
         cls.isolated_creds.create_and_attach_user_to_tenant()
         cls.inputs = cls.isolated_creds.get_inputs()
-        cls.connections = cls.isolated_creds.get_conections() 
+        cls.connections = cls.isolated_creds.get_conections()
         cls.quantum_h= cls.connections.quantum_h
         cls.nova_h = cls.connections.nova_h
         cls.vnc_lib= cls.connections.vnc_lib

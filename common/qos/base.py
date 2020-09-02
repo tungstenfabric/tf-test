@@ -943,23 +943,23 @@ class QosTestBase(BaseNeutronTest):
                     % (conf_file))
         cmds.append('openstack-config --set %s PG-2 scheduling strict' 
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-2 bandwidth 0' 
+        cmds.append('openstack-config --set %s PG-2 bandwidth 0'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-3 scheduling rr' 
+        cmds.append('openstack-config --set %s PG-3 scheduling rr'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-3 bandwidth 40' 
+        cmds.append('openstack-config --set %s PG-3 bandwidth 40'
                     % (conf_file))
         for cmd in cmds:
             cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd, container='agent')
         cls.inputs.restart_service("contrail-vrouter-agent",
-                                     [cls.qos_node_ip],
-									container='agent')
+                                    [cls.qos_node_ip],
+                                    container='agent')
         cluster_status, error_nodes = ContrailStatusChecker(
                                     ).wait_till_contrail_cluster_stable()
         assert cluster_status, 'Hash of error nodes and services : %s' % (
             error_nodes)
     # update_conf_file_queue_map
-    
+
     @classmethod
     def restore_conf_file_queueing(cls):
         '''
@@ -1013,14 +1013,14 @@ class QosTestBase(BaseNeutronTest):
         for cmd in cmds:
             cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd, container='agent')
         cls.inputs.restart_service("contrail-vrouter-agent",
-                                     [cls.qos_node_ip],
-									container='agent')
+                                    [cls.qos_node_ip],
+                                    container='agent')
         cluster_status, error_nodes = ContrailStatusChecker(
                                     ).wait_till_contrail_cluster_stable()
         assert cluster_status, 'Hash of error nodes and services : %s' % (
             error_nodes)
     # update_conf_file_queue_map
-    
+
     @classmethod
     def configure_queue_features(cls):
         '''

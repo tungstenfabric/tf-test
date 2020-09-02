@@ -1270,15 +1270,15 @@ class TestBGPaaS(BaseBGPaaS):
     def test_bgpaas_vsrx_bfd_suppress_route_advt(self):
         '''
         1. Create a BGPaaS object with shared attribute, IP address and ASN.
-        2. Launch vSRXs which will act as the clients. 
-        3. Run VRRP among them. 
-        4. The VRRP master will claim the BGP Source Address of the BGPaaS object. 
+        2. Launch vSRXs which will act as the clients.
+        3. Run VRRP among them.
+        4. The VRRP master will claim the BGP Source Address of the BGPaaS object.
         5. Configure bfd and verify.
 
         Suppress route-advt:
            1. Enable suppress-route-advt and verify test_vm is not advertised to vsrx.
            2. Disable suppress-route-advt and verify test_vm is advertised to vsrx.
-	Maintainer: vageesant@juniper.net
+    Maintainer: vageesant@juniper.net
         '''
         vn_name = get_random_name('bgpaas_vn')
         vn_subnets = [get_random_cidr()]

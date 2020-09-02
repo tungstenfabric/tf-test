@@ -511,13 +511,13 @@ class TestBasicVMVN0(BaseVnVmTest):
             if vm_host_ip not in compute_ip:
                 compute_ip.append(vm_host_ip)
         self.inputs.restart_service('contrail-vrouter-agent', compute_ip,
-									container='agent')
+                                    container='agent')
         sleep(50)
         for vmobj in list(vm_fixture.vm_obj_dict.values()):
             assert vmobj.verify_on_setup()
         return True
     #end test_process_restart_with_multiple_vn_vm
-    
+ 
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_kill_service_verify_core_generation(self):
