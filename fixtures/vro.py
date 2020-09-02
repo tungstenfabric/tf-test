@@ -64,12 +64,12 @@ class VroWorkflows(VcenterOrchestrator):
         for type in id_types:
             if obj_type in type:
                 return type.split(':')[-1]
-    
+
     def get_wf_output(self, location):
         result = self.wf_util.get_wf_output(location)
         if result:
             return [self.get_id(result)]
-    
+
     @retry(delay=3, tries=5)
     def verify_wf_status(self, wf_name, obj_name, location):
         wf_path = location + 'state'
@@ -93,12 +93,12 @@ class VroWorkflows(VcenterOrchestrator):
             rule = '0: protocol ' + ' '.join(rules[min:min+2]) + ' ports ' + ' '.join(rules[min+2:min+4]) + ' ports ' +  ' '.join(rules[min+4:max])
             sg_rules.append(rule)
         return sg_rules
-            
-        
+
+
     #WORKFLOWS
-    
+
     #Connection Workflows
-    
+
     def _create_connection(self, name, controller, port='8082'):
         try:
             conn_id = self.get_wf_object_ids(name,'Connection')
@@ -198,7 +198,7 @@ class VroWorkflows(VcenterOrchestrator):
             payload = self.get_post_body(wf_name, params)
             header,output_params = self.execute(wf_id, payload)
             assert self.verify_wf_status(wf_name, create_pol['policy_name'], header['location'])
-    
+
     def delete_policy(self, name):
         wf_name = 'delete_policy'
         params = {}
@@ -208,7 +208,7 @@ class VroWorkflows(VcenterOrchestrator):
         payload = self.get_post_body(wf_name, params)
         header,output_params = self.execute(wf_id, payload)
         assert self.verify_wf_status(wf_name,name,header['location'])
-    
+
     def remove_policy_rules(self):
         pass
 
@@ -250,7 +250,7 @@ class VroWorkflows(VcenterOrchestrator):
 
     def edit_virtual_network(self):
         pass
-    
+
     def create_vn_vro(self, vn_name, subnets=None, **kwargs):
         wf_name = 'create_vn'
         vn = kwargs
@@ -264,7 +264,7 @@ class VroWorkflows(VcenterOrchestrator):
         assert self.verify_wf_status(wf_name,vn_name,header['location'])
         if subnets:
             self.add_subnet_to_vn(vn,subnets)
-            
+
     def add_subnet_to_vn(self,vn, subnets):
         wf_name = 'add_subnet_to_vn'
         params={}
@@ -286,13 +286,13 @@ class VroWorkflows(VcenterOrchestrator):
             payload = self.get_post_body(wf_name, params)
             header,output_params = self.execute(wf_id, payload)
             assert self.verify_wf_status(wf_name,subnet['cidr'],header['location'])
-    
+
     def add_tag_to_vn(self,vn_name,tag):
         pass
-    
+
     def delete_tag_from_vn(self,vn_name,tag):
         pass
-            
+
     def delete_vn_vro(self, vn_name):
         wf_name = 'delete_vn'
         vn_id = self.get_wf_object_ids(vn_name,'VirtualNetwork')
@@ -311,7 +311,7 @@ class VroWorkflows(VcenterOrchestrator):
         fip = self.get_wf_object_ids(fip_id,'FloatingIp')
         port = self.get_wf_object_ids(port_id,'Port')
         params['FloatingIp'] = fip
-        params['Port'] = port   
+        params['Port'] = port
         payload = self.get_post_body(wf_name, params)
         header,output = self.execute(wf_id, payload)
         assert self.verify_wf_status(wf_name, port_id, header['location'])
@@ -351,16 +351,16 @@ class VroWorkflows(VcenterOrchestrator):
         payload = self.get_post_body(wf_name, params)
         header,output_params = self.execute(wf_id, payload)
         assert self.verify_wf_status(wf_name, port_uuid, header['location'])
-    
+
     def add_tag_to_port(self,port, type, tag):
         pass
-    
+
     def remove_tag_from_port(self,port, tag):
         pass
-    
+
     def add_shc_to_port(self):
         pass
-    
+
     def remove_shc_from_port(self):
         pass
 
@@ -433,11 +433,11 @@ class VroWorkflows(VcenterOrchestrator):
 
     def edit_sg(self):
         pass
-    
+
     def edit_sg_rule(self,sg_name, sg_rules):
         wf_name = 'edit_sg_rule'
         self.add_edit_sg_rules(wf_name, sg_name, sg_rules)
-    
+
     def set_sg_rules(self, sg_name, sg_rules):
         #remove existing rules and set new rules
         wf_name = 'remove_rule_from_sg'
@@ -452,7 +452,7 @@ class VroWorkflows(VcenterOrchestrator):
             header,output_params = self.execute(wf_id, payload)
             self.verify_wf_status(wf_name, sg_name, header['location'])
         self.add_rule_to_sg(sg_name, sg_rules)
-             
+
     def add_rule_to_sg(self,sg_name, sg_rules):
         wf_name = 'add_rule_to_sg'
         self.add_edit_sg_rules(wf_name, sg_name, sg_rules)
@@ -465,7 +465,7 @@ class VroWorkflows(VcenterOrchestrator):
         #ports:{'any','range(10-20)'
         #if ingress:_security
             #src_add:cidr,securitygroup
-            #dst_add:local    
+            #dst_add:local
             #take src_ports
         #if eggress:
             #src_add:local
@@ -567,7 +567,7 @@ class VroWorkflows(VcenterOrchestrator):
                     left_vn_name = if_details['left']['vn_name'].split(':')[-1]
                     left_vn_id = self.get_wf_object_ids(left_vn_name,'VirtualNetwork')
                     params['LeftVirtualNetwork'] = left_vn_id
-                    
+
                 elif itf == 'right':
                     right_vn_name = if_details['right']['vn_name'].split(':')[-1]
                     right_vn_id = self.get_wf_object_ids(right_vn_name,'VirtualNetwork')
@@ -635,8 +635,8 @@ class VroWorkflows(VcenterOrchestrator):
         payload = self.get_post_body(wf_name, params)
         header,output_params = self.execute(wf_id, payload)
         self.verify_wf_status(wf_name,pt_details['name'],header['location'])
-    
-    #contrail security 
+
+    #contrail security
     def create_ag(self, ag, scope='global', project = 'vCenter'):
         params['ag_name'] = ag
         if scope == 'local':
@@ -649,106 +649,106 @@ class VroWorkflows(VcenterOrchestrator):
         payload = self.get_post_body(wf_name, params)
         header,output_params = self.execute(wf_id, payload)
         self.verify_wf_status(wf_name,name,header['location'])
-            
+
     def add_label_to_ag(self,):
         pass
-    
+
     def add_subnet_to_ag():
         pass
-    
+
     #def create_global_ag():
     #    pass
-    
+
     #def create_project_ag():
     #    pass
-    
+
     def delete_ag():
         pass
-    
+
     def remove_label_from_ag():
         pass
-    
+
     def remove_subnet_from_ag():
         pass
-    
+
     def create_global_aps():
         pass
-    
+
     def create_project_aps():
         pass
-    
+
     def add_fwp_to_aps():
         pass
-    
+
     def add_tag_to_aps():
         pass
-    
+
     def delete_aps():
         pass
-    
+
     def remove_fwp_from_aps():
         pass
-    
+
     def remove_tag_from_aps():
         pass
-    
+
     def create_global_fwp():
         pass
-    
+
     def create_project_fwp():
         pass
-    
+
     def add_rule_to_fwp():
         pass
-    
+
     def remove_rule_from_fwp():
         pass
-    
+
     def delete_fwp():
         pass
-    
+
     def create_project_fw_rule():
         pass
-    
+
     def create_global_fw_rule():
         pass
-    
+
     def delete_fw_rule():
         pass
-    
+
     def edit_fw_rule():
         pass
-    
+
     def create_global_svg():
         pass
-    
+
     def create_project_svg():
         pass
-    
+
     def add_service_to_svg():
         pass
-    
+
     def edit_service_of_svg():
         pass
-    
+
     def remove_service_from_svg():
         pass
-    
+
     def delete_svg():
         pass
-    
+
     def create_global_tag():
         pass
-    
+
     def create_project_tag():
         pass
-    
+
     def delete_tag():
         pass
-    
+
     def create_tag_type():
         pass
-    
+
     def delete_tag_type():
         pass
 

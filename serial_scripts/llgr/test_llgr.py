@@ -20,17 +20,17 @@ from tcutils.tcpdump_utils import start_tcpdump_for_intf,\
 import test
 
 '''
-   This test suite runs only on control node scale setup 
-   Where MX is connected to one of the control node and two 
-   compute nodes were connected to each of the agent which 
+   This test suite runs only on control node scale setup
+   Where MX is connected to one of the control node and two
+   compute nodes were connected to each of the agent which
    is taken care during Base class setup
-   In each of the steps following steps were exectued 
-   Launch a Sigle VM for North/South traffic 
+   In each of the steps following steps were exectued
+   Launch a Sigle VM for North/South traffic
    Start ping from VM IP to MX loopback IP
    Start a failure ( link failure / MX restart )
    Check flags for Route advertised by MX is in GR/LLGR state
    Check if there is a drop in traffic
-   Restore the failure 
+   Restore the failure
    Check for BGP open message for notification bit and restart
    capabilities advertised by controller to MX
 '''
@@ -46,7 +46,7 @@ class TestLlgr(TestLlgrBase):
         cls.result6_file = 'ping6_stats'
         cls.pid_file = '/tmp/llgr.pid'
         cls.pid6_file = '/tmp/llgr6.pid'
-        cls.timeout = 30 
+        cls.timeout = 30
         cls.gr_timeout = 60
         cls.llgr_timeout = 120
         return True
@@ -62,7 +62,7 @@ class TestLlgr(TestLlgrBase):
     @preposttest_wrapper
     def test_gr_mx(self):
         '''
-           Check Traffic to MX goes fine when BGP session is down during GR configuration 
+           Check Traffic to MX goes fine when BGP session is down during GR configuration
         '''
         self.set_gr_llgr(gr=35,llgr=0,mode='enable')
         #self.set_gr_llgr(mode='disable')
@@ -70,10 +70,10 @@ class TestLlgr(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.set_bgp_peering(mode='disable')
 
@@ -105,10 +105,10 @@ class TestLlgr(TestLlgrBase):
     @preposttest_wrapper
     def test_gr_llgr_mx(self):
         '''
-           Check Traffic to MX goes fine when BGP session is down durin GR and LLGR configuration 
+           Check Traffic to MX goes fine when BGP session is down durin GR and LLGR configuration
         '''
         timeout = 60
-        #enable llgr 
+        #enable llgr
         self.set_gr_llgr(gr=35,llgr=60,mode='enable')
 
         #self.set_gr_llgr(mode='disable')
@@ -116,10 +116,10 @@ class TestLlgr(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.set_bgp_peering(mode='disable')
 
@@ -154,10 +154,10 @@ class TestLlgr(TestLlgrBase):
     @preposttest_wrapper
     def test_llgr_mx(self):
         '''
-           Check Traffic to MX goes fine when BGP session is down during LLGR configuration 
+           Check Traffic to MX goes fine when BGP session is down during LLGR configuration
         '''
         timeout = 60
-        #enable llgr 
+        #enable llgr
         self.set_gr_llgr(gr=0,llgr=60,mode='enable')
 
         #self.set_gr_llgr(mode='disable')
@@ -165,10 +165,10 @@ class TestLlgr(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.set_bgp_peering(mode='disable')
 
@@ -200,9 +200,9 @@ class TestLlgr(TestLlgrBase):
     @preposttest_wrapper
     def test_gr_mx_restart(self):
         '''
-           Check Traffic to MX goes fine when rpd is restarted during GR configuration 
+           Check Traffic to MX goes fine when rpd is restarted during GR configuration
         '''
-        #enable llgr 
+        #enable llgr
         self.set_gr_llgr(gr=35,llgr=0,mode='enable')
 
         #self.set_gr_llgr(mode='disable')
@@ -210,17 +210,17 @@ class TestLlgr(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
-        # restart rpd 
+        # restart rpd
         self.mx1_handle.restart('routing immediately')
         #self.stop_bgp_peering()
 
         time.sleep(self.timeout)
-  
+
         assert self.verify_gr_llgr_flags(flags=['None'], vn_fix=self.vn_fix, prefix=self.mx_loopback_ip)
 
         assert self.verify_gr_llgr_flags(flags=['None'], vn_fix=self.vn_fix, prefix=self.mx_loopback_ip6)
@@ -243,9 +243,9 @@ class TestLlgr(TestLlgrBase):
     @preposttest_wrapper
     def test_gr_mx_restart_gracefully(self):
         '''
-           Check Traffic to MX goes fine when rpd is restarted gracefully during GR configuration 
+           Check Traffic to MX goes fine when rpd is restarted gracefully during GR configuration
         '''
-        #enable llgr 
+        #enable llgr
         self.set_gr_llgr(gr=35,llgr=0,mode='enable')
 
         #self.set_gr_llgr(mode='disable')
@@ -253,16 +253,16 @@ class TestLlgr(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
-        # restart rpd 
+        # restart rpd
         self.mx1_handle.restart('routing gracefully')
 
         time.sleep(self.timeout)
-  
+
         assert self.verify_gr_llgr_flags(flags=['None'], vn_fix=self.vn_fix, prefix=self.mx_loopback_ip)
 
         assert self.verify_gr_llgr_flags(flags=['None'], vn_fix=self.vn_fix, prefix=self.mx_loopback_ip6)
@@ -285,20 +285,20 @@ class TestLlgr(TestLlgrBase):
     @preposttest_wrapper
     def test_llgr_mx_restart(self):
         '''
-           Check Traffic to MX goes fine when rpd is restarted immediately during LLGR configuration 
+           Check Traffic to MX goes fine when rpd is restarted immediately during LLGR configuration
         '''
         timeout = 60
-        #enable llgr 
+        #enable llgr
         self.set_gr_llgr(gr=35,llgr=60,mode='enable')
 
         if not self.create_vm_start_ping(ping_count=60):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.mx1_handle.restart('routing immediately')
 
@@ -326,9 +326,9 @@ class TestLlgr(TestLlgrBase):
     @preposttest_wrapper
     def test_llgr_mx_restart_gracefully(self):
         '''
-           Check Traffic to MX goes fine when rpd is restarted gracefully during LLGR configuration 
+           Check Traffic to MX goes fine when rpd is restarted gracefully during LLGR configuration
         '''
-        #enable llgr 
+        #enable llgr
         timeout = 60
         self.set_gr_llgr(gr=35,llgr=60,mode='enable')
 
@@ -336,10 +336,10 @@ class TestLlgr(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.mx1_handle.restart('routing gracefully')
 
@@ -370,7 +370,7 @@ class TestLlgr(TestLlgrBase):
         assert self.vm1_fixture.wait_till_vm_is_up()
 
         assert self.vm1_fixture.ping_with_certainty(self.mx_loopback_ip)
-   
+
         cmd = 'ping %s -c %s > %s' % (self.mx_loopback_ip,ping_count,self.result_file)
 
         self.logger.info('Starting ping on %s to %s' % (
@@ -391,7 +391,7 @@ class TestLlgr(TestLlgrBase):
         self.vm1_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=True,
             as_daemon=True, pidfile=self.pid6_file)
 
-        return True 
+        return True
 
     def verify_ping_stats(self):
 

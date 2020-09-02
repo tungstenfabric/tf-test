@@ -86,7 +86,7 @@ def getvmnics(content,vm,hosts):
                 vSwitch = 'NA'
             mac = dev.macAddress
             nic['vlan_id'] = vlanId
-            nic['port_group'] = portGroup 
+            nic['port_group'] = portGroup
             nic['mac'] = mac
     nics.append(nic)
     return nics
@@ -102,7 +102,7 @@ class VcenterGatewayOrch(VcenterOrchestrator):
         vn_id = self.plug_api.create_network_in_contrail_cluster(name,subnets,**kwargs)
         vn_obj.get()
         return vn_obj
-    
+
     def delete_vn(self, vn_obj, **kwargs):
         super(VcenterGatewayOrch, self).delete_vn(vn_obj, **kwargs)
         return self.plug_api.delete_network_from_contrail_cluster(vn_obj.name,**kwargs)
@@ -114,11 +114,11 @@ class VcenterGatewayOrch(VcenterOrchestrator):
             content = self._si.RetrieveContent()
             hosts = [host for cluster in self._dc.hostFolder.childEntity for host in cluster.host]
             nics = getvmnics(content,vm.vmobj,hosts)
-            for nic in nics:    
+            for nic in nics:
                 self.plug_api.create_vmi_lif_and_attach_vmi_to_lif\
                       (vn_name=nic['port_group'],mac_address=nic['mac'],vlan=nic['vlan_id'],vm=vm)
-            
-                 
+
+
         for vm in vm_objs:
             try:
                 self.plug_api.create_vmobj_in_api_server(vm)
@@ -127,19 +127,19 @@ class VcenterGatewayOrch(VcenterOrchestrator):
                 self.delete_vm(vm)
                 raise
         return vm_objs
-    
+
     def create_vn_vmi_for_stp_bpdu_to_be_flooded(self,**kwargs):
         self.plug_api.create_network_in_contrail_cluster(name='stp_vn',subnet=[{'cidr':'122.121.123.0/24'}],**kwargs)
-       	#The below code is needed for not to 
-        #create the stp vmi port if already exists 
-        #		
+        #The below code is needed for not to
+        #create the stp vmi port if already exists
+        #
         interfaces = self._vnc.virtual_machine_interfaces_list()
         for intf in interfaces['virtual-machine-interfaces']:
             uuid = intf['uuid']
             intf_obj = self._vnc.virtual_machine_interface_read(id=uuid)
             mac_obj = intf_obj.get_virtual_machine_interface_mac_addresses()
-            macs = mac_obj.mac_address 
-            if macs: 
+            macs = mac_obj.mac_address
+            if macs:
                 for mac in macs:
                     if mac == '02:02:03:04:05:06':
                         return
@@ -174,18 +174,18 @@ class ContrailPlugApi(object):
         return self._delete_vn(vn_name)
 
     def delete_vmi_and_detach_vmi_to_lif(self,vm):
-        self.delete_lif(vm)        
-        self._delete_vmi(vm) 
+        self.delete_lif(vm)
+        self._delete_vmi(vm)
 
     def delete_lif(self,vm):
         self._delete_lif(vm)
 
     def create_vmobj_in_api_server(self,vm_obj):
-        vm_uuid = vm_obj.id 
+        vm_uuid = vm_obj.id
         try:
             self.vnc_h.create_virtual_machine(vm_uuid=vm_uuid)
         except Exception as e:
-            self.logger.error("VM object create in api failed for vm id %s"%(vm_uuid)) 
+            self.logger.error("VM object create in api failed for vm id %s"%(vm_uuid))
             raise
         vm_api_obj = self._vnc.virtual_machine_read(id=vm_obj.id)
         for port in vm_obj.ports:
@@ -193,25 +193,25 @@ class ContrailPlugApi(object):
             port_obj = self._vnc.virtual_machine_interface_read(id=port_uuid)
             port_obj.set_virtual_machine(vm_api_obj)
             self._vnc.virtual_machine_interface_update(port_obj)
-    
+
     def delete_vmobj_in_api_server(self,vm_obj):
-        vm_uuid = vm_obj.id 
+        vm_uuid = vm_obj.id
         try:
             self.vnc_h.delete_virtual_machine(vm_uuid=vm_uuid)
         except Exception as e:
-            self.logger.error("VM object delete in api failed for vm id %s"%(vm_uuid)) 
+            self.logger.error("VM object delete in api failed for vm id %s"%(vm_uuid))
 
     def create_vmi_lif_and_attach_vmi_to_lif(self,vn_name,mac_address,vlan,vm=None):
-        vn_obj = self._read_vn(vn_name) 
+        vn_obj = self._read_vn(vn_name)
         vn_id = vn_obj.uuid
         #create vmi
         port = self._create_vmi(vn_id=vn_id,mac_address=mac_address,
                     vm=vm )
-        #for each vrouter gateway port , create lif 
+        #for each vrouter gateway port , create lif
         for gw in self._gw:
             for phy_port in gw.ports:
                 lif_name = phy_port + '.' + str(vlan)
-                pif_id = gw.get_port_uuid(phy_port,inputs=self._inputs)  
+                pif_id = gw.get_port_uuid(phy_port,inputs=self._inputs)
                 self._create_lif(lif_name,vlan,pif_id,vm=vm,vmi_ids = [port.uuid])
 
     def _create_vn(self, vn_name, vn_subnet):
@@ -238,7 +238,7 @@ class ContrailPlugApi(object):
         except vnc_api.exceptions.NoIdError:
             return True
     # end _delete_vn
- 
+
     def _read_vn(self,vn_name):
         self._proj_obj = self._get_project_object()
         vn_fq_name = VirtualNetwork(vn_name, self._proj_obj).get_fq_name()
@@ -293,15 +293,15 @@ class VcenterGateway(object):
     @property
     def name(self):
         return self.gateway['name']
-    
+
     @property
     def mgmt_ip(self):
         return self.gateway['mgmt_ip']
- 
+
     @property
     def ports(self):
         return self.gateway['ports']
-        
+
     def get_port_uuid(self,port,inputs=None):
         phy_device_fixture=PhysicalDeviceFixture(self.name,self.mgmt_ip,inputs=inputs)
         phy_device_fixture.setUp()

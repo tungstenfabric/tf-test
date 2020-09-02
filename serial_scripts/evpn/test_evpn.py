@@ -14,7 +14,7 @@ import test
 from tcutils.util import skip_because
 
 class TestEvpnCasesMplsoGre(base.BaseEvpnTest, VerifyEvpnCases):
-     
+
     @classmethod
     def setUpClass(cls):
         super(TestEvpnCasesMplsoGre, cls).setUpClass()
@@ -67,11 +67,11 @@ class TestEvpnCasesMplsoGre(base.BaseEvpnTest, VerifyEvpnCases):
            Maintainer: hkumar@juniper.net
         '''
         return self.verify_l2_vm_file_trf_by_scp(encap='gre')
-    
+
     @preposttest_wrapper
     def test_with_gre_encap_change_of_l3_vn_forwarding_mode(self):
         '''Test to verify change of vn forwarding mode from l2l3 to l3 with gre  encap'''
-        
+
         return self.verify_change_of_l3_vn_forwarding_mode(encap='gre')
 
     @preposttest_wrapper
@@ -92,7 +92,7 @@ class TestEvpnCasesMplsoGre(base.BaseEvpnTest, VerifyEvpnCases):
         '''Test L2 forwarding mode with GRE Encap
         '''
         return self.verify_epvn_l2_mode(encap='gre')
-    
+
     @preposttest_wrapper
     def test_with_gre_arp_resolution(self):
         '''Test arp resolution for different forwarding modes with GRE Encap
@@ -125,7 +125,7 @@ class TestEvpnCasesMplsoUdp(base.BaseEvpnTest, VerifyEvpnCases):
            Maintainer: hkumar@juniper.net
         '''
         return self.verify_l2_multicast_traffic(encap='udp')
-      
+
     #@preposttest_wrapper
     #def test_with_udp_encap_l2l3_ipv6_multicast_traffic(self):
     #    '''Test l2 multicast with udp encap
@@ -146,11 +146,11 @@ class TestEvpnCasesMplsoUdp(base.BaseEvpnTest, VerifyEvpnCases):
            Maintainer: hkumar@juniper.net
         '''
         return self.verify_change_of_l2l3_vn_forwarding_mode(encap='udp')
-    
+
     @preposttest_wrapper
     def test_with_udp_encap_change_of_l3_vn_forwarding_mode(self):
         '''Test to verify change of vn forwarding mode from l2l3 to l3 with udp  encap'''
-        
+
         return self.verify_change_of_l3_vn_forwarding_mode(encap='udp')
 
     @preposttest_wrapper
@@ -178,7 +178,7 @@ class TestEvpnCasesMplsoUdp(base.BaseEvpnTest, VerifyEvpnCases):
         '''Test L2 forwarding mode with UDP Encap
         '''
         return self.verify_epvn_l2_mode(encap='udp')
-    
+
     @preposttest_wrapper
     def test_with_udp_arp_resolution(self):
         '''Test arp resolution for different forwarding modes with UDP Encap
@@ -234,11 +234,11 @@ class TestEvpnCasesVxlan(base.BaseEvpnTest, VerifyEvpnCases):
            Maintainer: hkumar@juniper.net
         '''
         return self.verify_change_of_l2l3_vn_forwarding_mode(encap='vxlan')
-    
+
     @preposttest_wrapper
     def test_with_vxlan_encap_change_of_l3_vn_forwarding_mode(self):
         '''Test to verify change of vn forwarding mode from l2l3 to l3 with vxlan  encap'''
-        
+
         return self.verify_change_of_l3_vn_forwarding_mode(encap='vxlan')
 
     @skip_because(hypervisor='docker',msg='Bug 1461423:Need privileged access',dpdk_cluster=True)
@@ -352,7 +352,7 @@ class TestEvpnCasesRestart(base.BaseEvpnTest, VerifyEvpnCases):
              4. Restart the contrail-grouter service.
              5. Send L2 Traffic and verify communication between vms
          Pass criteria:  Step 3 and 5 should pass
-         Maintainer: chhandak@juniper.net 
+         Maintainer: chhandak@juniper.net
         '''
         verdict=self.verify_epvn_with_agent_restart(encap='vxlan')
         if not verdict:

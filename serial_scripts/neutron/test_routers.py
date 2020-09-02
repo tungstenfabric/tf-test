@@ -55,7 +55,7 @@ class TestRouterSNAT(BaseNeutronTest):
                 router_dict['id'],
                 ext_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn1_fixture)
-    
+
         assert self.verify_snat(vm1_fixture)
 
         for compute_ip in self.inputs.compute_ips:
@@ -80,7 +80,7 @@ class TestRouterSNAT(BaseNeutronTest):
         vn1_name = get_random_name('vn_private')
         vn1_subnets = [get_random_cidr()]
         self.allow_default_sg_to_allow_all_on_project(self.inputs.project_name)
-        ext_vn_fixture = self.create_external_network(self.connections, self.inputs) 
+        ext_vn_fixture = self.create_external_network(self.connections, self.inputs)
         ext_vn_fixture.verify_on_setup()
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
         vn1_fixture.verify_on_setup()
@@ -90,7 +90,7 @@ class TestRouterSNAT(BaseNeutronTest):
         vm2_fixture = self.create_vm(ext_vn_fixture, vm2_name,
                                          image_name='ubuntu')
         assert vm2_fixture.wait_till_vm_is_up()
-       
+
         router_name = get_random_name('router1')
         router_dict = self.create_router(router_name)
         router_rsp = self.quantum_h.router_gateway_set(

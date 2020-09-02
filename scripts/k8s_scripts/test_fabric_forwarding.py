@@ -20,7 +20,7 @@ class TestFabricFWD(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_namespaces_pods_for_fabric_test(self, isolation=False,ip_fabric_forwarding=False):
         """ common routine to create the namesapces and the pods  by enabling the fabric forwarding
             1.create 2 namespaces (ns1,ns2 enable fabric forwarding)
@@ -126,7 +126,7 @@ class TestFabricFWD(BaseK8sTest):
         assert pod1_in_ns1.verify_on_setup()
         assert pod1_in_ns1.ping_to_ip(self.ip_to_ping)
     #end test_fabric_forwarding_disabled_by_default
-    
+
     @skip_because(slave_orchestrator='kubernetes')
     @preposttest_wrapper
     def test_ping_with_jumbo_frame(self):

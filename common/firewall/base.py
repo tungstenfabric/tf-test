@@ -355,7 +355,7 @@ class BaseFirewallTest(BaseNeutronTest):
         connections = kwargs.pop('connections', None) or self.connections
         ingress_policy_id = ingress_policy.uuid if ingress_policy else None
         egress_policy_id = egress_policy.uuid if egress_policy else None
-        ports = [self._get_vmi_uuid(fixture) for fixture in 
+        ports = [self._get_vmi_uuid(fixture) for fixture in
                  (vm_fixtures or list()) + (port_fixtures or list())]
         # A port can only be associated to only one FW-Group
         # By default default FWG will have all ports associated

@@ -17,8 +17,8 @@ class TestIngressTLS(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
-    @test.attr(type=['k8s_sanity']) 
+
+    @test.attr(type=['k8s_sanity'])
     @skip_because(mx_gw = False, slave_orchestrator='kubernetes')
     @preposttest_wrapper
     def test_ingress_tls_1(self):

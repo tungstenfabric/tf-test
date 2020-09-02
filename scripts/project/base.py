@@ -13,7 +13,7 @@ class BaseProjectTest(test.BaseTestCase):
         cls.admin_inputs = None
         cls.admin_connections = None
         if not cls.inputs.admin_username:
-            # It is expected that is_test_applicable will not 
+            # It is expected that is_test_applicable will not
             # let the testcase run if admin_username is not set
             return
         if 'v3' in cls.inputs.auth_url:
@@ -37,7 +37,7 @@ class BaseProjectTest(test.BaseTestCase):
     @classmethod
     def tearDownClass(cls):
         super(BaseProjectTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
     def is_test_applicable(self):
         if not (self.inputs.admin_username or \

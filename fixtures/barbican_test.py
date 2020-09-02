@@ -31,7 +31,7 @@ class BarbicanHelper(object):
             if container.secrets[keys].secret_ref:
                 container.secrets[keys].delete()
         container.delete()
-        
+
     def add_users_to_refs_acl(self, auth_token, users, entity_ref):
         url = entity_ref + '/acl'
         DEFAULT_HEADERS = {'Content-type': 'application/json; charset="UTF-8"'}
@@ -42,7 +42,7 @@ class BarbicanHelper(object):
         data['read']['users'] = users
         resp = requests.patch(url, data=json.dumps(data), headers=headers)
         return resp.status_code
-        
+
 
 def setup_test_infra():
     import logging

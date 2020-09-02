@@ -107,7 +107,7 @@ class sdn_2vn_2vm_config(object):
         #
         # Define VN's in the project:
         self.vnet_list = [get_random_name('vnet0'), get_random_name('vnet1')]
-        
+
         #
         # Define network info for each VN:
         if self.project == 'vCenter':

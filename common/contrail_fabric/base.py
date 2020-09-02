@@ -151,7 +151,7 @@ class BaseFabricTest(BaseNeutronTest, FabricUtils):
                 obj.cleanup()
             if self.inputs.is_ironic_enabled:
                 obj.create_ironic_provision_vn(self.admin_connections)
-        assert obj.fabric and obj.devices and obj.interfaces 
+        assert obj.fabric and obj.devices and obj.interfaces
         if len(self.inputs.fabrics) > 1:
             assert obj.fabric2 and obj.devices2, "Onboarding fabric failed"
             self.fabric2 = obj.fabric2

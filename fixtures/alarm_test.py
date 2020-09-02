@@ -210,7 +210,7 @@ class AlarmFixture(fixtures.Fixture):
     def get_uve_keys(self):
         return self.uve_keys
     # end get_uve_keys
-    
+
     def get_fq_name(self):
         obj = self.getObj()
         fq_name = obj.get_fq_name()

@@ -67,7 +67,7 @@ class TestECMPMultipleSC(GenericTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMP
     # end test_ecmp_svc_in_network_with_multiple_service_chains
 
 class TestECMPRestart(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic, ECMPVerify):
-    
+
     @classmethod
     def setUpClass(cls):
         super(TestECMPRestart, cls).setUpClass()
@@ -83,11 +83,11 @@ class TestECMPRestart(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffi
          Description: Validate ECMP with service chaining in-network-nat mode datapath by incrementing the max instances
                     from 4 in steps of 4 till 16
          Test steps:
-           1.	Creating vm's - vm1 and vm2 in networks vn1 and vn2.
-           2.	Creating a service instance in in-network-nat mode with 4 instances and
+           1.   Creating vm's - vm1 and vm2 in networks vn1 and vn2.
+           2.   Creating a service instance in in-network-nat mode with 4 instances and
                 left-interface of the service instances sharing the IP.
-           3.	Creating a service chain by applying the service instance as a service in a policy between the VNs.
-           4.	Checking for ping and tcp traffic between vm1 and vm2.
+           3.   Creating a service chain by applying the service instance as a service in a policy between the VNs.
+           4.   Checking for ping and tcp traffic between vm1 and vm2.
            5.   Delete the Service Instances and Service Template.
            6.   Increment the service instance max count by 4 and repeat steps 1-5.
            7.   This testcase will be run in only multiple compute node scenario.

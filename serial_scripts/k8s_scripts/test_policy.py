@@ -27,7 +27,7 @@ class TestNetworkPolicyProjectIsolation(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_common_namespaces_pods(self):
         operation = self.modify_cluster_project()
         namespace1 = self.setup_namespace(name = "ns1")
@@ -75,7 +75,7 @@ class TestNetworkPolicyProjectIsolation(BaseK8sTest):
         2. Create an Ingress policy on namespace and verify all rules are followed as expected
         3. Update the Ingress policy and aply it over a single pod of the namespace.
            Verify that all rules work as expected.
-        Note: As policies are at Global level, all policies should apply in a way they 
+        Note: As policies are at Global level, all policies should apply in a way they
         apply on normal k8s namespaces and pods
         """
         ns1_clients, ns2_clients = self.setup_common_namespaces_pods()
@@ -110,7 +110,7 @@ class TestNetworkPolicyProjectIsolation(BaseK8sTest):
         assert ns2_clients[1].ping_with_certainty(ns1_clients[2].pod_ip)
         assert self.validate_wget(ns2_clients[1], url1)
         assert self.validate_wget(ns2_clients[0], url1)
-        
+
         # Edit the ingress policy and apply it on a specific pod of ns1
         ingress_list = [
             {'from': [
@@ -121,10 +121,10 @@ class TestNetworkPolicyProjectIsolation(BaseK8sTest):
              }
         ]
         self.setup_update_policy(pod_selector = ns1_clients[2].labels,
-                                update = True, 
+                                update = True,
                                 np_fixture = policy1,
                                 ingress= ingress_list)
-        
+
         # Verify that ingress policy works as expected
         assert ns1_clients[1].ping_with_certainty(ns1_clients[0].pod_ip)
         assert ns1_clients[0].ping_with_certainty(ns1_clients[1].pod_ip)
@@ -148,7 +148,7 @@ class TestNetworkPolicyProjectIsolation(BaseK8sTest):
         2. Create an Egress policy on namespace and verify all rules are followed as expected
         3. Update the Egress policy and apply it over a single pod of the namespace.
            Verify that all rules work as expected.
-        Note: As policies are at Global level, all policies should apply in a way they 
+        Note: As policies are at Global level, all policies should apply in a way they
         apply on normal k8s namespaces and pods
         """
         ns1_clients, ns2_clients = self.setup_common_namespaces_pods()
@@ -187,7 +187,7 @@ class TestNetworkPolicyProjectIsolation(BaseK8sTest):
         assert self.validate_wget(ns1_clients[0], url2)
         assert ns2_clients[0].ping_with_certainty(ns1_clients[0].pod_ip)
         assert self.validate_wget(ns2_clients[0], url1)
-        
+
         # Edit the egress policy and apply it on a specific pod of ns1
         egress_list = [
             {'to': [
@@ -196,10 +196,10 @@ class TestNetworkPolicyProjectIsolation(BaseK8sTest):
             }
         ]
         self.setup_update_policy(pod_selector = ns1_clients[1].labels,
-                                update = True, 
+                                update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
-        
+
         # Verify that ingress policy works as expected
         assert ns1_clients[1].ping_with_certainty(ns1_clients[0].pod_ip,
                                                     expectation=False)
@@ -319,7 +319,7 @@ class TestNetworkPolicyRestart(BaseK8sTest):
             except:
                 self.cleanUp()
                 raise
-        
+
         def cleanUp (self):
             cleanup_list = list()
             if getattr(self, 'web_pod_ns1', None):

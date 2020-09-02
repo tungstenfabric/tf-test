@@ -36,7 +36,7 @@ class TestDpdkBondStatus(GenericTestBase):
         assert self.analytics_obj._verify_contrail_alarms(None, 'vrouter', 'vrouter_interface', multi_instances=multi_instances, verify_alarm_cleared=verify_alarm_cleared) , 'Alarms not not cleared'
 
         return True
-    #end test_dpdkbond_status_basic 
+    #end test_dpdkbond_status_basic
 
     @preposttest_wrapper
     @skip_because(dpdk_cluster=False)
@@ -80,7 +80,7 @@ class TestDpdkBondStatus(GenericTestBase):
         assert self.analytics_obj._verify_contrail_alarms(None, 'vrouter', 'vrouter_interface', multi_instances=multi_instances, verify_alarm_cleared=verify_alarm_cleared) , 'Alarms not not cleared'
 
         return True
-    #end test_dpdkbond_status_restart 
+    #end test_dpdkbond_status_restart
 
     @preposttest_wrapper
     @skip_because(dpdk_cluster=False)
@@ -102,7 +102,7 @@ class TestDpdkBondStatus(GenericTestBase):
         time.sleep(10)
 
         self.logger.info('Bring down data switch bond interface connected to compute.')
-    
+
         self.addCleanup(self.cleanup_data_sw, mgmt_ip)
 
         cmd = []
@@ -145,7 +145,7 @@ class TestDpdkBondStatus(GenericTestBase):
         assert self.analytics_obj._verify_contrail_alarms(None, 'vrouter', 'vrouter_interface', multi_instances=multi_instances, verify_alarm_cleared=verify_alarm_cleared)
 
         return True
-    #end test_dpdkbond_status_flap 
+    #end test_dpdkbond_status_flap
 
     def cleanup_data_sw(self, ip):
         '''

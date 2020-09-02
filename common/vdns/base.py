@@ -50,7 +50,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
     @classmethod
     def tearDownClass(cls):
         super(BasevDNSTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
     def verify_dns_record_order(self, record_order, test_type='test_record_order', record_num=10):
         ''' This test tests DNS record order.
@@ -307,7 +307,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
             self.logger.info('Restarting active control node')
             self.inputs.restart_service(
                 'contrail-control', [active_controller],
-				container='control')
+                container='control')
             sleep(5)
             # Check the control node shifted to other control node
             new_active_controller = vm_fixture[
@@ -321,7 +321,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
                 return False
             self.inputs.restart_service(
                 'contrail-control', [new_active_controller],
-				container='control')
+                container='control')
         if restart_process == 'DnsRestart':
             # restart the dns process in the active control node
             self.logger.info(
@@ -377,7 +377,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
                     'File of size %sB not transferred via scp ' % size)
             assert transfer_result, 'File not transferred via scp'
 
-        
+
         sleep(20)
 
         for vm_name in vm_list:

@@ -10,7 +10,7 @@ def restart_collector_to_listen_on_port(
         collector_ip,
         port_no=35999):
     try:
-        with settings(host_string='%s@%s' % (self.inputs.username, 
+        with settings(host_string='%s@%s' % (self.inputs.username,
                       collector_ip), password=self.inputs.password,
                       warn_only=True, abort_on_prompts=False):
             cmd = "grep 'syslog_port' " + COLLECTOR_CONF_FILE

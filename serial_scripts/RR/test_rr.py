@@ -41,7 +41,7 @@ class TestBasicRR(BaseRRTest):
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_process_restart_with_rr_set(self):
-        ''' Test to validate rr works fine 
+        ''' Test to validate rr works fine
         with process restarts
             1. Pick 2 VN's from resource pool which has one VM each
             2. Set control node as RR
@@ -79,9 +79,9 @@ class TestBasicRR(BaseRRTest):
                           inputs=self.inputs,
                           router_name=ctrl_node_name,
                           router_ip=ctrl_node_ip
-                          )) 
+                          ))
         cluster_id = ipv4_to_decimal(ctrl_node_ip)
-       
+
         if ctrl_fixture.set_cluster_id(cluster_id):
             self.logger.info("cluster id set")
         else:
@@ -94,7 +94,7 @@ class TestBasicRR(BaseRRTest):
         for entry in connection_dicts:
             if verify_peer_in_control_nodes(self.cn_inspect,entry,connection_dicts[entry],self.logger):
                 self.logger.info("BGP connections are proper")
-            else: 
+            else:
                 self.logger.error("BGP connections are not proper")
 
         for compute_ip in self.inputs.compute_ips:
@@ -131,7 +131,7 @@ class TestBasicRR(BaseRRTest):
         for entry in connection_dicts:
             if verify_peer_in_control_nodes(self.cn_inspect,entry,connection_dicts[entry],self.logger):
                 self.logger.info("BGP connections are proper after restarts")
-            else: 
+            else:
                 self.logger.error("BGP connections are not proper after restarts")
         assert vm1_fixture.wait_till_vm_is_up()
         assert vm2_fixture.wait_till_vm_is_up()

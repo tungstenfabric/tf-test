@@ -19,13 +19,13 @@ class BaseRRTest(test_v1.BaseTestCase_v1):
         cls.cn_inspect= cls.connections.cn_inspect
         cls.analytics_obj=cls.connections.analytics_obj
         cls.api_s_inspect = cls.connections.api_server_inspect
-        cls.orch = cls.connections.orch 
+        cls.orch = cls.connections.orch
     #end setUpClass
 
     @classmethod
     def tearDownClass(cls):
         super(BaseRRTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
     def remove_from_cleanups(self, fix):
         for cleanup in self._cleanups:
@@ -42,7 +42,7 @@ class BaseRRTest(test_v1.BaseTestCase_v1):
                           vn_name=vn_name,
                           subnets=vn_subnets,
                           option = option))
-    
+
     def create_vm(self, vn_fixture, vm_name, node_name=None,
                     flavor='contrail_flavor_small',
                     image_name='ubuntu',

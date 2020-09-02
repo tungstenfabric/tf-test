@@ -228,7 +228,7 @@ class SvcInstanceFixture(fixtures.Fixture):
         self._vnc.assoc_health_check_to_si(self.si_fq_name, hc_uuid, intf_type)
         d = {'uuid': hc_uuid, 'intf_type': intf_type}
         if d not in self.hc_list:
-            self.hc_list.append(d) 
+            self.hc_list.append(d)
 
     def disassociate_hc(self, hc_uuid):
         self.logger.debug(

@@ -201,12 +201,12 @@ class OpServerUtils(object):
     def opserver_query_url(opserver_ip, opserver_port):
         return "http://" + opserver_ip + ":" + opserver_port + "/analytics/query"
     # end opserver_query_url
-    
+
     @staticmethod
     def opserver_operation_url(opserver_ip, opserver_port):
         return "http://" + opserver_ip + ":" + opserver_port + "/analytics/operation"
     # end opserver_operation_url
-    
+
     @staticmethod
     def opserver_db_purge_url(opserver_ip, opserver_port):
         operation_url = OpServerUtils.opserver_operation_url(opserver_ip, opserver_port)
@@ -457,7 +457,7 @@ class OpServerUtils(object):
     @staticmethod
     def get_json_body(*args,**kwargs):
         json = OpServerUtils.Json_Body(*args,**kwargs)
-        return json.__dict__    
+        return json.__dict__
     #end get_json_body
 
     class Json_Body(object):
@@ -500,7 +500,7 @@ class OpServerUtils(object):
                 self.dir = dir
             if session_type is not None:
                 self.session_type = session_type
-            
+
         # end __init__
 
     # end class Query

@@ -25,7 +25,7 @@ class BaseVnVmTest(GenericTestBase):
     @classmethod
     def tearDownClass(cls):
         super(BaseVnVmTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
     def remove_from_cleanups(self, fix):
         for cleanup in self._cleanups:
@@ -35,7 +35,7 @@ class BaseVnVmTest(GenericTestBase):
     #end remove_from_cleanups
 
     def get_default_gateway_interface(self,vm_fixture):
-        cmd = "route"+ r" -" +"n"    
+        cmd = "route"+ r" -" +"n"
         output = vm_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=False)
         output = list(output.values())[0].split('\r')
         output = output[1:]
@@ -43,11 +43,11 @@ class BaseVnVmTest(GenericTestBase):
             elem = elem.rstrip()
             if ('0.0.0.0' in elem.split()[0]):
                 return elem.split()[-1]
-        return None  
-        
+        return None
+
     def get_all_vm_interfaces(self,vm_fixture):
         intf_list = []
-        cmd = "route"+ r" -" +"n"    
+        cmd = "route"+ r" -" +"n"
         output = vm_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=False)
         output = list(output.values())[0].split('\r')
         output = output[2:]
@@ -57,7 +57,7 @@ class BaseVnVmTest(GenericTestBase):
                 if (elem.split()[-1] not in intf_list):
                     intf_list.append(elem.split()[-1])
             except Exception as e:
-                pass        
+                pass
         return intf_list
 
     def trim_command_output_from_vm(self, output):
@@ -118,4 +118,4 @@ class BaseVnVmTest(GenericTestBase):
         self.compute_2 = host_list[0]
         if len(host_list) > 1:
             self.compute_1 = host_list[0]
-            self.compute_2 = host_list[1]   
+            self.compute_2 = host_list[1]

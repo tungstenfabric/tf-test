@@ -616,7 +616,7 @@ echo "Hello World.  The time is now $(date -R)!" | tee /tmp/output.txt
 
         user2_fixture= self.useFixture(
             UserFixture(
-                connections=self.connections, username=user_list[1][0], password=user_list[1][1]))        
+                connections=self.connections, username=user_list[1][0], password=user_list[1][1]))
         project_fixture2 = self.useFixture(
             ProjectFixture(
                 project_name=projects[1], username=user_list[1][0],
@@ -705,7 +705,7 @@ class TestBasicVMVN1(BaseVnVmTest):
             VMFixture(
                 project_name=self.inputs.project_name, connections=self.connections,
                 vn_objs=[vn2_fixture.obj,vn1_fixture.obj], flavor='contrail_flavor_small', image_name='ubuntu-traffic', vm_name=vn1_vm2_name))
-       
+
         assert vm1_fixture.wait_till_vm_is_up()
         assert vm2_fixture.wait_till_vm_is_up()
         assert vm1_fixture.verify_on_setup()
@@ -750,9 +750,9 @@ class TestBasicVMVN1(BaseVnVmTest):
            result = result and False
            self.logger.error("Ping from vm %s to vm %s Failed "%(vn1_vm1_name, vn1_vm2_name))
            assert result
- 
+
         return True
-        
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_no_frag_in_vm(self):
@@ -840,7 +840,7 @@ class TestBasicVMVN2(BaseVnVmTest):
     def runTest(self):
         pass
     #end runTes
- 
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_ping_on_broadcast_multicast(self):
@@ -1065,8 +1065,8 @@ class TestBasicVMVN3(BaseVnVmTest):
 
     def runTest(self):
         pass
-    #end runTes 
-    
+    #end runTes
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_traffic_bw_vms_diff_pkt_size(self):
@@ -1186,7 +1186,7 @@ class TestBasicVMVN3(BaseVnVmTest):
 
     def runTest(self):
         pass
-    #end runTes 
+    #end runTes
 
 class TestBasicVMVN4(BaseVnVmTest):
 
@@ -1316,7 +1316,7 @@ class TestBasicVMVN4(BaseVnVmTest):
         assert vm1_fixture.verify_on_setup()
         return True
     # end test_vm_add_delete_in_2_vns
- 
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_vm_add_delete_in_2_vns_chk_ips(self):
@@ -1425,7 +1425,7 @@ class TestBasicVMVN4(BaseVnVmTest):
         Test steps:
                 1. Create a VM in a VN.
                 2. Try to update the IP of the VM.
-        Pass criteria: The fix to the bug is that modification of fixed IP will not be allowed. 
+        Pass criteria: The fix to the bug is that modification of fixed IP will not be allowed.
                         Proper error should be observed.
         Maintainer : pulkitt@juniper.net
         '''
@@ -1472,12 +1472,12 @@ class TestBasicVMVN4(BaseVnVmTest):
     def test_gratuitous_arp(self):
         '''
         Description:  This Test case verifies Bug #1513793
-        An ARP request/response packet with zero source IP address need to be 
+        An ARP request/response packet with zero source IP address need to be
         treated as Gratuitous ARP packet. The ARP request should reach VMs spanning
         multiple compute nodes.
         Test steps:
                 1. Create 2 VMs in a VN.
-                2. Start a arping from one of the VMs with source IP as 0.0.0.0 
+                2. Start a arping from one of the VMs with source IP as 0.0.0.0
         Pass criteria: arping should reach the VM on other compute node.
         Maintainer : pulkitt@juniper.net
         Note: This test case is intended to test multiple compute node scenario but
@@ -1667,8 +1667,8 @@ class TestBasicVMVN5(BaseVnVmTest):
 
         all_intfs = self.get_all_vm_interfaces(vm1_fixture)
         default_gateway_interface = self.get_default_gateway_interface(vm1_fixture)
-        all_intfs.remove(default_gateway_interface) 
-        other_interface = all_intfs[0] 
+        all_intfs.remove(default_gateway_interface)
+        other_interface = all_intfs[0]
         self.logger.info('-' * 80)
         self.logger.info(
             'Will shut down %s and hence \
@@ -1942,7 +1942,7 @@ class TestBasicVMVN5(BaseVnVmTest):
         Test steps:
                 1. Create a VN and a subnet in it such that only 5 addresses are usable.
                 2. Launch more than 5 VMs.
-        Pass criteria: Only 5 VMs should get spawned. 
+        Pass criteria: Only 5 VMs should get spawned.
         The 6th VM should go into ERROR state as it is unable to get any ip. The ip-block is exhausted.
         Maintainer : ganeshahv@juniper.net
         '''
@@ -2073,7 +2073,7 @@ class TestBasicVMVN6(BaseVnVmTest):
 
     def runTest(self):
         pass
-    #end runTes 
+    #end runTes
 
     @preposttest_wrapper
     def test_vn_subnet_types(self):
@@ -2094,30 +2094,30 @@ class TestBasicVMVN6(BaseVnVmTest):
                                 '100.100.100.0/31', 'vn-9': '200.200.200.1/32'}
 
         res_vn_fixture = self.useFixture(
-            MultipleVNFixture(connections=self.connections, 
+            MultipleVNFixture(connections=self.connections,
                                 inputs=self.inputs,
-                                subnet_count=2, 
-                                vn_name_net=reserved_ip_vns,  
+                                subnet_count=2,
+                                vn_name_net=reserved_ip_vns,
                                 project_name=self.inputs.project_name))
 
 
         for key,value in overlapping_vns.items():
             try:
                 ovlap_vn_fixture = self.useFixture(VNFixture(
-                                            connections=self.connections, 
-                                            inputs=self.inputs, 
-                                            subnets=value, 
-                                            vn_name=key,  
+                                            connections=self.connections,
+                                            inputs=self.inputs,
+                                            subnets=value,
+                                            vn_name=key,
                                             project_name=self.inputs.project_name))
             except Exception as e:
                 if 'overlap' in e:
-                    self.logger.info('Overlap address cannot be assigned')    
+                    self.logger.info('Overlap address cannot be assigned')
         try:
             non_usable_vn_fixture = self.useFixture(MultipleVNFixture(
-                                                    connections=self.connections, 
-                                                    inputs=self.inputs, 
-                                                    subnet_count=2, 
-                                                    vn_name_net=non_usable_block_vns,  
+                                                    connections=self.connections,
+                                                    inputs=self.inputs,
+                                                    subnet_count=2,
+                                                    vn_name_net=non_usable_block_vns,
                                                     project_name=self.inputs.project_name))
         except NotPossibleToSubnet as e:
             self.logger.info(
@@ -2362,16 +2362,16 @@ class TestBasicVMVN9(BaseVnVmTest):
         vn1_obj = vn1_fixture.obj
 
         vm1_fixture = self.useFixture(VMFixture(connections=self.connections,
-                                                vn_obj=vn1_obj, vm_name=vm1_name, 
-                                                project_name=self.inputs.project_name, 
-                                                flavor='contrail_flavor_small', 
+                                                vn_obj=vn1_obj, vm_name=vm1_name,
+                                                project_name=self.inputs.project_name,
+                                                flavor='contrail_flavor_small',
                                                 image_name='ubuntu-traffic'))
         assert vm1_fixture.wait_till_vm_is_up()
         assert vm1_fixture.verify_on_setup()
         vm2_fixture = self.useFixture(VMFixture(connections=self.connections,
-                                                vn_obj=vn1_obj, vm_name=vm2_name, 
-                                                project_name=self.inputs.project_name, 
-                                                flavor='contrail_flavor_small', 
+                                                vn_obj=vn1_obj, vm_name=vm2_name,
+                                                project_name=self.inputs.project_name,
+                                                flavor='contrail_flavor_small',
                                                 image_name='ubuntu-traffic'))
         assert vm2_fixture.wait_till_vm_is_up()
         assert vm2_fixture.verify_on_setup()
@@ -2391,8 +2391,8 @@ class TestBasicVMVN9(BaseVnVmTest):
 
 
 
-        with settings(host_string='%s@%s' % (self.inputs.username, self.inputs.cfgm_ips[0]), 
-                                    password=self.inputs.password, warn_only=True, 
+        with settings(host_string='%s@%s' % (self.inputs.username, self.inputs.cfgm_ips[0]),
+                                    password=self.inputs.password, warn_only=True,
                                     abort_on_prompts=False, debug=True):
             username = self.inputs.username
             password = self.inputs.password
@@ -2462,8 +2462,8 @@ class TestBasicVMVN9(BaseVnVmTest):
 
 
 
-        with settings(host_string='%s@%s' % (self.inputs.username, self.inputs.cfgm_ips[0]), 
-                        password=self.inputs.password, warn_only=True, 
+        with settings(host_string='%s@%s' % (self.inputs.username, self.inputs.cfgm_ips[0]),
+                        password=self.inputs.password, warn_only=True,
                         abort_on_prompts=False, debug=True):
             username = self.inputs.username
             password = self.inputs.password
@@ -2598,7 +2598,7 @@ class TestBasicVMVN9(BaseVnVmTest):
                                 link local service %s failed" % service
         for service in service_info:
             if service == "build_server":
-                # verify wget from vim.org 
+                # verify wget from vim.org
                 sleep(20) #wait before attempting download
                 image_name = 'vim-7.3.tar.bz2'
                 cmd = 'wget ' + \
@@ -2888,7 +2888,7 @@ class TestBasicVMVNx(BaseVnVmTest):
         Description: Test to validate SCTP flow setup between
         Test steps:
                 1. Run SCTP traffic between 2 VM across VN connected through FIP
-                2. Verify the Ingress and Egress flow. 
+                2. Verify the Ingress and Egress flow.
         Pass criteria: SCTP egress and ingress flow setup properly.
         Maintainer : chhandak@juniper.net
         '''
@@ -2966,7 +2966,7 @@ class TestBasicVMVNx(BaseVnVmTest):
             self.logger.error('Test to ping between VMs %s and %s failed' %
                               (vn1_vm1_name, fvn_vm1_name))
             assert result
-       
+
         # Setup SCTP flow on the vm
         # Server
         server_port=3700
@@ -2974,11 +2974,11 @@ class TestBasicVMVNx(BaseVnVmTest):
         fvn_vm1_fixture.run_cmd_on_vm(cmds=[cmd_to_pass], as_sudo=True,
                                       as_daemon=True)
 
-        # Client 
+        # Client
         client_port=4700
         cmd_to_pass="sctp_test -H %s -P %s -h %s -p %s -s -x 100" %(vn1_vm1_fixture.vm_ip,client_port,fvn_vm1_fixture.vm_ip,server_port)
-        vn1_vm1_fixture.run_cmd_on_vm(cmds=[cmd_to_pass], as_sudo=True, timeout=60)   
- 
+        vn1_vm1_fixture.run_cmd_on_vm(cmds=[cmd_to_pass], as_sudo=True, timeout=60)
+
         # Verify Flow records here
         inspect_h1 = self.agent_inspect[vn1_vm1_fixture.vm_node_ip]
         inspect_h2 = self.agent_inspect[fvn_vm1_fixture.vm_node_ip]
@@ -3016,11 +3016,11 @@ class TestBasicVMVNx(BaseVnVmTest):
         else:
             self.logger.error(
                 'Test Failed. Required ingress Traffic flow not found')
-            result = result and False 
+            result = result and False
 
         # Verify Egress Traffic
         # Check VMs are in same agent or not. Need to compute next hop
-        # accordingly 
+        # accordingly
         if  self.compute_1 is self.compute_2:
             vn_fq_name=fvn_fixture.get_vn_fq_name()
             nh_id=fvn_vm1_fixture.tap_intf[vn_fq_name]['flow_key_idx']
@@ -3071,7 +3071,7 @@ class TestBasicIPv6VMVNx(TestBasicVMVNx):
         if not self.connections.orch.is_feature_supported('ipv6'):
             return(False, 'IPv6 tests not supported in this environment ')
         return (True, None)
-    
+
     @test.attr(type=['sanity'])
     @preposttest_wrapper
     def test_vm_file_trf_scp_tests(self):

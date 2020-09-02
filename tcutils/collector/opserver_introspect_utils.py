@@ -27,8 +27,8 @@ class VerificationOpsSrv (VerificationUtilBase):
                                         insecure=insecure, protocol=protocol,
                                         args=inputs, base_url=base_url)
 
-    def get_ops_generator(self, generator=None, 
-                        moduleid=None, node_type=None, 
+    def get_ops_generator(self, generator=None,
+                        moduleid=None, node_type=None,
                         instanceid='0'):
         '''http://nodea29:8081/analytics/uves/generator\
             /nodea18:Control:Contrail-Control:0?flat'''
@@ -114,7 +114,7 @@ class VerificationOpsSrv (VerificationUtilBase):
         finally:
             return res
 
-    def get_ops_svc_instance(self, project='admin', 
+    def get_ops_svc_instance(self, project='admin',
                                 svc_instance=None):
         '''analytics/uves/service-instance/default-domain:\
             admin:svc-instance1?flat'''
@@ -128,8 +128,8 @@ class VerificationOpsSrv (VerificationUtilBase):
         finally:
             return res
 
-    def get_ops_svc_template(self, 
-                            left_vn=None, 
+    def get_ops_svc_template(self,
+                            left_vn=None,
                             right_vn=None):
         '''analytics/uves/service-chain/\
             sc:default-domain:admin:vn1:\
@@ -154,7 +154,7 @@ class VerificationOpsSrv (VerificationUtilBase):
                 dct = self.dict_get('analytics/uves/' + uveType)
         else:
             dct = self.dict_get('analytics/uves')
-            
+
         ret_value = []
         if not dct:
             return ret_value
@@ -162,7 +162,7 @@ class VerificationOpsSrv (VerificationUtilBase):
             self.ame = OpHrefResult(elem)
             ret_value.append(self.ame)
         return ret_value
-    
+
     def get_hrefs_to_all_tables(self, uveType=None):
         '''Get all hrefs for a uve type'''
         if uveType == 'tables':
@@ -176,15 +176,15 @@ class VerificationOpsSrv (VerificationUtilBase):
         return ret_value
 
 
-    def send_trace_to_database(self, node=None, 
-                            module=None, instance_id='0', 
+    def send_trace_to_database(self, node=None,
+                            module=None, instance_id='0',
                             trace_buffer_name=None):
         '''http://<opserver-ip>:8081/analytics/\
         send-tracebuffer/nodeb8/Contrail-Vrouter-Agent/UveTrace'''
         res = None
         try:
             res = self.dict_get('analytics/send-tracebuffer/' + node +
-                                '/' + module + '/' + 
+                                '/' + module + '/' +
                                 instance_id + '/' + trace_buffer_name)
         except Exception as e:
             print(e)
@@ -266,7 +266,7 @@ class VerificationOpsSrv (VerificationUtilBase):
             print(e)
         finally:
             return res
-    
+
     def get_ops_dns(self, control=None):
         '''http://nodea18:8081/analytics/uves/dns-node/nodea11?flat'''
         res = None
@@ -290,7 +290,7 @@ class VerificationOpsSrv (VerificationUtilBase):
             print(e)
         finally:
             return res
-    
+
     def get_ops_vm_intf(self, intf):
         '''http://nodea24:8081/analytics/uves/
             virtual-machine-interface/
@@ -305,7 +305,7 @@ class VerificationOpsSrv (VerificationUtilBase):
         finally:
             return res
 
-    def get_ops_sc_uve(self):        
+    def get_ops_sc_uve(self):
         '''http://nodea18:8081/analytics/uves/service-chain/*'''
         res = None
         try:

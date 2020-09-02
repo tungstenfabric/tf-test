@@ -1255,7 +1255,7 @@ def get_prefix_install_or_delete_time(cn_self, rt_self, cn_ip, rt_ip, rt_usr, rt
     if rt_per_block_enabled:
         total_expected_prefixes = prefixes_per_instance * ninstances * ninstances
     else:
-        total_expected_prefixes = prefixes_per_instance * ninstances 
+        total_expected_prefixes = prefixes_per_instance * ninstances
 
     #
     # Loop until it the number of routes has been reached, or timeout if count does not change for <n> times

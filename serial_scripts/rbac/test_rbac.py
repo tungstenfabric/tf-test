@@ -440,7 +440,7 @@ class RbacMode(BaseRbac):
     def setUpClass(cls):
         super(RbacMode, cls).setUpClass()
 
-    # test is disabled, since we don't want to support changing aaa-mode using API 
+    # test is disabled, since we don't want to support changing aaa-mode using API
     @preposttest_wrapper
     def disabled_test_update_aaa_mode(self):
         '''

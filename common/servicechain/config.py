@@ -455,7 +455,7 @@ class ConfigSvcChain(object):
 
         if self.inputs.vcenter_compute_ips:
             svc_img_name = VC_SVC_TYPE_PROPS[service_type][service_mode]
-        elif self.inputs.orchestrator == 'vcenter':#Fixing tinycore image 
+        elif self.inputs.orchestrator == 'vcenter':#Fixing tinycore image
                                                    #for vcenter-only mode
             svc_img_name = SVC_TYPE_PROPS[service_type][service_mode]
         else:
@@ -584,7 +584,7 @@ class ConfigSvcChain(object):
             si_name = get_random_name('si')
             si_fixture = self.config_si(si_name,
                 st_fixture,
-		mgmt_vn_fq_name=self._get_if_needed(svc_img_name, 'management', mgmt_vn_fq_name),
+                mgmt_vn_fq_name=self._get_if_needed(svc_img_name, 'management', mgmt_vn_fq_name),
                 left_vn_fq_name=self._get_if_needed(svc_img_name, 'left', si_left_vn_fq_name),
                 right_vn_fq_name=self._get_if_needed(svc_img_name, 'right', si_right_vn_fq_name),
                 port_tuples_props=port_tuples_props,

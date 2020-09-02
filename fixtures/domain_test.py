@@ -123,7 +123,7 @@ class DomainFixture(fixtures.Fixture):
             self.logger.info('Domain updation failed')
 
     def get_domain(self):
-       return self.auth.get_domain(domain_id=get_plain_uuid(self.uuid)) 
+       return self.auth.get_domain(domain_id=get_plain_uuid(self.uuid))
 
     def get_domain_connections(self, username=None, password=None, project_name=None):
         self.dm_connections= ContrailConnections(self.inputs, self.logger,
@@ -143,7 +143,7 @@ class DomainFixture(fixtures.Fixture):
             do_cleanup = True
         if do_cleanup:
             if not self.check_no_domain_references():
-                self.logger.warn('One or more references still present' 
+                self.logger.warn('One or more references still present'
                     ', will not delete the Domain %s' % (self.domain_name))
                 return
             self._delete_domain()

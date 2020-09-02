@@ -65,7 +65,7 @@ class TestAlarmConfigCases(BaseAlarmConfigTest, VerifyAlarms):
     def test_alarm_conf_with_multiple_rules_in_global_config(self):
         '''
         1. Configure an alarm with  and conditions 'UveVirtualNetworkConfig.total_acl_rules <= 2'
-           and UveVirtualNetworkConfig.total_acl_rules <= 1 and UveVirtualNetworkConfig.total_acl_rules == 1 
+           and UveVirtualNetworkConfig.total_acl_rules <= 1 and UveVirtualNetworkConfig.total_acl_rules == 1
         2. Verify the configuration under global_config
         3. Configure vn, add policy rules
         4. Verify that the alarm got raised

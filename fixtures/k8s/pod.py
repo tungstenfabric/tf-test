@@ -286,15 +286,15 @@ class PodFixture(fixtures.Fixture):
         km_h = self.connections.get_kube_manager_h()
         self.pod_info = km_h.get_pod_info(pod_uuid = self.uuid)
         if self.pod_info:
-            self.logger.info('Pod %s with uuid %s found in kube manager' 
+            self.logger.info('Pod %s with uuid %s found in kube manager'
                              % (self.name, self.uuid))
         else:
-            self.logger.warn('Pod %s with uuid %s not found in kube manager' 
+            self.logger.warn('Pod %s with uuid %s not found in kube manager'
                              % (self.name, self.uuid))
             return False
         return True
     # verify_pod_in_kube_manager
-    
+
     @retry(delay=2, tries=10)
     def verify_pod_in_contrail_agent(self):
         self.set_compute_ip()
@@ -324,7 +324,7 @@ class PodFixture(fixtures.Fixture):
         return True
     # verify_pod_in_contrail_agent
 
-    def run_kubectl_cmd_on_master(self, pod_name, cmd, shell='/bin/bash -l -c', 
+    def run_kubectl_cmd_on_master(self, pod_name, cmd, shell='/bin/bash -l -c',
                                  container=None):
         cntr = '-c %s' %container if container else ''
         kubectl_command = 'kubectl exec %s -c %s --namespace=%s -i -t -- %s "%s"' % (
@@ -345,10 +345,10 @@ class PodFixture(fixtures.Fixture):
         if mode == 'api':
             output = self.k8s_client.exec_cmd_on_pod(self.name, cmd,
                                                          container=container,
-                                                         namespace=self.namespace, 
+                                                         namespace=self.namespace,
                                                          shell=shell)
         else:
-            output = self.run_kubectl_cmd_on_master(self.name, cmd, shell, 
+            output = self.run_kubectl_cmd_on_master(self.name, cmd, shell,
                                                     container=container)
         self.logger.debug('[Pod %s] Cmd: %s, Output: %s' % (self.name,
                                                             cmd, output))
@@ -367,7 +367,7 @@ class PodFixture(fixtures.Fixture):
         This method logs into the POD from kubernets master using kubectl and runs ping test to an IP.
         """
         output = ''
-        pkt_size = '-s %s' %jumboframe if jumboframe else '' 
+        pkt_size = '-s %s' %jumboframe if jumboframe else ''
         cmd = "ping -c %s %s %s" % (count, pkt_size, ip)
         try:
             output = self.run_cmd_on_pod(cmd, container=container)
@@ -430,7 +430,7 @@ class PodFixture(fixtures.Fixture):
         return returnVal
 
     def get_pod_ip(self,nad_name):
-        '''routine is for returning the ip of the pod 
+        '''routine is for returning the ip of the pod
            corresponding to to given network attachment definition
         '''
         pod_status = self.read()

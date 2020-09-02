@@ -134,8 +134,8 @@ class TestQuotaUpdate(BaseNeutronTest):
                 self.logger.error("Quota limit not followed for %s " % (item))
 
         assert result, 'Quota tests failed'
-       
-        
+
+
     @preposttest_wrapper
     def test_update_quota_for_admin_tenant(self):
         '''Update quota for admin tenent using neutron quota_update

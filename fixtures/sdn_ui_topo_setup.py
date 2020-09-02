@@ -128,7 +128,7 @@ class sdnUiTopoSetupFixture(fixtures.Fixture):
 
     def create_floating_ip(self):
         self.config_topo = {
-            self.project_fixture.keys()[0] : {'vn' : self.vn_fixture, 
+            self.project_fixture.keys()[0] : {'vn' : self.vn_fixture,
                                               'vm' : self.vm_fixture,
                                               'fip' : self.fip_fixture}
                        }
