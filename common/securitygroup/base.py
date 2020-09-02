@@ -89,7 +89,7 @@ class BaseSGTest(test_v1.BaseTestCase_v1):
 
         self.logger.info("Remove the default sec group form the VM's")
         default_secgrp_id = get_secgrp_id_from_name(
-                        	self.connections,
+                            self.connections,
                                 ':'.join([self.connections.domain_name,
                                     self.inputs.project_name,
                                     'default']))

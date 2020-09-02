@@ -72,13 +72,13 @@ class sdn_4vn_xvm_config(object):
             'vnet1': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
                         subnet=SubnetType(self.vnet1_prefix,
                                         self.vnet1_prefix_len))]))],
-	    'vnet2': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
+            'vnet2': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
                         subnet=SubnetType(self.vnet2_prefix,
                                         self.vnet2_prefix_len))]))],
-	    'vnet3': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
+            'vnet3': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
                         subnet=SubnetType(self.vnet3_prefix,
                                         self.vnet3_prefix_len))]))],
-	    'vnet4': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
+            'vnet4': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
                         subnet=SubnetType(self.vnet4_prefix,
                                         self.vnet4_prefix_len))]))]
                            }
@@ -204,7 +204,7 @@ class sdn_topo_config(object):
     def __init__(self, af_test='v4'):
         self.af_test = af_test
 
-	#2 VN and 4 VM
+    #2 VN and 4 VM
     def build_topo_sg_stateful(self, domain= 'default-domain', project= 'admin', compute_node_list= None, username= None, password= None,config_option='openstack'):
         print("building dynamic topo")
         ##
@@ -284,13 +284,13 @@ class sdn_topo_config(object):
         # Define traffic profile.
         self.traffic_profile= [{'src_vm':'vm1', 'dst_vm':'vm2', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'fail'},
                                {'src_vm':'vm2', 'dst_vm':'vm1', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'pass'},
-    			       {'src_vm':'vm1', 'dst_vm':'vm3', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'fail'},
+                               {'src_vm':'vm1', 'dst_vm':'vm3', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'fail'},
                                {'src_vm':'vm3', 'dst_vm':'vm1', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'fail'},
                                {'src_vm':'vm1', 'dst_vm':'vm4', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'fail'},
                                {'src_vm':'vm4', 'dst_vm':'vm1', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'pass'},
                                {'src_vm':'vm2', 'dst_vm':'vm4', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'fail'},
                                {'src_vm':'vm4', 'dst_vm':'vm2', 'proto':'udp', 'sport':8000, 'dport':9000, 'exp':'fail'}
-			      ]
+]
 
         # end build_topo_sg_stateful
 # end class sdn_topo_config
@@ -436,7 +436,7 @@ class sdn_topo_1vn_2vm_config(object):
             self.vn_nets = {
             'vnet1': [(NetworkIpam(), VnSubnetsType([IpamSubnetType(
                 subnet=SubnetType(self.vnet1_prefix, self.vnet1_prefix_len))]))]
-        		   }
+                           }
 
         ##
         # Define network policies
@@ -673,8 +673,8 @@ class sdn_topo_icmp_error_handling(object):
 
 class sdn_topo_mx_with_si(object):
     def build_topo(self, domain= 'default-domain', project= 'admin',
-			compute_node_list= None, username= None,
-			password= None, public_vn_info=None,config_option='openstack'):
+            compute_node_list= None, username= None,
+            password= None, public_vn_info=None,config_option='openstack'):
         print("building dynamic topo")
         ##
         # Domain and project defaults: Do not change until support for non-default is tested!
@@ -709,9 +709,9 @@ class sdn_topo_mx_with_si(object):
 
         #Define diff. VN params
         self.vn_params = {self.vnet_list[0]:{'router_asn':public_vn_info['router_asn'],
-					     'rt_number':public_vn_info['rt_number']
-					    }
-			 }
+                         'rt_number':public_vn_info['rt_number']
+                        }
+                       }
         #
         # Define network policies
         self.policy_list=  ['policy0']
@@ -735,10 +735,10 @@ class sdn_topo_mx_with_si(object):
         else:
             self.rules['policy0'] = [
             PolicyRuleType(direction='<>', protocol='any',
-				dst_addresses=[AddressType(virtual_network=':'.join([self.domain,self.project,self.vnet_list[0]]))],
-				src_addresses=[AddressType(virtual_network=':'.join([self.domain,self.project,self.vnet_list[1]]))],
-				dst_ports=[PortType(-1, -1)], action_list=ActionListType(simple_action='pass'),
-				src_ports=[PortType(-1, -1)])
+                dst_addresses=[AddressType(virtual_network=':'.join([self.domain,self.project,self.vnet_list[0]]))],
+                src_addresses=[AddressType(virtual_network=':'.join([self.domain,self.project,self.vnet_list[1]]))],
+                dst_ports=[PortType(-1, -1)], action_list=ActionListType(simple_action='pass'),
+                src_ports=[PortType(-1, -1)])
             ]
 
         #Define the security_group and its rules
