@@ -105,7 +105,7 @@ class FabricUtils(object):
                    'overlay_ibgp_asn': dc_asn or fabric_dict['namespaces']['overlay_ibgp_asn'],
                    'fabric_asn_pool': [{"asn_max": fabric_dict['namespaces']['asn'][0]['max'],
                                        "asn_min": fabric_dict['namespaces']['asn'][0]['min']}]
-                   } 
+                   }
         if os_version:
             payload['os_version'] = os_version
         self.logger.info('Onboarding new fabric %s %s'%(name, payload))

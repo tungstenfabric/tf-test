@@ -31,7 +31,7 @@ class TestDSNAT(BaseDSNAT):
                                  image_name='ubuntu')
         assert test_vm1.wait_till_vm_is_up()
         assert test_vm2.wait_till_vm_is_up()
-        
+
         assert test_vm1.verify_fabric_ip_as_floating_ip(vn_fixture.vn_fq_name)
         assert test_vm2.verify_fabric_ip_as_floating_ip(vn_fixture.vn_fq_name)
 
@@ -119,11 +119,11 @@ class TestDSNAT(BaseDSNAT):
 
         assert test_vm1.wait_till_vm_is_up()
         assert test_vm2.wait_till_vm_is_up()
-        
+
         assert test_vm1.verify_fabric_ip_as_floating_ip(vn_fixture.vn_fq_name)
         assert test_vm2.verify_fabric_ip_as_floating_ip(vn_fixture.vn_fq_name)
 
-        # Get the default security group object 
+        # Get the default security group object
         default_sg = self.get_default_sg(connections=self.connections)
 
         self.logger.info("Create a security group with rule to allow only TCP")
@@ -341,7 +341,7 @@ class TestDSNAT(BaseDSNAT):
            create a test VN, enable SNAT and launch a VM
            create a floating ip and associate the VM created on test VN
            launch a VM on floating network,
-           configure interface route table for the external ip prefix and bind it to the 
+           configure interface route table for the external ip prefix and bind it to the
                 VMI of VM launched in floating network
            Verify ping from test VM  to the external IP fails
            unbind the interface table from the VMI of VM launched in floating network
@@ -359,7 +359,7 @@ class TestDSNAT(BaseDSNAT):
         fvn_name = get_random_name('dsnat_fvn')
         fvn_subnets = [get_random_cidr()]
         floating_vn = self.create_vn(fvn_name, fvn_subnets)
-        
+
         self.logger.info("Launch a VM on the floating virtual network")
         fvn_vm1 = self.create_vm(floating_vn, get_random_name('dsnat_fvm'),
                                  image_name='ubuntu')
@@ -373,7 +373,7 @@ class TestDSNAT(BaseDSNAT):
         self.addCleanup(fip_fixture.disassoc_and_delete_fip, fip_id)
 
         assert test_vm1.verify_fabric_ip_as_floating_ip(vn_fixture.vn_fq_name)
-    
+
         self.logger.info("Create interface router table with external ip prefix,\
             and bind the route table to the VM created on the floating network")
         cfgm_ip = self.inputs.get_host_data_ip(self.inputs.cfgm_names[0])

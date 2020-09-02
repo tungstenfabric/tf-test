@@ -56,8 +56,8 @@ class ECMPVerify(object):
                 #For vcenter only setup, nova not present
                 #derive ips from orchestrator get_vm_by_id
                 orch=src_vm.orch
-                svc_obj=orch.get_vm_by_id(svm_id) 
-                left_ip[svm_id]=svc_obj.ips[si_fixture.left_vn_fq_name.split(':')[2]] 
+                svc_obj=orch.get_vm_by_id(svm_id)
+                left_ip[svm_id]=svc_obj.ips[si_fixture.left_vn_fq_name.split(':')[2]]
                 right_ip[svm_id]=svc_obj.ips[si_fixture.right_vn_fq_name.split(':')[2]]
                 self.logger.info('%s has %s as left_ip and %s as right_ip' %
                              (svc_obj.name, left_ip[svm_id], right_ip[svm_id]))
@@ -106,7 +106,7 @@ class ECMPVerify(object):
             net = '128'
         paths = inspect_h1.get_vna_active_route(
             vrf_id=vn_vrf_id, ip=shared_ip, prefix=net)['path_list']
-        next_hops = paths[0]['nh']       
+        next_hops = paths[0]['nh']
         (domain, project, vn) = src_vn.vn_fq_name.split(':')
         tap_intf_list= []
         if 'mc_list' in next_hops:
@@ -164,7 +164,7 @@ class ECMPVerify(object):
             tap_intf_list)
         return tap_intf_list
     # end get_tap_intf_list
- 
+
     def get_vrf_id(self, src_vn, src_vm, destn_agent= None):
         if destn_agent is None:
             destn_agent= src_vm.vm_node_ip

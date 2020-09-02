@@ -21,7 +21,7 @@ class TestPodScale(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     @test.attr(type=['openshift_1', 'ci_contrail_go_k8s_sanity'])
     @preposttest_wrapper
     def test_many_pods(self):

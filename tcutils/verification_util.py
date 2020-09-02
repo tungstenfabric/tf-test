@@ -385,7 +385,7 @@ class EtreeToDict(object):
 
     def find_entry(self, path, match):
         """Looks for a particular entry in the etree.
-    
+
         Returns the element looked for/None.
         """
         xp = path.xpath(self.xpath)

@@ -297,7 +297,7 @@ class VerifyIntfMirror(VerifySvcMirror):
         return rules
     # end create_policy_rule
 
-    def verify_intf_mirroring(self, compute_nodes, vn_index_list, sub_intf=False, parent_intf=False, nic_mirror=False, 
+    def verify_intf_mirroring(self, compute_nodes, vn_index_list, sub_intf=False, parent_intf=False, nic_mirror=False,
         header=1, nh_mode='dynamic', direction='both', ipv6=False):
 
         """Validate the interface mirroring
@@ -324,7 +324,7 @@ class VerifyIntfMirror(VerifySvcMirror):
         #changing it to ubuntu to use tshark later
         #image_name = 'ubuntu' if not sub_intf else 'ubuntu'
         if ipv6 or sub_intf or header in [2, 3] or self.inputs.pcap_on_vm or \
-            self.inputs.ns_agilio_vrouter_data: 
+            self.inputs.ns_agilio_vrouter_data:
             image_name = 'ubuntu'
 
         vn1_subnets = [get_random_cidr(af=self.inputs.get_af())]

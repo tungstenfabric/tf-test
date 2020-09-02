@@ -12,15 +12,15 @@ from common import log_orig as contrail_logging
 
 from tcutils.util import retry, search_arp_entry
 from tcutils.tcpdump_utils import start_tcpdump_for_intf,\
-     stop_tcpdump_for_intf 
+     stop_tcpdump_for_intf
 
 class HostEndpointFixture(fixtures.Fixture):
 
     ''' HostEndpointFixture sets up a namespace (say ns1)
-        
+
         Connection will be of the form
         (Physical network)----p1p2(brns1)ovsns1tap1----tap1(ns1)
-       
+
 
         openvswitch is required on host_ip to act as a bridge
         arping and vlan packages are also required
@@ -80,7 +80,7 @@ class HostEndpointFixture(fixtures.Fixture):
             prefix = ''
         args = prefix + args
         output = run('ovs-vsctl %s' % (args))
-        return output 
+        return output
     # end ovs_vsctl
 
     def add_vlan_config(self):
@@ -93,7 +93,7 @@ class HostEndpointFixture(fixtures.Fixture):
         br_ports = self.ovs_vsctl('list-ports %s | grep "^%s$"' % (self.bridge,
             self.interface))
         if br_ports:
-            # It means that some other links are present on the bridge. 
+            # It means that some other links are present on the bridge.
             # Maybe some other ns. Do not remove the vlan config
             pass
         else:
@@ -103,7 +103,7 @@ class HostEndpointFixture(fixtures.Fixture):
     def add_bridge(self, bridge=None):
         ''' It is assumed that if the bridge is created,
             the corresponding uplink interface(self.interface)
-            from the bridge is also present. 
+            from the bridge is also present.
         '''
         if not bridge:
             bridge = self.bridge
@@ -137,12 +137,12 @@ class HostEndpointFixture(fixtures.Fixture):
             self.ovs_vsctl('del-br %s' % (self.bridge))
             time.sleep(1)
     # end delete_bridge
-                
+
 
     def setUp(self):
         super(HostEndpointFixture, self).setUp()
         self.logger.info('Setting up namespace %s on BMS host %s' % (
-            self.namespace, self.host_ip)) 
+            self.namespace, self.host_ip))
         with settings(
             host_string='%s@%s' % (self.username, self.host_ip),
             password=self.password,
@@ -180,7 +180,7 @@ class HostEndpointFixture(fixtures.Fixture):
 
     def cleanUp(self):
         self.logger.info('Deleting namespace %s on BMS host %s' % (
-            self.namespace, self.host_ip)) 
+            self.namespace, self.host_ip))
         with settings(
             host_string='%s@%s' % (self.username, self.host_ip),
             password=self.password,
@@ -255,7 +255,7 @@ class HostEndpointFixture(fixtures.Fixture):
 
     def get_interface_info(self, interface=None):
         '''Returns interface info as a dict from ifconfig output
-            Ex : 
+            Ex :
             info = { 'up' : True,
                      'hwaddr' : '00:00:00:00:00:01',
                      'inet_addr': '10.1.1.10'
@@ -366,7 +366,7 @@ class HostEndpointFixture(fixtures.Fixture):
             cmd = 'arp -d %s' % (ip_address)
         elif all_entries:
             cmd = 'ip -s -s neigh flush all'
-    
+
         output = self.run_cmd(cmd)
         return output
     # end clear_arp
@@ -380,7 +380,7 @@ class HostEndpointFixture(fixtures.Fixture):
 
     def stop_tcpdump(self, session, pcap):
         stop_tcpdump_for_intf(session, pcap, self.logger)
-        
+
     def add_static_arp(self, ip, mac):
         self.run_cmd('arp -s %s %s' % (ip, mac), as_sudo=True)
         self.logger.info('Added static arp %s:%s on BMS %s' % (ip, mac,

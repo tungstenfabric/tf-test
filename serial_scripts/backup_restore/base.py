@@ -5,7 +5,7 @@ from common.contrail_test_init import ContrailTestInit
 from upgrade.verify import BaseResource
 
 class BackupRestoreBaseTest(test_v1.BaseTestCase_v1):
-    
+
     @classmethod
     def setUpClass(cls):
         super(BackupRestoreBaseTest, cls).setUpClass()
@@ -24,7 +24,7 @@ class BackupRestoreBaseTest(test_v1.BaseTestCase_v1):
         cls.res.cleanUp()
         super(BackupRestoreBaseTest, cls).tearDownClass()
     #end tearDownClass
-    
+
 class ResourceFactory(object):
     factories = {}
     def createResource(id):
@@ -36,7 +36,7 @@ class ResourceFactory(object):
 
 
 class TestBackupRestoreResource(BaseResource):
-    
+
     def setUp(self,inputs,connections, logger):
         super(TestBackupRestoreResource, self).setUp(inputs,connections, logger)
 
@@ -49,4 +49,4 @@ class TestBackupRestoreResource(BaseResource):
     def runTest(self):
         pass
 
-#End resource   
+#End resource

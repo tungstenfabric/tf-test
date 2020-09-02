@@ -190,7 +190,7 @@ class AdminIsolatedCreds(fixtures.Fixture):
 
     def delete_tenant(self, project_fixture):
         project_fixture.cleanUp()
-    
+
     def create_domain(self, domain_name):
         if self.inputs.orchestrator  == 'vcenter' or self.inputs.vcenter_gw_setup:
             return

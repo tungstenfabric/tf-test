@@ -12,7 +12,7 @@ except:
     neutron_exception = None
     neutron_forbidden = None
 
-# import handling for keystone 
+# import handling for keystone
 try:
     from keystoneauth1 import identity as ks_identity
     from keystoneauth1 import session as ks_session

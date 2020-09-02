@@ -288,8 +288,8 @@ class BMSFixture(fixtures.Fixture):
 
     def config_mroute(self,interface,address,mask):
         self.run('ifconfig %s multicast' %(self._interface))
-        self.run_namespace('route -n add -net %s  netmask %s dev %s' %(address,mask,interface)) 
- 
+        self.run_namespace('route -n add -net %s  netmask %s dev %s' %(address,mask,interface))
+
     def copy_file_to_bms(self, localfile, dstdir=None, force=False):
         if not force and localfile in self.copied_files and \
            self.copied_files[localfile] == dstdir:
@@ -484,7 +484,7 @@ class BMSFixture(fixtures.Fixture):
                 self.logger.debug('Not setting up Namespaces')
                 return
             self.logger.info('Setting up namespace %s on BMS host %s' % (
-                    self.namespace, self.mgmt_ip)) 
+                    self.namespace, self.mgmt_ip))
             self.setup_bms()
         except:
             try:
@@ -512,7 +512,7 @@ class BMSFixture(fixtures.Fixture):
 
     def cleanUp(self):
         self.logger.info('Deleting namespace %s on BMS host %s' % (
-            self.namespace, self.name)) 
+            self.namespace, self.name))
         if self.bms_created:
             self.cleanup_bms()
         self.delete_vmi()
@@ -521,7 +521,7 @@ class BMSFixture(fixtures.Fixture):
 
     def get_interface_info(self):
         '''Returns interface info as a dict from ifconfig output
-            Ex : 
+            Ex :
             info = { 'up' : True,
                      'hwaddr' : '00:00:00:00:00:01',
                      'inet_addr': '10.1.1.10'
@@ -658,7 +658,7 @@ class BMSFixture(fixtures.Fixture):
 
     def stop_tcpdump(self, session, pcap):
         stop_tcpdump_for_intf(session, pcap, self.logger)
-        
+
     def add_static_arp(self, ip, mac):
         self.run_namespace('arp -s %s %s' % (ip, mac), as_sudo=True)
         self.logger.info('Added static arp %s:%s on BMS %s' % (ip, mac,

@@ -101,7 +101,7 @@ class TestSubInterfaces(BaseVrouterTest):
                                      port_ids=[self.vn2_port3.uuid],
                                      userdata='./scripts/vrouter/user_data1.sh'
                                      )
-        # vm2 and vm3 are in one VN. vm1 pings to these vms 
+        # vm2 and vm3 are in one VN. vm1 pings to these vms
         router_dict = self.create_router()
         self.add_vn_to_router(router_dict['id'], self.vn1_fixture)
         self.add_vn_to_router(router_dict['id'], self.vn3_fixture)

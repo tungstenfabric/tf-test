@@ -19,7 +19,7 @@ class BaseFwaaSTest(BaseFirewallTest):
             return False, 'FWaaSv2 needs atleast rocky, current sku %s'%(
                 self.inputs.get_build_sku())
         return True, None
- 
+
     @classmethod
     def create_common_objects(cls):
         ''' Create class specific objects

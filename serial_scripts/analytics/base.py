@@ -28,7 +28,7 @@ class AnalyticsBaseTest(GenericTestBase):
         cls.agent_inspect= cls.connections.agent_inspect
         cls.cn_inspect= cls.connections.cn_inspect
         cls.analytics_obj=cls.connections.analytics_obj
-        cls.orch = cls.connections.orch 
+        cls.orch = cls.connections.orch
         resource_class = cls.__name__ + 'Resource'
         cls.res = ResourceFactory.createResource(resource_class)
     #end setUpClass
@@ -176,7 +176,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.stop_traffic(traffic_obj)
 
     #end setup_create_streams
-    
+
     def creat_bind_policy(self,policy_name, rules, src_vn_fix, dst_vn_fix):
         #method to avoid redundant code for binding
         policy_fixture = self.useFixture(
@@ -188,12 +188,12 @@ class AnalyticsBaseTest(GenericTestBase):
         src_vn_fix.bind_policies([policy_fixture.policy_fq_name], src_vn_fix.vn_id)
         self.addCleanup(src_vn_fix.unbind_policies, src_vn_fix.vn_id, [
                 policy_fixture.policy_fq_name])
-        
+
         dst_vn_fix.bind_policies([policy_fixture.policy_fq_name], dst_vn_fix.vn_id)
         self.addCleanup(dst_vn_fix.unbind_policies, dst_vn_fix.vn_id, [
                 policy_fixture.policy_fq_name])
     #end create and bind policy
-       
+
     def verify_session_record_table(self, start_time, src_vn, dst_vn):
         self.logger.info('Verify session record table')
         result = True
@@ -211,12 +211,12 @@ class AnalyticsBaseTest(GenericTestBase):
                            'reverse_flow_uuid', 'vn', 'remote_vn'],
                 where_clause=query,
                 session_type='client')
-            
+
             if len(res) != 3:
                 self.logger.error('Expected client session records 3 got %s'%len(res))
                 result = result and False
             self.logger.debug(res)
-            
+
             #query and verify number of server session records
             query = 'vn=' + dst_vn + ' AND remote_vn=' + src_vn + ' AND protocol=17'
             res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -227,12 +227,12 @@ class AnalyticsBaseTest(GenericTestBase):
                            'reverse_flow_uuid', 'vn', 'remote_vn'],
                 where_clause=query,
                 session_type='server')
-            
+
             if len(res) != 3:
                 self.logger.error('Expected server session records 3 got %s'%len(res))
                 result = result and False
             self.logger.debug(res)
-            
+
             #query with local_ip server_port protocol
             query = 'local_ip=%s AND server_port=9001 AND protocol=17'%self.res.vn1_vm1_fixture.vm_ip
             res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -246,7 +246,7 @@ class AnalyticsBaseTest(GenericTestBase):
                self.logger.error('Expected session records 1 got %s'%len(res))
                result = result and False
             self.logger.debug(res)
-            
+
             #query with server_port local_ip filter by server_port
             query = 'vn=' + src_vn + ' AND remote_vn=' + dst_vn + ' AND protocol=17'
             res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -262,8 +262,8 @@ class AnalyticsBaseTest(GenericTestBase):
                self.logger.error('Expected session records 1 got %s'%len(res))
                result = result and False
             self.logger.debug(res)
-            
-            #query with client_port remote_ip filter by client_port 
+
+            #query with client_port remote_ip filter by client_port
             #Total we get three record limit by 2
             query = 'vn=' + src_vn + ' AND remote_vn=' + dst_vn + ' AND protocol=17'
             res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -280,7 +280,7 @@ class AnalyticsBaseTest(GenericTestBase):
                self.logger.error('Expected session records 2 got %s'%len(res))
                result = result and False
             self.logger.debug(res)
-            
+
             #query with sort_fields
             query = 'vn=' + src_vn + ' AND remote_vn=' + dst_vn + ' AND protocol=17'
             res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -296,12 +296,12 @@ class AnalyticsBaseTest(GenericTestBase):
                self.logger.error('Expected server port 9000 got %s'%res[0]['server_port'])
                result = result and False
             self.logger.debug(res)
-             
+
         assert result,'Failed to get expected number of Records'
     #end verify_session_record_table
-    
+
     def verify_session_series_table(self, start_time, src_vn, dst_vn):
-        
+
         self.logger.info('Verify session series table and aggregation stats')
         result = True
         query = 'vn=' + src_vn + ' AND remote_vn=' + dst_vn + ' AND protocol=17'
@@ -328,7 +328,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session aggregate stats returned %s not expected'%len(res))
             result = result and False
         self.logger.debug(res)
-        
+
         #have three server ports so three record in output each with sum(forward pkts) 100
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -345,7 +345,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session series records returned %s not expected'%len(res))
             result = result and status
         self.logger.debug(res)
-        
+
         ## all session msgs have same vn-remote_vn hence following query should return 1 record
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -358,7 +358,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session series records returned %s not expected'%len(res))
             result = result and False
         self.logger.debug(res)
-        
+
         ## sort results by server_port column
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -372,7 +372,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session series records with sort fileld returned %s not expected'%len(res))
             result = result and False
         self.logger.debug(res)
-        
+
         #verify granularity with T=10
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -386,7 +386,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session series records with granularity returned %s not expected'%len(res))
             result = result and False
         self.logger.debug(res)
-        
+
         #with sampled bytes
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -399,7 +399,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session series records with specific server_port returned %s not expected'%len(res))
             result = result and False
         self.logger.debug(res)
-        
+
         #with logged bytes
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -412,7 +412,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session series records with logged _bytes/pkts returned %s not expected'%len(res))
             result = result and False
         self.logger.debug(res)
-        
+
         #filter by action
         action = 'pass'
         res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -429,10 +429,10 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session series records with filter_action pass returned %s not expected'%len(res))
             result = result and False
         self.logger.debug(res)
-        
+
         assert result,'Failed to get expected number of Records'
     #end verify_session_series_table
-    
+
     def verify_session_sampling_teardown(self, start_time, src_vn, dst_vn):
         result = True
         vm_node_ip = self.res.vn1_vm1_fixture.vm_node_data_ip
@@ -445,7 +445,7 @@ class AnalyticsBaseTest(GenericTestBase):
         self.logger.info('Verify session samples and teardown pkts')
         ip = self.inputs.collector_ips[0]
         self.logger.info("Verifying SessionSeriesTable through opserver %s" %(ip))
-        
+
         #query client session samples
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -458,7 +458,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session sample client returned %s not expected'%res)
             result = result and False
         self.logger.debug(res)
-        
+
         #query server session samples
         query = 'vn=' + dst_vn + ' AND remote_vn=' + src_vn + ' AND protocol=1'
         res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -472,7 +472,7 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session sample server returned %s not expected'%res)
             result = result and False
         self.logger.debug(res)
-        
+
         #query client session to get number of sessions exported
         query = 'vn=' + src_vn + ' AND remote_vn=' + dst_vn + ' AND protocol=1'
         res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -486,14 +486,14 @@ class AnalyticsBaseTest(GenericTestBase):
             self.logger.error('Session sample count returned %s not expected'%res)
             result = result and False
         self.logger.debug(res)
-        
+
         #query session record table for teardown bytes/pkts
         self.logger.info('wait for the flows to get expire')
         time.sleep(200)
         flow_record = self.analytics_obj.get_flows_vrouter_uve(
             vrouter=vm_host)
         assert not flow_record,'flows not got deleted even after 240 sec'
-        
+
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionRecordTable',
             start_time=start_time,
@@ -509,7 +509,7 @@ class AnalyticsBaseTest(GenericTestBase):
            self.logger.error('Teardown fields were missing in the result')
            result = result and False
         self.logger.debug(res)
-        
+
         # verify sample count after teardown on client side
         res = self.analytics_obj.ops_inspect[ip].post_query(
             'SessionSeriesTable',
@@ -521,7 +521,7 @@ class AnalyticsBaseTest(GenericTestBase):
         if len(res) and res[0].get('sample_count') !=4:
             self.logger.error('Session sample count returned %s not expected'%res)
             result = result and False
-        
+
         # verify sample count after teardown on server side
         query = 'vn=' + dst_vn + ' AND remote_vn=' + src_vn + ' AND protocol=1'
         res = self.analytics_obj.ops_inspect[ip].post_query(
@@ -531,14 +531,14 @@ class AnalyticsBaseTest(GenericTestBase):
             select_fields=['vn','remote_vn','sample_count'],
             where_clause=query,
             session_type='server')
-        
+
         if len(res) and res[0].get('sample_count') !=4:
             self.logger.error('Session sample count returned %s not expected'%res)
             result = result and False
         self.logger.debug(res)
         return result
     #end verify_session_sampling_teardown
-    
+
 class ResourceFactory(object):
     factories = {}
     def createResource(id):
@@ -549,7 +549,7 @@ class ResourceFactory(object):
     createResource = staticmethod(createResource)
 
 class BaseSanityResource(with_metaclass(Singleton, fixtures.Fixture)):
-   
+
     def setUp(self,inputs,connections):
         super(BaseSanityResource , self).setUp()
         self.inputs = inputs
@@ -621,7 +621,7 @@ class BaseResource(with_metaclass(Singleton, BaseSanityResource)):
             vn_name=self.fip_vn_name))
 
         # Making sure VM falls on diffrent compute host
-        self.orch = self.connections.orch 
+        self.orch = self.connections.orch
         host_list = self.orch.get_hosts()
         compute_2 = host_list[0]
         if len(host_list) > 1:
@@ -720,7 +720,7 @@ class AnalyticsTestSanityWithMinResource(BaseSanityResource):
     class Factory(object):
         def create(self): return AnalyticsTestSanityWithMinResource()
 
-class AnalyticsTestSanityResource(BaseResource): 
+class AnalyticsTestSanityResource(BaseResource):
 
     def setUp(self,inputs,connections):
         pass

@@ -1,5 +1,5 @@
 """Intf mirroring IPv6 Regression tests."""
-# Written by 	: ankitja@juniper.net
+# Written by    : ankitja@juniper.net
 # Maintained by : ankitja@juniper.net
 
 import os
@@ -34,14 +34,14 @@ class TestIntfMirror6(BaseIntfMirrorTest, VerifyIntfMirror):
         Maintainer : ankitja@juniper.net
         """
         return self.verify_juniper_header_testcase(header=2, ipv6=True)
-        
+
     @preposttest_wrapper
     def test_juniper_header6_ingress(self):
         """Validate the presence of juniper header with ingress IPv6 cases
         1) Check pkts get mirrored from both sub intf and parent intf when enabled on both
         2) Verify if the juniper header is correct
         3) Verify if the inner header is correct
-        
+
         Maintainer : ankitja@juniper.net
 
         """
@@ -53,7 +53,7 @@ class TestIntfMirror6(BaseIntfMirrorTest, VerifyIntfMirror):
         1) Check pkts get mirrored from both sub intf and parent intf when enabled on both
         2) Verify if the juniper header is correct
         3) Verify if the inner header is correct
-        
+
         Maintainer : ankitja@juniper.net
 
         """
@@ -296,7 +296,7 @@ class TestIntfMirror6(BaseIntfMirrorTest, VerifyIntfMirror):
     def test_intf_mirror6_src_cn1vn1_dst_cn2vn1_analyzer_cn1vn1(self):
         """Validate the interface mirroring IPv6
         src vm, analyzer vm on same CN and dst vm on different CN, all in same VN
-        
+
         Maintainer : ankitja@juniper.net
 
         """

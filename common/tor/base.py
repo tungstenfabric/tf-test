@@ -1,7 +1,7 @@
 from builtins import str
 from builtins import range
 import time
-from netaddr import * 
+from netaddr import *
 from random import randint
 
 from common.neutron.base import BaseNeutronTest
@@ -45,7 +45,7 @@ class BaseTorTest(BaseNeutronTest):
         endpoints = []
         for (ip, ep_list) in self.inputs.tor_hosts_data.items():
             if device_ip == ip:
-                return ep_list 
+                return ep_list
         return endpoints
     # end get_available_endpoints
 
@@ -80,7 +80,7 @@ class BaseTorTest(BaseNeutronTest):
         tors_info_list = self.get_available_devices('tor')
         assert len(tors_info_list) >= count, (
             'Not enough devices available! Expected %s, Got %s' % (
-                count, len(tors_info_list)))  
+                count, len(tors_info_list)))
         for i in range(0, count):
             tor_params = tors_info_list[i]
             tor_fixture = self.useFixture(PhysicalRouterFixture(
@@ -129,7 +129,7 @@ class BaseTorTest(BaseNeutronTest):
     def setup_tor_port(self, tor_fixture, port_index=0, vlan_id=0, vmi_objs=[],
         cleanup=True):
         device_id = tor_fixture.phy_device.uuid
-        tor_ip = tor_fixture.mgmt_ip 
+        tor_ip = tor_fixture.mgmt_ip
         pif_name = self.inputs.tor_hosts_data[tor_ip][port_index]['tor_port']
         lif_name = pif_name + '.' + str(vlan_id)
         pif_fixture = PhysicalInterfaceFixture(name=pif_name,
@@ -152,7 +152,7 @@ class BaseTorTest(BaseNeutronTest):
     # end setup_tor_port
 
     def setup_bms(self, tor_fixture, port_index=0, namespace=None,
-        ns_intf=None, ns_mac_address=None, 
+        ns_intf=None, ns_mac_address=None,
         ns_ip_address=None,
         ns_netmask=None,
         ns_gateway=None,
@@ -161,17 +161,17 @@ class BaseTorTest(BaseNeutronTest):
         cleanup=True):
         '''Setups up a bms using HostEndpointFixture
 
-            tor_ip : tor mgmt IP 
-            port_index : index of the port in tor_hosts dict of 
+            tor_ip : tor mgmt IP
+            port_index : index of the port in tor_hosts dict of
                          the ToR
             namespace : name of the netns instance
             ns_intf   : Interface name on the netns instance
             ns_mac_address : MAC address of ns_intf on netns instance
-            ns_ip_address  : IP Address of ns_intf 
-            ns_gateway     : Gateway IP to be assigned to netns 
-            vlan_id        : Vlan id to be assigned to ns_intf, default is 
+            ns_ip_address  : IP Address of ns_intf
+            ns_gateway     : Gateway IP to be assigned to netns
+            vlan_id        : Vlan id to be assigned to ns_intf, default is
                              untagged
-            verify         : If True, does dhclient on the netns intf and 
+            verify         : If True, does dhclient on the netns intf and
                              verifies if it has got the expected IP
         '''
         if namespace is None:
@@ -208,7 +208,7 @@ class BaseTorTest(BaseNeutronTest):
                 self.validate_interface_ip(bms_obj, ns_ip_address)
         return bms_obj
     # end setup_bms
-    
+
     def create_vn(self, vn_name=None, vn_subnets=None, disable_dns=False,
                   vxlan_id=None, enable_dhcp=True, **kwargs):
         vn_fixture = super(BaseTorTest, self).create_vn(vn_name, vn_subnets,
@@ -216,7 +216,7 @@ class BaseTorTest(BaseNeutronTest):
         if disable_dns:
             dns_dict = {'dns_nameservers': ['0.0.0.0']}
             for vn_subnet_obj in vn_fixture.vn_subnet_objs:
-                vn_fixture.update_subnet(vn_subnet_obj['id'], dns_dict) 
+                vn_fixture.update_subnet(vn_subnet_obj['id'], dns_dict)
         return vn_fixture
     # end create_vn
 
@@ -224,14 +224,14 @@ class BaseTorTest(BaseNeutronTest):
         assert expected_ip == bms_fixture.info['inet_addr'],\
             'BMS IP not expected : Seen:%s, Expected:%s' % (
             bms_fixture.info['inet_addr'], expected_ip)
-    # end validate_interface_ip  
+    # end validate_interface_ip
 
     def set_configured_vxlan_mode(self):
         self.vnc_lib_fixture.set_vxlan_mode('configured')
         self.addCleanup(self.vnc_lib_fixture.set_vxlan_mode, 'automatic')
 
     def restart_openvwitches(self, tor_fixtures):
-        '''In some scenarios,(Ex: Vxlan id change), it is required 
+        '''In some scenarios,(Ex: Vxlan id change), it is required
             that one needs to restart the openvswitch processes ourselves
             This is unlike QFX where a change is taken care of by itself.
         '''
@@ -314,7 +314,7 @@ class BaseTorTest(BaseNeutronTest):
             dest_name = dest_fixture.identifier
         elif isinstance(dest_fixture, VMFixture):
             dest_name = dest_fixture.vm_name
-        
+
         result = search_in_pcap(session, pcap, 'Request who-has %s tell %s' % (
             ip, source_ip))
         if result :
@@ -323,7 +323,7 @@ class BaseTorTest(BaseNeutronTest):
         else:
             message = 'ARP request from %s to %s is NOT seen on %s' % (
                 source_ip, ip, dest_name)
-                
+
         self.logger.info(message)
         delete_pcap(session, pcap)
         return (result, message)
@@ -332,7 +332,7 @@ class BaseTorTest(BaseNeutronTest):
     def validate_dhcp_forwarding(self, source_fixture,
             dest_fixture, source_interface=None):
         '''
-            Validate that dhcp discover packet from a VM/BMS 
+            Validate that dhcp discover packet from a VM/BMS
             is seen on the destination VM/BMS
             Returns True in such a case, else False
         '''
@@ -373,4 +373,4 @@ class BaseTorTest(BaseNeutronTest):
         cmd = cmd + 'nohup python -m SimpleHTTPServer '+str(listen_port) + ' &'
         cmd = '''bash -c "''' + cmd + '"'
         bms_fixture.run_cmd(cmd)
-    
+

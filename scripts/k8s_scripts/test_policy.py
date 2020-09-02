@@ -20,7 +20,7 @@ class TestNetworkPolicy(BaseK8sTest):
         def __init__ (self, connections):
             self.connections = connections
             self.setUp()
-        
+
         def setUp (self):
             try:
                 self.ns1 = NamespaceFixture(connections=self.connections, name="default")
@@ -195,7 +195,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.client1_pod_ns2.ping_with_certainty(self.client1_pod_ns1.pod_ip)
         assert self.client1_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip)
     #end test_allow_all_ingress
-   
+
     @test.attr(type=['openshift_1', 'ci_contrail_go_k8s_sanity'])
     @preposttest_wrapper
     def test_deny_all_ingress(self):
@@ -241,10 +241,10 @@ class TestNetworkPolicy(BaseK8sTest):
         # All traffic between everyone should work
         assert self.client1_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip)
         assert self.client1_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
-        policy = self.setup_update_simple_policy(name="ingress-pod-to-pod", 
+        policy = self.setup_update_simple_policy(name="ingress-pod-to-pod",
                                  pod_selector = self.web_pod_ns1.labels,
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_pods= self.client1_pod_ns1.labels)
         assert policy.verify_on_setup()
         # All ingress traffic to pod cls.web_pod_ns1 will be dropped except from pod self.client1_pod_ns1.labels
@@ -275,7 +275,7 @@ class TestNetworkPolicy(BaseK8sTest):
         policy = self.setup_update_simple_policy(name="ingress-ns-to-pod",
                                  pod_selector = self.web_pod_ns1.labels,
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_namespaces= self.ns2.labels)
         assert policy.verify_on_setup()
         # All ingress traffic to pod cls.web_pod_ns1 will be allowed only from all pods of namespace "non-default"
@@ -312,7 +312,7 @@ class TestNetworkPolicy(BaseK8sTest):
         policy = self.setup_update_simple_policy(name="ingress-ipblock-to-pod",
                                  pod_selector = self.web_pod_ns1.labels,
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_ipblock= {"cidr" : ingress_allow_cidr,
                                                    "_except" : [deny_cidr]})
         assert policy.verify_on_setup()
@@ -374,7 +374,7 @@ class TestNetworkPolicy(BaseK8sTest):
         1. Verify that all pods are reachable from all namespaces
         2. Create a Network policy on "default" namespace to allow ingress
            from a particular pod of "default" namespace.
-        3. Verify that ingress to the namespace "default" is allowed from configured 
+        3. Verify that ingress to the namespace "default" is allowed from configured
            PodSelector only.
         4. Verify that ingress from all other pods in namespace "default" is dropped.
         5. Verify that egress from namespace "default" to other namespace is not affected
@@ -383,9 +383,9 @@ class TestNetworkPolicy(BaseK8sTest):
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.validate_wget(self.client1_pod_ns2, url)
-        policy = self.setup_update_simple_policy(name="ingress-pod-to-ns", 
+        policy = self.setup_update_simple_policy(name="ingress-pod-to-ns",
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_pods= self.client1_pod_ns1.labels)
         assert policy.verify_on_setup()
         # Traffic should only be allowed from self.client1_pod_ns1 inside namespace default
@@ -408,21 +408,21 @@ class TestNetworkPolicy(BaseK8sTest):
     def test_ingress_podselector_for_namespace_negative(self):
         """
         Verify a network policy for a Namespace with Ingress Podselector rule where the
-        Pod lies in different namespace. It is a negative test. 
+        Pod lies in different namespace. It is a negative test.
         Steps:
         1. Verify that all pods are reachable from all namespaces
         2. Create a Network policy on "default" namespace to allow ingress
            from a particular pod of "non-default" namespace.
-        3. Verify that no ingress is allowed in "default" namespace as it will search for 
+        3. Verify that no ingress is allowed in "default" namespace as it will search for
            the pod in its own namespace("default") and it will not find it.
         """
         # All traffic between everyone should work
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.validate_wget(self.client1_pod_ns2, url)
-        policy = self.setup_update_simple_policy(name="ingress-pod-to-ns", 
+        policy = self.setup_update_simple_policy(name="ingress-pod-to-ns",
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_pods= self.client1_pod_ns2.labels)
         assert policy.verify_on_setup()
         # Being a negative case where PodSelector "ingress_pods" is from different namespace, this policy is similar as deny all policy on namespace "default"
@@ -449,7 +449,7 @@ class TestNetworkPolicy(BaseK8sTest):
         1. Verify that all pods are reachable from all namespaces
         2. Create a Network policy on "default" namespace to allow ingress
            from a particular namespace.
-        3. Verify that ingress to the pods of "default" namespace is allowed from pods of configured 
+        3. Verify that ingress to the pods of "default" namespace is allowed from pods of configured
            NamespaceSelector only.
         4. Verify that ingress to "default" namespace from pods of same namespace is not allowed.
         5. Verify that egress from "default" namespace to other namespace is not affected.
@@ -458,9 +458,9 @@ class TestNetworkPolicy(BaseK8sTest):
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.validate_wget(self.client1_pod_ns2, url)
-        policy = self.setup_update_simple_policy(name="ingress-ns-to-ns", 
+        policy = self.setup_update_simple_policy(name="ingress-ns-to-ns",
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_namespaces= self.ns2.labels)
         assert policy.verify_on_setup()
         # Traffic from "non-default" namespace to "default" namespace should work
@@ -483,9 +483,9 @@ class TestNetworkPolicy(BaseK8sTest):
         2. Create a Network policy on "default" namespace to allow ingress
            from a particular IpBlock CIDR.
            Also mention to deny traffic from another cidr towards namespace "default".
-        3. Verify that ingress to all pods of  namespace "default" is allowed from pods 
+        3. Verify that ingress to all pods of  namespace "default" is allowed from pods
            lying in the configured cidr
-        4. Verify that ingress to namespace "default" from Pod mentioned in "except" 
+        4. Verify that ingress to namespace "default" from Pod mentioned in "except"
            block of policy is not allowed.
         5. Verify that egress from namespace "default" is not affected.
         """
@@ -500,11 +500,11 @@ class TestNetworkPolicy(BaseK8sTest):
         deny_cidr = self.client2_pod_ns2.pod_ip + "/32"
         policy = self.setup_update_simple_policy(name="ingress-ipblock-to-ns",
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_ipblock= {"cidr" : ingress_allow_cidr,
                                                    "_except" : [deny_cidr]})
         assert policy.verify_on_setup()
-        # Ingress traffic should be allowed from pods lying in "ingress_allow_cidr" 
+        # Ingress traffic should be allowed from pods lying in "ingress_allow_cidr"
         assert self.validate_wget(self.client1_pod_ns2, url)
         assert self.client1_pod_ns2.ping_with_certainty(self.client1_pod_ns1.pod_ip)
         # Ingress traffic should not be allowed from host ip of self.client2_pod_ns2
@@ -562,7 +562,7 @@ class TestNetworkPolicy(BaseK8sTest):
         1. Create a network policy with ingress "from" rule mentioning "podSelector",
            "NamespaceSelector" and "port"
         2. Verify the accessibility between pods as per the rule
-        3. Delete the policy and create another policy with ingress "from" rule 
+        3. Delete the policy and create another policy with ingress "from" rule
            mentioning "podSelector", "IpBlock" and "port"
         4. Verify the accessibility between pods as per the rule
         """
@@ -597,7 +597,7 @@ class TestNetworkPolicy(BaseK8sTest):
                                                         expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.web_pod_ns2.pod_ip,
                                                         expectation=False)
-        
+
         self.perform_cleanup(policy1)
         allowed_ip = self.client2_pod_ns1.pod_ip.split(".")[:3]
         allowed_ip.append("0/24")
@@ -644,10 +644,10 @@ class TestNetworkPolicy(BaseK8sTest):
         """
         Verify that Contrail FW policies are updated on editing the k8s netwok poliy
         Steps:
-        1. Create a netwok policy on one of the podSelector of namespace "non-default" with 
+        1. Create a netwok policy on one of the podSelector of namespace "non-default" with
            ingress from "pdSelector", "namespaceSelector" and ports.
         2. Verify that policy works as expected
-        3. Update the netwok policy on same podSelector of namespace "non-default" with 
+        3. Update the netwok policy on same podSelector of namespace "non-default" with
            updated "podSelector", removing "namespaceSelector", ipblock and updated ports.
         4. Verify that policy works as expected
         5. Again update the network policy with updated PodSelctor which corresponds to
@@ -685,7 +685,7 @@ class TestNetworkPolicy(BaseK8sTest):
                                                         expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.web_pod_ns2.pod_ip,
                                                         expectation=False)
-        
+
         #Updating the same network policy
         allowed_ip = self.client2_pod_ns1.pod_ip.split(".")[:3]
         allowed_ip.append("0/24")
@@ -699,10 +699,10 @@ class TestNetworkPolicy(BaseK8sTest):
              'ports': [ 'TCP/80' ]
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 ingress= ingress_list)
-        
+
         # INgess traffic to self.web_pod_ns2 should be allowed from self.client2_pod_ns1 as per cidr rule
         assert self.validate_wget(self.client2_pod_ns1, url2)
         # INgess traffic to self.web_pod_ns2 should not be allowed from self.client1_pod_ns1 as per except rule
@@ -722,7 +722,7 @@ class TestNetworkPolicy(BaseK8sTest):
         # Ingress Traffic for any other pod of namespace "non-default" should not be affected
         assert self.client2_pod_ns2.ping_with_certainty(self.client1_pod_ns2.pod_ip)
         assert self.client1_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip)
-        
+
         #Updating the policy again:
         ingress_list = [
             {'from': [
@@ -731,10 +731,10 @@ class TestNetworkPolicy(BaseK8sTest):
              },
         ]
         self.setup_update_policy(pod_selector = self.client1_pod_ns2.labels,
-                                update = True, 
+                                update = True,
                                 np_fixture = policy1,
                                 ingress= ingress_list)
-        
+
         assert self.client2_pod_ns2.ping_with_certainty(self.client1_pod_ns2.pod_ip,
                                                         expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip)
@@ -759,15 +759,15 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.validate_wget(self.client1_pod_ns2, url)
         assert self.validate_wget(self.client1_pod_ns1, url2)
         # Enable all traffic to ns1
-        policy1 = self.setup_update_simple_policy(name="ingress-pod-to-pod", 
+        policy1 = self.setup_update_simple_policy(name="ingress-pod-to-pod",
                                  pod_selector = self.web_pod_ns1.labels,
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_pods= self.client1_pod_ns1.labels)
         policy2 = self.setup_update_simple_policy(name="ingress-ns-to-pod",
                                  pod_selector = self.web_pod_ns1.labels,
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  ingress_namespaces= self.ns2.labels)
         assert policy1.verify_on_setup()
         assert policy2.verify_on_setup()
@@ -783,9 +783,9 @@ class TestNetworkPolicy(BaseK8sTest):
                                    namespace = self.ns1.name,
                                    policy_types = ["Ingress"],
                                    ingress= ingress_list)
-        policy4 = self.setup_update_simple_policy(name="ingress-pod-to-ns", 
+        policy4 = self.setup_update_simple_policy(name="ingress-pod-to-ns",
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns2.name, 
+                                 namespace= self.ns2.name,
                                  ingress_pods= self.client1_pod_ns2.labels)
         assert policy3.verify_on_setup()
         assert policy4.verify_on_setup()
@@ -795,10 +795,10 @@ class TestNetworkPolicy(BaseK8sTest):
         deny_cidr = self.client2_pod_ns1.pod_ip + "/32"
         policy5 = self.setup_update_simple_policy(name="ingress-ipblock-to-ns",
                                  policy_types = ["Ingress"],
-                                 namespace= self.ns2.name, 
+                                 namespace= self.ns2.name,
                                  ingress_ipblock= {"cidr" : ingress_allow_cidr,
                                                    "_except" : [deny_cidr]})
-        
+
         # Verifying ingress behavior on namspace "default" as per 1st 3 policies
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.validate_wget(self.client2_pod_ns1, url)
@@ -809,7 +809,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.client1_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip)
         assert self.client1_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
         assert self.client1_pod_ns2.ping_with_certainty(self.client1_pod_ns1.pod_ip)
-        
+
         # Verifying ingress behavior on namspace "non-default" as per policy 4 and 5
         assert self.validate_wget(self.client1_pod_ns2, url2)
         assert self.validate_wget(self.client1_pod_ns1, url2)
@@ -820,7 +820,7 @@ class TestNetworkPolicy(BaseK8sTest):
                                                         expectation = False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip,
                                                         expectation = False)
-        
+
         self.perform_cleanup(policy1)
         assert self.validate_wget(self.client1_pod_ns1, url, expectation=False)
         assert self.client1_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip,
@@ -829,13 +829,13 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.client2_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip,
                                                         expectation=False)
         assert self.validate_wget(self.client1_pod_ns2, url)
-        
+
         self.perform_cleanup(policy2)
         assert self.validate_wget(self.client2_pod_ns1, url)
         assert self.client2_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip,
                                                         expectation=False)
         assert self.validate_wget(self.client1_pod_ns2, url, expectation=False)
-        
+
         self.perform_cleanup(policy3)
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.client1_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip)
@@ -854,11 +854,11 @@ class TestNetworkPolicy(BaseK8sTest):
     @preposttest_wrapper
     def test_ingress_rules_label_edit(self):
         """
-        Verify that pod reachability takes effect correctly on editing the label of 
+        Verify that pod reachability takes effect correctly on editing the label of
         pods and namespace specified in network policy.
         Steps:
         1. Change the label of the pod mentioned in podSelector rule and verify reachability
-        2. Change the label of the pod of namespace mentioned in namespaceSelector 
+        2. Change the label of the pod of namespace mentioned in namespaceSelector
            and verify the reachability.
         3. Change the label of namespace mentioned in namespaceSelector and verify reachability.
         4. Edit the network policy to comply with the podSelector and namespaceSelector
@@ -888,18 +888,18 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.validate_wget(self.client1_pod_ns2, url2)
         assert self.validate_wget(self.client2_pod_ns2, url2, expectation = False)
         assert self.validate_wget(self.client2_pod_ns1, url2)
-        
+
         # Change the label of the pod mentione in podSelector rule and verify that it cant reach self.web_pod_ns2 anymore
         self.client1_pod_ns2.set_labels({'app': 'client2_ns2'})
         self.addCleanup(self.client1_pod_ns2.set_labels, {'app': 'client1_ns2'})
         assert self.validate_wget(self.client1_pod_ns2, url2, expectation = False)
         assert self.validate_wget(self.client2_pod_ns1, url2)
-        
+
         # Change the label of a pods which is part of namespace mentioned in namespaceSelector. Verify that it does not matter.
         self.client2_pod_ns1.set_labels({'app': 'test'})
         self.addCleanup(self.client2_pod_ns1.set_labels, {'app': 'client2_ns1'})
         assert self.validate_wget(self.client2_pod_ns1, url2)
-        
+
         # Change the label of namespace mentioned in namespaceSelector. Verify that pods of that namespace are not reachable anymore
         self.ns1.set_labels({'site': 'test'})
         self.addCleanup(self.ns1.set_labels, {'site': 'default'})
@@ -908,7 +908,7 @@ class TestNetworkPolicy(BaseK8sTest):
         self.addCleanup(self.client2_pod_ns2.set_labels, {'app': 'client2_ns2'})
         assert self.validate_wget(self.client2_pod_ns1, url2, expectation = False)
         assert self.validate_wget(self.client2_pod_ns2, url2)
-        
+
         # Update the policy corresponding to the labels changed and verify that all reachability is same as before
         ingress_list = [
             {'from': [
@@ -917,7 +917,7 @@ class TestNetworkPolicy(BaseK8sTest):
                     ],
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 ingress= ingress_list)
         assert self.validate_wget(self.client1_pod_ns2, url2)
@@ -978,7 +978,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.client1_pod_ns2.ping_with_certainty(self.client1_pod_ns1.pod_ip)
         assert self.client2_pod_ns2.ping_with_certainty(self.client2_pod_ns1.pod_ip)
     #end test_deny_all_egress
-    
+
     @preposttest_wrapper
     def test_egress_podselector_for_pod(self):
         """
@@ -994,26 +994,26 @@ class TestNetworkPolicy(BaseK8sTest):
         # All traffic between everyone should work
         assert self.client1_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip)
         assert self.client1_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
-        policy = self.setup_update_simple_policy(name="egress-pod-to-pod", 
+        policy = self.setup_update_simple_policy(name="egress-pod-to-pod",
                                  pod_selector = self.client2_pod_ns1.labels,
                                  policy_types = ["Egress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  egress_pods= self.client1_pod_ns1.labels)
         assert policy.verify_on_setup()
         # All egress traffic from pod cls.client2_pod_ns1 will be dropped except to pod self.client1_pod_ns1.labels
-        assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)  
+        assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
         assert self.client2_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip,
                                                         expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip,
                                                         expectation=False)
         # Traffic of othe rpods should not be affected
-        assert self.client1_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip)  
+        assert self.client1_pod_ns1.ping_with_certainty(self.web_pod_ns1.pod_ip)
         assert self.client1_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip)
         #Ingress to pod cls.client2_pod_ns1 should not be affected
         assert self.client1_pod_ns2.ping_with_certainty(self.client2_pod_ns1.pod_ip)
         assert self.client1_pod_ns1.ping_with_certainty(self.client2_pod_ns1.pod_ip)
     #end test_egress_podselector_for_pod
-    
+
     @preposttest_wrapper
     def test_egress_podselector_for_namespace(self):
         """
@@ -1022,7 +1022,7 @@ class TestNetworkPolicy(BaseK8sTest):
         1. Verify that all pods are reachable from all namespaces
         2. Create a Network policy on "default" namespace to allow egress
            to a particular pod of "default" namespace.
-        3. Verify that egress from the namespace "default" is allowed to the configured 
+        3. Verify that egress from the namespace "default" is allowed to the configured
            pod only.
         4. Verify that egress to all other pods in namespace "default" is dropped.
         5. Verify that egress from namespace "default" to other namespace is not affected
@@ -1031,9 +1031,9 @@ class TestNetworkPolicy(BaseK8sTest):
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.validate_wget(self.client1_pod_ns2, url)
-        policy = self.setup_update_simple_policy(name="egress-pod-to-ns", 
+        policy = self.setup_update_simple_policy(name="egress-pod-to-ns",
                                  policy_types = ["Egress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  egress_pods= self.client1_pod_ns1.labels)
         assert policy.verify_on_setup()
         # Traffic should only be allowed to self.client1_pod_ns1 inside namespace default
@@ -1052,7 +1052,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.client1_pod_ns2.ping_with_certainty(self.client1_pod_ns1.pod_ip)
         assert self.client2_pod_ns2.ping_with_certainty(self.client2_pod_ns1.pod_ip)
     #end test_ingress_podselector_for_namespace
-    
+
     @preposttest_wrapper
     def test_egress_namespaceselector_for_pod(self):
         """
@@ -1071,7 +1071,7 @@ class TestNetworkPolicy(BaseK8sTest):
         policy = self.setup_update_simple_policy(name="egress-ns-to-pod",
                                  pod_selector = self.client1_pod_ns1.labels,
                                  policy_types = ["Egress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  egress_namespaces= self.ns2.labels)
         assert policy.verify_on_setup()
         # All egress traffic from pod cls.client1_pod_ns1 will be allowed only to all pods of namespace "non-default"
@@ -1087,7 +1087,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
         assert self.client2_pod_ns1.ping_with_certainty(self.client2_pod_ns2.pod_ip)
     #end test_egress_namespaceselector_for_pod
-    
+
     @preposttest_wrapper
     def test_egress_namespaceselector_for_namespace(self):
         """
@@ -1096,7 +1096,7 @@ class TestNetworkPolicy(BaseK8sTest):
         1. Verify that all pods are reachable from all namespaces
         2. Create a Network policy on "default" namespace to allow egress
            to a particular namespace.
-        3. Verify that egress from the pods of "default" namespace is allowed to pods of configured 
+        3. Verify that egress from the pods of "default" namespace is allowed to pods of configured
            NamespaceSelector only.
         4. Verify that egress from "default" namespace to pods of same namespace is not allowed.
         5. Verify that ingress to "default" namespace from other namespace is not affected.
@@ -1106,9 +1106,9 @@ class TestNetworkPolicy(BaseK8sTest):
         url2 = 'http://%s' % (self.web_pod_ns2.pod_ip)
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.validate_wget(self.client1_pod_ns2, url)
-        policy = self.setup_update_simple_policy(name="egress-ns-to-ns", 
+        policy = self.setup_update_simple_policy(name="egress-ns-to-ns",
                                  policy_types = ["Egress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  egress_namespaces= self.ns2.labels)
         assert policy.verify_on_setup()
         # Traffic to "non-default" namespace from "default" namespace should work
@@ -1133,7 +1133,7 @@ class TestNetworkPolicy(BaseK8sTest):
         2. Create a Network policy on "default" namespace to allow egress
            to a particular IpBlock CIDR for a particular pod.
         3. Verify that egress from the pod is allowed to pods lying in the configured cidr
-        4. Verify that egress from the pod is not allowed to any pod with IP not 
+        4. Verify that egress from the pod is not allowed to any pod with IP not
            present in configured cidr
         5. Verify that egress from other pods of "default" namespace should not be affected
         6. Verify that ingress to the pod should not be affected
@@ -1148,7 +1148,7 @@ class TestNetworkPolicy(BaseK8sTest):
         policy = self.setup_update_simple_policy(name="egress-ipblock-to-pod",
                                  pod_selector = self.client2_pod_ns1.labels,
                                  policy_types = ["Egress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  egress_ipblock= {"cidr" : egress_allow_cidr,
                                                    "_except" : [deny_cidr]})
         assert policy.verify_on_setup()
@@ -1179,9 +1179,9 @@ class TestNetworkPolicy(BaseK8sTest):
         1. Verify that all pods are reachable from all namespaces
         2. Create a Network policy on "default" namespace to allow egress
            to a particular IpBlock CIDR.
-        3. Verify that egress from the all pods of "default" namespace  is allowed to 
+        3. Verify that egress from the all pods of "default" namespace  is allowed to
            pods lying in the configured cidr
-        4. Verify that egress from the all pods of "default" namespace is not allowed to 
+        4. Verify that egress from the all pods of "default" namespace is not allowed to
            any pod having IP outside configured cidr
         5. Verify that egress from other pods of "default" namespace should not be affected
         6. Verify that ingress to any pod of "default" namespace should not be affected
@@ -1194,13 +1194,13 @@ class TestNetworkPolicy(BaseK8sTest):
         egress_allow_cidr = self.client1_pod_ns2.pod_ip + "/32"
         policy = self.setup_update_simple_policy(name="egress-ipblock-ns",
                                  policy_types = ["Egress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  egress_ipblock= {"cidr" : egress_allow_cidr})
         assert policy.verify_on_setup()
         # Egress traffic should be allowed from any pod of namespace "default" to self.client1_pod_ns2 only.
         assert self.client1_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns2.pod_ip)
-        # No other egress traffic should be allowed from pods of namespace default 
+        # No other egress traffic should be allowed from pods of namespace default
         assert self.client1_pod_ns1.ping_with_certainty(self.client2_pod_ns1.pod_ip,
                                                          expectation = False)
         assert self.client1_pod_ns1.ping_with_certainty(self.client2_pod_ns2.pod_ip,
@@ -1239,7 +1239,7 @@ class TestNetworkPolicy(BaseK8sTest):
                                  egress_ports=['TCP/80'],
                                  egress_all =True)
         assert policy.verify_on_setup()
-        # Only TCP Egress traffic should be allowed from self.client1_pod_ns1 
+        # Only TCP Egress traffic should be allowed from self.client1_pod_ns1
         assert self.validate_wget(self.client1_pod_ns1, url)
         assert self.validate_wget(self.client1_pod_ns1, url2)
         # No other egress traffic should be allowed from self.client1_pod_ns1
@@ -1304,7 +1304,7 @@ class TestNetworkPolicy(BaseK8sTest):
         1. Create a network policy with egress "to" rule mentioning "podSelector",
            "NamespaceSelector" and "port"
         2. Verify the accessibility between pods as per the rule
-        3. Delete the policy and create another policy with egress "to" rule 
+        3. Delete the policy and create another policy with egress "to" rule
            mentioning "podSelector", "IpBlock" and "port"
         4. Verify the accessibility between pods as per the rule
         """
@@ -1386,10 +1386,10 @@ class TestNetworkPolicy(BaseK8sTest):
         """
         Verify that Contrail FW policies are updated on editing the k8s netwok poliy
         Steps:
-        1. Create a netwok policy on one of the podSelector of namespace "non-default" with 
+        1. Create a netwok policy on one of the podSelector of namespace "non-default" with
            egress to a particular namespaceSelector, podSelector and port
         2. Verify that policy works as expected
-        3. Update the netwok policy on same podSelector of namespace "non-default" with 
+        3. Update the netwok policy on same podSelector of namespace "non-default" with
            updated "podSelector", removing "namespaceSelector", ipblock and updated ports.
         4. Verify that policy works as expected
         5. Again update the network policy with updated PodSelctor which corresponds to
@@ -1439,10 +1439,10 @@ class TestNetworkPolicy(BaseK8sTest):
              'egress_ports': [ 'TCP/80', 'UDP/53' ]
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
-        
+
         # Pod client1_pod_ns2 can only reach pods mentioned in the rule
         assert self.validate_wget(self.client1_pod_ns2, url2) # podSelector rule
         assert self.validate_wget(self.client1_pod_ns2, url) # ip_block cidr rule
@@ -1463,7 +1463,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.validate_wget(self.client2_pod_ns2, url)
         assert self.client2_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
         assert self.client2_pod_ns2.ping_with_certainty(self.web_pod_ns2.pod_ip)
-        
+
         #Updating the policy again:
         egress_list = [
             {'to': [
@@ -1472,7 +1472,7 @@ class TestNetworkPolicy(BaseK8sTest):
              },
         ]
         self.setup_update_policy(pod_selector = self.client2_pod_ns2.labels,
-                                update = True, 
+                                update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
         assert self.client1_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
@@ -1506,7 +1506,7 @@ class TestNetworkPolicy(BaseK8sTest):
         policy1 = self.setup_update_simple_policy(name="egress-ipblock-pod",
                                  pod_selector = self.client1_pod_ns1.labels,
                                  policy_types = ["Egress"],
-                                 namespace= self.ns1.name, 
+                                 namespace= self.ns1.name,
                                  egress_ipblock= {"cidr" : egress_allow_cidr})
         policy2 = self.setup_update_simple_policy(name="egress-ports-pod",
                                  pod_selector = self.client1_pod_ns1.labels,
@@ -1519,7 +1519,7 @@ class TestNetworkPolicy(BaseK8sTest):
         egress_allow_cidr = self.web_pod_ns1.pod_ip + "/32"
         policy3 = self.setup_update_simple_policy(name="egress-ipblock-ns",
                                  policy_types = ["Egress"],
-                                 namespace= self.ns2.name, 
+                                 namespace= self.ns2.name,
                                  egress_ipblock= {"cidr" : egress_allow_cidr})
         policy4 = self.setup_update_simple_policy(name="egress-ports-ns",
                                  policy_types = ["Egress"],
@@ -1539,7 +1539,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.validate_wget(self.client2_pod_ns1, url)
         assert self.client2_pod_ns1.ping_with_certainty(self.web_pod_ns2.pod_ip)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
-        
+
         # Verifying egress behavior on namspace "non-default" as per policy 3 and 4
         assert self.validate_wget(self.client1_pod_ns2, url)
         assert self.validate_wget(self.client2_pod_ns2, url)
@@ -1552,7 +1552,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.client1_pod_ns2.ping_with_certainty(self.client2_pod_ns2.pod_ip,
                                                         expectation=False)
         assert self.client2_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
-        
+
         # Deleting policy 4 and expecting the ping from namespace "non-default" to start working
         self.perform_cleanup(policy4)
         assert self.validate_wget(self.client1_pod_ns2, url)
@@ -1565,14 +1565,14 @@ class TestNetworkPolicy(BaseK8sTest):
                                                         expectation=False)
         assert self.client2_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
         assert self.client1_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
-        
+
         # Deleting policy 3 and all egress traffic from pods of "non-default" should be allowed
         self.perform_cleanup(policy3)
         assert self.validate_wget(self.client1_pod_ns2, url2)
         assert self.validate_wget(self.client2_pod_ns2, url2)
         assert self.client1_pod_ns2.ping_with_certainty(self.client2_pod_ns2.pod_ip)
         assert self.client2_pod_ns2.ping_with_certainty(self.client1_pod_ns1.pod_ip)
-        
+
         # Deleting policy 2 and expecting that ICMP traffic will start flowing
         self.perform_cleanup(policy2)
         assert self.validate_wget(self.client1_pod_ns1, url2)
@@ -1594,11 +1594,11 @@ class TestNetworkPolicy(BaseK8sTest):
     @preposttest_wrapper
     def test_egress_rules_label_edit(self):
         """
-        Verify that pod reachability takes effect correctly on editing the label of 
+        Verify that pod reachability takes effect correctly on editing the label of
         pods and namespace specified in network policy.
         Steps:
         1. Change the label of the pod mentioned in podSelector rule and verify reachability
-        2. Change the label of the pod of namespace mentioned in namespaceSelector 
+        2. Change the label of the pod of namespace mentioned in namespaceSelector
            and verify the reachability.
         3. Change the label of namespace mentioned in namespaceSelector and verify reachability.
         4. Edit the network policy to comply with the podSelector and namespaceSelector
@@ -1629,26 +1629,26 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.validate_wget(self.client2_pod_ns2, url2, expectation = False)
         assert self.client2_pod_ns2.ping_with_certainty(self.client1_pod_ns2.pod_ip)
         assert self.client2_pod_ns2.ping_with_certainty(self.web_pod_ns1.pod_ip)
-        
+
         # Change the label of the pod mentioned in podSelector rule and verify that it can't reach self.client1_pod_ns2 anymore
         self.client1_pod_ns2.set_labels({'app': 'newtest'})
         self.addCleanup(self.client1_pod_ns2.set_labels, {'app': 'client1_ns2'})
         assert self.client2_pod_ns2.ping_with_certainty(self.client1_pod_ns2.pod_ip,
                                                         expectation=False)
         assert self.validate_wget(self.client2_pod_ns2, url)
-        
+
         # Change the label of a pods which is part of namespace mentioned in namespaceSelector. Verify that it does not matter.
         self.client2_pod_ns1.set_labels({'app': 'test'})
         self.addCleanup(self.client2_pod_ns1.set_labels, {'app': 'client2_ns1'})
         assert self.client2_pod_ns2.ping_with_certainty(self.client2_pod_ns1.pod_ip)
-        
+
         # Change the label of namespace mentioned in namespaceSelector. Verify that pods of that namespace are not reachable anymore
         self.ns1.set_labels({'site': 'test'})
         self.addCleanup(self.ns1.set_labels, {'site': 'default'})
         assert self.client2_pod_ns2.ping_with_certainty(self.client2_pod_ns1.pod_ip,
                                                         expectation=False)
         assert self.validate_wget(self.client2_pod_ns2, url, expectation = False)
-        
+
         # Update the policy corresponding to the labels changed and verify that all reachability is same as before
         egress_list = [
             {'to': [
@@ -1657,7 +1657,7 @@ class TestNetworkPolicy(BaseK8sTest):
                     ],
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
         assert self.validate_wget(self.client2_pod_ns2, url)
@@ -1708,7 +1708,7 @@ class TestNetworkPolicy(BaseK8sTest):
            should be allowed from any pod of the namespace.
         3. Edit the policy and apply it over one of the pod of the same namespace
         4. No traffic should be allowed from that pod to any pod. All ingress traffic to
-           the pod should flow without interruption 
+           the pod should flow without interruption
         """
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
         url2 = 'http://%s' % (self.web_pod_ns2.pod_ip)
@@ -1795,7 +1795,7 @@ class TestNetworkPolicy(BaseK8sTest):
            apply it over a namespace.
         2. No traffic should be allowed to and from any pod of namespace pods.
         3. Edit the policy and apply it over one of the pod of the same namespaec
-        4. No traffic should be allowed to and from that pod of namespace. Other pods 
+        4. No traffic should be allowed to and from that pod of namespace. Other pods
            should not be affected
         """
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
@@ -1820,7 +1820,7 @@ class TestNetworkPolicy(BaseK8sTest):
         assert self.validate_wget(self.client1_pod_ns1, url2, expectation=False)
         #Update the policy and apply it on a single pod
         self.setup_update_policy(pod_selector = self.client2_pod_ns1.labels,
-                                update = True, 
+                                update = True,
                                 namespace= self.ns1.name,
                                 np_fixture = policy1)
         #Verify that the updated policy is applicable only on one pod of the namespace
@@ -1843,9 +1843,9 @@ class TestNetworkPolicy(BaseK8sTest):
         Create a network Policy with both ingress and egress rules specified for a pod
         and verify corresponding contrail FW policy operations.
         1. Create policy having both ingress and egress rules.
-        2. Verify all ingress rules are met. 
+        2. Verify all ingress rules are met.
         3. Verify no other ingress is allowed other than that mentioned in the rules
-        4. Verify all egress rules are met. 
+        4. Verify all egress rules are met.
         5. Verify no other egress is allowed other than that mentioned in the rules
         """
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
@@ -1918,9 +1918,9 @@ class TestNetworkPolicy(BaseK8sTest):
         Create a network Policy with both ingress and egress rules specified for a namespace
         and verify corresponding contrail FW policy operations.
         1. Create policy having both ingress and egress rules.
-        2. Verify all ingress rules are met. 
+        2. Verify all ingress rules are met.
         3. Verify no other igress is allowed other than that mentioned in the rules
-        4. Verify all egress rules are met. 
+        4. Verify all egress rules are met.
         5. Verify no other egress is allowed other than that mentioned in the rules
         """
         url = 'http://%s' % (self.web_pod_ns1.pod_ip)
@@ -1959,7 +1959,7 @@ class TestNetworkPolicy(BaseK8sTest):
         # as the egress port rule will fall after ingress pod selector rule in priority
         assert self.client2_pod_ns3.ping_with_certainty(self.client1_pod_ns3.pod_ip)
         assert self.client2_pod_ns3.ping_with_certainty(self.client3_pod_ns3.pod_ip)
-        
+
         assert self.client1_pod_ns2.ping_with_certainty(self.client1_pod_ns3.pod_ip)
         assert self.client2_pod_ns2.ping_with_certainty(self.client2_pod_ns3.pod_ip)
         assert self.client1_pod_ns1.ping_with_certainty(self.client1_pod_ns3.pod_ip)
@@ -2013,7 +2013,7 @@ class TestNetworkPolicyNSIsolation(BaseK8sTest):
             vn_dict_for_namespace = {"domain": vn_for_namespace.domain_name,
                    "project" : vn_for_namespace.project_name,
                    "name": vn_for_namespace.vn_name}
-            namespace3 = self.setup_namespace(name = get_random_name("ns3"), 
+            namespace3 = self.setup_namespace(name = get_random_name("ns3"),
                                     custom_isolation = True,
                                     fq_network_name= vn_dict_for_namespace)
         else:
@@ -2061,7 +2061,7 @@ class TestNetworkPolicyNSIsolation(BaseK8sTest):
     @preposttest_wrapper
     def test_ingress_policy_over_isolated_namespace(self):
         """
-        Verify that namespace isolation is not affected by network policy ingress rules and 
+        Verify that namespace isolation is not affected by network policy ingress rules and
         rules work fine within the isolated namespace.
         Steps:
         1. Create some non isolated namespaces and 1 isolated namespace.
@@ -2118,7 +2118,7 @@ class TestNetworkPolicyNSIsolation(BaseK8sTest):
         assert self.validate_wget(ns3_clients[1], url1, expectation=False)
         # Update the policy and configure a PodSelector of isolated namespace
         self.setup_update_policy(pod_selector = ns3_clients[2].labels,
-                                update = True, 
+                                update = True,
                                 np_fixture = policy1,
                                 ingress= ingress_list)
         # Verify that network policy do not take precedence over network isolation
@@ -2142,12 +2142,12 @@ class TestNetworkPolicyNSIsolation(BaseK8sTest):
     @preposttest_wrapper
     def test_egress_policy_over_isolated_namespace(self):
         """
-        Verify that namespace isolation is not affected by network policy egress rules and 
+        Verify that namespace isolation is not affected by network policy egress rules and
         rules work fine within the isolated namespace.
         Steps:
         1. Create some non isolated namespaces and 1 isolated namespace.
         2. Create a Network policy with egress rules on isolated namespace and allow traffic
-           from pods of different namespaces 
+           from pods of different namespaces
         3. Verify that precedence of namespace isolation is more than FW policy
         4. Update the network policy and configure a PodSelector of isolated namespace
         5. Verify that precedence of namespace isolation is more than FW policy
@@ -2200,7 +2200,7 @@ class TestNetworkPolicyNSIsolation(BaseK8sTest):
         assert self.validate_wget(ns3_clients[1], url1, expectation=False)
         # Update the policy and configure a PodSelector of isolated namespace
         self.setup_update_policy(pod_selector = ns3_clients[1].labels,
-                                update = True, 
+                                update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
         # Verify that network policy do not take precedence over network isolation
@@ -2221,20 +2221,20 @@ class TestNetworkPolicyNSIsolation(BaseK8sTest):
         assert self.validate_wget(ns3_clients[0], url1, expectation=False)
         assert self.validate_wget(ns3_clients[1], url1, expectation=False)
     #end test_egress_policy_over_isolated_namespace
-    
+
 class TestNetworkPolicyCustomIsolation(TestNetworkPolicyNSIsolation):
 
     @classmethod
     def setUpClass(cls):
         super(TestNetworkPolicyNSIsolation, cls).setUpClass()
         cls.setup_custom_isolation = True
-        
+
 class TestNetworkPolicyRandom(BaseK8sTest):
 
     @classmethod
     def setUpClass(cls):
         super(TestNetworkPolicyRandom, cls).setUpClass()
-        
+
     @classmethod
     def tearDownClass(cls):
         super(TestNetworkPolicyRandom, cls).tearDownClass()
@@ -2242,7 +2242,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     @test.attr(type=['k8s_sanity'])
     @preposttest_wrapper
     def test_k8s_configurations_post_policy_creation(self):
@@ -2296,7 +2296,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
         assert client1_ns2.verify_on_setup()
         assert client2_ns2.verify_on_setup()
         assert client3_ns2.verify_on_setup()
-        
+
         #validate that policy has been applied correctly
         url1 = 'http://%s' % (client3_ns1.pod_ip)
         url2 = 'http://%s' % (client3_ns2.pod_ip)
@@ -2317,14 +2317,14 @@ class TestNetworkPolicyRandom(BaseK8sTest):
         assert client4_ns1.ping_with_certainty(client1_ns1.pod_ip,
                                                     expectation=False)
     #end test_k8s_configurations_post_policy_creation
-   
+
     @test.attr(type=['openshift_1'])
     @preposttest_wrapper
     def test_policy_negative(self):
         """
         Verify that a policy does not get applied to the pod if Pod is in different namespace
         1. Create a network policy on namespace 1 with podSelector label as pod label of namespace 2.
-        2. Verify that the pod of namespace 2 is not affected by the policy 
+        2. Verify that the pod of namespace 2 is not affected by the policy
         """
         namespace1 = self.setup_namespace(name = get_random_name("ns1"))
         namespace2 = self.setup_namespace(name = get_random_name("ns2"))
@@ -2404,7 +2404,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
         client1_pod_ns3.verify_on_setup()
         deployment = self.setup_nginx_deployment(namespace=namespace1.name,
                                             replicas=replicas, pod_labels=labels)
-        
+
         assert deployment.verify_on_setup()
         ingress_allow_cidr = client1_pod_ns2.pod_ip + "/32"
         policy_types = ["Ingress"]
@@ -2432,7 +2432,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
             assert client1_pod_ns2.ping_with_certainty(ip)
             assert client2_pod_ns2.ping_with_certainty(ip, expectation=False)
             assert client1_pod_ns3.ping_with_certainty(ip)
-        
+
         # Creating few more replicas
         deployment.set_replicas(new_replicas)
         assert deployment.verify_on_setup()
@@ -2445,7 +2445,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
             assert client1_pod_ns2.ping_with_certainty(ip)
             assert client2_pod_ns2.ping_with_certainty(ip, expectation=False)
             assert client1_pod_ns3.ping_with_certainty(ip)
-        
+
         # Reducing the replicas again
         deployment.set_replicas(replicas)
         time.sleep(15) # Delay so that extra replicas are removed
@@ -2460,7 +2460,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
             assert client2_pod_ns2.ping_with_certainty(ip, expectation=False)
             assert client1_pod_ns3.ping_with_certainty(ip)
     #end test_deployment_replica_updation
-    
+
     @test.attr(type=['k8s_sanity'])
     @preposttest_wrapper
     def test_multiple_pod_selector(self):
@@ -2470,7 +2470,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
         1. Create 2 different namespaces
         2. Create pods under the anmespaces and mention multiple labels for the pods.
         3. Create a network policy with multiple labels in podSelector
-        4. Verify that policy is applicable on pods having all the matching labels. Its a && operation 
+        4. Verify that policy is applicable on pods having all the matching labels. Its a && operation
         """
         namespace1 = self.setup_namespace(name = get_random_name("ns1"))
         namespace2 = self.setup_namespace(name = get_random_name("ns2"))
@@ -2537,7 +2537,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
         assert client4_pod_ns1.ping_with_certainty(client5_pod_ns1.pod_ip)
         assert client5_pod_ns1.ping_with_certainty(client4_pod_ns1.pod_ip)
     #end test_multiple_pod_selector
-    
+
     @test.attr(type=['k8s_sanity'])
     @preposttest_wrapper
     def test_multiple_values_in_ingress_rule(self):
@@ -2642,9 +2642,9 @@ class TestNetworkPolicyRandom(BaseK8sTest):
         assert client1_pod_ns4.ping_with_certainty(client4_pod_ns1.pod_ip)
         assert client1_pod_ns1.ping_with_certainty(client2_pod_ns1.pod_ip,
                                                    expectation=False)
-        
-        
-        
+
+
+
         #Verify ingress rules for ipblock cidr _except
         assert client2_pod_ns2.ping_with_certainty(client3_pod_ns1.pod_ip)# This will pass because of namespace rule
         assert client1_pod_ns3.ping_with_certainty(client3_pod_ns1.pod_ip)
@@ -2768,7 +2768,7 @@ class TestNetworkPolicyRandom(BaseK8sTest):
                                                    expectation=False)
         assert client3_pod_ns1.ping_with_certainty(client2_pod_ns2.pod_ip) # This will pass because of namespace  rule
     #end test_multiple_values_in_egress_rule
-    
+
 class TestNetworkPolicyServiceIngress(BaseK8sTest):
 
     class SharedResources (with_metaclass(Singleton, object)):
@@ -2778,7 +2778,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
 
         def setUp (self):
             try:
-                self.ns1 = NamespaceFixture(connections=self.connections, 
+                self.ns1 = NamespaceFixture(connections=self.connections,
                                         name=get_random_name("new-default"))
                 self.ns1.setUp()
                 self.ns2 = NamespaceFixture(connections=self.connections,
@@ -2914,7 +2914,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         super(TestNetworkPolicyServiceIngress, cls).tearDownClass()
         if getattr(cls, '_shared_resources'):
             cls._shared_resources.cleanUp()
-        
+
     @test.attr(type=['k8s_sanity'])
     @preposttest_wrapper
     def test_ingress_rule_on_namespace_with_service(self):
@@ -2931,21 +2931,21 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         # All traffic between everyone should work
         url1 = 'http://%s' % (self.web1_pod_ns1.pod_ip)
         url2 = 'http://%s' % (self.web2_pod_ns1.pod_ip)
-        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns1.name))
-        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns1.name))
-        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns2.name))
-        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns2.name))
         service_ns1 = self.setup_http_service(namespace=self.ns1.name,
                                           labels={'app': 'web_ns1'})
         assert service_ns1.verify_on_setup()
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         ingress_list = [{'from': [{'pod_selector': self.client2_pod_ns1.labels}]}]
@@ -2956,13 +2956,13 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                    ingress= ingress_list)
         assert policy1.verify_on_setup()
         # Verify is policy works as expected
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2, expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
@@ -2982,16 +2982,16 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                     ],
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 ingress= ingress_list)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
@@ -3003,7 +3003,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         assert self.validate_wget(self.client1_pod_ns1, url2, expectation=False)
         assert self.validate_wget(self.client2_pod_ns2, url1)
     #end test_ingress_rule_on_namespace_with_service
-    
+
     @test.attr(type=['k8s_sanity'])
     @preposttest_wrapper
     def test_egress_rule_on_namespace_with_service(self):
@@ -3020,13 +3020,13 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         url1 = 'http://%s' % (self.web1_pod_ns1.pod_ip)
         url2 = 'http://%s' % (self.web2_pod_ns1.pod_ip)
         url3 = 'http://%s' % (self.web2_pod_ns2.pod_ip)
-        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns1.name))
-        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns1.name))
-        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns2.name))
-        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns2.name))
         service_ns1 = self.setup_http_service(namespace=self.ns1.name,
                                           labels={'app': 'web_ns1'})
@@ -3034,16 +3034,16 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         service_ns2 = self.setup_http_service(namespace=self.ns2.name,
                                           labels={'app': 'web_ns2'})
         assert service_ns2.verify_on_setup()
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         egress_allow_cidr = service_ns1.cluster_ip + "/32"
@@ -3055,7 +3055,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                    egress= egress_list)
         assert policy1.verify_on_setup()
         # Verify that policy should fail as the DNAT at VIP of load balancer(Service) wont be resolved
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
         egress_endpoint1_cidr = self.web1_pod_ns1.pod_ip + "/32"
@@ -3068,16 +3068,16 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                 ]
             }
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip,
@@ -3101,19 +3101,19 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                     ],
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip,
@@ -3127,7 +3127,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         assert self.validate_wget(self.client1_pod_ns1, url3)
         assert self.validate_wget(self.client2_pod_ns2, url1)
     #end test_egress_rule_on_namespace_with_service
-    
+
     @test.attr(type=['ci_k8s_sanity', 'k8s_sanity'])
     @preposttest_wrapper
     def test_ingress_rule_on_pod_with_service(self):
@@ -3144,21 +3144,21 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         # All traffic between everyone should work
         url1 = 'http://%s' % (self.web1_pod_ns1.pod_ip)
         url2 = 'http://%s' % (self.web2_pod_ns1.pod_ip)
-        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns1.name))
-        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns1.name))
-        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns2.name))
-        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns2.name))
         service_ns1 = self.setup_http_service(namespace=self.ns1.name,
                                           labels={'app2': 'common_label'})
         assert service_ns1.verify_on_setup()
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         ingress_list = [{'from': [{'pod_selector': self.client2_pod_ns1.labels}]}]
@@ -3170,13 +3170,13 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                     ingress= ingress_list)
         assert policy1.verify_on_setup()
         # Verify is policy works as expected
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2, expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
@@ -3194,16 +3194,16 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                     ],
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 ingress= ingress_list)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
@@ -3230,13 +3230,13 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         url1 = 'http://%s' % (self.web1_pod_ns1.pod_ip)
         url2 = 'http://%s' % (self.web2_pod_ns1.pod_ip)
         url3 = 'http://%s' % (self.web2_pod_ns2.pod_ip)
-        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns1.name))
-        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns1.name))
-        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns2.name))
-        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns2.name))
         service_ns1 = self.setup_http_service(namespace=self.ns1.name,
                                           labels={'app': 'web_ns1'})
@@ -3244,41 +3244,41 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                           labels={'app': 'web_ns2'})
         assert service_ns1.verify_on_setup()
         assert service_ns2.verify_on_setup()
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         egress_allow_cidr = service_ns1.cluster_ip + "/32"
         egress_list = [{'to': [{'pod_selector': {'app2':'common_label'}}]}]
         policy_types = ["Egress"]
         policy1 = self.setup_update_policy(pod_selector= self.client2_pod_ns1.labels,
-                                   name="egress-to-service", 
+                                   name="egress-to-service",
                                    namespace = self.ns1.name,
                                    policy_types = policy_types,
                                    egress= egress_list)
         assert policy1.verify_on_setup()
         # Verify if policy works as expected
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client2_pod_ns1, expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip,
@@ -3301,22 +3301,22 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                     ],
              },
         ]
-        self.setup_update_policy(update = True, 
+        self.setup_update_policy(update = True,
                                 np_fixture = policy1,
                                 egress= egress_list)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2], 
+        assert self.validate_nginx_lb([self.web1_pod_ns2,self.web2_pod_ns2],
                                       service_ns2.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip,
@@ -3336,7 +3336,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
     @preposttest_wrapper
     def test_ingress_rule_on_namespace_with_k8s_ingress(self):
         """
-        Verify that ingress rules on a namespace are not effective on pods present 
+        Verify that ingress rules on a namespace are not effective on pods present
         under k8s Ingress.
         k8s Ingress is a proxy for traffic originating from internet and should not be
         affected by k8s network policies. In k8s INgress, being a proxy, the source context
@@ -3353,13 +3353,13 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         # All traffic between everyone should work
         url1 = 'http://%s' % (self.web1_pod_ns1.pod_ip)
         url2 = 'http://%s' % (self.web2_pod_ns1.pod_ip)
-        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns1.name))
-        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns1.name))
-        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns2.name))
-        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns2.name))
         service_ns1 = self.setup_http_service(namespace=self.ns1.name,
                                           labels={'app': 'web_ns1'})
@@ -3367,10 +3367,10 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         k8s_ingress = self.setup_simple_nginx_ingress(service_ns1.name,
                                                   namespace=self.ns1.name)
         assert k8s_ingress.verify_on_setup()
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         ingress_list = [
@@ -3386,24 +3386,24 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                    ingress= ingress_list)
         assert policy1.verify_on_setup()
         # Verify is policy works as expected
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns2, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.external_ips[0], expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2, expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
@@ -3416,12 +3416,12 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         assert self.validate_wget(self.client1_pod_ns1, url2, expectation=False)
         assert self.validate_wget(self.client2_pod_ns2, url1, expectation=False)
     #end test_ingress_rule_on_namespace_with_k8s_ingress
-    
+
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ingress_rule_on_pod_with_k8s_ingress(self):
         """
-        Verify that ingress rules on a pod label are not effective on pods present 
+        Verify that ingress rules on a pod label are not effective on pods present
         under k8s Ingress.
         k8s Ingress is a proxy for traffic originating from internet and should not be
         affected by k8s network policies, In k8s INgress, being a proxy, the source context
@@ -3438,13 +3438,13 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         # All traffic between everyone should work
         url1 = 'http://%s' % (self.web1_pod_ns1.pod_ip)
         url2 = 'http://%s' % (self.web2_pod_ns1.pod_ip)
-        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns1.name))
-        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns1.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns1.name))
-        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web1_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web1_pod_ns2.name))
-        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html' 
+        self.web2_pod_ns2.run_cmd('echo %s > /usr/share/nginx/html/index.html'
                                   % (self.web2_pod_ns2.name))
         service_ns1 = self.setup_http_service(namespace=self.ns1.name,
                                           labels={'app': 'web_ns1'})
@@ -3452,10 +3452,10 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         k8s_ingress = self.setup_simple_nginx_ingress(service_ns1.name,
                                                   namespace=self.ns1.name)
         assert k8s_ingress.verify_on_setup()
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
         ingress_list = [
@@ -3472,24 +3472,24 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                    ingress= ingress_list)
         assert policy1.verify_on_setup()
         # Verify is policy works as expected
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns2)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       k8s_ingress.external_ips[0])
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns1, expectation=False)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client2_pod_ns1)
-        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1], 
+        assert self.validate_nginx_lb([self.web1_pod_ns1,self.web2_pod_ns1],
                                       service_ns1.cluster_ip,
                                       test_pod=self.client1_pod_ns2, expectation=False)
         assert self.client2_pod_ns1.ping_with_certainty(self.client1_pod_ns1.pod_ip)
@@ -3500,13 +3500,13 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         assert self.validate_wget(self.client1_pod_ns1, url2, expectation=False)
         assert self.validate_wget(self.client2_pod_ns2, url1, expectation=False)
     #end test_ingress_rule_on_pod_with_k8s_ingress
-   
+
     @test.attr(type=['k8s_sanity'])
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ingress_rule_on_namespace_with_k8s_ingress_fanout(self):
         """
-        Verify that ingress rules on a namespace are not effective on pods present 
+        Verify that ingress rules on a namespace are not effective on pods present
         under k8s Ingress.
         Steps:
         1. Create 4 temporary pods and create 2 services with 2 pods as enpoint of each service
@@ -3524,7 +3524,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         path1 = 'foo'
         path2 = 'bar'
         host1 = 'foo.bar.com'
-        host2 = 'bar.foo.com' 
+        host2 = 'bar.foo.com'
         ingress_name = 'testingress'
         temp_pod1 = self.setup_nginx_pod(namespace=self.ns1.name,
                                           labels=labels1)
@@ -3541,8 +3541,8 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
         service_ns1 = self.setup_http_service(namespace=self.ns1.name,
                                           labels=labels1)
         service_ns2 = self.setup_http_service(namespace=self.ns1.name,
-                                          labels=labels2)        
-        rules = [{'host': host1, 
+                                          labels=labels2)
+        rules = [{'host': host1,
                   'http': {'paths': [{
                                     'path':'/'+path1,
                                     'backend': { 'service_name': service_ns1.name,
@@ -3557,10 +3557,10 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                     'backend': { 'service_name': service_ns2.name,
                                                  'service_port': 80
                                                }
-                                    }]    
+                                    }]
                          }
                  }]
-   
+
         default_backend = {'service_name': service_ns1.name,
                            'service_port': 80}
 
@@ -3569,7 +3569,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                      rules=rules,
                                      default_backend=default_backend)
         assert ingress.verify_on_setup()
-        
+
         # Now validate ingress from within the cluster network
         assert self.validate_nginx_lb([temp_pod1, temp_pod2], ingress.cluster_ip,
                                       test_pod=self.client1_pod_ns1, path=path1, host=host1)
@@ -3583,7 +3583,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                        path=path1, host=host1)
         assert self.validate_nginx_lb([temp_pod3, temp_pod4], ingress.external_ips[0],
                                        path=path2, host=host2)
-        
+
         ingress_list = [{'from': [{'namespace_selector': self.ns2.labels}]}]
         policy_types = ["Ingress"]
         policy1 = self.setup_update_policy(name="ingress-on-k8s-ingress-fanout",

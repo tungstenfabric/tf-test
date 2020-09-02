@@ -46,7 +46,7 @@ class BaseInterAS(PbbEvpnTestBase, BaseNeutronTest):
         '''
         for ctrl_node in self.inputs.bgp_ips:
             self.vnc_h.update_bgp_router_af(self.inputs.host_data[ctrl_node]['fqname'], 'inet-labeled')
-        
+
     def configure_local_asbr(self):
         self.local_asbr = []
         for (router, ip) in self.inputs.inputs.local_asbr_info:
@@ -79,7 +79,7 @@ class BaseInterAS(PbbEvpnTestBase, BaseNeutronTest):
         bgp_family_attr = BgpFamilyAttributes()
         bgp_family_attr.set_address_family(u'inet-vpn')
         bgp_family_attr.set_default_tunnel_encap([u'mpls'])
-        
+
         bgp_session_param = BgpSessionAttributes()
         bgp_session_param.set_family_attributes([bgp_family_attr])
 
@@ -93,7 +93,7 @@ class BaseInterAS(PbbEvpnTestBase, BaseNeutronTest):
             ctrl_node_obj = self.vnc_lib.bgp_router_read(fq_name=fq_name)
             remote_asbr_obj.add_bgp_router(ctrl_node_obj, bgp_peering_attrs)
             self.vnc_lib.bgp_router_update(remote_asbr_obj)
-  
+
 
     def control_node_fix(self, bgp_router):
         router_name = bgp_router.name
@@ -183,7 +183,7 @@ class BaseInterAS(PbbEvpnTestBase, BaseNeutronTest):
                 self.inputs.remote_asbr_info[router]['target']
 
             vn_fixtures = self.setup_vns(vn)
-    
+
             if forwarding_mode:
                 self.set_vn_forwarding_mode(vn_fixtures['vn1'], forwarding_mode)
 

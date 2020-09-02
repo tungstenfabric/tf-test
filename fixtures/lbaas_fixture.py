@@ -23,7 +23,7 @@ custom_attributes_dict = {
 class LBaasFixture(vnc_api_test.VncLibFixture):
 
     '''Fixture to handle LBaas object
-    
+
     Optional:
     :param name : name of the LBaas Pool (random name)
     :param uuid : UUID of the LBaas Pool
@@ -499,7 +499,7 @@ class LBaasFixture(vnc_api_test.VncLibFixture):
                 return False
         if self.is_vip_active:
             if self.vip_id != pool.vip():
-                self.logger.warn("LB %s VIP id doesnt match, expected %s" 
+                self.logger.warn("LB %s VIP id doesnt match, expected %s"
                                  " got %s"%(self.uuid, self.vip_id, pool.vip()))
                 return False
         prop = pool.properties()

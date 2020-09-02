@@ -38,13 +38,13 @@ class TestServiceConnections(BaseServiceConnectionsTest):
     @preposttest_wrapper
     def test_contrail_dns_connects_to_rabbitmq(self):
         '''
-        This test case verifies that Contrail DNS connects to a valid 
+        This test case verifies that Contrail DNS connects to a valid
         Rabbit MQ Server
         Steps:
         1. Read "contrail-dns.conf" and read all valid rabbitMQ servers.
         2. Read OpServer connections and find valid rabbitMQ server connected
            to the contrail-dns client.
-        3. Check that contrail-dns connections to RabbitMQ server is a 
+        3. Check that contrail-dns connections to RabbitMQ server is a
            subset of values configured in client .conf file
         '''
         valid_rabbitmq_servers = self.get_all_configured_servers("rabbitmq",
@@ -65,13 +65,13 @@ class TestServiceConnections(BaseServiceConnectionsTest):
     @preposttest_wrapper
     def test_contrail_control_connects_to_rabbitmq(self):
         '''
-        This test case verifies that Contrail Control connects to a valid 
+        This test case verifies that Contrail Control connects to a valid
         Rabbit MQ Server
         Steps:
         1. Read "contrail-control.conf" and read all valid rabbitMQ servers.
         2. Read OpServer connections and find valid rabbitMQ server connected
            to the contrail-control client.
-        3. Check that contrail-control connections to RabbitMQ server is a 
+        3. Check that contrail-control connections to RabbitMQ server is a
            subset of values configured in client .conf file
         '''
         valid_rabbitmq_servers = self.get_all_configured_servers("rabbitmq",
@@ -92,7 +92,7 @@ class TestServiceConnections(BaseServiceConnectionsTest):
     @preposttest_wrapper
     def test_contrail_agent_connects_to_dns(self):
         '''
-        This test case verifies that Contrail Vrouter agent connects to a valid 
+        This test case verifies that Contrail Vrouter agent connects to a valid
         DNS Server
         Steps:
         1. Read "contrail-vrouter-agent.conf" and read all valid DNS servers.
@@ -120,7 +120,7 @@ class TestServiceConnections(BaseServiceConnectionsTest):
     @preposttest_wrapper
     def test_contrail_agent_connects_to_control(self):
         '''
-        This test case verifies that Contrail Vrouter agent connects to a valid 
+        This test case verifies that Contrail Vrouter agent connects to a valid
         Controller
         Steps:
         1. Read "contrail-vrouter-agent.conf" and read all valid Control servers.
@@ -148,7 +148,7 @@ class TestServiceConnections(BaseServiceConnectionsTest):
     @preposttest_wrapper
     def test_contrail_agent_connects_to_collector(self):
         '''
-        This test case verifies that Contrail Vrouter agent connects to a valid 
+        This test case verifies that Contrail Vrouter agent connects to a valid
         Collector
         Steps:
         1. Read "contrail-vrouter-agent.conf" and read all valid Collector.
@@ -181,7 +181,7 @@ class TestServiceConnections(BaseServiceConnectionsTest):
         to the collector servers
         '''
         verification_dict = \
-            {'agent' : 
+            {'agent' :
                 {'contrail-vrouter-agent' : self.inputs.compute_control_ips[0],
                  'contrail-vrouter-nodemgr' : self.inputs.compute_control_ips[0]},
              'control' :

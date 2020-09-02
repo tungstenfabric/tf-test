@@ -65,12 +65,12 @@ class TestBGPaaS(BaseBGPaaS):
         input_encap_list = ["mpls","gre"]
         # mpls,gre,udp,vxlan
         self.set_addr_family_attr(bgpaas_fixture,"inet",tunnel_encap_list=input_encap_list)
- 
+
         for cn in self.inputs.bgp_control_ips:
             entries = cn_inspect_handle[cn].get_cn_route_table_entry(prefix="0.0.0.0/0",table="inet.0",ri_name=vn_fixture.ri_name) or []
             for entry in entries:
                 if entry["protocol"] == 'BGP (bgpaas)':
-                   for encap in input_encap_list: 
+                   for encap in input_encap_list:
                        if encap not in entry["tunnel_encap"]:
                           assert False,"Configured tunnel_encap is missing in the route entry"
 
@@ -79,12 +79,12 @@ class TestBGPaaS(BaseBGPaaS):
         input_encap_list = ["udp","vxlan"]
 
         self.set_addr_family_attr(bgpaas_fixture,"inet",tunnel_encap_list=["udp","vxlan"])
- 
+
         for cn in self.inputs.bgp_control_ips:
             entries = cn_inspect_handle[cn].get_cn_route_table_entry(prefix="0.0.0.0/0",table="inet.0",ri_name=vn_fixture.ri_name) or []
             for entry in entries:
                 if entry["protocol"] == 'BGP (bgpaas)':
-                   for encap in input_encap_list: 
+                   for encap in input_encap_list:
                        if encap not in entry["tunnel_encap"]:
                           assert False,"Configured tunnel_encap is missing in the route entry"
         self.logger.info("Updated tunnel_encap is seen in the route entries")
@@ -121,7 +121,7 @@ class TestBGPaaS(BaseBGPaaS):
         self.logger.info('Configuring BGP on the bird-vm')
 
         community_asn = 65000
-        community_num = 666 
+        community_num = 666
         static_routes = [ {"network":"0.0.0.0/0","nexthop":"blackhole"}]
         export_filter = [ "export filter bgp_out_uplink_a;",
                           """filter bgp_out_uplink_a
@@ -161,8 +161,8 @@ class TestBGPaaS(BaseBGPaaS):
         if not community_not_seen:
            self.logger.info("Communities sent by BGPaaS VM is seen in control node")
         else:
-           assert False,"Communities sent by BGPaaS VM is NOT seen in control node" 
- 
+           assert False,"Communities sent by BGPaaS VM is NOT seen in control node"
+
     @preposttest_wrapper
     def test_bgpaas_ibgp(self):
         """
@@ -207,13 +207,13 @@ class TestBGPaaS(BaseBGPaaS):
            assert False,"BGP session with Controller is seen with iBGP configuration"
         else:
            self.logger.info("BGP session with Controller is NOT seen as expected in iBGP configuration")
- 
+
     @preposttest_wrapper
     def disabled_test_bgpaas_private_as_action(self):
         """
         disabling this as of now this is not supported
         Description: Verify private-as action remove,remove-all,replace-all
-        Test Steps: 
+        Test Steps:
             1. Configure BGP VM to advertise routes with private-as
             2. Set private-as action in bgp session attribute as remove
                Verify left-most private-as number is removed.
@@ -267,7 +267,7 @@ class TestBGPaaS(BaseBGPaaS):
 
         assert bgpaas_fixture.verify_in_control_node(bgpaas_vm1),"BGP session with Controller is not seen"
         self.logger.info("BGP session with Controller is seen")
- 
+
         cn_inspect_handle = {}
         for cn in self.inputs.bgp_control_ips:
            cn_inspect_handle[cn] = self.connections.get_control_node_inspect_handle(cn)
@@ -296,7 +296,7 @@ class TestBGPaaS(BaseBGPaaS):
                self.logger.info("Private-as-action for %s is working correctly"%action)
             else:
                assert False,"Private-as-action for %s is incorrect"%action
- 
+
     @preposttest_wrapper
     def test_bgpaas_ipv6_prefix_limit_idle_timeout(self):
         """
@@ -442,7 +442,7 @@ class TestBGPaaS(BaseBGPaaS):
         for i in range(50):
             cidr = get_random_cidr(af=addr_family)
             static_routes_list.append({"network":cidr,"nexthop":"blackhole"})
-        
+
         self.logger.info("Configuring %d inet6 routes in vsrx vm"%len(static_routes_list))
 
         self.config_bgp_on_bird(
@@ -485,7 +485,7 @@ class TestBGPaaS(BaseBGPaaS):
         ret = bgpaas_fixture.verify_in_control_node(bgpaas_vm1)
         if ret:
            self.logger.info("BGP session with Controller is seen after idle_timeout")
-        else: 
+        else:
            assert False,"BGP session with Controller is NOT seen after idle_timeout"
 
 
@@ -552,7 +552,7 @@ class TestBGPaaS(BaseBGPaaS):
                self.logger.info("BGP session is not up after updating hold_time")
             else:
                assert False,"BGP session is not up after updating hold_time"
- 
+
             output=bgpaas_vm1.run_cmd_on_vm(cmds=["birdc show protocols all"],as_sudo=True)
             ret = re.search("Hold timer:\s+(\d+)/(?P<hold>\d+)",output['birdc show protocols all'])
             hold_timer_seen = ret.group('hold') if ret else -1
@@ -560,7 +560,7 @@ class TestBGPaaS(BaseBGPaaS):
                hold_timer_seen = int(ret.group('hold'))
                self.logger.info("Hold timer is seen correctly in the peer:%d"%int(random_hold_time))
             assert hold_timer_seen == random_hold_time,"Hold timer seen in the peer is incorrect.Expected: %d , Actual: %d"%(random_hold_time,hold_timer_seen)
- 
+
     @preposttest_wrapper
     def test_bgpaas_asn_update(self):
         """
@@ -574,7 +574,7 @@ class TestBGPaaS(BaseBGPaaS):
         bgpaas_as = [ 64000,84000,54000]
         cluster_local_as = [64100,84100,54100]
         as4_flag  = [ False,True,True]
-         
+
         vn_name = get_random_name('bgpaas_vn')
         vn_subnets = [get_random_cidr()]
         vn_fixture = self.create_vn(vn_name, vn_subnets)
@@ -613,7 +613,7 @@ class TestBGPaaS(BaseBGPaaS):
             if existing_as4_flag != current_as_flag :
               self.set_4byte_enable(current_as_flag)
               existing_as4_flag = current_as_flag
-            if i == 0 : 
+            if i == 0 :
                bgpaas_fixture = self.create_bgpaas(
                                       bgpaas_shared=True, autonomous_system=autonomous_system,
                                       bgpaas_ip_address=bgpaas_vm1.vm_ip,
@@ -657,9 +657,9 @@ class TestBGPaaS(BaseBGPaaS):
            2. Enable ipv4_mapped_ipv6_nexthop and verify vsrx2 receive ipv6 routes
               verify ipv4 mapped ipv6 nexthop on the received route.
            3. Disable ipv4_mapped_ipv6_nexthop and verify vsrx2 dont receive ipv6 routes
-        Maintainer: vageesant@juniper.net    
+        Maintainer: vageesant@juniper.net
         """
-        
+
         vn_name = get_random_name('bgpaas_vn')
         vn_subnets = [get_random_cidr()]
         vn_fixture = self.create_vn(vn_name, vn_subnets)
@@ -749,7 +749,7 @@ class TestBGPaaS(BaseBGPaaS):
            assert False,"Use IPv4-mapped IPv6 Nexthop flag is NOT set correctly in bgpaas_fixture2"
 
         time.sleep(5)
-        
+
         ret = bgpaas_fixture2.verify_in_control_node(bgpaas_vm2)
         if ret:
            self.logger.info("bgpaas_vm2: BGPaaS Session not seen in the control-node")
@@ -817,7 +817,7 @@ class TestBGPaaS(BaseBGPaaS):
             bgpaas_vm1_state = bgpaas_vm1.wait_till_vm_is_up()
             if bgpaas_vm1_state :
                break
-        assert bgpaas_vm1_state,"bgpaas_vm1 failed to come up" 
+        assert bgpaas_vm1_state,"bgpaas_vm1 failed to come up"
 
         address_families = ['inet', 'inet6']
         gw_ip = vn_fixture.get_subnets()[0]['gateway_ip']
@@ -827,7 +827,7 @@ class TestBGPaaS(BaseBGPaaS):
 
         self.set_md5_auth_data(bgpaas_fixture1,"juniper")
 
-        self.config_bgp_on_vsrx(src_vm=test_vm, dst_vm=bgpaas_vm1, 
+        self.config_bgp_on_vsrx(src_vm=test_vm, dst_vm=bgpaas_vm1,
                                 bgp_ip=bgpaas_vm1.vm_ip, lo_ip=bgpaas_vm1.vm_ip,
                                 address_families=address_families, autonomous_system=bgpaas_as1,
                                 neighbors=neighbors,local_autonomous_system=cluster_local_autonomous_system)
@@ -841,7 +841,7 @@ class TestBGPaaS(BaseBGPaaS):
         time.sleep(95)
 
         assert bgpaas_fixture1.verify_in_control_node(bgpaas_vm1) , "BGP session is NOT up after configuring authentication key in vsrx"
- 
+
     def bgpaas_as_loop_count(self,four_byte=False):
 
         if four_byte:
@@ -917,7 +917,7 @@ class TestBGPaaS(BaseBGPaaS):
             peer_as=cluster_local_autonomous_system,
             local_as=bgpaas_as1,static_routes=static_routes,export_filter_cmds=export_filter)
 
-        self.config_bgp_on_vsrx(src_vm=test_vm, dst_vm=bgpaas_vm2, 
+        self.config_bgp_on_vsrx(src_vm=test_vm, dst_vm=bgpaas_vm2,
                                 bgp_ip=bgpaas_vm2.vm_ip, lo_ip=bgpaas_vm2.vm_ip,
                                 address_families=address_families, autonomous_system=bgpaas_as2,
                                 neighbors=neighbors,local_autonomous_system=cluster_local_autonomous_system)
@@ -942,7 +942,7 @@ class TestBGPaaS(BaseBGPaaS):
            self.logger.info("AsPathLooped detected for 0.0.0.0/0 , as expected")
         else:
            assert False,"AsPathLooped not seen for route 0.0.0.0/0"
- 
+
         new_as_loop_count = 3
         self.set_as_loop_count(bgpaas_fixture1,new_as_loop_count)
         as_loop_count = self.get_as_loop_count(bgpaas_fixture1)
@@ -1026,16 +1026,16 @@ class TestBGPaaS(BaseBGPaaS):
             1. Create 2 BGPaaS with same asn number.
             2. By default due to as-loop, routes from vsrx1 should not be seen in vsrx2.Verify this.
             3. Enable as-override flag in vsrx1 bgpaas service.
-               This will make routes from vsrx1 to be advertised to vsrx2 with controller local-asn 
+               This will make routes from vsrx1 to be advertised to vsrx2 with controller local-asn
                replacing vsrx1's asn.
             4. Disable as-override flag and verify route from vsrx1 is not seen in vsrx2.
         """
- 
+
         initial_4byte_enable = self.get_4byte_enable()
         if initial_4byte_enable == False:
            self.set_4byte_enable(True)
            self.addCleanup(self.set_4byte_enable,initial_4byte_enable)
-       
+
         vn_name = get_random_name('bgpaas_vn')
         vn_subnets = [get_random_cidr()]
         vn_fixture = self.create_vn(vn_name, vn_subnets)
@@ -1052,7 +1052,7 @@ class TestBGPaaS(BaseBGPaaS):
         bgpaas_fixture1 = self.create_bgpaas(bgpaas_shared=True,
              autonomous_system=autonomous_system, bgpaas_ip_address=bgpaas_vm1.vm_ip,local_autonomous_system=cluster_local_autonomous_system)
         bgpaas_fixture2 = self.create_bgpaas(bgpaas_shared=True,
-             autonomous_system=autonomous_system, bgpaas_ip_address=bgpaas_vm2.vm_ip,local_autonomous_system=cluster_local_autonomous_system) 
+             autonomous_system=autonomous_system, bgpaas_ip_address=bgpaas_vm2.vm_ip,local_autonomous_system=cluster_local_autonomous_system)
         port1 = bgpaas_vm1.vmi_ids[bgpaas_vm1.vn_fq_name]
         port2 = bgpaas_vm2.vmi_ids[bgpaas_vm2.vn_fq_name]
         bgpaas_vm1_state = False
@@ -1061,12 +1061,12 @@ class TestBGPaaS(BaseBGPaaS):
             bgpaas_vm1_state = bgpaas_vm1.wait_till_vm_is_up()
             if bgpaas_vm1_state:
                break
-        assert bgpaas_vm1_state,"bgpaas_vm1 failed to come up" 
+        assert bgpaas_vm1_state,"bgpaas_vm1 failed to come up"
         for i in range(5):
             bgpaas_vm2_state = bgpaas_vm2.wait_till_vm_is_up()
             if bgpaas_vm2_state:
               break
-        assert bgpaas_vm2_state,"bgpaas_vm2 failed to come up" 
+        assert bgpaas_vm2_state,"bgpaas_vm2 failed to come up"
         address_families = []
         address_families = ['inet', 'inet6']
         gw_ip = vn_fixture.get_subnets()[0]['gateway_ip']
@@ -1103,7 +1103,7 @@ class TestBGPaaS(BaseBGPaaS):
 
         self.set_as_override(bgpaas_fixture1,True)
         assert self.get_as_override(bgpaas_fixture1),"bgpaas_fixture1: AS_Override flag is not updated to True"
-      
+
         time.sleep(2)
         assert bgpaas_fixture1.verify_in_control_node(
                 bgpaas_vm1), 'BGPaaS Session for bgpaas_vm1 not seen in the control-node'
@@ -1139,7 +1139,7 @@ class TestBGPaaS(BaseBGPaaS):
         Test steps:
              1. Configure bgpaas vm to advertise route 0.0.0.0/0.
                 Verify route origin is advertised with default origin attribute as igp
-             2. Enable origin-override and set origin to IGP. 
+             2. Enable origin-override and set origin to IGP.
                 Verify routes are seen with origin as igp in the vrf
              3. Enable origin-override and set origin to EGP
                 verify routes seen with origin as egp in the vrf.
@@ -1169,7 +1169,7 @@ class TestBGPaaS(BaseBGPaaS):
         neighbors = [gw_ip, dns_ip]
         self.logger.info('Configuring BGP on the bird-vm')
         static_routes = [ {"network":"0.0.0.0/0","nexthop":"blackhole"}]
-        
+
         self.config_bgp_on_bird(
             bgpaas_vm=bgpaas_vm1,
             local_ip=bgpaas_vm1.vm_ip,
@@ -1208,7 +1208,7 @@ class TestBGPaaS(BaseBGPaaS):
 
         assert origin_from_bgpaas_vm=="igp","route 0.0.0.0/0 is not seen in ri: %s"%vn_fixture.ri_name
         self.logger.info("Origin info for route 0.0.0.0/0 is : %s"%origin_from_bgpaas_vm)
-       
+
         self.set_route_origin_override(bgpaas_fixture,True,"EGP")
         time.sleep(2)
         bgpaas_fixture.verify_in_control_node(bgpaas_vm1)
@@ -1262,7 +1262,7 @@ class TestBGPaaS(BaseBGPaaS):
             for rt_entry in rt_entries:
                if rt_entry['protocol'] == "BGP (bgpaas)":
                   origin_from_bgpaas_vm = rt_entry["origin"]
-       
+
         assert origin_from_bgpaas_vm=="igp","route 0.0.0.0/0 is not seen in ri: %s"%vn_fixture.ri_name
         self.logger.info("Origin info for route 0.0.0.0/0 is : %s"%origin_from_bgpaas_vm)
 
@@ -1270,15 +1270,15 @@ class TestBGPaaS(BaseBGPaaS):
     def test_bgpaas_vsrx_bfd_suppress_route_advt(self):
         '''
         1. Create a BGPaaS object with shared attribute, IP address and ASN.
-        2. Launch vSRXs which will act as the clients. 
-        3. Run VRRP among them. 
-        4. The VRRP master will claim the BGP Source Address of the BGPaaS object. 
+        2. Launch vSRXs which will act as the clients.
+        3. Run VRRP among them.
+        4. The VRRP master will claim the BGP Source Address of the BGPaaS object.
         5. Configure bfd and verify.
 
         Suppress route-advt:
            1. Enable suppress-route-advt and verify test_vm is not advertised to vsrx.
            2. Disable suppress-route-advt and verify test_vm is advertised to vsrx.
-	Maintainer: vageesant@juniper.net
+    Maintainer: vageesant@juniper.net
         '''
         vn_name = get_random_name('bgpaas_vn')
         vn_subnets = [get_random_cidr()]
@@ -1363,7 +1363,7 @@ class TestBGPaaS(BaseBGPaaS):
             routes_received = True
         if re.search("inet.0",received_routes2) and re.search(test_vm.vm_ip,received_routes2):
             routes_received = True
-       
+
         assert routes_received,"ERROR: Routes are NOT received by BGPaaS VM correctly"
 
         self.set_suppress_route_advt(bgpaas_fixture,True)
@@ -1444,8 +1444,8 @@ class TestBGPaaS(BaseBGPaaS):
     def test_bgpaas_basic(self):
         '''
         1. Create a BGPaaS object with shared attribute, IP address and ASN.
-        2. Launch a VM which will act as the BGPaaS client. 
-        3. Configure BFDoBGPaaS on it. 
+        2. Launch a VM which will act as the BGPaaS client.
+        3. Configure BFDoBGPaaS on it.
         4. Verify BGP and BFD sessions over it come up fine.
         Maintainer: ganeshahv@juniper.net
         '''

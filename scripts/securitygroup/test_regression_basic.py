@@ -78,7 +78,7 @@ class SecurityGroupBasicRegressionTests1(BaseSGTest, VerifySecGroup, ConfigPolic
             inputs=self.inputs, subnets=vn_net))
         assert vn_fixture.verify_on_setup()
         img_name = self.inputs.get_ci_image() or 'ubuntu-traffic'
-        
+
         #cannot use set_security_group in vro ,so remove default sg before adding new sg
         if self.inputs.vro_based:
             vm1_fixture = self.useFixture(VMFixture(
@@ -95,7 +95,7 @@ class SecurityGroupBasicRegressionTests1(BaseSGTest, VerifySecGroup, ConfigPolic
             vm2_fixture.remove_security_group(secgrp='default')
             vm1_fixture.add_security_group(secgrp_id)
             vm2_fixture.add_security_group(secgrp_id)
-        else: 
+        else:
             vm1_fixture = self.useFixture(VMFixture(
                 project_name=self.inputs.project_name, connections=self.connections,
                 vn_obj=vn_fixture.obj, image_name=img_name, flavor='contrail_flavor_small',sg_ids=[secgrp_id]))

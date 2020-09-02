@@ -102,7 +102,7 @@ class BasePolicyGenTest(BaseFirewallTest):
         return True
 
     def get_tags_for_untagged(self, query, traffic):
-        ''' contruct tags expected for traffic from/to 
+        ''' contruct tags expected for traffic from/to
             untagged or partially tagged endpoints
         '''
         src_tags = self.get_tags(traffic.sender_vm, query['tags'])

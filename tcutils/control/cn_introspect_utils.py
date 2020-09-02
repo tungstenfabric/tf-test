@@ -14,7 +14,7 @@ LOG.basicConfig(format='%(levelname)s: %(message)s', level=LOG.DEBUG)
 class ControlNodeInspect (VerificationUtilBase):
 
     def __init__(self, ip, port=8083, logger=LOG, args=None, protocol='http'):
-        
+
         super(ControlNodeInspect, self).__init__(ip, port, XmlDrv,
                  logger=logger, args=args, protocol=protocol)
 
@@ -312,7 +312,7 @@ class ControlNodeInspect (VerificationUtilBase):
             except Exception as e:
                 #Entry came as dictionary
                 if rt['encoding'] == encoding:
-                    parshed_rt.append(rt)    
+                    parshed_rt.append(rt)
             return parshed_rt
 
     def policy_update(self, domain='default-domain', *arg):

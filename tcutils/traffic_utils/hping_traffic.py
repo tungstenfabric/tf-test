@@ -140,7 +140,7 @@ class Hping3(object):
     # end parse_result_file
 
     def get_cmd_args(self, **kwargs):
-        ''' convert { 'k1': val, 'k2':val2 } to 
+        ''' convert { 'k1': val, 'k2':val2 } to
             "--k1 val --k2 val2"
             All keys are of type string
             All values are string or boolean

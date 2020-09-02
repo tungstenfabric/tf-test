@@ -114,16 +114,16 @@ class ServiceFixture(fixtures.Fixture):
                          'contrail-api' % (self.name))
         return True
     # end verify_service_in_contrail_api
-    
+
     @retry(delay=1, tries=10)
     def verify_service_in_kube_manager(self):
         km_h = self.connections.get_kube_manager_h()
         self.lb_info = km_h.get_svc_or_ingress_lb_info(uuid = self.uuid)
         if self.lb_info:
-            self.logger.info('Service %s with uuid %s found in kube manager' 
+            self.logger.info('Service %s with uuid %s found in kube manager'
                              % (self.name, self.uuid))
         else:
-            self.logger.warn('Service %s with uuid %s not found in kube manager' 
+            self.logger.warn('Service %s with uuid %s not found in kube manager'
                              % (self.name, self.uuid))
             return False
         return True

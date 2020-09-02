@@ -141,7 +141,7 @@ class NetworkAttachmentFixture(fixtures.Fixture):
             self.logger.info('Network Attachement  %s found in kubernetes'
                              % (self.name))
         else:
-            self.logger.warn('Network Attachement %s not found in kube manager' 
+            self.logger.warn('Network Attachement %s not found in kube manager'
                              % (self.name))
             return False
         return True

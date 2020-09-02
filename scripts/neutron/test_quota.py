@@ -44,7 +44,7 @@ class TestQuota(BaseNeutronTest):
                         "Default Quota limit not followed for %s and is set to %s " %
                         (neutron_obj, quota_dict['quota'][neutron_obj]))
                     result = False
-                    
+
         assert result, 'Default quota for admin tenant is not set'
 
     @preposttest_wrapper

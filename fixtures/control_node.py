@@ -280,12 +280,12 @@ class CNFixture(fixtures.Fixture):
 
     def set_graceful_restart(self, gr_restart_time='60', eor_timeout='60',
                              llgr_restart_time='180', gr_enable=False,
-                             bgp_helper_enable=False, 
+                             bgp_helper_enable=False,
                              xmpp_helper_enable=False, router_asn=None):
         vnc_lib = self.vnc_lib_h
         router_asn = router_asn or self.router_asn
         gsc_obj = vnc_lib.global_system_config_read(
-                  fq_name=['default-global-system-config']) 
+                  fq_name=['default-global-system-config'])
         gsc_obj.set_autonomous_system(router_asn)
         gr_params = GracefulRestartParametersType()
         gr_params.set_restart_time(int(gr_restart_time))
@@ -310,7 +310,7 @@ class CNFixture(fixtures.Fixture):
         except Exception as e:
             print(e)
             return False
-    
+
     def unset_cluster_id(self):
         fq_name = ['default-domain', 'default-project', 'ip-fabric', '__default__',self.router_name]
         vnc = self.vnc_lib_h

@@ -70,5 +70,5 @@ def send_mail(config_file, file_to_send, report_details):
 # end send_mail
 
 if __name__ == "__main__":
-    #send_mail('sanity_params.ini','report/junit-noframes.html') 
+    #send_mail('sanity_params.ini','report/junit-noframes.html')
     send_mail(sys.argv[1], sys.argv[2], sys.argv[3])

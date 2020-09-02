@@ -2,14 +2,14 @@ import vnc_api_test
 
 class LogicalInterfaceFixture(vnc_api_test.VncLibFixture):
 
-    '''Fixture to handle Logical Interface object in 
-       a phyiscal port 
+    '''Fixture to handle Logical Interface object in
+       a phyiscal port
 
     Optional:
     :param name     : name of the lif
     :param uuid     : UUID of the logical interface
-    :param pif_id   : Physical interface UUID 
-    :param pif_fqname   : Physical interface fqname 
+    :param pif_id   : Physical interface UUID
+    :param pif_fqname   : Physical interface fqname
     :param vlan_id : Default is 0
     :param interface_type : l2 or l3
     :param vmi_ids  : List of vmi ids part of this lif, default is []
@@ -106,7 +106,7 @@ class LogicalInterfaceFixture(vnc_api_test.VncLibFixture):
         self.obj.set_virtual_machine_interface_list([])
         self.vnc_api_h.logical_interface_update(self.obj)
     # end clear_vmi_mapping
-        
+
     def delete_lif(self):
         self.logger.info('Deleting Logical port %s' % (self.fq_name))
         self.vnc_h.delete_logical_interface(id=self.uuid)

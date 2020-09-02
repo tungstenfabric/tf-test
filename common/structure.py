@@ -4,7 +4,7 @@ class DynamicArgs(object):
     """ Class variable that specifies expected fields
         This class helps initialiazing the __init__() for
         other classes,which would inherit from this class.
-        The _fields variable in the subclasses need to be declared 
+        The _fields variable in the subclasses need to be declared
         with the positional paraleters as below:
         _fields = ['auth_url', 'username', 'password', 'tenant_id', 'insecure']
     """

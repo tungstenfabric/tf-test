@@ -16,7 +16,7 @@ class TestQosQueueSerial(QosTestExtendedBase):
     def tearDownClass(cls):
         super(TestQosQueueSerial, cls).tearDownClass()
     # end tearDownClass
-    
+
     @preposttest_wrapper
     def test_queue_dscp(self):
         '''
@@ -29,7 +29,7 @@ class TestQosQueueSerial(QosTestExtendedBase):
         3. Dynamically create single FC object for each queue object
         4. Dynamically create dscp mapping table as per entries in fc
         5. Create a qos map with entries in the dscp map table and attach to VMI.
-        6. Test for all entries in qos map and verify that traffic is steered to right 
+        6. Test for all entries in qos map and verify that traffic is steered to right
            hardware queue.
         '''
         self.skip_tc_if_no_queue_config()
@@ -80,7 +80,7 @@ class TestQosQueueSerial(QosTestExtendedBase):
         3. Dynamically create single FC object for each queue object
         4. Dynamically create dot1p mapping table as per entries in fc
         5. Create a qos with entries in the dot1p map table and attach to VN.
-        6. Test for all entries in qos map and verify that traffic is steered to right 
+        6. Test for all entries in qos map and verify that traffic is steered to right
            hardware queue.
         '''
         self.skip_tc_if_no_queue_config()
@@ -116,11 +116,11 @@ class TestQosQueueSerial(QosTestExtendedBase):
                                             self.vn1_fixture.vn_fq_name]}
             assert self.validate_packet_qos_marking(**validate_method_args)
     #end test_queue_dscp
-    
+
     @preposttest_wrapper
     def test_fc_queue_id_update(self):
         '''
-        This test case aims at testing that traffic steered to configured queue 
+        This test case aims at testing that traffic steered to configured queue
         while queue id in FC is updated.
         Steps:
         1. Read testbed file and populate logical to HW queue mappings.
@@ -170,14 +170,14 @@ class TestQosQueueSerial(QosTestExtendedBase):
                                     self.vn1_fixture.vn_fq_name]}
             assert self.validate_packet_qos_marking(**validate_method_args)
     #end test_fc_queue_id_update
-    
+
     @preposttest_wrapper
     def test_default_queueing(self):
         '''
         This test case aims at testing all scenarios where traffic is steered to default queue
         Steps:
         1. Create a Logical queue with unique ID which is not configured by user
-        2. Configure different FCs 
+        2. Configure different FCs
             A. FC0 to be configured as default FC for qos config
             B. FC1 to be configured without mentioning any queue id
             C. FC2 to be configured with queue id which is not configured by user.
@@ -197,7 +197,7 @@ class TestQosQueueSerial(QosTestExtendedBase):
                 break
         queue = [{'queue_id': unique_queue_id}] # Assuming that user has not configured above value 255
         queue_fixture = self.setup_queues(queue)
-        
+
         fcs = [{'fc_id': 0, 'dscp': 10, 'dot1p': 1, 'exp': 1},
                {'fc_id': 1, 'dscp': 20, 'dot1p': 2, 'exp': 2},
                {'fc_id': 2, 'dscp': 30, 'dot1p': 3, 'exp': 3,
@@ -224,7 +224,7 @@ class TestQosQueueSerial(QosTestExtendedBase):
                     'traffic_duration' : 5}
             assert self.validate_packet_qos_marking(**validate_method_args)
     #end test_default_queueing
-    
+
     @preposttest_wrapper
     def test_queueing_dscp_on_vhost(self):
         '''
@@ -259,7 +259,7 @@ class TestQosQueueSerial(QosTestExtendedBase):
         compute_control_ip_idx = self.inputs.compute_ips.index(
                                             self.vn1_vm2_fixture.vm_node_ip)
         compute_control_ip = self.inputs.compute_control_ips[
-                                        compute_control_ip_idx] 
+                                        compute_control_ip_idx]
         interface = self.vn1_vm1_compute_fixture.agent_physical_interface
         for key,value in dscp_map_vhost.items():
             dscp =key
@@ -359,7 +359,7 @@ class TestQosPolicyEncap(TestQosPolicyBase):
            Steps:
            1.Create a Forwarding class with ID 10 to mark dscp as 62
            2.Create a qos config for remarking dscp 0-9 traffic to dscp 62.
-           3.Validate that packets on fabric from A to B have DSCP 
+           3.Validate that packets on fabric from A to B have DSCP
              marked to 62
         '''
         fcs = [{'name': "FC_Test", 'fc_id': 100,
@@ -379,7 +379,7 @@ class TestQosPolicyEncap(TestQosPolicyBase):
             src_compute_fixture=self.vn1_vm1_compute_fixture,
             encap="MPLSoGRE")
     # end test_qos_remark_exp_dscp_on_policy_gre_encap
-    
+
     @preposttest_wrapper
     def test_qos_config_on_policy_for_all_dscp_entries(self):
         '''
@@ -388,9 +388,9 @@ class TestQosPolicyEncap(TestQosPolicyBase):
         Steps:
         1. Create 62 FC IDs having unique DSCP values in all
         2. Create a qos config and map all DSCP to unique FC ID
-        3. Validate that packets with dscp 1 on fabric from A to B 
+        3. Validate that packets with dscp 1 on fabric from A to B
            have DSCP marked to 62
-        4. Validate that packets with dscp 62 on fabric from A to B 
+        4. Validate that packets with dscp 62 on fabric from A to B
            have DSCP marked to 1
         5. Similarly, verify for all DSCP values
         '''
@@ -427,7 +427,7 @@ class TestQosPolicyQueueSerial(TestQosPolicyBase):
     def tearDownClass(cls):
         super(TestQosPolicyQueueSerial, cls).tearDownClass()
     # end tearDownClass
-    
+
     @preposttest_wrapper
     def test_queue_dscp_on_policy(self):
         '''
@@ -440,7 +440,7 @@ class TestQosPolicyQueueSerial(TestQosPolicyBase):
         3. Dynamically create single FC object for each queue object
         4. Dynamically create dscp mapping table as per entries in fc
         5. Create a qos map with entries in the dscp map table and attach to Policy rule.
-        6. Test for all entries in qos map and verify that traffic is steered to right 
+        6. Test for all entries in qos map and verify that traffic is steered to right
            hardware queue.
         '''
         self.skip_tc_if_no_queue_config()
@@ -476,7 +476,7 @@ class TestQosPolicyQueueSerial(TestQosPolicyBase):
                     'traffic_duration' : 5}
             assert self.validate_packet_qos_marking(**validate_method_args)
     #end test_queue_dscp_on_policy
-    
+
     @preposttest_wrapper
     def test_qos_queue_on_vmi_precedence_over_policy_over_vn(self):
         '''
@@ -557,7 +557,7 @@ class TestQosPolicyQueueSerial(TestQosPolicyBase):
         validate_method_args['queue_id'] = hw_queue
         assert self.validate_packet_qos_marking(**validate_method_args)
     # end test_qos_queue_on_vmi_precedence_over_policy_over_vn
-    
+
 
 class TestQosSVCSerial(TestQosSVCBase):
 
@@ -570,7 +570,7 @@ class TestQosSVCSerial(TestQosSVCBase):
     def tearDownClass(cls):
         super(TestQosSVCSerial, cls).tearDownClass()
     # end tearDownClass
-    
+
     @preposttest_wrapper
     def test_qos_queueing_on_vmi_of_si(self):
         '''Test that qos queueing happens when qos config is applied on vmi
@@ -633,27 +633,27 @@ class TestQosQueueQosmap(TestQosQueueProperties):
     def tearDownClass(cls):
         super(TestQosQueueQosmap, cls).tearDownClass()
     # end tearDownClass
-    
+
     def preconfiguration_queueing_test(self):
         '''
         This module is not a test case.
         It only has pre configurations required for queueing test cases
         '''
         self.skip_tc_if_no_queue_config()
-        queues = [{'queue_id': 15}, 
+        queues = [{'queue_id': 15},
                   {'queue_id': 45},
                   {'queue_id': 75},
                   {'queue_id': 115}]
         queue_fixtures = self.setup_queues(queues)
         for elem in queue_fixtures:
             assert elem.verify_on_setup()
-        fcs = [{'fc_id': 101, 'dscp': 5, 'dot1p': 1, 'exp': 1, 
+        fcs = [{'fc_id': 101, 'dscp': 5, 'dot1p': 1, 'exp': 1,
                 'queue_uuid' :queue_fixtures[0].uuid},
-               {'fc_id': 102, 'dscp': 10, 'dot1p': 2, 'exp': 2, 
+               {'fc_id': 102, 'dscp': 10, 'dot1p': 2, 'exp': 2,
                 'queue_uuid' :queue_fixtures[1].uuid},
-               {'fc_id': 103, 'dscp': 15, 'dot1p': 3, 'exp': 3, 
+               {'fc_id': 103, 'dscp': 15, 'dot1p': 3, 'exp': 3,
                 'queue_uuid' :queue_fixtures[2].uuid},
-               {'fc_id': 104, 'dscp': 20, 'dot1p': 4, 'exp': 4, 
+               {'fc_id': 104, 'dscp': 20, 'dot1p': 4, 'exp': 4,
                 'queue_uuid' :queue_fixtures[3].uuid}]
         fc_fixtures = self.setup_fcs(fcs)
         dscp_map = {25: 101, 26 : 102, 27 : 103,28 : 104}
@@ -689,7 +689,7 @@ class TestQosQueueQosmap(TestQosQueueProperties):
                                 'dscp_vn2_traffic': 28}
         assert self.validate_queue_performance(**validate_method_args)
     #end test_scheduling_rr_queues
-    
+
     @preposttest_wrapper
     def test_scheduling_strict_queues(self):
         '''
@@ -717,14 +717,14 @@ class TestQosQueueQosmap(TestQosQueueProperties):
                                 'dscp_vn2_traffic': 27}
         assert self.validate_queue_performance(**validate_method_args)
     #end test_scheduling_strict_queues
-    
+
     @preposttest_wrapper
     def test_scheduling_strict_rr_queues(self):
         '''
         This test case verifies that if traffic is sent through 2 different
         queues which are mapping to 2 different Priority groups where 1 PG is
         having scheduling as strict and other as round robin , the traffic of
-        strict priority group should not get dropped. 
+        strict priority group should not get dropped.
         Steps:
         1. Start sending traffic through 2 different queues where q1 configured
         with strictness as 1 and q2 configured with strictness as 0.
@@ -771,7 +771,7 @@ class TestQosQueueQosmap(TestQosQueueProperties):
                 if output == ['0','60','0','40','0','0','0','0']:
                     self.logger.debug("Bandwidth configured correctly on physical"
                                       "interface %s of bond interface" % intf)
-                else: 
+                else:
                     assert False, "BW values not configured correctly"
                 cmd = "qosmap --get-queue %s| grep 'Strictness:'" % intf
                 output = self.inputs.run_cmd_on_server(server , cmd,
@@ -780,7 +780,7 @@ class TestQosQueueQosmap(TestQosQueueProperties):
                 if output == ['1','0','1','0','1','0','1','0']:
                     self.logger.debug("Stritness configured correctly on physical"
                                       "interface %s of bond interface" % intf)
-                else: 
+                else:
                     assert False, "Strictness values not configured correctly"
         else:
             msg = "Not a bond interface. Test case runs only over bond"
@@ -802,13 +802,13 @@ class TestQosControlDscp(QosTestExtendedBase):
     @preposttest_wrapper
     def test_xmpp_packet_dscp(self):
         '''
-        This test case verifies XMPPP control packet marking from packets 
+        This test case verifies XMPPP control packet marking from packets
         generated by agent and control node.
         Steps:
         1. Set the global control packet DSCP marking.
-        2. Capture XMPP packets generated by agent and verify that DSCP is 
+        2. Capture XMPP packets generated by agent and verify that DSCP is
            marked as configured.
-        3. Capture the XMPP packets generated by control node and verify 
+        3. Capture the XMPP packets generated by control node and verify
            that DSCP is marked as configured.
         '''
         control_dscp, dns_dscp, analytics_dscp = 10, 20, 30
@@ -852,11 +852,11 @@ class TestQosControlDscp(QosTestExtendedBase):
     @preposttest_wrapper
     def test_analytics_packet_dscp(self):
         '''
-        This test case verifies Analytcis control packet marking from packets 
+        This test case verifies Analytcis control packet marking from packets
         generated by agent to collector node.
         Steps:
         1. Set the global control packet DSCP marking.
-        2. Capture Analytics packets generated by agent and verify that DSCP is 
+        2. Capture Analytics packets generated by agent and verify that DSCP is
            marked as configured.
         '''
         control_dscp, dns_dscp, analytics_dscp = 10, 20, 30
@@ -867,8 +867,8 @@ class TestQosControlDscp(QosTestExtendedBase):
         agent_interface = self.vn1_vm1_compute_fixture.agent_physical_interface
         compute_index = self.inputs.compute_names.index(self.first_node_name)
         compute_ip = self.inputs.compute_control_ips[compute_index]
-        # Searching for analytics node(Collector) IP and source port of 
-        # TCP connection of contrail-vrouter-agent with collector 
+        # Searching for analytics node(Collector) IP and source port of
+        # TCP connection of contrail-vrouter-agent with collector
         cmd = "pidof contrail-vrouter-agent"
         pid = self.inputs.run_cmd_on_server(compute_ip, cmd)
         cmd = "netstat -nap | grep 8086 | grep %s" % pid
@@ -901,14 +901,14 @@ class TestQosControlDscp(QosTestExtendedBase):
     @preposttest_wrapper
     def test_dns_packet_dscp(self):
         '''
-        This test case verifies DNS packet marking from packets 
+        This test case verifies DNS packet marking from packets
         generated by agent.
         Steps:
         1. Set the global control packet DSCP marking.
-        2. Determine the in use interface of agent for DNS packets. In case 
+        2. Determine the in use interface of agent for DNS packets. In case
            Default DNS method is used, DNS packets use the management Interface.
         3. Do a DNS lookup and generate a query.
-        4. Capture DNS packets generated by agent and verify that DSCP is 
+        4. Capture DNS packets generated by agent and verify that DSCP is
            marked as configured.
         '''
         control_dscp, dns_dscp, analytics_dscp = 10, 20, 30
@@ -932,15 +932,15 @@ class TestQosControlDscp(QosTestExtendedBase):
         assert self.validate_control_packet_dscp_marking(
                                     **validate_method_args_1)
     #end test_dns_packet_dscp
-    
+
     @preposttest_wrapper
     def test_vhost_marking_over_control_packet_marking(self):
         """
         This test case verifies that vhost qos marking works correctly on
-        control packet which was marked by Control DSCP marking. 
+        control packet which was marked by Control DSCP marking.
         Steps:
         1. Set the global control packet DSCP marking.
-        2. Capture XMPP packets generated by agent and verify that DSCP is 
+        2. Capture XMPP packets generated by agent and verify that DSCP is
            marked as configured.
         3. Apply a vHOST QOS config for DSCP value same as changed by control
            data marking.

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 # traffic generator using nc.traditional, supports only tcp and udp protocol
 
 from tcutils.util import retry
-from .base_traffic import * 
+from .base_traffic import *
 from tcutils.util import get_random_name
 default_data = '*****This is default data.*****'
 result_file = '/tmp/nc'
@@ -86,7 +86,7 @@ class Netcat(BaseTraffic):
 
     def get_packet_count(self):
 
-        sent, self.recv = self.get_packet_count_nc(self.receiver_vm_fix) 
+        sent, self.recv = self.get_packet_count_nc(self.receiver_vm_fix)
         return self.recv
 
     def get_packet_count_nc(self, vm_fix):

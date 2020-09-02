@@ -1,8 +1,8 @@
 from __future__ import print_function
-# Converts log files(typically in contrail-test/logs/ folder) 
+# Converts log files(typically in contrail-test/logs/ folder)
 # to css-based html files
-# 
-# This is so that failure points (i.e. at 'END TEST') can be 
+#
+# This is so that failure points (i.e. at 'END TEST') can be
 # hash-tagged
 #
 import re

@@ -156,7 +156,7 @@ class PhysicalDeviceFixture(vnc_api_test.VncLibFixture):
 
     def get_device_details(self, physical_routers_data):
         '''
-            Returns the device dict of the ToR 
+            Returns the device dict of the ToR
         '''
         for (device_name, device_dict) in physical_routers_data.items():
             if device_name == self.name:

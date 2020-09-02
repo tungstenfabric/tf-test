@@ -49,7 +49,7 @@ class TestvDNS0(BasevDNSTest):
 
     def runTest(self):
         pass
-    #end runTest 
+    #end runTest
 
     @preposttest_wrapper
     def test_vdns_ping_diff_vn(self):
@@ -709,7 +709,7 @@ class TestvDNS0(BasevDNSTest):
            Bug Id 1566067 : "Agent crash at BindUtil::DnsClass"
            Steps:
             1. Create a VN with IPAM having Virtual DNS configured.
-            2. Create a VM and send a DNS query from VM to DNS server. DNS server should 
+            2. Create a VM and send a DNS query from VM to DNS server. DNS server should
                have the Qclass field as any value other than "01"
             3. Verify that no crash happens when this malformed DNS packet reaches the server
         Pass criteria: Vrouter agent should not crash on receiving a malformed DNS packet
@@ -724,7 +724,7 @@ class TestvDNS0(BasevDNSTest):
         dns_data = VirtualDnsType(
             domain_name=domain_name, dynamic_records_from_client=True,
             default_ttl_seconds=ttl, record_order='random', reverse_resolution=True)
-        vdns_fixt1 = self.useFixture(VdnsFixture(self.inputs, self.connections, 
+        vdns_fixt1 = self.useFixture(VdnsFixture(self.inputs, self.connections,
             vdns_name=dns_server_name, dns_data=dns_data))
         result, msg = vdns_fixt1.verify_on_setup()
         self.assertTrue(result, msg)
@@ -733,12 +733,12 @@ class TestvDNS0(BasevDNSTest):
         ipam_mgmt_obj = IpamType(
             ipam_dns_method='virtual-dns-server', ipam_dns_server=dns_server)
         # Associate IPAM with  VDNS server Object
-        ipam_fixt1 = self.useFixture(IPAMFixture(ipam_name, vdns_obj=vdns_fixt1.obj, 
+        ipam_fixt1 = self.useFixture(IPAMFixture(ipam_name, vdns_obj=vdns_fixt1.obj,
                 connections=self.connections, ipamtype=ipam_mgmt_obj))
         # Launch  VM with VN Created above.
         vn_fixt = self.useFixture(VNFixture(self.connections, self.inputs, vn_name=vn_name,
                      subnets=[vn_nets['vn1']], ipam_fq_name=ipam_fixt1.fq_name, option='contrail'))
-        vm_fixture1 = self.useFixture(VMFixture(project_name=self.inputs.project_name, 
+        vm_fixture1 = self.useFixture(VMFixture(project_name=self.inputs.project_name,
                     connections=self.connections, vn_obj=vn_fixt.obj, vm_name=vm_list[0],
                     image_name = "ubuntu-traffic"))
         assert vm_fixture1.verify_vm_launched()
@@ -764,7 +764,7 @@ send(a, iface='eth0',inter=1.000000,count=10)
         sleep(2)
         stop_tcpdump_for_vm_intf(self, session, pcap)
         sleep(2)
-        # grep in pcap file with source port (1234) 
+        # grep in pcap file with source port (1234)
         assert verify_tcpdump_count(self, session, pcap, grep_string="1234", exp_count=10)
 
 if __name__ == '__main__':

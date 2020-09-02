@@ -51,7 +51,7 @@ class QosQueueFixture(QosBaseFixture):
         self.name = kwargs.get('name', get_random_name('qos_queue'))
         self.queue_id= kwargs.get('queue_id', None)
         self.uuid = kwargs.get('uuid', None)
-        
+
         self.is_already_present = False
         self.obj = None
         self.fq_name = None
@@ -83,7 +83,7 @@ class QosQueueFixture(QosBaseFixture):
         queue_obj = self.vnc_api_h.qos_queue_read(id = queue_uuid)
         self._populate_attr(queue_obj)
     # end create
-    
+
     def verify_on_setup(self):
         if not self.verify_qq_in_all_agents():
             self.logger.error('Verification of Qos Queue %s in agent failed' % (
@@ -146,7 +146,7 @@ class QosQueueFixture(QosBaseFixture):
         try:
             self.logger.info('Reading existing Queue with UUID %s' % (
                                                         self.uuid))
-            queue_obj = self.vnc_api_h.qos_queue_read(id=self.uuid) 
+            queue_obj = self.vnc_api_h.qos_queue_read(id=self.uuid)
         except NoIdError as e:
             self.logger.exception('UUID %s not found, unable to read Queue' % (
                 self.uuid))
@@ -162,7 +162,7 @@ class QosQueueFixture(QosBaseFixture):
         self.vnc_h.delete_queue(self.uuid)
         self.verify_on_cleanup()
     # end delete
-    
+
     def _populate_attr(self, queue_obj):
         self.obj = queue_obj
         self.fq_name = queue_obj.fq_name
@@ -472,7 +472,7 @@ class QosConfigFixture(QosBaseFixture):
             exp_mapping=exp_mapping)
         self._populate_attr()
     # end set_entries
-    
+
     def set_default_fc(self, default_fc_id=0):
         ''' Updates the default FC ID associated with this qos config
         '''

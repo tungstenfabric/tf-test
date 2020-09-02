@@ -1,6 +1,6 @@
 """Customized HTMLTestTunner
-	1. Customized for adding core count in the test report.
-   Can be extended when required.
+    1. Customized for adding core count in the test report.
+    Can be extended when required.
 """
 from __future__ import print_function
 from builtins import str
