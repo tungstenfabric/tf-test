@@ -897,8 +897,8 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
     def test_routing_with_tor_agent_restarts(self):
         ''' 
             Verify reachability between 2 BMS restored after restart
-            of contrail tor agent service. 
-        '''  
+            of contrail tor agent service.
+        '''
         tor_agent_dicts = self.tor1_fixture.get_tor_agents_details()
         for tor_agent_dict in tor_agent_dicts:
             tor_agent_service = 'contrail-tor-agent-%s' % (
@@ -907,15 +907,15 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
             tor_agent_node = self.get_mgmt_ip_of_node(
                 tor_agent_dict['tor_tsn_ip'])
             self.inputs.restart_service(tor_agent_service, [tor_agent_node],
-										container='agent')
+                                        container='agent')
             self.do_reachability_checks()
     # end test_routing_with_tor_agent_restarts
-            
+
     @preposttest_wrapper
     def test_routing_with_ovs_restarts(self):
-        ''' 
+        '''
             Verify reachability between 2 BMS restored after restart
-            of ovs  service. 
+            of ovs  service.
         '''
         self.tor1_fixture.restart_ovs()
         self.do_reachability_checks()

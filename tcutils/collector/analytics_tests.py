@@ -4744,12 +4744,12 @@ class AnalyticsVerification(fixtures.Fixture):
                     schema = self.get_schema_from_table(v)
                     schema.remove('CLASS(T=)')
                     names = self.get_names_from_table(v)
-                    found = True 
+                    found = True
                     break
             if found:
-               	return stat_table
+                return stat_table
         return None
-           
+
     #@retry(delay=5, tries=10)
     def verify_purge_info_in_database_uve(self,purge_id,start_time):
         stat_table = self.get_table()

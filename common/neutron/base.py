@@ -339,7 +339,7 @@ conn.commit()
 '$reboot_cmd'
 conn.unlock()
 conn.close_session()
-    	''')
+        ''')
         if hostkey_verify == 'False':
             hostkey_verify = bool(False)
         timeout = int(timeout)
@@ -366,7 +366,7 @@ from ncclient import manager
 conn = manager.connect(host='$ip', username='$username', password='$password',timeout=$timeout, device_params=$device_params, hostkey_verify=$hostkey_verify)
 get_config=conn.command(command='$cmd', format='$format')
 print get_config.tostring
-    	''')
+        ''')
         if hostkey_verify == 'False':
             hostkey_verify = bool(False)
         if device == 'junos':
