@@ -121,7 +121,7 @@ class TestBasicPolicy(BasePolicyTest):
         assert vm1_fixture.ping_with_certainty(vm2_fixture.vm_ip), (
             'Ping failed between VNs with allow-policy')
 
-        # Deny the same traffic 
+        # Deny the same traffic
         policy_id = policy_fixture.get_id()
         rules[0]['simple_action'] = 'deny'
         policy_entries = policy_fixture.get_entries()

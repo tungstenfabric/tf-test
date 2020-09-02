@@ -9,13 +9,13 @@ from tcutils.util import *
 import test_v1
 from common import isolated_creds
 from common.connections import ContrailConnections
-from tcutils.control.cn_introspect_utils import ControlNodeInspect 
+from tcutils.control.cn_introspect_utils import ControlNodeInspect
 from common.device_connection import NetconfConnection
 from control_node import CNFixture
 import time
 
 class TestLlgrBase(BaseNeutronTest):
- 
+
     @classmethod
     def setUpClass(cls):
         '''
@@ -26,9 +26,9 @@ class TestLlgrBase(BaseNeutronTest):
         cls.cn_introspect = ControlNodeInspect(cls.inputs.bgp_ips[0])
         cls.host_list = cls.connections.orch.get_hosts()
         if len(cls.host_list) > 1 and len(cls.inputs.bgp_ips) > 1 :
-            cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[0]]['host_control_ip'] , 
+            cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[0]]['host_control_ip'] ,
                                  ctrl_node=cls.inputs.bgp_ips[0],mode='disable')
-            cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[1]]['host_control_ip'] , 
+            cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[1]]['host_control_ip'] ,
                                  ctrl_node=cls.inputs.bgp_ips[1],mode='disable')
         if cls.inputs.ext_routers:
             cls.mx1_ip = cls.inputs.ext_routers[0][1]
@@ -47,9 +47,9 @@ class TestLlgrBase(BaseNeutronTest):
         '''
         cls.set_bgp_peering(mode='enable')
         cls.set_gr_llgr(mode='disable')
-        cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[0]]['host_control_ip'] , 
+        cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[0]]['host_control_ip'] ,
                                            mode='enable')
-        cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[1]]['host_control_ip'] , 
+        cls.set_xmpp_peering(compute_ip=cls.inputs.host_data[cls.host_list[1]]['host_control_ip'] ,
                                            mode='enable')
         super(TestLlgrBase, cls).tearDownClass()
     # end cleanUp
@@ -71,17 +71,17 @@ class TestLlgrBase(BaseNeutronTest):
                                        router_type='mx',
                                        inputs=self.inputs))
         cntrl_fix.set_graceful_restart(gr_restart_time=gr_timeout,
-                                     llgr_restart_time = llgr_timeout, 
-                                     eor_timeout = eor_timeout, 
-                                     gr_enable = gr_enable, 
+                                     llgr_restart_time = llgr_timeout,
+                                     eor_timeout = eor_timeout,
+                                     gr_enable = gr_enable,
                                      router_asn = router_asn,
-                                     bgp_helper_enable = True, 
+                                     bgp_helper_enable = True,
                                      xmpp_helper_enable = False)
         return True
 
     @classmethod
     def set_bgp_peering(self,**kwargs):
-        ''' 
+        '''
            Stop and start of BGP peer communication so that GR/LLGR timers are triggered
         '''
         mode = kwargs['mode']
@@ -96,24 +96,24 @@ class TestLlgrBase(BaseNeutronTest):
         return True
 
     def verify_traffic_loss(self,**kwargs):
-        vm1_fixture = kwargs['vm_fixture'] 
+        vm1_fixture = kwargs['vm_fixture']
         result_file = kwargs['result_file']
         pkts_trans = '0'
         pkts_recv = '0'
         ret = False
- 
+
         cmd = 'cat %s | grep loss'% result_file
-        res = vm1_fixture.run_cmd_on_vm(cmds=[cmd]) 
+        res = vm1_fixture.run_cmd_on_vm(cmds=[cmd])
         self.logger.debug('results %s' %(res))
         if not res[cmd]:
             self.logger.error("Not able to get the log file %s"%res)
             return (ret,pkts_trans,pkts_recv)
 
         pattern = '''(\S+) packets transmitted, (\S+) received, (\S+)% packet loss'''
-        res = re.search(pattern,res[cmd]) 
+        res = re.search(pattern,res[cmd])
         if res:
             pkts_trans = res.group(1)
-            pkts_recv = res.group(2) 
+            pkts_recv = res.group(2)
             loss = res.group(3)
             ret = True
         return (ret,pkts_trans,pkts_recv)
@@ -142,8 +142,8 @@ class TestLlgrBase(BaseNeutronTest):
 
     @classmethod
     def set_xmpp_peering(self,**kwargs):
-        ''' 
-            Enabling / Disabling XMPP peer communication 
+        '''
+            Enabling / Disabling XMPP peer communication
         '''
         compute_ip = kwargs['compute_ip']
         mode = kwargs['mode']
@@ -154,16 +154,16 @@ class TestLlgrBase(BaseNeutronTest):
             ctrl_ip = ctrl_ip + ":"+'5269'
             self.configure_server_list(compute_ip, 'contrail-vrouter-agent',
                              'CONTROL-NODE', 'servers' , [ctrl_ip], container = "agent")
-        else : 
+        else :
             control_ips = [self.inputs.host_data[x]['host_data_ip']+":"+'5269' for x in self.inputs.bgp_ips]
             self.configure_server_list(compute_ip, 'contrail-vrouter-agent',
                            'CONTROL-NODE', 'servers' , control_ips , container = "agent")
         return True
-   
+
     @classmethod
     def set_headless_mode(self,**kwargs):
-        ''' 
-           Enabling/Disabling headless mode in agent 
+        '''
+           Enabling/Disabling headless mode in agent
         '''
         mode = kwargs['mode']
         if mode == 'enable':
@@ -174,7 +174,7 @@ class TestLlgrBase(BaseNeutronTest):
             self.logger.debug('enable headless mode %s : %s' %(host,cmd))
             self.inputs.run_cmd_on_server(host,cmd,container='agent')
         self.inputs.restart_service('contrail-vrouter-agent',self.host_list)
-        return True 
+        return True
 
     def verify_gr_bgp_flags(self,**kwargs):
         '''
@@ -274,7 +274,7 @@ class TestLlgrBase(BaseNeutronTest):
         # check for atleast 2 control nodes
         if len(self.inputs.bgp_ips) < 2 :
             return (False, "compute nodes are not sufficient")
-        # check for 1 mx 
+        # check for 1 mx
         if len(self.inputs.ext_routers) < 1:
             self.logger.error("MX routers are not sufficient : %s"%len(self.inputs.ext_routers))
             return (False ,"MX routers are not sufficient")

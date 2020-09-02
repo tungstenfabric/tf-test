@@ -34,7 +34,7 @@ class create_multiple_vn_and_multiple_vm_fixture(fixtures.Fixture):
 
 #    @classmethod
     def __init__(self, connections, inputs, policy_objs=[], subnets=[], project_name=None, image_name='ubuntu', flavor='contrail_flavor_tiny', vn_name=get_random_name('vn'), vm_name=get_random_name('vm'), vn_count=1, vm_count=2, subnet_count=2, af=None, userdata=None):
-        """ 
+        """
         creates a dict of the format: {vn_name:{vm_name:vm_obj,...}}
         """
         self.connections = connections

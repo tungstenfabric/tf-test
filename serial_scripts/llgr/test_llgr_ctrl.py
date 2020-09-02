@@ -21,17 +21,17 @@ from tcutils.tcpdump_utils import start_tcpdump_for_intf,\
 #from cn_introspect_bgp import ControlNodeInspect
 import test
 '''
-   This test suite runs only on control node scale setup 
-   Where MX is connected to one of the control node and two 
-   compute nodes were connected to each of the agent which 
+   This test suite runs only on control node scale setup
+   Where MX is connected to one of the control node and two
+   compute nodes were connected to each of the agent which
    is taken care during Base class setup
-   In each of the steps following steps were exectued 
-   Launch a two VMs for North/South traffic 
+   In each of the steps following steps were exectued
+   Launch a two VMs for North/South traffic
    Start ping from VM IP to MX loopback IP
    Start a failure ( link failure / MX restart )
    Check flags for Route advertised by MX is in GR/LLGR state
    Check if there is a drop in traffic
-   Restore the failure 
+   Restore the failure
    Check for BGP open message for notification bit and restart
    capabilities advertised by controller to MX
 '''
@@ -50,7 +50,7 @@ class TestLlgrCtrl(TestLlgrBase):
         cls.result6_file = 'ping6_stats'
         cls.pid_file = '/tmp/llgr.pid'
         cls.pid6_file = '/tmp/llgr6.pid'
-        cls.timeout = 30 
+        cls.timeout = 30
         cls.gr_timeout = 60
         cls.llgr_timeout = 120
         return True
@@ -68,10 +68,10 @@ class TestLlgrCtrl(TestLlgrBase):
     @preposttest_wrapper
     def test_gr_ctrl(self):
         '''
-           Check Traffic to VM on different host goes fine when BGP session is down during GR configuration 
-           holdtime of 90sec + stale time of 35sec 
+           Check Traffic to VM on different host goes fine when BGP session is down during GR configuration
+           holdtime of 90sec + stale time of 35sec
         '''
-        timeout = 90  
+        timeout = 90
 
         self.set_gr_llgr(gr=35,llgr=0,mode='enable')
 
@@ -80,17 +80,17 @@ class TestLlgrCtrl(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.set_bgp_peering(mode='disable')
 
         self.addCleanup(self.set_bgp_peering,mode='enable')
 
         time.sleep(timeout)
- 
+
         if not self.verify_gr_llgr_flags(flags=['Stale'], vn_fix=self.vn_fix, prefix=self.vm2_fixture.vm_ip):
             self.logger.error("Stale flag is not set for route : %s"%self.vm2_fixture.vm_ip)
             return False
@@ -104,7 +104,7 @@ class TestLlgrCtrl(TestLlgrBase):
             return False
 
         self.set_bgp_peering(mode='enable')
- 
+
         time.sleep(20)
 
         stop_tcpdump_for_intf(session, pcap_file)
@@ -119,10 +119,10 @@ class TestLlgrCtrl(TestLlgrBase):
     @preposttest_wrapper
     def test_gr_llgr_ctrl(self):
         '''
-           Check Traffic to VM on different host goes fine when BGP session is down during GR and LLGR configuration 
+           Check Traffic to VM on different host goes fine when BGP session is down during GR and LLGR configuration
            holdtime of 90sec + stale time of 30sec + llgr stale time of 60sec
         '''
-        timeout = 140  
+        timeout = 140
 
         self.set_gr_llgr(gr=35,llgr=60,mode='enable')
 
@@ -131,17 +131,17 @@ class TestLlgrCtrl(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.set_bgp_peering(mode='disable')
 
         self.addCleanup(self.set_bgp_peering,mode='enable')
 
         time.sleep(timeout)
- 
+
         if not self.verify_gr_llgr_flags(flags=['Stale','LlgrStale'], vn_fix=self.vn_fix, prefix=self.vm2_fixture.vm_ip):
             self.logger.error("Stale flag is not set for route : %s"%self.vm2_fixture.vm_ip)
             return False
@@ -171,12 +171,12 @@ class TestLlgrCtrl(TestLlgrBase):
     @preposttest_wrapper
     def test_llgr_ctrl(self):
         '''
-           Check Traffic to VM on different host goes fine when BGP session is down during GR and LLGR configuration 
-           holdtime of 90sec + llgr stale time of 60sec 
+           Check Traffic to VM on different host goes fine when BGP session is down during GR and LLGR configuration
+           holdtime of 90sec + llgr stale time of 60sec
         '''
-        #enable llgr 
-        # holdtime of 90sec + stale time of 30sec 
-        timeout = 100  
+        #enable llgr
+        # holdtime of 90sec + stale time of 30sec
+        timeout = 100
 
         self.set_gr_llgr(gr=0,llgr=60,mode='enable')
 
@@ -185,17 +185,17 @@ class TestLlgrCtrl(TestLlgrBase):
             self.logger.error("Error in creating VM")
             return False
 
-        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0], 
-                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'], 
+        session , pcap_file = start_tcpdump_for_intf(self.inputs.bgp_ips[0],
+                              self.inputs.host_data[self.inputs.bgp_ips[0]]['username'],
                               self.inputs.host_data[self.inputs.bgp_ips[0]]['password'],
-                              'bond0', filters='-vvv port bgp') 
+                              'bond0', filters='-vvv port bgp')
 
         self.set_bgp_peering(mode='disable')
 
         self.addCleanup(self.set_bgp_peering,mode='enable')
 
         time.sleep(timeout)
- 
+
         if not self.verify_gr_llgr_flags(flags=['Stale','LlgrStale'], vn_fix=self.vn_fix, prefix=self.vm2_fixture.vm_ip):
             self.logger.error("Stale flag is not set for route : %s"%self.vm2_fixture.vm_ip)
             return False
@@ -220,16 +220,16 @@ class TestLlgrCtrl(TestLlgrBase):
 
         return True
 
-    # RESTART of controller 
+    # RESTART of controller
     @test.attr(type=['llgr'])
     @preposttest_wrapper
     def test_gr_ctrl_restart(self):
         '''
-           Check Traffic to VM on different host goes fine when control node session is restarted during GR configuration 
-           holdtime of 0sec + stale time of 60sec 
+           Check Traffic to VM on different host goes fine when control node session is restarted during GR configuration
+           holdtime of 0sec + stale time of 60sec
            In this case route state is immediately changed to stale , holdtime is not triggered
         '''
-        timeout = 40  
+        timeout = 40
         self.set_gr_llgr(gr=60,llgr=0,mode='enable')
 
         #self.set_gr_llgr(mode='disable')
@@ -241,8 +241,8 @@ class TestLlgrCtrl(TestLlgrBase):
 
         time.sleep(timeout)
 
-        assert self.verify_gr_llgr_flags(flags=['Stale'], vn_fix=self.vn_fix, prefix=self.vm2_fixture.vm_ip) 
-        assert self.verify_gr_llgr_flags(flags=['Stale'], vn_fix=self.vn_fix, prefix=self.ipv6_addr) 
+        assert self.verify_gr_llgr_flags(flags=['Stale'], vn_fix=self.vn_fix, prefix=self.vm2_fixture.vm_ip)
+        assert self.verify_gr_llgr_flags(flags=['Stale'], vn_fix=self.vn_fix, prefix=self.ipv6_addr)
 
         self.inputs.start_service('contrail-control', [self.inputs.bgp_ips[1]], container='control')
 
@@ -253,16 +253,16 @@ class TestLlgrCtrl(TestLlgrBase):
         return True
 
 
-    # RESTART of controller 
+    # RESTART of controller
     @test.attr(type=['llgr'])
     @preposttest_wrapper
     def test_llgr_ctrl_restart(self):
         '''
-           Check Traffic to VM on different host goes fine when control node session is restarted during LLGR configuration 
-           holdtime of 0sec + stale time of 30sec and llgr time of 60 
+           Check Traffic to VM on different host goes fine when control node session is restarted during LLGR configuration
+           holdtime of 0sec + stale time of 30sec and llgr time of 60
         '''
-        # holdtime of 90sec + stale time of 30sec 
-        timeout = 50  
+        # holdtime of 90sec + stale time of 30sec
+        timeout = 50
         self.set_gr_llgr(gr=35,llgr=60,mode='enable')
 
         #self.set_gr_llgr(mode='disable')
@@ -273,9 +273,9 @@ class TestLlgrCtrl(TestLlgrBase):
         self.inputs.stop_service('contrail-control', [self.inputs.bgp_ips[1]], container='control')
 
         time.sleep(timeout)
- 
-        assert self.verify_gr_llgr_flags(flags=['Stale','LlgrStale'], vn_fix=self.vn_fix, prefix=self.vm2_fixture.vm_ip) 
-        assert self.verify_gr_llgr_flags(flags=['Stale','LlgrStale'], vn_fix=self.vn_fix, prefix=self.ipv6_addr) 
+
+        assert self.verify_gr_llgr_flags(flags=['Stale','LlgrStale'], vn_fix=self.vn_fix, prefix=self.vm2_fixture.vm_ip)
+        assert self.verify_gr_llgr_flags(flags=['Stale','LlgrStale'], vn_fix=self.vn_fix, prefix=self.ipv6_addr)
 
         self.inputs.start_service('contrail-control', [self.inputs.bgp_ips[1]], container='control')
 
@@ -308,7 +308,7 @@ class TestLlgrCtrl(TestLlgrBase):
 
         self.vm1_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=True,
             as_daemon=True, pidfile=self.pid_file)
-    
+
         self.ipv6_addr =  ''.join(self.vm2_fixture.get_vm_ips(vn_fq_name=self.vn_fix.vn_fq_name,af='v6'))
 
         cmd = 'ping6 %s -c %s -i 0.01 > %s' % (self.ipv6_addr,ping_count,self.result6_file)
@@ -321,7 +321,7 @@ class TestLlgrCtrl(TestLlgrBase):
         self.vm1_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=True,
             as_daemon=True, pidfile=self.pid6_file)
 
-        return True 
+        return True
 
     def verify_ping_stats(self):
 

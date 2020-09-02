@@ -22,7 +22,7 @@ class MulticastPolicyFixture(vnc_api_test.VncLibFixture):
         super(MulticastPolicyFixture, self).setUp()
         return self.create()
 
-    
+
     def create(self):
         if not self.uuid:
             try:
@@ -45,7 +45,7 @@ class MulticastPolicyFixture(vnc_api_test.VncLibFixture):
     def get_fq_name(self):
         return self.fq_name
 
-    
+
     def cleanUp(self):
         if (self.created == False or self.inputs.fixture_cleanup == 'no') and\
            self.inputs.fixture_cleanup != 'force':
@@ -70,4 +70,4 @@ if __name__ == "__main__":
         obj = MulticastPolicyFixture(name='test_policy',policy=pol1,connections=connections)
         obj.setUp()
         obj.cleanUp()
-      
+

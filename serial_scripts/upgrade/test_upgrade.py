@@ -7,7 +7,7 @@ from __future__ import absolute_import
 # Set the env variable PARAMS_FILE to point to your ini file. Else it will try to pick params.ini in PWD
 # Test to upgrade to new contrail version  from existing version usage :
 # fab run_sanity:upgrade,rpmfile
-from . import base 
+from . import base
 import re
 import time
 import os
@@ -31,12 +31,12 @@ from common.securitygroup.config import ConfigSecGroup
 import test
 from .verify import VerifyFeatureTestCases
 class UpgradeTestSanityWithResource(base.UpgradeBaseTest,VerifyFeatureTestCases):
-    
+
     @classmethod
     def setUpClass(cls):
         super(UpgradeTestSanityWithResource, cls).setUpClass()
         cls.res.setUp(cls.inputs , cls.connections, cls.logger)
-  
+
     @classmethod
     def tearDownClass(cls):
         cls.res.cleanUp()
@@ -45,24 +45,24 @@ class UpgradeTestSanityWithResource(base.UpgradeBaseTest,VerifyFeatureTestCases)
     def runTest(self):
         pass
     #end runTest
-    
+
     @test.attr(type=['upgrade'])
     @preposttest_wrapper
     def test_traffic_after_upgrade(self):
         '''Test to test traffic after upgrade using previouly defined  policy and floating ip and then adding new policy,fip to new resources also  validate service chaining in network  datapath and security group
         '''
         return self.verify_config_after_feature_test()
-        
-        
+
+
     @test.attr(type=['upgrade'])
     @preposttest_wrapper
     def test_fiptraffic_before_upgrade(self):
         ''' Test to create policy, security group  and floating ip rules on common resources and checking if they work fine
         '''
         return self.verify_config_before_feature_test()
-        
-        
-    @test.attr(type=['upgrade']) 
+
+
+    @test.attr(type=['upgrade'])
     @preposttest_wrapper
     def test_to_upgrade(self):
         '''Test to upgrade contrail software from existing build to new build and then rebooting resource vm's
@@ -147,5 +147,5 @@ class UpgradeTestSanityWithResource(base.UpgradeBaseTest,VerifyFeatureTestCases)
             run("rm -rf /opt/contrail/utils/fabfile/testbeds/testbed.py")
 
         return result
- 
+
     # end test_to_upgrade

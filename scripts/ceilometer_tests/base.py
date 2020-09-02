@@ -63,9 +63,9 @@ class ResourceFactory(object):
 
 
 class BaseResource(fixtures.Fixture):
-   
+
 #    __metaclass__ = Singleton
-     
+
     def setUp(self,inputs,connections,public_vn_obj):
         super(BaseResource , self).setUp()
         self.inputs = inputs
@@ -74,10 +74,10 @@ class BaseResource(fixtures.Fixture):
         self.setup_common_objects(self.inputs , self.connections)
 
     def cleanUp(self):
-        super(BaseResource, self).cleanUp() 
+        super(BaseResource, self).cleanUp()
 
     def setup_common_objects(self, inputs , connections):
-  
+
         self.inputs = inputs
         #self.inputs.set_af('dual')
         self.connections = connections
@@ -127,11 +127,11 @@ class BaseResource(fixtures.Fixture):
                     (self.inputs.project_name, fip_pool_name))
         project_obj = self.public_vn_obj.fip_fixture.deassoc_project\
                     (self.inputs.project_name)
-    
+
     #end setup_common_objects
 
 
-class CeilometerTestResource (BaseResource): 
+class CeilometerTestResource (BaseResource):
 
     def setUp(self,inputs,connections,public_vn_obj):
         super(CeilometerTestResource , self).setUp(inputs,connections,public_vn_obj)

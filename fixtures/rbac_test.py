@@ -9,7 +9,7 @@ class RbacFixture(vnc_api_test.VncLibFixture):
     :param uuid : UUID of the RBAC Acl
     :param parent_type : Parent type - one of project/domain/global-system-config (default: project)
     :param parent_fqname : fqname of the parent (default: derived from connections)
-    :param rules : rbac rules 
+    :param rules : rbac rules
                    eg: [{'rule_object': 'virtual_network',
                         'rule_field': 'route_target_list',
                         'perms': [{'role': 'admin', 'crud': 'CRUD'},

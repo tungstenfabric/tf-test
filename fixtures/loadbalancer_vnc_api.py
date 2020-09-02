@@ -177,7 +177,7 @@ class ServiceLbManager(LoadBalancerBase):
         vip_address = iip.get_instance_ip_address()
 
         return vmi, vip_address
-    
+
     def _delete_virtual_interface(self, vmi_list):
         if vmi_list is None:
             return
@@ -327,7 +327,7 @@ class ServiceLbListenerManager(LoadBalancerBase):
         if lb_obj:
             ll_obj.set_loadbalancer(lb_obj)
 
-        props = self.make_properties(**kwargs) 
+        props = self.make_properties(**kwargs)
         ll_obj.set_loadbalancer_listener_properties(props)
         if name:
             ll_obj.add_annotations(KeyValuePair(key=name, value=name))
@@ -426,8 +426,8 @@ class ServiceLbPoolManager(LoadBalancerBase):
     def delete(self, id):
         return self._api.loadbalancer_pool_delete(id=id)
 
-    def create(self, ll_obj, proj_obj, protocol, 
-               name=None,lb_algorithm=None, 
+    def create(self, ll_obj, proj_obj, protocol,
+               name=None,lb_algorithm=None,
                session_persistence=None,annotations=None):
         """
         Create a loadbalancer_pool object.
@@ -523,7 +523,7 @@ class ServiceLbMemberManager(LoadBalancerBase):
         Create a loadbalancer_member object.
         """
         lm_uuid = str(uuid.uuid4())
-        props = self.make_properties(**kwargs)    
+        props = self.make_properties(**kwargs)
         id_perms = IdPermsType(enable=True)
 
         member_obj = LoadbalancerMember(
@@ -549,7 +549,7 @@ class ServiceLbMemberManager(LoadBalancerBase):
         for k,v in props.items():
             if k in kwargs:
                 props[k]=kwargs.get(k)
-        props=self.make_properties(props)    
+        props=self.make_properties(props)
         member_obj.set_loadbalancer_member_properties(props)
         return self._api.loadbalancer_member_update(member_obj)
 
@@ -661,4 +661,4 @@ class ServiceLbHealthMonitorManager(LoadBalancerBase):
         props = self.make_properties(props)
         hm_obj.set_loadbalancer_healthmonitor_properties(props)
         return self._api.loadbalancer_healthmonitor_update(hm_obj)
-                
+

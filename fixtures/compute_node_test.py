@@ -535,8 +535,8 @@ class ComputeNodeFixture(fixtures.Fixture):
             if viewitems(reqd_entries) <= viewitems(flow_entry_item):
                 forward_flow = FlowEntry(flow_entry_item)
                 if flow_entry_item['rflow'] != '-1':
-                    reverse_flow_item = [x for x 
-                        in flow_table.items 
+                    reverse_flow_item = [x for x
+                        in flow_table.items
                         if x['index']==forward_flow.r_flow_index][0]
                     reverse_flow = FlowEntry(reverse_flow_item)
                     if all_flows:
@@ -582,7 +582,7 @@ class ComputeNodeFixture(fixtures.Fixture):
         ''' Read /etc/modprobe.d/vrouter.conf and return dict
         '''
         curr_params = {}
-        if not self.get_file(self.vrouter_conf_file, 
+        if not self.get_file(self.vrouter_conf_file,
             self.recd_vrouter_conf_file.name):
             return curr_params
 

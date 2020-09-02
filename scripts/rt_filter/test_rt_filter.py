@@ -69,7 +69,7 @@ class TestBasicRTFilter(BaseRtFilterTest):
                   1. Create a VM in a VN.
                   2. Add a route-target entry to the VN.
                   3. Check the rt_group and  bgp.rtarget.0 table on the control nodes.
-        Pass criteria: The system-defined, user-defined route target of the VN and the VM IP should 
+        Pass criteria: The system-defined, user-defined route target of the VN and the VM IP should
         be seen in the respective tables.
         Maintainer : ganeshahv@juniper.net
         '''

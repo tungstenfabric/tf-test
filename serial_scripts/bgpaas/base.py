@@ -44,7 +44,7 @@ class LocalASBase(test_v1.BaseTestCase_v1):
                                  image_name='cirros-traffic')
         bgpaas_vm1 = self.create_vm(
             vn_fixture, 'bgpaas_vm1', image_name=image_name)
-                
+
         assert test_vm.wait_till_vm_is_up()
         assert bgpaas_vm1.wait_till_vm_is_up()
         ret_dict = {

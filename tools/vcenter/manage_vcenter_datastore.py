@@ -5,7 +5,7 @@ import sys
 import logging
 
 from common.contrail_test_init import ContrailTestInit
-from vcenter import VcenterOrchestrator 
+from vcenter import VcenterOrchestrator
 
 log = logging.getLogger(__name__)
 
@@ -22,17 +22,17 @@ def get_vcenter_server_details(inputs):
     vcenter['port'] = inputs.vcenter_port
     vcenter['user'] = inputs.vcenter_username
     vcenter['password'] = inputs.vcenter_password
-    return VcenterInfo(vcenter) 
+    return VcenterInfo(vcenter)
 
 def main():
     init_obj = ContrailTestInit(sys.argv[1])
     if init_obj.inputs.vcenter_gw_setup or (init_obj.inputs.orchestrator == 'vcenter'):
         vcenter=get_vcenter_server_details(init_obj.inputs)
-        vcenter_orch = VcenterOrchestrator(init_obj.inputs, vcenter.server, 
-                                           vcenter.port, vcenter.user, 
-                                           vcenter.password, 
+        vcenter_orch = VcenterOrchestrator(init_obj.inputs, vcenter.server,
+                                           vcenter.port, vcenter.user,
+                                           vcenter.password,
                                            init_obj.inputs.vcenter_dc,
-                                           logger = log 
+                                           logger = log
                                            )
         if sys.argv[2] == 'delete':
             vcenter_orch._nfs_ds.delete_datastore()

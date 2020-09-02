@@ -197,7 +197,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         fq_name = [domain_name , project_name]
         return self.useFixture(HbsFixture(
                                connections=self.connections,
-                               name=name, 
+                               name=name,
                                fqname=fq_name,
                                namespace=namespace))
     # end create_Hbs_Object
@@ -236,7 +236,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                         labels=None,
                         spec=None,
                         custom_isolation = False,
-			compute_node_selector = None,
+                        compute_node_selector = None,
                         fq_network_name = {}):
         '''
         Noticed that nginx continues to listen on port 80 even if target port
@@ -882,7 +882,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         '''
         A helper method to create a daemonset
 
-        Ref https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1DaemonSet.md 
+        Ref https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1DaemonSet.md
 
         '''
         metadata = metadata or {}
@@ -1129,7 +1129,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         vn_name = vn_name or get_random_name('vn_test')
         return self.useFixture(VNFixture(
                                         connections=connections,
-					project_name=project_name,
+                                        project_name=project_name,
                                         inputs=inputs,
                                         vn_name=vn_name,
                                         option=option))
@@ -1334,7 +1334,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                                  ip_fabric_forwarding=False,
                                  **kwargs):
         name = name or get_random_name('nad')
-        metadata =  {} 
+        metadata =  {}
         spec = {}
         metadata["annotations"]={}
         spec["config"]={}
@@ -1403,7 +1403,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
 
     def verify_daemonset_status(self, namespace=''):
         '''
-        Returns 
+        Returns
            True, if Desired and available are same for all daemonsets
            False, otherwise
         '''

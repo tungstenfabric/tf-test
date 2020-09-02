@@ -10,10 +10,10 @@ class PortProfileFixture(vnc_api_test.VncLibFixture):
     :param action : one of 'shutdown'
     :param recovery_timeout : timeout in seconds to recover the interface from shutdown state
     :param bandwidth : value in int, when to raise the alarm (1-100)
-    :param no_unicast : 
-    :param no_multicast : 
-    :param no_unknown_unicast : 
-    :param no_registered_multicast : 
+    :param no_unicast :
+    :param no_multicast :
+    :param no_unknown_unicast :
+    :param no_registered_multicast :
     :param no_unregistered_multicast :
     '''
     def __init__(self, *args, **kwargs):

@@ -34,7 +34,7 @@ class TestBasicVMVN0(BaseVnVmTest):
     @classmethod
     def tearDownClass(cls):
         super(TestBasicVMVN0, cls).tearDownClass()
-    
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_bring_up_vm_with_control_node_down(self):
@@ -126,8 +126,8 @@ class TestBasicVMVN0(BaseVnVmTest):
         for entry in self.inputs.compute_ips:
             inspect_h = self.agent_inspect[entry]
             self.logger.info('Checking VN info in agent %s.' % (entry))
-            if inspect_h.get_vna_vn(domain=self.project.domain_name, 
-                           project=self.project.project_name, 
+            if inspect_h.get_vna_vn(domain=self.project.domain_name,
+                           project=self.project.project_name,
                            vn_name=vn1_fixture.vn_name):
                 self.logger.error(
                     'Agent should not have any VN info present when control node is down')
@@ -154,7 +154,7 @@ class TestBasicVMVN0(BaseVnVmTest):
         return True
 
     # end test_bring_up_vm_with_control_node_down
-    
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_ipam_persistence_across_restart_reboots(self):
@@ -204,7 +204,7 @@ class TestBasicVMVN0(BaseVnVmTest):
         assert vm2_fixture.verify_on_setup(), msg
         assert vm1_fixture.ping_with_certainty(vm2_fixture.vm_ip)
         return True
-    
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_multistep_vm_add_delete_with_stop_start_service(self):
@@ -260,7 +260,7 @@ class TestBasicVMVN0(BaseVnVmTest):
 
         return True
     # end test_multistep_vm_add_delete_with_stop_start_service
-    
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_multistep_vm_delete_with_stop_start_service(self):
@@ -305,7 +305,7 @@ class TestBasicVMVN0(BaseVnVmTest):
             sleep(10)
         return True
     # end test_multistep_vm_delete_with_stop_start_service
-    
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter')
     def test_nova_com_sch_restart_with_multiple_vn_vm(self):
@@ -361,7 +361,7 @@ class TestBasicVMVN0(BaseVnVmTest):
         except:
             result=False
         return result
-    
+
     @test.attr(type=['cb_sanity', 'sanity'])
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
@@ -390,7 +390,7 @@ class TestBasicVMVN0(BaseVnVmTest):
             },
         ]
         rev_rules = [
-            {  
+            {
                 'direction': '<>', 'simple_action': 'pass',
                 'protocol': 'icmp',
                 'source_network': vn2_name,
@@ -403,7 +403,7 @@ class TestBasicVMVN0(BaseVnVmTest):
                 connections=self.connections))
         policy2_fixture = self.useFixture(
             PolicyFixture(
-                policy_name=policy2_name, 
+                policy_name=policy2_name,
                 rules_list=rev_rules, inputs=self.inputs,
                 connections=self.connections))
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets, option='contrail')
@@ -473,7 +473,7 @@ class TestBasicVMVN0(BaseVnVmTest):
         assert vm3_fixture.ping_with_certainty(vm4_fixture.vm_ip)
 
 # end test_process_restart_in_policy_between_vns
-    
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_process_restart_with_multiple_vn_vm(self):
@@ -511,13 +511,13 @@ class TestBasicVMVN0(BaseVnVmTest):
             if vm_host_ip not in compute_ip:
                 compute_ip.append(vm_host_ip)
         self.inputs.restart_service('contrail-vrouter-agent', compute_ip,
-									container='agent')
+                                    container='agent')
         sleep(50)
         for vmobj in list(vm_fixture.vm_obj_dict.values()):
             assert vmobj.verify_on_setup()
         return True
     #end test_process_restart_with_multiple_vn_vm
-    
+
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter',address_family = 'v6')
     def test_kill_service_verify_core_generation(self):
@@ -591,7 +591,7 @@ class TestBasicVMVN0(BaseVnVmTest):
             output = self.inputs.run_cmd_on_server(login_ip,cmd1,login_user,
                                                    login_pwd,container=container)
             cmd_list_cores = "ls -lrt /var/crashes/core.*%s*" % (pid)
-            
+
             sleep(10)
             output =  self.inputs.run_cmd_on_server(login_ip,cmd_list_cores,login_user,
                                                    login_pwd,container=container)
@@ -837,7 +837,7 @@ class TestBasicVMVN0(BaseVnVmTest):
         num_flows = vm_flow_limit + 30
         interval = 'u10000'
         proto = 'udp'
-        # Try UDP echo 
+        # Try UDP echo
         dest_port = 7
 
         hping_h = Hping3(vm1_fixture, vm2_fixture.vm_ip,
@@ -872,8 +872,8 @@ class TestBasicVMVN0(BaseVnVmTest):
         ''' Test the underlay brocast traffic handling by vrouter. (Bug-1545229).
             1. Send broadcast traffic from one compute node.
             2. Other compute in same subnet should receive that traffic.
-            3. Receiving compute should treat this traffic as underlay. 
-            4. Compute should not replicate the packet and send the copy back.  
+            3. Receiving compute should treat this traffic as underlay.
+            4. Compute should not replicate the packet and send the copy back.
         Pass criteria: Step 3-4 should pass
         Maintainer : chhandak@juniper.net
         '''
@@ -882,7 +882,7 @@ class TestBasicVMVN0(BaseVnVmTest):
                 "Skipping Test. At least 2 compute node required to run the test")
         result = True
 
-        # Find ignore brocast exiting value 
+        # Find ignore brocast exiting value
         ignore_broadcasts={}
         cmd='cat /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts'
         for item in self.inputs.compute_ips:
@@ -891,7 +891,7 @@ class TestBasicVMVN0(BaseVnVmTest):
                 self.inputs.host_data[item]['username'],
                 self.inputs.host_data[item]['password'])
 
-        # Set ignore brocast to false 
+        # Set ignore brocast to false
         cmd='echo "0" > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts'
         for item in self.inputs.compute_ips:
             self.inputs.run_cmd_on_server(
@@ -940,7 +940,7 @@ class TestBasicVMVN0(BaseVnVmTest):
                 self.inputs.host_data[item]['password'],
                 container='agent')
         sleep(5)
-        
+
         # Stop tcpdump
         stop_tcpdump_for_intf(session, pcap, self.logger)
 
@@ -958,9 +958,9 @@ class TestBasicVMVN0(BaseVnVmTest):
         self.logger.info(
             'Packet count matched: Compute %s has receive only %s packet from source IP %s.\
                                       No duplicate packet seen' %(compute_ip, packet_count, broadcast_address))
-        return result 
+        return result
 
-    # end test_underlay_brodcast_traffic_handling 
+    # end test_underlay_brodcast_traffic_handling
 
 # end TestBasicVMVN0
 
@@ -1083,7 +1083,7 @@ echo "Hello World.  The time is now $(date -R)!" | tee /tmp/output.txt
                     result = False
         assert result
         return True
-    #end metadata_service_test 
+    #end metadata_service_test
 
     @preposttest_wrapper
     @skip_because(orchestrator = 'vcenter', metadata_ssl = 'False')

@@ -19,11 +19,11 @@ class BaseMirrorTest(test_v1.BaseTestCase_v1):
     @classmethod
     def tearDownClass(cls):
         super(BaseMirrorTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
-    def remove_from_cleanups(self, fix):                                                                                                                                                                                                                                     
-        for cleanup in self._cleanups:                                                                                                                                                                                                                                       
-            if fix in cleanup:                                                                                                                                                                                                                                       
-                self._cleanups.remove(cleanup)                                                                                                                                                                                                                               
-                break                                                                                                                                                                                                                                                        
-    #end remove_from_cleanups                                                                                                                                                                                                                                          
+    def remove_from_cleanups(self, fix):
+        for cleanup in self._cleanups:
+            if fix in cleanup:
+                self._cleanups.remove(cleanup)
+                break
+    #end remove_from_cleanups

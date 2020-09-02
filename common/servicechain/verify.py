@@ -4,15 +4,15 @@ import sys
 from time import sleep
 
 import fixtures
-import testtools                                                                                                                                                                                                                            
-import unittest                                                                                                                                                                                                                           
-import types                                                                                                                                                                                                                                
+import testtools
+import unittest
+import types
 import time
 trafficdir = os.path.join(os.path.dirname(__file__), '../../tcutils/pkgs/Traffic')
 sys.path.append(trafficdir)
 from tcutils.util import retry
 from tcutils.commands import ssh
-from traffic.core.stream import Stream                                                                                                                                                                                                      
+from traffic.core.stream import Stream
 from traffic.core.profile import StandardProfile, ContinuousProfile, ContinuousSportRange
 from traffic.core.helpers import Host, Sender, Receiver
 from common.servicechain.config import ConfigSvcChain
@@ -140,8 +140,8 @@ class VerifySvcChain(ConfigSvcChain):
         1]. Get a list of all RIs associted with the VN.
         2]. On the compute node housing the SI, get all the VRFs.
         3]. See if any one of the RIs match the VRF on the node.
-        4]. Get the paths in that VRF and the next-hop to the destination.  
-        5]. The src is required because for Transparent SIs, the left and right VNs 
+        4]. Get the paths in that VRF and the next-hop to the destination.
+        5]. The src is required because for Transparent SIs, the left and right VNs
             are different from those in the Service Chain.
         '''
         if si.svc_template.get_service_template_properties().service_type == 'analyzer':

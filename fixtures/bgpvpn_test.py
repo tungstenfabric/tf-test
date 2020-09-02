@@ -47,7 +47,7 @@ class BgpvpnFixture(fixtures.Fixture):
     def associate_bgpvpn_to_LR(self, lr_obj):
         lr_obj.add_bgpvpn(self.bgpvpn_obj)
         self.vnc_lib.logical_router_update(lr_obj)
-  
+
     def update_bgpvpn_mode(self, route_target=[]):
         self.bgpvpn_obj.set_route_target_list(RouteTargetList(route_target))
         self.vnc_lib.bgpvpn_update(bgpvpn)
@@ -63,7 +63,7 @@ class BgpvpnFixture(fixtures.Fixture):
     def update_rt(self, rt=[]):
         self.bgpvpn_obj.set_route_target_list(RouteTargetList(rt))
         self.vnc_lib_h.bgpvpn_update(self.bgpvpn_obj)
- 
+
     @retry(delay=1, tries=10)
     def verify_route_target_in_control(self, vn_fixture, vm_fixture, prefix = '', search_value = ''):
         search_in_cn = prefix

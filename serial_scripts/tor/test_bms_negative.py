@@ -52,6 +52,6 @@ class TestBMSNegative(BaseTorTest):
 
         assert result, 'Port with lif attached was allowed to be deleted'
     # end test_vmi_delete_when_lif_bound
-        
+
 
 

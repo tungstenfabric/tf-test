@@ -1343,7 +1343,7 @@ class TestECMP(testtools.TestCase, ResourcedTestCase, fixtures.TestWithFixtures)
             rx_vm_node_ip[vm] = self.inputs.host_data[
                 self.nova_h.get_nova_host_of_vm(vm.vm_obj)]['host_ip']
             rx_local_host[vm] = Host(
-                rx_vm_node_ip[vm], 
+                rx_vm_node_ip[vm],
                 self.inputs.host_data[vm.vm_node_ip]['username'],
                 self.inputs.host_data[vm.vm_node_ip]['password'])
             recv_host[vm] = Host(vm.local_ip, vm.vm_username, vm.vm_password)

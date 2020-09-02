@@ -94,7 +94,7 @@ class LBBaseFixture(vnc_api_test.VncLibFixture):
             except Exception as e:
                 #Api server object
                 self.lb_uuid = obj[0]['uuid'] if obj else None
-                
+
         if self.lb_uuid:
             self.lb_present = True
         else:
@@ -1098,8 +1098,8 @@ class LBaasV2Fixture(LBBaseFixture):
                    self.vip_ip == frontend['address'] and \
                    (self.vip_protocol.lower() == frontend['protocol']
                    or (self.vip_protocol.lower() == 'terminated_https'
-                   and frontend['protocol'] == 'http') or 
-                   (self.vip_protocol.lower() == 'https' and 
+                   and frontend['protocol'] == 'http') or
+                   (self.vip_protocol.lower() == 'https' and
                    frontend['protocol'] == 'tcp')) and \
                    self.vip_port == frontend['port']:
                    if self.pool_uuid:
@@ -1113,7 +1113,7 @@ class LBaasV2Fixture(LBBaseFixture):
             retval = False
             for backend in haproxy_dict['backends'] or []:
                 if self.pool_uuid == backend['uuid'] and \
-                    (self.pool_protocol.lower() == backend['protocol'] or 
+                    (self.pool_protocol.lower() == backend['protocol'] or
                     self.pool_protocol.lower() == 'https' and backend['protocol'] == 'tcp'):
                     if mappings[self.pool_algorithm] != backend['lb_method']:
                         break

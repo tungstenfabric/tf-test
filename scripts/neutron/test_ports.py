@@ -581,12 +581,12 @@ class TestPorts(BaseNeutronTest):
         and "instance_ip_secondary" is set True for 2nd Instance IP, 1st Instance IP
         should act as native IP of VM. This script verifies following bug:
         https://bugs.launchpad.net/juniperopenstack/+bug/1645414
-        
+
         Create a VN.
         Create a VMI/Port and add set "instance_ip_secondary" = False.
         This will result in 2 instances getting created and attached to same VMI.
         1 IIP Primary and 2nd IIP as Secondary.
-        Create a VM using that port and verify that IP from primary IIP gets assigned by DHCP 
+        Create a VM using that port and verify that IP from primary IIP gets assigned by DHCP
         '''
         vn1_name = get_random_name('vn1')
         vn1_subnet = get_random_cidr()
@@ -613,7 +613,7 @@ class TestPorts(BaseNeutronTest):
         else:
             assert False, "VM Ip is none among any IIP"
     # end test_ports_secondary_ip_attach
- 
+
     @preposttest_wrapper
     def test_shutoff_vm_route_withdrawal(self):
         '''Test shutdown of VM using nova command and correponfing route withdrawal.
@@ -939,13 +939,13 @@ class TestPorts(BaseNeutronTest):
         assert self.verify_vrrp_action(vm_test_fixture, vm2_fixture, vIP)
 
     # end test_aap_with_vrrp_priority_change
-    
+
     @preposttest_wrapper
     def test_zombie_tap_interface(self):
         '''Test Zombie Tap-interface
             create vn,vm and port
             delete the port
-            check whether still tap-interface present or not''' 
+            check whether still tap-interface present or not'''
         result = True
         vn1_name = get_random_name('vn1')
         vm1_name = get_random_name('vm1')
@@ -973,7 +973,7 @@ class TestPorts(BaseNeutronTest):
     def test_aap_active_active_mode(self):
         '''
         Verify AAP in active-active mode
-            1. Launch 2 vms on same virtual network. 
+            1. Launch 2 vms on same virtual network.
             2. Configure AAP between the two ports in active-active mode.
             3. Launch a test VM in the same network.
             4. Create a alias on both the VMs for the vIP.
@@ -1036,8 +1036,8 @@ class TestPorts(BaseNeutronTest):
         5. Ping to the vIP and FIP should be answered by the AAP active port.
         6. Cause a keepalived mastership switchover.
         7. The vIP and FIP should still be accessible via the new VRRP master.
-        
-	Maintainer: ganeshahv@juniper.net
+
+    Maintainer: ganeshahv@juniper.net
         '''
 
         self.logger.info('Create a FVN. Create a FIP-Pool and FIP')
@@ -1121,22 +1121,22 @@ class TestPorts(BaseNeutronTest):
             'Ping to the Floating IP %s from the test VM  %s failed' % (fIP[0],
                                                 fvn_vm_fixture.vm_ip)
 
-    # end test_aap_with_fip  
+    # end test_aap_with_fip
 
     @test.attr(type=['cb_sanity', 'sanity'])
     @preposttest_wrapper
     def test_aap_with_zero_mac(self):
         '''
         Verify  VIP reachability over L2 network when AAP MAC is configured with all zeo
-            1. Launch 2 vms on same virtual network. 
+            1. Launch 2 vms on same virtual network.
             2. Configure high availability between them with keepalived.
-            3. Launch third VM in same VM. 
+            3. Launch third VM in same VM.
             4. Check the reachability of VIP from 3rd VM.
-            5. Shutdown keepalive in master VM to induce VIP  switch over.  
+            5. Shutdown keepalive in master VM to induce VIP  switch over.
             6. Check the reachability of VIP from 3rd VM again.
             7. Bring back master VM which will cause switchover of VIP again.
             8. Check the reachability of VIP from 3rd VM again.
-                
+
         Pass criteria: Step 4,6 and 8 should pass
         Maintainer: chhandak@juniper.net
         '''
@@ -1194,7 +1194,7 @@ class TestPorts(BaseNeutronTest):
         assert vm_test_fixture.ping_with_certainty(vIP), ''\
             'Ping to the Virtual IP %s from the test VM  %s, failed' % (vIP,
                                                 vm_test_fixture.vm_ip)
-    # end test_aap_with_zero_mac  
+    # end test_aap_with_zero_mac
 
     @test.attr(type=['sanity', 'vcenter_compute'])
     @preposttest_wrapper

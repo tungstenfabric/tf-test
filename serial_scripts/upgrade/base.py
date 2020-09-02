@@ -7,7 +7,7 @@ from common import isolated_creds
 from .verify import BaseResource
 
 class UpgradeBaseTest(test_v1.BaseTestCase_v1):
-    
+
     @classmethod
     def setUpClass(cls):
         super(UpgradeBaseTest, cls).setUpClass()
@@ -26,7 +26,7 @@ class UpgradeBaseTest(test_v1.BaseTestCase_v1):
         cls.res.cleanUp()
         super(UpgradeBaseTest, cls).tearDownClass()
     #end tearDownClass
-    
+
 class ResourceFactory(object):
     factories = {}
     def createResource(id):

@@ -223,7 +223,7 @@ class PortFixture(vnc_api_test.VncLibFixture):
 
     def cleanUp(self, force=False):
         if self.created or force:
-            try: 
+            try:
                 if self.api_type == 'neutron':
                     self._neutron_delete_port()
                 else:

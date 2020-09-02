@@ -53,8 +53,8 @@ class SmgrFixture(fixtures.Fixture):
     '''
 
     def __init__(self, inputs, testbed_py="./testbed.py",
-	 smgr_config_ini="./smgr_input.ini", 
-	test_local=False,logger = None):
+            smgr_config_ini="./smgr_input.ini",
+            test_local=False,logger = None):
         self.testbed_py = testbed_py
         self.testbed = self.get_testbed()
         self.smgr_config_ini = smgr_config_ini
@@ -106,9 +106,9 @@ class SmgrFixture(fixtures.Fixture):
     # end modify_server_json
 
     def update_roles_from_testbed_py(self, server_dict):
-        ''' This will update the dict corresponding to server.json with 
+        ''' This will update the dict corresponding to server.json with
             the roles mentioned in testbed.roledefs. It will seamlessly integrate
-            Server Manager with legacy method where a user has to edit testbed.py only. '''              
+            Server Manager with legacy method where a user has to edit testbed.py only. '''
 
         testbed = self.testbed
         if 'roledefs' not in testbed.env:
@@ -149,7 +149,7 @@ class SmgrFixture(fixtures.Fixture):
         for node in testbed.env.roledefs['all']:
             if node not in test_node:
                 remaining_node += node
-        return remaining_node 
+        return remaining_node
     # end get_remaining_node_from_testbed_py
 
     def delete_cluster_id_based(self, test_cluster_id=None):
@@ -179,7 +179,7 @@ class SmgrFixture(fixtures.Fixture):
         server_dict = self.get_server_with_ip_from_db(ip)
         server_id = server_dict['server'][0]['id']
         self.delete_server_id_based(server_id)
-        
+
     # end delete_server
 
     def provision_server(self, node):
@@ -197,7 +197,7 @@ class SmgrFixture(fixtures.Fixture):
                result = result and False
             run('server-manager status server --server_id %s' %server_id)
         return result
-        
+
     # end provision_server
 
     def delete_compute_node(self):
@@ -213,7 +213,7 @@ class SmgrFixture(fixtures.Fixture):
         return test_node
     # end delete_compute_node
 
-    
+
     def update_bond_from_testbed_py(self, server_dict):
         testbed = self.testbed
         if 'control_data' in dir(testbed):
@@ -320,7 +320,7 @@ class SmgrFixture(fixtures.Fixture):
                                   {
                                       "id" : "",
                                       "parameters" : {
-    
+
                                           }
                                   }
                               ]
@@ -1113,7 +1113,7 @@ class SmgrFixture(fixtures.Fixture):
             if not(restart_only):
                 if "reimage queued" not in output:
                     self.logger.error("Reimage command was not successfull")
-            
+
         if restart_only:
             expected_status = "restart_issued"
             expected_wait = RESTART_WAIT
@@ -1277,7 +1277,7 @@ class SmgrFixture(fixtures.Fixture):
         if not self.verify_contrail_status(skip_node=test_node):
             result = result and False
 
-        #restoring all will re-add compute node 
+        #restoring all will re-add compute node
         self.add_server()
         remaining_node = self.get_remaining_node_from_testbed_py(test_node)
         if no_reimage_pkg:
@@ -1371,7 +1371,7 @@ class SmgrFixture(fixtures.Fixture):
         return result
     #end verify_server_status
 
-    # Install server manager and start the service provided the SM 
+    # Install server manager and start the service provided the SM
     # installer file path is specified.
     def install_sm(self, SM_installer_file_path=None):
         """Install Server Manager Server and verify it's running."""
@@ -1520,7 +1520,7 @@ class SmgrFixture(fixtures.Fixture):
             self.logger.error("Test test_list_servers_using_tag FAILED")
             return False
         return True
-    #end add_tag_and_verify_server_listing 
+    #end add_tag_and_verify_server_listing
 
 # end SmgrFixture
 

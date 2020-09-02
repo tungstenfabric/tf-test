@@ -14,8 +14,8 @@ class KeystoneCommands(object):
     '''Handle all tenant managements'''
 
     def __init__(self, username=None, password=None, tenant=None,
-                 domain_name=None, auth_url=None, insecure=True, region_name=None,
-		 cert=None, key=None, cacert=None, version=None, logger=None, scope='domain'):
+                domain_name=None, auth_url=None, insecure=True, region_name=None,
+                cert=None, key=None, cacert=None, version=None, logger=None, scope='domain'):
         self.sessions = dict()
         self.logger = logger or contrail_logging.getLogger(__name__)
         self.auth_url = auth_url
@@ -58,7 +58,7 @@ class KeystoneCommands(object):
                                            domain_name=domain_name,
                                            user_domain_name=self.domain_name,
                                            project_domain_name=project_domain_name)
-            
+
         self.sessions[scope] = ks_session.Session(auth=self.auth,
             verify=not self.insecure if self.insecure else self.cacert,
             cert=(self.cert, self.key))
@@ -91,14 +91,14 @@ class KeystoneCommands(object):
             if (x.name == tenant_name):
                 return x
         return None
-    
+
     def get_group_dct(self,group_name):
         all_groups = self.group_list()
         for x in all_groups:
             if (x.name == group_name):
                 return x
         return None
-    
+
     def find_domain(self, domain_name):
         return self.keystone.domains.find(name=domain_name)
 
@@ -130,7 +130,7 @@ class KeystoneCommands(object):
             return get_dashed_uuid(self.keystone.projects.create(name=project_name, domain=domain).id)
         else:
             return get_dashed_uuid(self.keystone.tenants.create(project_name).id)
- 
+
     def delete_project(self, name, obj=None):
         if self.version == '3':
             if not obj:
@@ -196,7 +196,7 @@ class KeystoneCommands(object):
         tenant = self.get_tenant_dct(tenant)
         if self.version == '3':
             self.keystone.roles.grant(role, user=None, group=group, project=tenant)
-    
+
     def remove_user_from_domain(self, user, role, domain):
         user = self.get_user_dct(user)
         role = self.get_role_dct(role)
@@ -212,14 +212,14 @@ class KeystoneCommands(object):
             self.keystone.roles.revoke(role, user=user, project=tenant)
         else:
             self.keystone.tenants.remove_user(tenant, user, role)
-    
+
     def remove_group_from_domain(self, group, role, domain=None):
         group = self.get_group_dct(group)
         role = self.get_role_dct(role)
         if self.version == '3':
             domain=self.find_domain(domain)
             self.keystone.roles.revoke(role, user=None, group=group, domain=domain)
-    
+
     def remove_group_from_tenant(self,tenant, group, role):
         group = self.get_group_dct(group)
         role = self.get_role_dct(role)
@@ -232,7 +232,7 @@ class KeystoneCommands(object):
             return self.keystone.projects.list()
         else:
             return self.keystone.tenants.list()
-    
+
     def group_list(self,):
         return self.keystone.groups.list()
 
@@ -291,7 +291,7 @@ class KeystoneCommands(object):
             self.keystone.users.delete(user)
             return True
         except ks_exceptions.ClientException as e:
-            # TODO Remove this workaround 
+            # TODO Remove this workaround
             if 'Unable to add token to revocation list' in str(e):
                 self.logger.warn('Exception %s while deleting user' % (
                                  str(e)))
@@ -352,11 +352,11 @@ class KeystoneCommands(object):
     def create_group(self,name,domain_name):
         domain=self.find_domain(domain_name)
         return self.keystone.groups.create(name=name, domain=domain)
-    
+
     def delete_group(self,name):
         domain=self.find_domain(domain_name)
         return self.keystone.groups.delete(name=name)
-    
+
     def add_user_to_group(self,user,group):
         user = self.get_user_dct(user)
         group = self.get_group_dct(group)

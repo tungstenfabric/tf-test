@@ -21,7 +21,7 @@ from compute_node_test import ComputeNodeFixture
 
 
 class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
-   
+
     setup_fixtures = {}
 
     DEFAULT_FLOW_TIMEOUT = 120
@@ -47,21 +47,21 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
     def test_max_flows_vn_level(self):
 
         '''
-        Description: 
+        Description:
                 Verify max_flows functionality at VN level
         Test steps:
                1.Create a vn1 and vn2
                2.configure max_flows as 1000 @ vn1
-               3.Launch  vm11, vm12 and vm13 on vn1 network 
-               4.Launch vm21 and vm22 on vn2 network 
+               3.Launch  vm11, vm12 and vm13 on vn1 network
+               4.Launch vm21 and vm22 on vn2 network
                5.Verify traffic between the VMs
-               6.send 2000 flows traffic from vm11 to vm12 , it should allow only 1000 flows 
-               7.send 2000 flows traffic from vm11 to vm13, it should all only 1000 flows 
-               8.Modify the max_flows value as 1500, verify traffic between vm11 and vm12 
+               6.send 2000 flows traffic from vm11 to vm12 , it should allow only 1000 flows
+               7.send 2000 flows traffic from vm11 to vm13, it should all only 1000 flows
+               8.Modify the max_flows value as 1500, verify traffic between vm11 and vm12
                9.send 2000 flows traffic from vm21 to vm22, it should allow all the traffic
                10.Delete the max_flows @ vn1 ( by setting the value as 0 )
                11.send 2000 flows traffic from vm11 to vm12 , it should allow all the traffic
-        Pass criteria: 
+        Pass criteria:
                Number of flows should be created as per max_flows configured at VN level.
                Other VNs should not be imapacted
                After deleting max_flows configuration, it should allow all the flows.
@@ -79,12 +79,12 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi21':{'vn': 'vn2'}, # VMI details
             'vmi22':{'vn': 'vn2'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':5, 
+        vm = {'count':5,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
@@ -93,18 +93,18 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
                 'vm22':{'vn':['vn2'], 'vmi':['vmi22'],'node': compute_nodes[1]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
         vn2_fix = vn_fixtures['vn2']
-        
+
         # Setting MAX Flows only on VN-1
         vn1_max_flows = 1000
         vn1_fix.set_max_flows(max_flows=vn1_max_flows)
 
         # Create VMIs
         vmi_fixtures = self.setup_vmis(vn_fixtures, vmi=vmi)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
@@ -112,14 +112,14 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vm13_fix = vm_fixtures['vm13']
         vm21_fix = vm_fixtures['vm21']
         vm22_fix = vm_fixtures['vm22']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
         vm21_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm22_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
 
-       
+
 
         self.logger.info("Verify Traffic within VMs in VN-1")
         send_vm_fixture = vm11_fix
@@ -140,13 +140,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("Sleeping for dns/metadata flows to timeout...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VN level 
+
+        # Verify Max_flows functionality on VN level
         #import pdb; pdb.set_trace()
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm12_fix.vm_ip), 
-                max_flows=vn1_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm12_fix.vm_ip),
+                max_flows=vn1_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count = self.get_total_flow_count(
@@ -167,7 +167,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
 
         self.waiting_for_flow_timeout()
-          
+
         # Source and Destination VMs part of the same Compute Node
         send_flow_count = self.send_traffic(
                 src=str(vm11_fix.vm_ip),
@@ -193,13 +193,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
         self.waiting_for_flow_timeout()
 
-        # Modifiy max flows to differnet values 
+        # Modifiy max flows to differnet values
         # Setting MAX Flows on VN-1
-        vn1_max_flows_new = vn1_max_flows + 500 
+        vn1_max_flows_new = vn1_max_flows + 500
         vn1_fix.set_max_flows(max_flows=vn1_max_flows_new)
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm12_fix.vm_ip), 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm12_fix.vm_ip),
                 max_flows=vn1_max_flows,
                 vm_fix=vm11_fix
                 )
@@ -219,10 +219,10 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         assert total_flow_count == vn1_max_flows_new, "VN level Max Flows is not working as per modified value"
 
 
-        # check other VN-2 should allow all the flows 
+        # check other VN-2 should allow all the flows
         send_flow_count = self.send_traffic(
-                src=str(vm21_fix.vm_ip), 
-                dst=str(vm22_fix.vm_ip), 
+                src=str(vm21_fix.vm_ip),
+                dst=str(vm22_fix.vm_ip),
                 max_flows=vn1_max_flows,
                 vm_fix=vm21_fix
             )
@@ -246,8 +246,8 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         # Reset the VN level Max flows to default value (0)
         vn1_fix.set_max_flows(max_flows=0)
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm12_fix.vm_ip), 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm12_fix.vm_ip),
                 max_flows=vn1_max_flows,
                 vm_fix=vm11_fix
                 )
@@ -296,7 +296,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         time.sleep(sleep_time)
         flow_count = dport_range[1]-dport_range[0]+1
         return flow_count
-   
+
 
     def get_total_flow_count(self,**kwargs):
         source_ip = kwargs.get('source_ip', None)
@@ -322,7 +322,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
                 proto='udp',
                 vrf_id=vrf_id
                 )
-        else:    
+        else:
             (ff_count, rf_count) = vrouter_fixture.get_flow_count(
                 flow_table=flow_table,
                 refresh=False,
@@ -353,28 +353,28 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("Meta Data Flow Count Forward: %d  Reverse: %d" % (ff_meta_ip, rf_meta_ip))
 
         total_flow_count = ff_count + rf_count + ff_dns_count + rf_dns_count + ff_meta_ip + rf_meta_ip
-        
+
         return total_flow_count
 
-        
+
     @preposttest_wrapper
     def test_max_flows_vmi_level(self):
 
         '''
-        Description: 
+        Description:
                 Verify max_flows functionality at VMI level
         Test steps:
                1.Create a virtual network (vn1)
-               2.Launch  vm11, vm12 and vm13 on vn1 network 
+               2.Launch  vm11, vm12 and vm13 on vn1 network
                3.Configure vmi level max_flows as 1000, 2000 and 3000 on vmi11, vmi12 and vmi13 respectively
                5.Verify traffic between the VMs
                6.send 2000 flows traffic from vm11 to vm13 , it should allow only 1000 flows @vmi11
                7.send 4000 flows traffic from vm12 to vm13, it should all only 2000 flows @vmi12
                8.Modify the max_flows value as 1500 @ vmi11
-               9.verify sending traffic between vm11 and vm13, now it should all 1500 flows  
+               9.verify sending traffic between vm11 and vm13, now it should all 1500 flows
                10.Delete the max_flows @ all VMIs ( by setting the value as 0 )
                11.send traffics across vm11, vm12 and vm13 , it should allow all the traffic
-        Pass criteria: 
+        Pass criteria:
                Number of flows should be created as per max_flows configured at VMI level.
                After modification, it should work as per modified value
                After deleting max_flows configuration, it should allow all the flows.
@@ -389,19 +389,19 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi12':{'vn': 'vn1'}, # VMI details
             'vmi13':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':3, 
+        vm = {'count':3,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 'vm13':{'vn':['vn1'], 'vmi':['vmi13'],'node': compute_nodes[0]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
@@ -420,18 +420,18 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi12_fix.set_max_flows(max_flows=vmi12_max_flows)
         vmi13_max_flows = 300
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
         vm13_vrouter_fixture = ComputeNodeFixture(self.connections, vm13_fix.vm_node_ip)
-       
+
 
         self.logger.info("Verify Traffic within VMs in VN-1")
         send_vm_fixture = vm11_fix
@@ -452,7 +452,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vm11_inspect = self.agent_inspect[vm11_fix.vm_node_ip]
         vm12_inspect = self.agent_inspect[vm12_fix.vm_node_ip]
         vm13_inspect = self.agent_inspect[vm13_fix.vm_node_ip]
-        
+
 
         vm11_tap_intf = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)
 
@@ -463,21 +463,21 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("drop_new_flows flag value @ vm12: %s " % (vm12_drop_new_flows))
         vm13_drop_new_flows = vm13_inspect.get_vna_tap_interface_by_ip(vm13_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm13: %s " % (vm13_drop_new_flows))
-        
+
         if vm11_drop_new_flows != 'false' and vm11_drop_new_flows != 'false' and vm13_drop_new_flows != 'false' :
             assert False, "drop_new_flows flag is set even before sending traffics..."
 
-            
+
         self.logger.info("Sleeping for dns/meta flows timeout seconds...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VMI level 
+
+        # Verify Max_flows functionality on VMI level
         #import pdb; pdb.set_trace()
         send_flow_count_vm11 = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
-                max_flows=vmi11_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
+                max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count_vm11 = self.get_total_flow_count(
@@ -516,8 +516,8 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
                 metadata_ip=str(vm13_fix.get_local_ip()),
                 vrouter_fixture=vm13_vrouter_fixture
             )
-        
-        
+
+
         self.logger.info("drop_new_flows flag values @ vifs after max_flows exceeds..")
         vm11_drop_new_flows = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm11: %s " % (vm11_drop_new_flows))
@@ -525,7 +525,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("drop_new_flows flag value @ vm12: %s " % (vm12_drop_new_flows))
         vm13_drop_new_flows = vm13_inspect.get_vna_tap_interface_by_ip(vm13_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm13: %s " % (vm13_drop_new_flows))
-        
+
         if vm11_drop_new_flows != 'true' and vm11_drop_new_flows != 'true' and vm13_drop_new_flows != 'true' :
             assert False, "drop_new_flows flag is NOT set even after max_flows execeeded.."
 
@@ -558,7 +558,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             self.logger.info("VMI level (vm13) Max Flows Provisioning is working fine")
         else:
             assert False, "VMI (vm13) level Provisioning is not working"
-            
+
         self.waiting_for_flow_timeout()
 
         self.logger.info("drop_new_flows flag values @ vifs after flows timedout...")
@@ -571,9 +571,9 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
         if vm11_drop_new_flows != 'false' and vm11_drop_new_flows != 'false' and vm13_drop_new_flows != 'false' :
             assert False, "drop_new_flows flag is set even after flows timedout..."
-        
 
-        # Modifiy max flows to differnet values 
+
+        # Modifiy max flows to differnet values
         # Setting MAX Flows on VMI 11
         vmi11_max_flows_new = vmi11_max_flows + 50
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows_new)
@@ -786,19 +786,19 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
     def test_max_flows_precedence(self):
 
         '''
-        Description: 
+        Description:
                 Verify precedence order between VMI level and VN level configuration
         Test steps:
                1.Create a virtaul network (vn1)
                2.Launch  vm11, vm12 and vm13 on vn1 network
                3.configure max_flows as 400 @ VN level (vn1)
                4.configure max_flows as 1000 and 2000 on VMIs ( vmi11 and vmi13) respectively
-               5.send traffic between vm11 and vm12 and it should allow only 1000 flows 
-               6.send traffic between vm12 and vm13 , it should all only 400 flows  
+               5.send traffic between vm11 and vm12 and it should allow only 1000 flows
+               6.send traffic between vm12 and vm13 , it should all only 400 flows
                7.Delete VMI level configuration @ vmi11 (max_flows=0)
                8.Now send traffic between vm11 and vm12 and it should allow only 400 flows
-        Pass criteria: 
-               VMI level is preferred when max_flows configured @ both VMI and VN level 
+        Pass criteria:
+               VMI level is preferred when max_flows configured @ both VMI and VN level
                After removing configration from VMI level, it should use VN level value
         Maintainer : mmohan@juniper.net
         '''
@@ -810,19 +810,19 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi12':{'vn': 'vn1'}, # VMI details
             'vmi13':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':3, 
+        vm = {'count':3,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 'vm13':{'vn':['vn1'], 'vmi':['vmi13'],'node': compute_nodes[0]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
@@ -841,17 +841,17 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vn1_fix.set_max_flows(max_flows=vn1_max_flows)
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
-       
+
 
         self.logger.info("Verify Traffic within VMs in VN-1")
         send_vm_fixture = vm11_fix
@@ -864,13 +864,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("Sleeping for dns/meta flows timeout seconds...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VMI level 
+
+        # Verify Max_flows functionality on VMI level
         #import pdb; pdb.set_trace()
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
-                max_flows=vmi11_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
+                max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count = self.get_total_flow_count(
@@ -888,10 +888,10 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             self.logger.info("VMI level Max Flows Provisioning is working fine")
 
         assert total_flow_count == vmi11_max_flows, "VMI level Max Flows Provisioning is not working"
-       
+
         send_flow_count = self.send_traffic(
-                src=str(vm12_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
+                src=str(vm12_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
                 max_flows=vmi11_max_flows,
                 vm_fix=vm12_fix
             )
@@ -916,8 +916,8 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         # Reset the VN level Max flows to default value (0)
         vmi11_fix.set_max_flows(max_flows=0)
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
                 max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
@@ -947,24 +947,24 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
     def test_max_flows_precedence_with_max_vm_flows(self):
 
         '''
-        Description: 
+        Description:
                 Verify precedence order between VMI level and VN level configuration
         Test steps:
                1.Create a virtaul network (vn1)
                2.Launch  vm11, vm12 and vm13 on vn1 network
                3.configure max_flows as 400 @ VN level (vn1)
                4.configure max_flows as 1000 and 2000 on VMIs ( vmi11 and vmi13) respectively
-               5.configure max_vm_flows as 0.02 @ vm11 (vm level) 
-               6.send traffic between vm11 and vm12 and it should allow only 1000 flows 
-               7.send traffic between vm12 and vm13 , it should all only 400 flows  
+               5.configure max_vm_flows as 0.02 @ vm11 (vm level)
+               6.send traffic between vm11 and vm12 and it should allow only 1000 flows
+               7.send traffic between vm12 and vm13 , it should all only 400 flows
                8.Delete VMI level configuration @ vmi11 (max_flows=0)
                9.Now send traffic between vm11 and vm12
                10.It should allow only 400 flows, as per VN level configuration
                11.Delete VN level configration @ vn1 (max_flows=0)
                12.Now send traffic between vm11 and vm12
                13.It should allow only ~120 flows, as per max_vm_flows configuration
-        Pass criteria: 
-               Precedence order:  VMI > VN > max_vm_flows 
+        Pass criteria:
+               Precedence order:  VMI > VN > max_vm_flows
                After removing configration from VMI level, it should use VN level value
                After removing VN level, it should use VM level ( max_vm_flows)
         Maintainer : mmohan@juniper.net
@@ -977,19 +977,19 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi12':{'vn': 'vn1'}, # VMI details
             'vmi13':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':3, 
+        vm = {'count':3,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 'vm13':{'vn':['vn1'], 'vmi':['vmi13'],'node': compute_nodes[0]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
@@ -1008,21 +1008,21 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vn1_fix.set_max_flows(max_flows=vn1_max_flows)
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
-       
+
 
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
 
-        vm11_vrouter_fixture.set_per_vm_flow_limit(0.02) 
+        vm11_vrouter_fixture.set_per_vm_flow_limit(0.02)
         #import pdb; pdb.set_trace()
-       
+
         self.logger.info("Sleeping for 360 secs...")
         time.sleep(360)
         self.logger.info("Sleeping for 360 secs...Completed")
@@ -1041,13 +1041,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("Sleeping for dns/meta flows timeout seconds...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VMI level 
+
+        # Verify Max_flows functionality on VMI level
         #import pdb; pdb.set_trace()
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
-                max_flows=vmi11_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
+                max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count = self.get_total_flow_count(
@@ -1065,10 +1065,10 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             self.logger.info("VMI level Max Flows Provisioning is working fine")
 
         assert total_flow_count == vmi11_max_flows, "VMI level Max Flows Provisioning is not working"
-       
+
         send_flow_count = self.send_traffic(
-                src=str(vm12_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
+                src=str(vm12_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
                 max_flows=vmi11_max_flows,
                 vm_fix=vm12_fix
             )
@@ -1093,8 +1093,8 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         # Reset the VN level Max flows to default value (0)
         vmi11_fix.set_max_flows(max_flows=0)
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
                 max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
@@ -1146,16 +1146,16 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
     def test_max_flows_vn_level_already_has_some_vmis(self):
 
         '''
-        Description: 
+        Description:
                 Verify max_flows functionality at VN which already has some VMIs
         Test steps:
                1.Create a virtaul network (vn1)
                2.Launch  vm11, vm12  vn1 network
                3.configure max_flows as 1000 @ vn1
-               4.send traffic between vm11 and vm12 and it should allow only 1000 flows 
-               4.Launch 1 more VM(vm13) on vn1 network 
+               4.send traffic between vm11 and vm12 and it should allow only 1000 flows
+               4.Launch 1 more VM(vm13) on vn1 network
                5.Verify traffic between the vm13 and vm12, it shouls allow only 1000 flows
-        Pass criteria: 
+        Pass criteria:
                Number of flows should be created as per max_flows configured at VN level.
         Maintainer : mmohan@juniper.net
         '''
@@ -1170,33 +1170,33 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi_3 = {'count':1, # VMI Count
             'vmi13':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':2, 
+        vm = {'count':2,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 }
-        vm_3 = {'count':1, 
+        vm_3 = {'count':1,
                 'launch_mode':'distribute',
                 'vm13':{'vn':['vn1'], 'vmi':['vmi13'],'node': compute_nodes[0]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
         # Create VMIs
         vmi_fixtures = self.setup_vmis(vn_fixtures, vmi=vmi)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
@@ -1216,13 +1216,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("Sleeping for dns/metadata flows to timeout 180 seconds...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VN level 
+
+        # Verify Max_flows functionality on VN level
         #import pdb; pdb.set_trace()
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm12_fix.vm_ip), 
-                max_flows=vn1_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm12_fix.vm_ip),
+                max_flows=vn1_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count = self.get_total_flow_count(
@@ -1243,7 +1243,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
         self.waiting_for_flow_timeout()
 
-          
+
         self.logger.info("Creating 1 more VM on the same VN....")
         # Create VMIs
         vmi_fixtures_3 = self.setup_vmis(vn_fixtures, vmi=vmi_3)
@@ -1286,20 +1286,20 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
     def test_drop_new_flows_flag(self):
 
         '''
-        Description: 
+        Description:
                Verify Drop new flows flag is set once flow count value exceeds max_flows
                and flag is set as false after flow count value reduces below 90% max_flows
         Test steps:
                1.Create a virtaul network (vn1)
                2.Launch VMs( vm11, vm12) on vn1 network
                3.configure max_flows as 1000 @ VMI (vmi11)
-               4.send traffic (2000 flows)  between vm11 and vm12 
+               4.send traffic (2000 flows)  between vm11 and vm12
                5.it should allow only 1000 flows and drop_new_flows should be set (true)
-               6.Keep sending 90% of flows @ every 60 seconds 
+               6.Keep sending 90% of flows @ every 60 seconds
                7.wait for flow timeout to happens
                8.drop_new_flows flag should be removed (False),onces flows reduces below <90%
-        Pass criteria: 
-               drop_new_flows flag should be set when flow rate exceeds max_flows 
+        Pass criteria:
+               drop_new_flows flag should be set when flow rate exceeds max_flows
                flag should be removed once number of flows reduces to <=90% of max_flows
         Maintainer : mmohan@juniper.net
         '''
@@ -1310,18 +1310,18 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi11':{'vn': 'vn1'}, # VMI details
             'vmi12':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':2, 
+        vm = {'count':2,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
@@ -1335,16 +1335,16 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         # Setting MAX Flows only on VMI 11
         vmi11_max_flows = 1000
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
-       
+
 
         self.logger.info("Verify Traffic within VMs in VN-1")
         send_vm_fixture = vm11_fix
@@ -1356,27 +1356,27 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
         #import pdb; pdb.set_trace()
         vm11_inspect = self.agent_inspect[vm11_fix.vm_node_ip]
-        
+
 
         vm11_tap_intf = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)
 
         self.logger.info("drop_new_flows flag values @ vifs before sending traffics...")
         vm11_drop_new_flows = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm11: %s " % (vm11_drop_new_flows))
-        
+
         if vm11_drop_new_flows != 'false':
             assert False, "drop_new_flows flag is set even before sending traffics..."
 
         self.logger.info("Sleeping for dns/meta flows timeout seconds...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VMI level 
+
+        # Verify Max_flows functionality on VMI level
         #import pdb; pdb.set_trace()
         send_flow_count_vm11 = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm12_fix.vm_ip), 
-                max_flows=vmi11_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm12_fix.vm_ip),
+                max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count_vm11 = self.get_total_flow_count(
@@ -1390,7 +1390,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("drop_new_flows flag values @ vifs after max_flows exceeds..")
         vm11_drop_new_flows = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm11: %s " % (vm11_drop_new_flows))
-        
+
         if vm11_drop_new_flows != 'true':
             assert False, "drop_new_flows flag is NOT set even after max_flows execeeded.."
 
@@ -1416,9 +1416,9 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
                 time.sleep(60)
                 flow_timeout = flow_timeout - 60
             send_flow_count_vm11 = self.send_traffic(
-                                         src=str(vm11_fix.vm_ip), 
-                                         dst=str(vm12_fix.vm_ip), 
-                                         max_flows=old_div(vmi11_max_flows_90_percentage,2), 
+                                         src=str(vm11_fix.vm_ip),
+                                         dst=str(vm12_fix.vm_ip),
+                                         max_flows=old_div(vmi11_max_flows_90_percentage,2),
                                          vm_fix=vm11_fix
                                          )
         total_flow_count_vm11 = self.get_total_flow_count(
@@ -1445,7 +1445,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
         if vm11_drop_new_flows != 'false':
             assert False, "drop_new_flows flag is set even after flowcount to reduces < 90% of max_flows"
-       
+
         self.waiting_for_flow_timeout()
 
         self.logger.info("drop_new_flows flag values @ vifs after all flows timed out...")
@@ -1457,12 +1457,12 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
 
 
-    
+
     @preposttest_wrapper
     def test_dropstats(self):
 
         '''
-        Description: 
+        Description:
            Verify VN max_flows with values as  -1
            Verify VMI max_flows with values as  -1
            Verify vrouter drop_stats are incremented properly after exceeding max_flows limit
@@ -1473,13 +1473,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
                3.Try configuring max_flows as -1 @ VN level
                4.Try configuring max_flows as -1 @ VMI level
                5.Configure VMI level max_flows as 1000 @ vmi11
-               4.send traffic (1000 flows)  between vm11 and vm12 
-               5.verify dropstats (New Flow Drops), it should not be increated 
+               4.send traffic (1000 flows)  between vm11 and vm12
+               5.verify dropstats (New Flow Drops), it should not be increated
                6.send traffic (2000 flows) between vm11 and vm12
-               7.verify dropstats (New Flow Drop), it should be increated 
+               7.verify dropstats (New Flow Drop), it should be increated
                8.clear dropstats values using dropstats --clear
                9.verify counter (New Flow Drop) value
-        Pass criteria: 
+        Pass criteria:
                It should NOT allow configuration of negative values (-1)
                dropstats(New Flow Drop) should not be incremented when flows are <= max_flows
                dropstats(New Flow Drop) should be incremented when flows are > max_flows
@@ -1493,18 +1493,18 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi11':{'vn': 'vn1'}, # VMI details
             'vmi12':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':2, 
+        vm = {'count':2,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
@@ -1516,8 +1516,8 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
         #import pdb; pdb.set_trace()
         # Setting MAX Flows only on VMI 11
-        
-        # Try configuring negative value @ VN level ... 
+
+        # Try configuring negative value @ VN level ...
         self.logger.info("Try Configuring negative value @ VN level ...")
         try:
             vn1_fix.set_max_flows(max_flows=-1)
@@ -1535,20 +1535,20 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             self.logger.info("Not able to configure negative value (-1) @ VMI level max_flows")
         else:
             assert False, self.logger.info("Able to configure negative value (-1) @ VMI level max_flows")
-             
+
 
         vmi11_max_flows = 1000
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
-       
+
 
         self.logger.info("Verify Traffic within VMs in VN-1")
         send_vm_fixture = vm11_fix
@@ -1566,12 +1566,12 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vm11_dropstats = vm11_inspect.get_agent_vrouter_drop_stats()
         vm11_drop_new_flow_before = int(vm11_dropstats['ds_drop_new_flow'])
         self.logger.info("New Flow Drops stats value before traffic @ %s :  %d" % (vm11_fix.vm_node_ip,vm11_drop_new_flow_before))
-        
+
 
         self.logger.info("drop_new_flows flag values @ vifs before sending traffics...")
         vm11_drop_new_flows = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm11: %s " % (vm11_drop_new_flows))
-        
+
         if vm11_drop_new_flows != 'false':
             assert False, "drop_new_flows flag is set even before sending traffics..."
 
@@ -1580,12 +1580,12 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
 
         vmi11_max_flows_exact = (old_div(vmi11_max_flows,2))-10
-        # Verify Max_flows functionality on VMI level 
+        # Verify Max_flows functionality on VMI level
         #import pdb; pdb.set_trace()
         send_flow_count_vm11 = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm12_fix.vm_ip), 
-                max_flows=vmi11_max_flows_exact, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm12_fix.vm_ip),
+                max_flows=vmi11_max_flows_exact,
                 vm_fix=vm11_fix
                 )
         total_flow_count_vm11 = self.get_total_flow_count(
@@ -1599,7 +1599,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("drop_new_flows flag values @ vifs after max_flows exceeds..")
         vm11_drop_new_flows = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm11: %s " % (vm11_drop_new_flows))
-        
+
         if vm11_drop_new_flows != 'false':
             assert False, "drop_new_flows flag is set even before max_flows execeeded.."
 
@@ -1619,8 +1619,8 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vm11_dropstats = vm11_inspect.get_agent_vrouter_drop_stats()
         vm11_drop_new_flow_after = int(vm11_dropstats['ds_drop_new_flow'])
         self.logger.info("New Flow Drops stats value after traffic @ %s :  %d" % (vm11_fix.vm_node_ip,vm11_drop_new_flow_after))
-        
-        if vm11_drop_new_flow_before == vm11_drop_new_flow_after: 
+
+        if vm11_drop_new_flow_before == vm11_drop_new_flow_after:
             self.logger.info("Dropstats for 'New Flow Drops' is not incremented when num of flows <= max_flows")
         else:
             assert False, "Dropstats for 'New Flow Drops' is incremented when num of flows <= max_flows"
@@ -1658,7 +1658,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("drop_new_flows flag values @ vifs after max_flows exceeds..")
         vm11_drop_new_flows = vm11_inspect.get_vna_tap_interface_by_ip(vm11_fix.vm_ip)[0]['drop_new_flows']
         self.logger.info("drop_new_flows flag value @ vm11: %s " % (vm11_drop_new_flows))
-        
+
         if vm11_drop_new_flows != 'true':
             assert False, "drop_new_flows flag is NOT set even after max_flows execeeded.."
 
@@ -1681,7 +1681,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         else:
             assert False, "Dropstats for 'New Flow Drops' is NOT incremented when num of flows exceeds max_flows"
 
-        # Verify clearing drop stats 
+        # Verify clearing drop stats
 
         vm11_dropstats = vm11_inspect.get_agent_vrouter_drop_stats()
         vm11_drop_new_flow_before = int(vm11_dropstats['ds_drop_new_flow'])
@@ -1702,25 +1702,25 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             self.logger.info("Dropstats(Drop New Flows) is cleared properly, becomes zero(0) after execting 'dropstats --clear'")
         else:
             assert False, "Dropstats(Drop New Flows) is NOT cleared properly, even after executing 'dropstats --clear'"
-    
+
     @preposttest_wrapper
     def test_restart_vrouter_agent(self):
 
         '''
-        Description: 
+        Description:
                Verify VMI level functionality after restart of Vrouter Agent
         Test steps:
                1.Create a virtual network (vn1)
-               2.Launch  vm11, vm12 and vm13 on vn1 network 
+               2.Launch  vm11, vm12 and vm13 on vn1 network
                3.Configure vmi level max_flows as 1000, 2000 and 3000 on vmi11, vmi12 and vmi13 respectively
                5.Verify traffic between the VMs
                6.send 2000 flows traffic from vm11 to vm13 , it should allow only 1000 flows @vmi11
                7.send 4000 flows traffic from vm12 to vm13, it should all only 2000 flows @vmi12
                8.Modify the max_flows value as 1500 @ vmi11
-               9.verify sending traffic between vm11 and vm13, now it should all 1500 flows  
+               9.verify sending traffic between vm11 and vm13, now it should all 1500 flows
                10.Delete the max_flows @ all VMIs ( by setting the value as 0 )
                11.send traffics across vm11, vm12 and vm13 , it should allow all the traffic
-        Pass criteria: 
+        Pass criteria:
                Number of flows should be created as per max_flows configured at VMI level.
                After modification, it should work as per modified value
                After deleting max_flows configuration, it should allow all the flows.
@@ -1734,19 +1734,19 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi12':{'vn': 'vn1'}, # VMI details
             'vmi13':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':3, 
+        vm = {'count':3,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 'vm13':{'vn':['vn1'], 'vmi':['vmi13'],'node': compute_nodes[0]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
@@ -1765,17 +1765,17 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vn1_fix.set_max_flows(max_flows=vn1_max_flows)
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
-       
+
 
         self.logger.info("Verify Traffic within VMs in VN-1")
         send_vm_fixture = vm11_fix
@@ -1789,13 +1789,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("Sleeping for dns/meta flows timeout seconds...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VMI level 
+
+        # Verify Max_flows functionality on VMI level
         #import pdb; pdb.set_trace()
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
-                max_flows=vmi11_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
+                max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count = self.get_total_flow_count(
@@ -1813,11 +1813,11 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             self.logger.info("VMI level Max Flows Provisioning is working fine")
 
         assert total_flow_count == vmi11_max_flows, "VMI level Max Flows Provisioning is not working"
-       
-        # check other VMIs part of that same VN should allow all the flows 
+
+        # check other VMIs part of that same VN should allow all the flows
         send_flow_count = self.send_traffic(
-                src=str(vm12_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
+                src=str(vm12_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
                 max_flows=vmi11_max_flows,
                 vm_fix=vm12_fix
             )
@@ -1896,8 +1896,8 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         # Reset the VN level Max flows to default value (0)
         vmi11_fix.set_max_flows(max_flows=0)
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
                 max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
@@ -1915,7 +1915,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
         if total_flow_count == vn1_max_flows:
             self.logger.info("VMI level deleted properly and it uses VN level Value")
-        
+
         assert total_flow_count == vn1_max_flows, "VMI level deleted properly and it uses VN level Value"
 
         self.logger.info("Restarting Vrouter Agent...")
@@ -1979,19 +1979,19 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
     def test_restart_vm(self):
 
         '''
-        Description: 
+        Description:
                Verify VMI level functionality after restart of VM
         Test steps:
                1.Create a virtaul network (vn1)
                2.Launch VMs( vm11, vm12) on vn1 network
                3.configure max_flows as 1000 @ VMI (vmi11)
-               4.send traffic (2000 flows)  between vm11 and vm12 
+               4.send traffic (2000 flows)  between vm11 and vm12
                5.it should allow only 1000 flows and drop_new_flows should be set (true)
-               6.Keep sending 90% of flows @ every 60 seconds 
+               6.Keep sending 90% of flows @ every 60 seconds
                7.wait for flow timeout to happens
                8.drop_new_flows flag should be removed (False),onces flows reduces below <90%
-        Pass criteria: 
-               drop_new_flows flag should be set when flow rate exceeds max_flows 
+        Pass criteria:
+               drop_new_flows flag should be set when flow rate exceeds max_flows
                flag should be removed once number of flows reduces to <=90% of max_flows
         Maintainer : mmohan@juniper.net
         '''
@@ -2003,19 +2003,19 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             'vmi12':{'vn': 'vn1'}, # VMI details
             'vmi13':{'vn': 'vn1'}, # VMI details
             }
-         
-        # Input Variables 
+
+        # Input Variables
         compute_nodes = self.orch.get_hosts()
         assert len(compute_nodes) >= 2 , "Required Minimum 2 Compute Nodes"
 
-        vm = {'count':3, 
+        vm = {'count':3,
                 'launch_mode':'distribute',
                 'vm11':{'vn':['vn1'], 'vmi':['vmi11'],'node': compute_nodes[0]}, # VM Details
                 'vm12':{'vn':['vn1'], 'vmi':['vmi12'],'node': compute_nodes[1]}, # VM Details
                 'vm13':{'vn':['vn1'], 'vmi':['vmi13'],'node': compute_nodes[0]}, # VM Details
                 }
 
-        # Create Virtual Networks (VNs) 
+        # Create Virtual Networks (VNs)
         vn_fixtures = self.setup_vns(vn=vn)
         vn1_fix = vn_fixtures['vn1']
 
@@ -2034,17 +2034,17 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vn1_fix.set_max_flows(max_flows=vn1_max_flows)
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
-        
+
         # Create VMs
         vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
-       
+
         # Creating ComputeNode/Vrouter Fixtures
         vm11_vrouter_fixture = ComputeNodeFixture(self.connections, vm11_fix.vm_node_ip)
         vm12_vrouter_fixture = ComputeNodeFixture(self.connections, vm12_fix.vm_node_ip)
-       
+
 
         self.logger.info("Verify Traffic within VMs in VN-1")
         send_vm_fixture = vm11_fix
@@ -2058,13 +2058,13 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         self.logger.info("Sleeping for dns/meta flows timeout seconds...")
         self.waiting_for_flow_timeout()
 
-        
-        # Verify Max_flows functionality on VMI level 
+
+        # Verify Max_flows functionality on VMI level
         #import pdb; pdb.set_trace()
         send_flow_count = self.send_traffic(
-                src=str(vm11_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
-                max_flows=vmi11_max_flows, 
+                src=str(vm11_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
+                max_flows=vmi11_max_flows,
                 vm_fix=vm11_fix
                 )
         total_flow_count = self.get_total_flow_count(
@@ -2082,11 +2082,11 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
             self.logger.info("VMI level Max Flows Provisioning is working fine")
 
         assert total_flow_count == vmi11_max_flows, "VMI level Max Flows Provisioning is not working"
-       
-        # check other VMIs part of that same VN should allow all the flows 
+
+        # check other VMIs part of that same VN should allow all the flows
         send_flow_count = self.send_traffic(
-                src=str(vm12_fix.vm_ip), 
-                dst=str(vm13_fix.vm_ip), 
+                src=str(vm12_fix.vm_ip),
+                dst=str(vm13_fix.vm_ip),
                 max_flows=vmi11_max_flows,
                 vm_fix=vm12_fix
             )

@@ -11,7 +11,7 @@ from tcutils.util import retry
 class VdnsFixture(fixtures.Fixture):
 
     def __init__(self, inputs=None, connections=None, vdns_name=None,
-                 dns_data=None, dns_domain_name='juniper.net', 
+                 dns_data=None, dns_domain_name='juniper.net',
                  ttl=100, record_order='random', uuid=None):
         self.vnc_lib = connections.get_vnc_lib_h()
         self.api_s_inspect = connections.api_server_inspect

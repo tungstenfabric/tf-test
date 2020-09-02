@@ -48,7 +48,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
         #mx config using device manager
         #both dm_mx and use_device_manager knobs are required for DM
         #this check is present in is_test_applicable
-        if check_dm:   
+        if check_dm:
             if self.inputs.use_devicemanager_for_md5:
                 for i in range(len(list(self.inputs.dm_mx.values()))):
                     router_params = list(self.inputs.dm_mx.values())[i]
@@ -117,14 +117,14 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
                 project_name=self.inputs.project_name, connections=self.connections,
                 vn_obj=vn61_fixture.obj, vm_name=vm61_name, node_name=None,
                 image_name='cirros', flavor='m1.tiny'))
-    
+
             vm62_fixture = self.useFixture(VMFixture(
                 project_name=self.inputs.project_name, connections=self.connections,
                 vn_obj=vn62_fixture.obj, vm_name=vm62_name, node_name=None,
                 image_name='cirros', flavor='m1.tiny'))
             vm61_fixture.wait_till_vm_is_up()
             vm62_fixture.wait_till_vm_is_up()
-    
+
             rule = [
                 {
                     'direction': '<>',
@@ -138,7 +138,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
             ]
             policy_name = 'allow_all'
             policy_fixture = self.config_policy(policy_name, rule)
-    
+
             vn61_policy_fix = self.attach_policy_to_vn(
                 policy_fixture, vn61_fixture)
             vn62_policy_fix = self.attach_policy_to_vn(
@@ -226,7 +226,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
     @retry(delay=10, tries=9)
     def check_tcp_status(self):
         result = True
-        #testcases which check tcp status quickly change keys and check for tcp status. 
+        #testcases which check tcp status quickly change keys and check for tcp status.
         #internally, tcp session is restarted when md5 keys are changed,
         #as tcp session may take some time to come up, adding some sleep.
         sleep(10)
@@ -245,7 +245,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
                 cmd = 'netstat -tnp | grep :179 | '
                 for ext_router in self.inputs.ext_routers:
                     cmd = cmd + 'grep -v %s | ' % ext_router[1]
-                
+
                 cmd = cmd + 'awk \"{print $6}\"'
 
             tcp_status = self.inputs.run_cmd_on_server(node, cmd,
@@ -275,7 +275,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
                    firstattr = firstsess.get_attributes()
                    firstattr[0].set_auth_data(auth_data)
                    list_uuid1._pending_field_updates.add('bgp_router_refs')
-                   self.vnc_lib.bgp_router_update(list_uuid1) 
+                   self.vnc_lib.bgp_router_update(list_uuid1)
 
     @classmethod
     def remove_mx_group_config(cls):
@@ -300,7 +300,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
             self.config_per_peer(auth_data=auth_data)
             self.config_md5( host=host, auth_data=auth_data )
         #Same routine is used for DM and non DM testcases. Check if DM knob is enabled.
-        if self.check_dm: 
+        if self.check_dm:
             self.config_md5( host = self.phy_router_fixture.bgp_router.uuid, auth_data=auth_data )
         sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
@@ -309,7 +309,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
             self.config_md5( host=host, auth_data=auth_data )
         #Same routine is used for DM and non DM testcases. Check if DM knob is enabled.
         if self.check_dm:
-            self.config_md5( host = self.phy_router_fixture.bgp_router.uuid, auth_data=auth_data )    
+            self.config_md5( host = self.phy_router_fixture.bgp_router.uuid, auth_data=auth_data )
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes after basic md5 config not up"
         return True
 
@@ -355,7 +355,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
         for host in self.list_uuid:
             self.config_per_peer(auth_data=auth_data)
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95) 
+        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
         for host in self.list_uuid:
             auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
@@ -369,8 +369,8 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
             self.config_md5( host=host, auth_data=auth_data )
             i += 1
         sleep(95)
-        assert not (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should not be up as keys are different"       
-            
+        assert not (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should not be up as keys are different"
+
         for host in self.list_uuid:
             auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
             self.config_md5( host=host, auth_data=auth_data )
@@ -383,7 +383,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
         sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up"
         return True
-    
+
     def check_per_peer_md5_config(self):
         auth_data=None
         for host in self.list_uuid:
@@ -415,7 +415,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
 
         self.config_per_peer(auth_data=auth_data )
         sleep(95)
-        assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after different per peer value" 
+        assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after different per peer value"
 
         auth_data=None
 
@@ -429,7 +429,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
         sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after reconfig per peer with mx"
         auth_data=None
-  
+
         self.config_per_peer(auth_data=auth_data )
         sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after removing md5 with control"

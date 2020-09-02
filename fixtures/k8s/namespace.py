@@ -13,7 +13,7 @@ class NamespaceFixture(fixtures.Fixture):
     '''
     '''
 
-    def __init__(self, connections, name=None, isolation=False, 
+    def __init__(self, connections, name=None, isolation=False,
                  custom_isolation = False, ip_fabric_snat=False, ip_fabric_forwarding=False, fq_network_name = None):
         self.connections = connections
         self.logger = connections.logger or contrail_logging.getLogger(
@@ -43,7 +43,7 @@ class NamespaceFixture(fixtures.Fixture):
             self.logger.error('Namespace %s verification failed' % (
                 self.name))
             return False
-       
+
         if self.inputs.slave_orchestrator == 'kubernetes':
             self.logger.info('Skipping Namespace API server validation in nested mode')
         else:
@@ -124,14 +124,14 @@ class NamespaceFixture(fixtures.Fixture):
         self.namespace_info = km_h.get_namespace_info(ns_uuid = self.uuid)
         if self.namespace_info:
             if self.namespace_info['phase'] == "Active":
-                self.logger.info('Namespace %s with uuid %s found in kube manager' 
+                self.logger.info('Namespace %s with uuid %s found in kube manager'
                              % (self.name, self.uuid))
             else:
                 self.logger.warn("Namespace present in kube manager but phase is %s"
                                  % self.namespace_info['phase'])
                 return False
         else:
-            self.logger.warn('Namespace %s with uuid %s not found in kube manager' 
+            self.logger.warn('Namespace %s with uuid %s not found in kube manager'
                              % (self.name, self.uuid))
             return False
         return True
@@ -237,7 +237,7 @@ class NamespaceFixture(fixtures.Fixture):
         self.obj = self.k8s_client.set_namespace_label(self.name, label_dict)
         self._populate_attr()
     # end set_labels
-   
+
     def enable_service_isolation(self):
         return self.k8s_client.set_service_isolation(self.name, enable=True)
 

@@ -263,7 +263,7 @@ class trafficTestFixture(fixtures.Fixture):
     # end of getLiveTrafficStats
 
     def stopTraffic(self, loose='no', loose_allow=100, wait_for_stop=True):
-        ''' Stop traffic launched using startTraffic. 
+        ''' Stop traffic launched using startTraffic.
         Return [] if recv = sent, else, return error info
         set loose if you are ok with allowing some loss, used for scale/stress tests.
         '''

@@ -59,7 +59,7 @@ class WfTemplate(object):
         policy_rules = {'parameters': [{'name': 'item',
         'scope': 'local',
         'type': 'Contrail:NetworkPolicy',
-        'value': {'sdk-object': {'id':params['NetworkPolicy'], 
+        'value': {'sdk-object': {'id':params['NetworkPolicy'],
          'type': 'Contrail:NetworkPolicy'}}},
         {'name': 'simpleAction',
         'scope': 'local',
@@ -112,7 +112,7 @@ class WfTemplate(object):
                                                     'scope': 'local',
                                                     'type': 'Contrail:VirtualNetwork',
                                                     'value': {'sdk-object': {'id':params['dest_network'],
-                                                    'type': 'Contrail:VirtualNetwork'}}})                                
+                                                    'type': 'Contrail:VirtualNetwork'}}})
         if params.get('src_ports'):
             policy_rules['parameters'].append({'name': 'srcPorts',
                                                'scope': 'local',
@@ -156,7 +156,7 @@ class WfTemplate(object):
 
     def get_remove_policy_rules_template(params):
         pass
-    
+
     #virtual_network
     def get_add_network_policy_to_vn_template(self, params):
         pol_to_vn = {'parameters': [{'name': 'item',
@@ -203,13 +203,13 @@ class WfTemplate(object):
            'value': {'sdk-object': {'id': params['VirtualNetwork'],
              'type': 'Contrail:VirtualNetwork'}}}]}
         return delete_vn
-       
+
     def get_edit_vn_template():
         pass
-        
+
     def get_add_ipam_to_vn_template():
         pass
-    
+
     def get_add_subnet_to_vn_template(self, params):
         add_sub ={'parameters': [{'name': 'parent',
                'scope': 'local',
@@ -247,16 +247,16 @@ class WfTemplate(object):
         return add_sub
     def get_add_tag_to_vn_template():
         pass
-    
+
     def get_remove_ipam_from_vn_template():
         pass
-    
+
     def get_remove_subnet_from_vn_template():
         pass
-    
+
     def get_remove_tag_from_vn_template():
         pass
-    
+
     #port
     def get_add_fip_to_port_template(self, params):
         fip_to_port = {'parameters': [{'name': 'item',
@@ -273,7 +273,7 @@ class WfTemplate(object):
            'type': 'boolean',
            'value': {'boolean': {'value': True}}}]}
         return fip_to_port
-    
+
     def get_remove_fip_from_port_template(self, params):
         fip_to_port = {'parameters': [{'name': 'item',
            'scope': 'local',
@@ -285,7 +285,7 @@ class WfTemplate(object):
            'value': {'sdk-object': {'id': params['FloatingIp'],
              'type': 'Contrail:FloatingIp'}}}]}
         return fip_to_port
-    
+
     def get_add_sg_to_port_template(self, params):
         sg_to_port = {'parameters': [{'name': 'item',
            'scope': 'local',
@@ -311,16 +311,16 @@ class WfTemplate(object):
            'value': {'sdk-object': {'id': params['SecurityGroup'],
              'type': 'Contrail:SecurityGroup'}}}]}
         return sg_from_port
-    
+
     def get_add_shc_to_port_template():
         pass
-    
+
     def get_remove_shc_from_port_template():
         pass
-    
+
     def get_add_tag_to_port_template():
         pass
-    
+
     def get_remove_tag_from_port_template():
         pass
 
@@ -349,7 +349,7 @@ class WfTemplate(object):
                'value': {'sdk-object': {'id': params['FloatingIp'],
                  'type': 'Contrail:FloatingIp'}}}]}
         return fip
-    
+
     #FIP_pool
     def get_create_fip_pool_template(self, params):
         fip_pool = {'parameters': [{
@@ -370,12 +370,12 @@ class WfTemplate(object):
            'value': {'sdk-object': {'id': params['FloatingIpPool'],
             'type': 'Contrail:FloatingIpPool'}}}]}
         return fip_pool
-    
+
     def get_edit_fip_pool_template(self):
         pass
-    
+
     #Security_group
-    
+
     def get_create_sg_template(self, params):
         create_sg = {'parameters': [{'name': 'name',
            'scope': 'local',
@@ -393,7 +393,7 @@ class WfTemplate(object):
 
     def get_edit_sg_rule_template(self, params):
         return self.get_add_rule_to_sg_template(params)
-   
+
     def get_add_rule_to_sg_template(self, params):
         #ether_type:{'IPv4','IPv6'}
         #direction:{ingress,egress}
@@ -432,7 +432,7 @@ class WfTemplate(object):
                 'type': 'Contrail:SecurityGroup',
                 'value': {'sdk-object': {'id':params['addressSecurityGroup'],
                  'type': 'Contrail:SecurityGroup'}}})
-                                          
+
         sg_rules['parameters'].append({'name': 'protocol',
                'scope': 'local',
                'type': 'string',
@@ -452,9 +452,9 @@ class WfTemplate(object):
             {'name': 'rule',
             'scope': 'local',
             'type': 'string',
-            'value': {'string': {'value': params['rule']}}}]}      
+            'value': {'string': {'value': params['rule']}}}]}
         return rm_rule
-    
+
     def get_delete_sg_template(self, params):
         delete_sg = {'parameters': [{'name': 'item',
             'scope': 'local',
@@ -462,7 +462,7 @@ class WfTemplate(object):
             'value': {'sdk-object': {'id': params['SecurityGroup'],
                       'type': 'Contrail:SecurityGroup'}}}]}
         return delete_sg
-    
+
     #Service Template
     def get_create_st_template(self, params):
         #parent:Connection
@@ -500,9 +500,9 @@ class WfTemplate(object):
                'type': 'Array/string',
                'value': {'array': {'elements': [{'string': {'value': 'management'}},
                   {'string': {'value': 'left'}},
-                  {'string': {'value': 'right'}}]}}}]}   
+                  {'string': {'value': 'right'}}]}}}]}
         return create_st
-      
+
     def get_delete_st_template(self, params):
         delete_st = {'parameters': [{'name': 'item',
                 'scope': 'local',
@@ -599,109 +599,109 @@ class WfTemplate(object):
     #Address group
     def get_add_label_to_ag_template():
         pass
-    
+
     def get_add_subnet_to_ag_template():
         pass
-    
+
     def get_create_global_ag_template():
         pass
-    
+
     def get_create_project_ag_template():
         pass
-    
+
     def get_delete_ag_template():
         pass
-    
+
     def get_remove_label_from_ag_template():
         pass
-    
+
     def get_remove_subnet_from_ag_template():
         pass
-    
+
     #Application Policy Set
     def get_create_global_aps_template():
         pass
-    
+
     def get_create_project_aps_template():
         pass
-    
+
     def get_add_fwp_to_aps_template():
         pass
-    
+
     def get_add_tag_to_aps_template():
         pass
-    
+
     def get_delete_aps_template():
         pass
-    
+
     def get_remove_fwp_from_aps_template():
         pass
-    
+
     def get_remove_tag_from_aps_template():
         pass
-    
+
     #Firewall Policy
     def get_create_global_fwp_template():
         pass
-    
+
     def get_create_project_fwp_template():
         pass
-    
+
     def get_add_rule_to_fwp_template():
         pass
-    
+
     def get_remove_rule_from_fwp_template():
         pass
-    
+
     def get_delete_fwp_template():
         pass
-    
+
     #Firewall rules
     def get_create_project_fw_rule_template():
         pass
-    
+
     def get_create_global_fw_rule_template():
         pass
-    
+
     def get_delete_fw_rule_template():
         pass
-    
+
     def get_edit_fw_rule_template():
         pass
-    
+
     #Service Groups
     def get_create_global_svg_template():
         pass
-    
+
     def get_create_project_svg_template():
         pass
-    
+
     def get_add_service_to_svg_template():
         pass
-    
+
     def get_edit_service_of_svg_template():
         pass
-    
+
     def get_remove_service_from_svg_template():
         pass
-    
+
     def get_delete_svg_template():
         pass
-    
+
     #Tag
     def get_create_global_tag_template():
         pass
-    
+
     def get_create_project_tag_template():
         pass
-    
+
     def get_delete_tag_template():
         pass
-    
+
     #Tag Type
     def get_create_tag_type_template():
         pass
-    
+
     def get_delete_tag_type_template():
         pass
 
@@ -784,7 +784,7 @@ class WfTemplate(object):
         'delete_tag': 'Delete tag',
         'create_tag_type': 'Create tag type',
         'delete_tag_type': 'Delete tag type'
-        
+
     }
 
     workflow_name_template = {
@@ -835,7 +835,7 @@ class WfTemplate(object):
         'add_subnet_to_ag': get_add_subnet_to_ag_template,
         'create_global_ag': get_create_global_ag_template,
         'create_project_ag': get_create_project_ag_template,
-        'delete_ag': get_delete_ag_template, 
+        'delete_ag': get_delete_ag_template,
         'remove_label_from_ag': get_remove_label_from_ag_template,
         'remove_subnet_from_ag': get_remove_subnet_from_ag_template,
         'create_global_aps': get_create_global_aps_template,
@@ -866,7 +866,7 @@ class WfTemplate(object):
         'create_tag_type': get_create_tag_type_template,
         'delete_tag_type': get_delete_tag_type_template
     }
-    
+
     if __name__ == '__main__':
         param_dict = {'wf_name':'create_connection','host_name':'c54','host_ip':'123','port':123}
         temp = _workflow_name_template[param_dict['wf_name']](param_dict)

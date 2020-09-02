@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
         if device_dict['type'] == 'vcenter_gateway':
                vrouter_obj = VirtualRouterFixture(device_dict['name'],
-                                      'embedded', 
+                                      'embedded',
                                       cfgm_ip=init_obj.cfgm_ip,
                                       auth_server_ip=init_obj.auth_ip,
                                        )

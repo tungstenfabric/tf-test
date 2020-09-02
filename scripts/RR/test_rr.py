@@ -36,7 +36,7 @@ class TestBasicRR(BaseRRTest):
     def tearDownClass(cls):
         super(TestBasicRR, cls).tearDownClass()
 
-    @test.attr(type=['sanity'])    
+    @test.attr(type=['sanity'])
     @preposttest_wrapper
     def test_basic_RR(self):
         ''' Configure RR in one control node.
@@ -79,9 +79,9 @@ class TestBasicRR(BaseRRTest):
                           inputs=self.inputs,
                           router_name=ctrl_node_name,
                           router_ip=ctrl_node_ip
-                          )) 
+                          ))
         cluster_id = ipv4_to_decimal(ctrl_node_ip)
-       
+
         if ctrl_fixture.set_cluster_id(cluster_id):
             self.logger.info("cluster id set")
         else:
@@ -97,7 +97,7 @@ class TestBasicRR(BaseRRTest):
         for entry in connection_dicts:
             if verify_peer_in_control_nodes(self.cn_inspect,entry,connection_dicts[entry],skip_peers,self.logger):
                 self.logger.info("BGP connections are proper")
-            else: 
+            else:
                 self.logger.error("BGP connections are not proper")
                 assert False
         assert vm1_fixture.ping_to_ip(vm2_fixture.vm_ip)
@@ -106,7 +106,7 @@ class TestBasicRR(BaseRRTest):
 
     # end test_basic_RR
 
-    @test.attr(type=['sanity'])    
+    @test.attr(type=['sanity'])
     @preposttest_wrapper
     def test_create_vm_after_RR_set(self):
         ''' Configure RR in one control node.
@@ -135,9 +135,9 @@ class TestBasicRR(BaseRRTest):
                           inputs=self.inputs,
                           router_name=ctrl_node_name,
                           router_ip=ctrl_node_ip
-                          )) 
+                          ))
         cluster_id = ipv4_to_decimal(ctrl_node_ip)
-       
+
         if ctrl_fixture.set_cluster_id(cluster_id):
             self.logger.info("cluster id set")
         else:
@@ -153,7 +153,7 @@ class TestBasicRR(BaseRRTest):
         for entry in connection_dicts:
             if verify_peer_in_control_nodes(self.cn_inspect,entry,connection_dicts[entry],skip_peers,self.logger):
                 self.logger.info("BGP connections are proper")
-            else: 
+            else:
                 self.logger.error("BGP connections are not proper")
                 assert False
         vn1_name = get_random_name('vn1')

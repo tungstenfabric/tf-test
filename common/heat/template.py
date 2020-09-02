@@ -2180,7 +2180,7 @@ svc_tmpl_v2 = {
   u'parameters': {
     u'domain': {
       u'description': u'domain of service template',
-      u'type': u'string'}, 
+      u'type': u'string'},
     u'flavor': {
       u'description': u'Flavor',
       u'type': u'string'},

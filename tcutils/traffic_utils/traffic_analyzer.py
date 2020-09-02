@@ -18,7 +18,7 @@ class TrafficAnalyzer(object):
     This class is used to capture traffic using tcpdump and analyze qos
     related fields of captured packets.
     Following are main utilities which are part of this class:
-    1. Capturing packet on user defined fields or payload and storing the 
+    1. Capturing packet on user defined fields or payload and storing the
        captured packets in .pcap.
     2. Analyzing the .pcap file and verifying the qos fields of packets
        are as expected or not.
@@ -30,7 +30,7 @@ class TrafficAnalyzer(object):
                 src_ip = None, dest_ip = None, src_port = None, \
                 dest_port = None, protocol=None, logger = None, \
                 encap_type = None):
-        
+
         self.compute_node_fixture = compute_node_fixture
         self.interface = interface or compute_node_fixture.agent_physical_interface
         self.node_ip = compute_node_fixture.ip
@@ -60,11 +60,11 @@ class TrafficAnalyzer(object):
            If Encap is VxLAN or MPLSoUDP, it captures packets based on the
            user inputs of vlan, protocol, ips, ports etc.
         3. If encap is MPLSoGRE, it captures packets based on the source ip
-           and destination ip of internal header. User should specify 
+           and destination ip of internal header. User should specify
            "traffic_between_diff_networks" flag to get the correct results
            This flag is applicable only in case encap is MPLSoGRE and networks
            corresponds to internal source and destination IP networks
-        Note: 
+        Note:
         Use bytes_to_match as multiple of 4
         All arguments of this functions are only required when user want to
         capture traffic on basis of payload.
@@ -113,7 +113,7 @@ class TrafficAnalyzer(object):
                                         self.dest_ip.split('.'))))
             # Below 'if' check is to distinguish packets within the same network
             # and different  networks
-            # Packet between different networks don't carry L2 header and thus 
+            # Packet between different networks don't carry L2 header and thus
             # there is a 14 byte difference
             if traffic_between_diff_networks:
                 filter_string="proto gre and (ip[40:4]= %s and ip[44:4]= %s)"\
@@ -138,7 +138,7 @@ class TrafficAnalyzer(object):
                 filters='-vvxx %s' % filter_string,
                 logger=self.logger)
         return (self.session, self.pcap)
-    
+
     def packet_capture_stop(self):
         '''
         Closes the tcpdump session.
@@ -151,7 +151,7 @@ class TrafficAnalyzer(object):
         except e:
             self.info.error("Failed to stop tcpdump. Possibly,"
                             " session does not exist")
-    
+
     def _check_underlay_interface_is_tagged(self):
         ''' Returns True if self.interface is compute nodes' phy intf
             and it is tagged
@@ -163,9 +163,9 @@ class TrafficAnalyzer(object):
             return False
         return True
     # end _check_underlay_interface_is_tagged
-    
+
     def verify_packets(self, packet_type, pcap_path_with_file_name,
-                       expected_count =None, dot1p = None, dscp = None, 
+                       expected_count =None, dot1p = None, dscp = None,
                        mpls_exp = None):
         '''
         This function parses tcpdump file.
@@ -197,7 +197,7 @@ class TrafficAnalyzer(object):
                 return False
         if expected_count:
             result = verify_tcpdump_count(self, self.session, self.pcap,
-                                          expected_count, raw_count=True, 
+                                          expected_count, raw_count=True,
                                           exact_match=False)
             if not result:
                 return result
@@ -227,7 +227,7 @@ class TrafficAnalyzer(object):
                         self.logger.error(e)
                         return False
                     if priority == dot1p:
-                        self.logger.debug("Validated dot1p marking of %s" 
+                        self.logger.debug("Validated dot1p marking of %s"
                                           % (dot1p))
                     else:
                         self.logger.error("Mismatch between actual and"
@@ -247,7 +247,7 @@ class TrafficAnalyzer(object):
                         self.logger.error(e)
                         return False
                     if dscp == actual_dscp:
-                        self.logger.debug("Validated DSCP marking of %s" % 
+                        self.logger.debug("Validated DSCP marking of %s" %
                                           (dscp))
                     else:
                         self.logger.error("Mismatch between actual and"
@@ -280,7 +280,7 @@ class TrafficAnalyzer(object):
                         self.logger.error(e)
                         return False
                     if mpls_exp == actual_mpls_exp:
-                        self.logger.debug("Validated EXP marking of %s" 
+                        self.logger.debug("Validated EXP marking of %s"
                                           % (mpls_exp))
                     else:
                         self.logger.error("Mismatch between actual and"
@@ -307,7 +307,7 @@ class TrafficAnalyzer(object):
                     break
             except AttributeError as e:
                 self.logger.debug(e)
-                self.logger.debug("Packet different from GRE encap")  
+                self.logger.debug("Packet different from GRE encap")
             if ether.ip.data.data.hex()[0:8] == '08000000':
                 actual_encap = 'VxLAN'
             elif ether.ip.data.data.hex()[0:8] != '08000000'\
@@ -327,4 +327,4 @@ class TrafficAnalyzer(object):
             self.logger.error("Expected encapsulation: %s" % expected_encap)
             self.logger.error("Actual encapsulation: %s" % actual_encap)
             return False
-        
+

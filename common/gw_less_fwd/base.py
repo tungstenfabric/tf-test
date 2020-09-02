@@ -337,7 +337,7 @@ class GWLessFWDTestBase(BaseVrouterTest, ConfigSvcChain):
         vmi_fixtures = self.setup_vmis(vn_fixtures, vmi)
 
         # VMs creation
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm) 
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm)
 
         ret_dict = {
             'vmi_fixtures':vmi_fixtures,
@@ -768,7 +768,7 @@ class GWLessFWDTestBase(BaseVrouterTest, ConfigSvcChain):
                             result = verify_tcpdump_count(self, None, 'eth0', vm_fix_pcap_pid_files=vm_fix_pcap_pid_files, exp_count=exp_count, exact_match=False)
                         else:
                             stop_tcpdump_for_intf(session, pcap)
-  
+
                             result = verify_tcpdump_count(self, session, pcap,
                                       exp_count=exp_count, grep_string=src_vm_fixture.vm_ip)
 

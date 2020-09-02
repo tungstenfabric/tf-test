@@ -17,8 +17,8 @@ class SecurityGroupFixture(ContrailFixture):
 
     def __init__(
         self, connections, domain_name=None, project_name=None, secgrp_name=None,
-	    uuid=None, secgrp_entries=None,option='orch'):
-	#option <'orch' or 'contrail'>
+        uuid=None, secgrp_entries=None,option='orch'):
+    #option <'orch' or 'contrail'>
         self.connections = connections
         self.inputs = connections.inputs
         self.logger = connections.logger
@@ -109,7 +109,7 @@ class SecurityGroupFixture(ContrailFixture):
             if self.inputs.is_gui_based_config():
                 self.webui.delete_security_group(self)
             elif self.inputs.vro_based:
-                self.orch.delete_security_group(self.secgrp_name) 
+                self.orch.delete_security_group(self.secgrp_name)
             else:
                 self.orch.delete_security_group(sg_id=self.secgrp_id, option=self.option)
             if self.verify_is_run or verify:
@@ -141,7 +141,7 @@ class SecurityGroupFixture(ContrailFixture):
     @retry(delay=2, tries=5)
     def verify_secgrp_in_api_server(self):
         """Validate security group information in API-Server."""
-	#verify if sg present in api
+    #verify if sg present in api
         self.api_s_secgrp_obj = self.api_s_inspect.get_cs_secgrp(
             domain=self.domain_name, project=self.project_name,
             secgrp=self.secgrp_name, refresh=True)
@@ -153,7 +153,7 @@ class SecurityGroupFixture(ContrailFixture):
             self.logger.info(
                 "Security group %s found in the API Server", self.secgrp_name)
 
-	#verify if sg acls present in api
+    #verify if sg acls present in api
         self.api_s_acls = self.api_s_inspect.get_secgrp_acls_href(
             domain=self.domain_name, project=self.project_name,
             secgrp=self.secgrp_name, refresh=True)
@@ -187,13 +187,13 @@ class SecurityGroupFixture(ContrailFixture):
         if not retval:
             errmsg = "Security group: %s not found in control node." % self.secgrp_fq_name
             return False, errmsg
-	
+
         return True, None
 
     @retry(delay=2, tries=5)
     def verify_secgrp_not_in_api_server(self):
         """Validate security group information in API-Server."""
-	#verify if sg is removed from api
+    #verify if sg is removed from api
         self.api_s_secgrp_obj = self.api_s_inspect.get_cs_secgrp(
             domain=self.domain_name, project=self.project_name,
             secgrp=self.secgrp_name, refresh=True)
@@ -205,7 +205,7 @@ class SecurityGroupFixture(ContrailFixture):
             self.logger.info(
                 "Security group %s removed from the API Server", self.secgrp_name)
 
-	#verify if sg acls removed from api
+    #verify if sg acls removed from api
         self.api_s_acls = self.api_s_inspect.get_secgrp_acls_href(
             domain=self.domain_name, project=self.project_name,
             secgrp=self.secgrp_name, refresh=True)
@@ -254,7 +254,7 @@ class SecurityGroupFixture(ContrailFixture):
     def verify_secgrp_in_control_nodes(self):
         """Validate security group information in control nodes."""
 
-	    #verify if sg present in control nodes
+        #verify if sg present in control nodes
         for cn in self.inputs.bgp_ips:
             cn_secgrp_obj = self.cn_inspect[cn].get_cn_sec_grp(
                 domain=self.domain_name,
@@ -270,7 +270,7 @@ class SecurityGroupFixture(ContrailFixture):
                     "Validated that Security group %s is found in control node %s" % (
                     self.secgrp_name, cn))
 
-	    #verify if sg acls present in control nodes
+        #verify if sg acls present in control nodes
             cn_secgrp_obj = self.cn_inspect[cn].get_cn_sec_grp_acls(
                 domain=self.domain_name,
                 project=self.project_name,

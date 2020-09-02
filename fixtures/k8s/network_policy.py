@@ -39,7 +39,7 @@ class NetworkPolicyFixture(fixtures.Fixture):
                                                 'default-policy-management:k8s-Ingress',
                                                 'default-policy-management:k8s-denyall']
             self.k8s_defaut_aps = "default-policy-management:k8s"
-        
+
         self.already_exists = None
 
     def setUp(self):
@@ -118,7 +118,7 @@ class NetworkPolicyFixture(fixtures.Fixture):
             spec=self.spec)
         self._populate_attr()
     # end update
-    
+
     @retry(delay=2, tries=60)
     def verify_network_policy_in_k8s(self):
         if self.read():
@@ -128,16 +128,16 @@ class NetworkPolicyFixture(fixtures.Fixture):
             return False
         return True
     # end verify_ingress_in_k8s
-    
+
     @retry(delay=2, tries=60)
     def verify_network_policy_in_kube_manager(self):
         km_h = self.connections.get_kube_manager_h()
         self.np_info = km_h.get_network_policy_info(np_uuid = self.uuid)
         if self.np_info:
-            self.logger.info('Network Policy %s with uuid %s found in kube manager' 
+            self.logger.info('Network Policy %s with uuid %s found in kube manager'
                              % (self.name, self.uuid))
         else:
-            self.logger.warn('Network Policy %s with uuid %s not found in kube manager' 
+            self.logger.warn('Network Policy %s with uuid %s not found in kube manager'
                              % (self.name, self.uuid))
             return False
         return True

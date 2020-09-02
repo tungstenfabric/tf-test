@@ -35,10 +35,10 @@ def update_xml(config_file, xmlfile):
         properties_elem.append(prop_elem)
     except configparser.NoOptionError as e:
         pass
-    
+
     prop_elem = ET.Element('property')
-    prop_elem.set('name','Build') 
-    prop_elem.set('value', build_id) 
+    prop_elem.set('name','Build')
+    prop_elem.set('value', build_id)
     properties_elem.append(prop_elem)
 
     prop_elem = ET.Element('property')
@@ -50,7 +50,7 @@ def update_xml(config_file, xmlfile):
     prop_elem.set('name','Topology')
     prop_elem.set('value', topology)
     properties_elem.append(prop_elem)
-    
+
     try:
         sm_pkg = config.get('Test', 'sm_pkg')
         prop_elem = ET.Element('property')
@@ -77,7 +77,7 @@ def update_xml(config_file, xmlfile):
         properties_elem.append(prop_elem)
     except configparser.NoOptionError as e:
         pass
-   
+
     ts_root.append(properties_elem)
 
     try:
@@ -90,17 +90,17 @@ def update_xml(config_file, xmlfile):
         pass
     try:
         prop_elem = ET.Element('property')
-        prop_elem.set('name','BGP_STRESS_TEST_SUMMARY') 
+        prop_elem.set('name','BGP_STRESS_TEST_SUMMARY')
         bgp_stress_test = config.get('Test', 'bgp stress test summary')
         bgp_stress_test = "<br />".join(bgp_stress_test.split("\n"))
-        prop_elem.set('value', bgp_stress_test) 
+        prop_elem.set('value', bgp_stress_test)
         properties_elem.append(prop_elem)
     except configparser.NoOptionError as e:
         pass
     result_tree.write(xmlfile)
-# end 
-    
-    
+# end
+
+
 
 # end update_xml
 

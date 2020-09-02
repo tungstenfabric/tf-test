@@ -23,7 +23,7 @@ class VirtualRouterBase(vnc_api_test.VncLibFixture):
      # end __init__
     def setUp(self):
         super(VirtualRouterBase, self).setUp()
-    
+
     def cleanUp(self):
         super(VirtualRouterBase, self).cleanUp()
 
@@ -39,7 +39,7 @@ class VirtualRouterBase(vnc_api_test.VncLibFixture):
 
     def read(self,id):
         self.vr = self.vnc_api_h.virtual_router_read(id=id)
-    
+
     def update_virtual_router_type(self,vrouter_type=None):
         if not vrouter_type:
             self.vnc_h.update_virtual_router_type(self.name,self.virtual_router_type)
@@ -51,13 +51,13 @@ class VirtualRouterFixture(VirtualRouterBase):
     def __init__(self, *args, **kwargs):
         super(VirtualRouterFixture,self).__init__(*args, **kwargs)
         try:
-            #inputs object not mandatory.Its not passed as part of 
+            #inputs object not mandatory.Its not passed as part of
             #tools/setup_tors.py.Code was getting exception here
             if self.inputs.verify_thru_gui():
                 self.webui = WebuiTest(self.connections, self.inputs)
                 self.ip = args[2]
         except Exception as e:
-            pass 
+            pass
 
     def setUp(self):
         super(VirtualRouterFixture, self).setUp()
@@ -72,8 +72,8 @@ class VirtualRouterFixture(VirtualRouterBase):
                 self.vr = self.webui.create_virtual_router(self)
             else:
                 self.vr = self.create_virtual_router()
-       
-        try: 
+
+        try:
             if not self.inputs.is_gui_based_config():
                 self.update_virtual_router_type()
         except Exception as e:

@@ -65,12 +65,12 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_basic_dm(self):
         """
-        Description: Verify basic config is pushed to mx 
+        Description: Verify basic config is pushed to mx
         """
         self.sleep(90)
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
-        
+
         cmd = 'show configuration groups __contrail__'
         self.does_mx_have_config(cmd)
 
@@ -88,14 +88,14 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_if_vn_pushed_using_dm(self):
         """
-        Description: Verify VN config is pushed to mx 
+        Description: Verify VN config is pushed to mx
         """
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
 
         self.add_vn_to_device()
         self.send_traffic_between_vms()
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -112,7 +112,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_change_vtep(self):
         """
-        Description: Change vtep config and push to mx 
+        Description: Change vtep config and push to mx
         """
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
@@ -128,7 +128,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
-       
+
         self.change_vtep()
         as_value = self.get_old_as()
         cmd = 'show configuration groups __contrail__ routing-options dynamic-tunnels _contrail_asn-%s source-address' % as_value
@@ -181,7 +181,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
             for node in self.inputs.cfgm_ips:
                 dm_status = self.inputs.run_cmd_on_server(node, cmd)
         self.add_vn_to_device()
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         try:
             self.does_mx_have_config(cmd)
             self.is_dm_removed()
@@ -200,7 +200,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
             for node in self.inputs.cfgm_ips:
                 dm_status = self.inputs.run_cmd_on_server(node, cmd)
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -226,11 +226,11 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
 
         self.delete_vn_from_devices
         return True
-        
+
     @preposttest_wrapper
     def test_bind_unbind_vn_pushed_using_dm(self):
         """
-        Description: Verify bind unbind VN config is pushed to mx 
+        Description: Verify bind unbind VN config is pushed to mx
         """
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
@@ -238,7 +238,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.add_vn_to_device()
         self.send_traffic_between_vms()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
 
         self.does_mx_have_config(cmd)
 
@@ -251,7 +251,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.delete_vn_from_devices()
 
         self.does_mx_have_config(cmd)
-        
+
         self.is_dm_removed()
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
@@ -261,7 +261,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_add_delete_vn_pushed_using_dm(self):
         """
-        Description: Verify add/delete VN config is pushed to mx 
+        Description: Verify add/delete VN config is pushed to mx
         """
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
@@ -269,7 +269,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.add_vn_to_device()
         self.send_traffic_between_vms()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -292,7 +292,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.create_vn()
         self.add_vn_to_device()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
 
         self.does_mx_have_config(cmd)
 
@@ -312,7 +312,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_add_delete_device_using_dm(self):
         """
-        Description: Verify add/delete device is pushed to mx 
+        Description: Verify add/delete device is pushed to mx
         """
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
@@ -320,7 +320,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.add_vn_to_device()
         self.send_traffic_between_vms()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -351,7 +351,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.create_physical_dev()
         self.add_vn_to_device()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
         self.is_dm_going_through()
         cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn2_name, self.v6_index)
@@ -369,7 +369,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_bind_unbind_device_using_dm(self):
         """
-        Description: Verify bind/unbind config is pushed to mx 
+        Description: Verify bind/unbind config is pushed to mx
         """
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status()
@@ -377,7 +377,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.add_vn_to_device()
         self.send_traffic_between_vms()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -400,7 +400,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
 
         self.bind_dev_to_router()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -427,7 +427,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.add_vn_to_device()
         self.send_traffic_between_vms()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -444,7 +444,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
                 self.inputs.restart_service('contrail-device-manager', [node])
         cluster_status, error_nodes = ContrailStatusChecker().wait_till_contrail_cluster_stable()
         assert cluster_status, 'Hash of error nodes and services : %s' % (
-                    error_nodes) 
+                    error_nodes)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -453,7 +453,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         assert self.check_tcp_status()
         self.delete_vn_from_devices
         return True
- 
+
     @preposttest_wrapper
     def test_vn_change_forwarding_mode(self):
         """
@@ -466,7 +466,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.add_vn_to_device()
         self.send_traffic_between_vms()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -487,7 +487,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.is_dm_going_through()
 
         self.change_global_vn_config('l2')
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_removed()
@@ -498,7 +498,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.is_dm_removed()
 
         self.change_global_vn_config('l3')
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_removed()
@@ -509,7 +509,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.is_dm_removed()
 
         self.change_global_vn_config('l2_l3')
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -519,7 +519,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
 
         self.is_dm_going_through()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -530,7 +530,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.is_dm_going_through()
 
         self.change_vn_forwarding_mode('l2')
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_removed()
@@ -541,7 +541,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.is_dm_removed()
 
         self.change_vn_forwarding_mode('l3')
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_removed()
@@ -552,7 +552,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.is_dm_removed()
 
         self.change_vn_forwarding_mode('l2_l3')
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -562,7 +562,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
 
         self.is_dm_going_through()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -590,7 +590,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.add_vn_RT(value = '54321')
         self.send_traffic_between_vms()
 
-        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index) 
+        cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l2-%s' % (self.vn1_name, self.vn_index)
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()
@@ -610,7 +610,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         assert self.check_policy_removed_on_mx(cmd, '65432'), 'Policy added with wrong RT'
 
         cmd = 'show configuration groups __contrail__ policy-options policy-statement _contrail_%s-l3-%s-import term t1 from community' % (self.vn1_name, self.vn_index)
- 
+
         self.does_mx_have_config(cmd)
         self.is_dm_going_through()
 
@@ -629,7 +629,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         assert self.check_policy_added_on_mx(cmd, '65432'), 'Policy not added after 120 sec'
 
         cmd = 'show configuration groups __contrail__ policy-options policy-statement _contrail_%s-l3-%s-export term t1 then' % (self.vn1_name, self.vn_index)
- 
+
         self.does_mx_have_config(cmd)
         self.is_dm_going_through()
         assert self.check_policy_added_on_mx(cmd, '54321'), 'Policy not added after 120 sec'
@@ -641,7 +641,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         self.del_vn_RT(value = '76543', mode = 'import')
         self.del_vn_RT(value = '65432', mode = 'export')
         cmd = 'show configuration groups __contrail__ policy-options policy-statement _contrail_%s-l2-%s-import term t1 from community' % (self.vn1_name, self.vn_index)
- 
+
         self.does_mx_have_config(cmd)
         self.is_dm_going_through()
 
@@ -651,7 +651,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         assert self.check_policy_removed_on_mx(cmd, '65432'), 'Policy not deleted after 120 sec'
 
         cmd = 'show configuration groups __contrail__ policy-options policy-statement _contrail_%s-l3-%s-import term t1 from community' % (self.vn1_name, self.vn_index)
- 
+
         self.does_mx_have_config(cmd)
         self.is_dm_going_through()
 
@@ -660,7 +660,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         assert self.check_policy_removed_on_mx(cmd, '76543'), 'Policy not deleted after 120 sec'
         assert self.check_policy_removed_on_mx(cmd, '65432'), 'Policy not deleted after 120 sec'
         cmd = 'show configuration groups __contrail__ policy-options policy-statement _contrail_%s-l2-%s-export term t1 then' % (self.vn1_name, self.vn_index)
- 
+
         self.does_mx_have_config(cmd)
         self.is_dm_going_through()
 
@@ -670,7 +670,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
         assert self.check_policy_removed_on_mx(cmd, '65432'), 'Policy not deleted after 120 sec'
 
         cmd = 'show configuration groups __contrail__ policy-options policy-statement _contrail_%s-l3-%s-export term t1 then' % (self.vn1_name, self.vn_index)
- 
+
         self.does_mx_have_config(cmd)
         self.is_dm_going_through()
         assert self.check_policy_removed_on_mx(cmd, '54321'), 'Policy not deleted after 120 sec'
@@ -745,7 +745,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_logs_for_errors(self):
         """
-        Description: Check for errors in DM logs 
+        Description: Check for errors in DM logs
         """
         for node in self.inputs.cfgm_ips:
             with settings(
@@ -783,7 +783,7 @@ class TestDM(BaseDM, Md5Base, BaseNeutronTest):
     @preposttest_wrapper
     def test_fip_vm(self):
         """
-        Description: Check if FIP config is pushed 
+        Description: Check if FIP config is pushed
         """
         assert self.check_bgp_status(is_mx_present=True)
         assert self.check_tcp_status

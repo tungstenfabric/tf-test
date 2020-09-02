@@ -61,7 +61,7 @@ class Iperf3(object):
             server_cmd = 'iperf3 -s 1>%s 2>%s' % (self.log_file,
                                                   self.result_file)
         client_cmd = 'iperf3 -c %s %s 1>%s 2>%s' % (
-                                            self.server_vm_fixture.vm_ip, 
+                                            self.server_vm_fixture.vm_ip,
                                             self.args_string,
                                             self.log_file,
                                             self.result_file)
@@ -90,7 +90,7 @@ class Iperf3(object):
     # end stop
 
     def get_cmd_args(self, **kwargs):
-        ''' convert { 'k1': val, 'k2':val2 } to 
+        ''' convert { 'k1': val, 'k2':val2 } to
             "--k1 val --k2 val2"
             All keys are of type string
             All values are string or boolean
