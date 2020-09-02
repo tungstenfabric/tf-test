@@ -42,7 +42,7 @@ class FloatingipTestSanity_restart(base.FloatingIpBaseTest):
     def setUpClass(cls):
         super(FloatingipTestSanity_restart, cls).setUpClass()
 
-    @test.attr(type='serial')	
+    @test.attr(type='serial')
     @preposttest_wrapper
     def test_service_restart_with_fip(self):
         '''Test restart of agent and control service with floating IP

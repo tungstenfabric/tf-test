@@ -211,13 +211,13 @@ class AnalyticsTestPerformance(testtools.TestCase, ConfigSvcChain, VerifySvcChai
             dest_vn_fixture=dest_vn_fixture)
 
     def restart_service(self, ip_list, service, command='restart',
-						container=None):
+                        container=None):
 
         for ip in ip_list:
             cmd = 'service %s %s' % (service, command)
             self.inputs.run_cmd_on_server(
                 ip, cmd, username='root', password='c0ntrail123',
-				container=container)
+                container=container)
 
     def reboot_node(self, ip_list):
 
@@ -230,7 +230,7 @@ class AnalyticsTestPerformance(testtools.TestCase, ConfigSvcChain, VerifySvcChai
         vm.run_cmd_on_vm([cmd])
 
     def triggers(self, preference='', ip=[], command='', service='', vm=None,
-				 container=None):
+                container=None):
         '''
         preference : agent restart - to restart vrouter service
                      control restart
@@ -347,7 +347,7 @@ class AnalyticsTestPerformance(testtools.TestCase, ConfigSvcChain, VerifySvcChai
         self.inputs.compute_ips.remove(self.tx_vm_node_ip)
         self.triggers(preference='agent restart', ip=self.inputs.compute_ips,
                       command='restart', service='contrail-vrouter',
-					  container='agent')
+                      container='agent')
         time.sleep(20)
         self.verifications(verify='uve')
         self.inputs.compute_ips = temp[:]
@@ -355,7 +355,7 @@ class AnalyticsTestPerformance(testtools.TestCase, ConfigSvcChain, VerifySvcChai
         self.logger.info("Verifying collector start/stop")
         self.triggers(preference='collector stop', ip=[
                       self.inputs.collector_ips[0]], command='stop', service='supervisor-analytics',
-					  container='analytics')
+                      container='analytics')
         temp = self.inputs.collector_ips[:]
         self.inputs.collector_ips.remove(self.inputs.collector_ips[0])
         time.sleep(10)
