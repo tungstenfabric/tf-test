@@ -12,8 +12,8 @@ class BaseSriovTest(test.BaseTestCase):
     def setUpClass(cls):
         super(BaseSriovTest, cls).setUpClass()
         cls.isolated_creds = isolated_creds.IsolatedCreds(cls.__name__, \
-				cls.inputs, input_file = cls.input_file, \
-				logger = cls.logger)
+                cls.inputs, input_file = cls.input_file, \
+                logger = cls.logger)
         cls.isolated_creds.setUp()
         cls.project = cls.isolated_creds.create_tenant() 
         cls.isolated_creds.create_and_attach_user_to_tenant()

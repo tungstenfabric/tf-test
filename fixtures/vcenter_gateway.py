@@ -130,9 +130,9 @@ class VcenterGatewayOrch(VcenterOrchestrator):
     
     def create_vn_vmi_for_stp_bpdu_to_be_flooded(self,**kwargs):
         self.plug_api.create_network_in_contrail_cluster(name='stp_vn',subnet=[{'cidr':'122.121.123.0/24'}],**kwargs)
-       	#The below code is needed for not to 
+        #The below code is needed for not to
         #create the stp vmi port if already exists 
-        #		
+        #
         interfaces = self._vnc.virtual_machine_interfaces_list()
         for intf in interfaces['virtual-machine-interfaces']:
             uuid = intf['uuid']
