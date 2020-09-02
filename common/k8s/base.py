@@ -236,7 +236,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                         labels=None,
                         spec=None,
                         custom_isolation = False,
-			compute_node_selector = None,
+                        compute_node_selector = None,
                         fq_network_name = {}):
         '''
         Noticed that nginx continues to listen on port 80 even if target port
@@ -1129,7 +1129,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         vn_name = vn_name or get_random_name('vn_test')
         return self.useFixture(VNFixture(
                                         connections=connections,
-					project_name=project_name,
+                                        project_name=project_name,
                                         inputs=inputs,
                                         vn_name=vn_name,
                                         option=option))
