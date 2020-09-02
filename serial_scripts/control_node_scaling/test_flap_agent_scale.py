@@ -655,15 +655,15 @@ class FlapAgentScaleInit (object):
         #
         # Get localhost IP
         #
-#	if 'TEST_CONFIG_FILE' in os.environ :
+#   if 'TEST_CONFIG_FILE' in os.environ :
 #            self.ini_file= os.environ.get('TEST_CONFIG_FILE')
 #        else:
 #            self.ini_file= 'sanity_params.ini'
 #        self.inputs= ContrailTestInit(
 #                self.ini_file, stack_user=self._args.username,
 #                stack_password=self._args.password, project_fq_name=['default-domain', 'default-project'])
-#	self.inputs.setUp()
-#	cmd = 'resolveip -s `hostname`'
+#   self.inputs.setUp()
+#   cmd = 'resolveip -s `hostname`'
 #        cmd = "ip addr show | \grep '192\.168\.200' | awk '{print $2}' | cut -d '/' -f 1"
 #        status, ip = self._get_subprocess_info(cmd)
 #

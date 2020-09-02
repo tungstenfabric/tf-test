@@ -1,5 +1,5 @@
 """Intf mirroring IPv6 Regression tests."""
-# Written by 	: ankitja@juniper.net
+# Written by    : ankitja@juniper.net
 # Maintained by : ankitja@juniper.net
 
 import os

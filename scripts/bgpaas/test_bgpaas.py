@@ -1278,7 +1278,7 @@ class TestBGPaaS(BaseBGPaaS):
         Suppress route-advt:
            1. Enable suppress-route-advt and verify test_vm is not advertised to vsrx.
            2. Disable suppress-route-advt and verify test_vm is advertised to vsrx.
-	Maintainer: vageesant@juniper.net
+    Maintainer: vageesant@juniper.net
         '''
         vn_name = get_random_name('bgpaas_vn')
         vn_subnets = [get_random_cidr()]

@@ -511,7 +511,7 @@ class TestBasicVMVN0(BaseVnVmTest):
             if vm_host_ip not in compute_ip:
                 compute_ip.append(vm_host_ip)
         self.inputs.restart_service('contrail-vrouter-agent', compute_ip,
-									container='agent')
+                                    container='agent')
         sleep(50)
         for vmobj in list(vm_fixture.vm_obj_dict.values()):
             assert vmobj.verify_on_setup()
