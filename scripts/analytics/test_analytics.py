@@ -27,7 +27,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
     @classmethod
     def setUpClass(cls):
         super(AnalyticsTestSanity, cls).setUpClass()
-    
+
     @preposttest_wrapper
     def test_redis_stunnel_provision(self):
         ''' Test verify redis & stunnel services
@@ -112,7 +112,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
         '''
         assert self.analytics_obj.verify_bgp_router_uve_xmpp_and_bgp_count()
         return True
-    
+ 
     @preposttest_wrapper
     def test_colector_uve_module_sates(self):
         '''Test to validate collector uve.
@@ -122,8 +122,8 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
                         'contrail-analytics-nodemgr']
         for process in process_list:
             result = result and self.analytics_obj.verify_collector_uve_module_state\
-							(self.inputs.collector_names[0],\
-							self.inputs.collector_names[0],process)
+                            (self.inputs.collector_names[0],\
+                            self.inputs.collector_names[0],process)
         assert result
         return True
 
@@ -134,7 +134,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
         start_time=self.analytics_obj.get_time_since_uptime(self.inputs.cfgm_ip)
         assert self.analytics_obj.verify_message_table(start_time= start_time)
         return True
-    
+ 
     @preposttest_wrapper
     def test_config_node_uve_states(self):
         '''Test to validate config node uve.
@@ -144,10 +144,10 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
                         'contrail-schema']
         for process in process_list:
             result = result and self.analytics_obj.verify_cfgm_uve_module_state(self.inputs.collector_names[0],
-				self.inputs.cfgm_names[0],process)
+                self.inputs.cfgm_names[0],process)
         assert result
         return True
-    
+
     @preposttest_wrapper
     def test_verify_hrefs(self):
         ''' Test all hrefs for collector/agents/bgp-routers etc
@@ -181,24 +181,24 @@ class AnalyticsTestSanity1(base.AnalyticsBaseTest):
         '''
         assert self.analytics_obj.verify_bgp_router_uve_up_xmpp_and_bgp_count()
         return True
-    
-    
+
+
     @preposttest_wrapper
     def test_verify_bgp_peer_uve(self):
         ''' Test to validate bgp peer uve
 
         '''
-        abc= self.analytics_obj.get_peer_stats_info_tx_proto_stats(self.inputs.collector_ips[0],
-			(self.inputs.bgp_names[0],self.inputs.bgp_names[1]))
+        abc = self.analytics_obj.get_peer_stats_info_tx_proto_stats(self.inputs.collector_ips[0],
+            (self.inputs.bgp_names[0],self.inputs.bgp_names[1]))
         assert abc
         return True
-    
+
 class AnalyticsTestSanity2(base.AnalyticsBaseTest):
 
     @classmethod
     def setUpClass(cls):
         super(AnalyticsTestSanity2, cls).setUpClass()
-    
+
     def runTest(self):
         pass
     #end runTest

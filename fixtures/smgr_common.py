@@ -53,8 +53,8 @@ class SmgrFixture(fixtures.Fixture):
     '''
 
     def __init__(self, inputs, testbed_py="./testbed.py",
-	 smgr_config_ini="./smgr_input.ini", 
-	test_local=False,logger = None):
+            smgr_config_ini="./smgr_input.ini",
+            test_local=False,logger = None):
         self.testbed_py = testbed_py
         self.testbed = self.get_testbed()
         self.smgr_config_ini = smgr_config_ini

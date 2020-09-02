@@ -36,14 +36,14 @@ if not configfile:
     sys.exit(2)
 
 try:
-	ixnHLT_errorHandler('', {})
+    ixnHLT_errorHandler('', {})
 except (NameError,):
-	def ixnHLT_errorHandler(cmd, retval):
-		global ixiatcl
-		err = ixiatcl.tcl_error_info()
-		log = retval['log']
-		additional_info = '> command: %s\n> tcl errorInfo: %s\n> log: %s' % (cmd, err, log)
-		raise IxiaError(IxiaError.COMMAND_FAIL, additional_info)
+    def ixnHLT_errorHandler(cmd, retval):
+        global ixiatcl
+        err = ixiatcl.tcl_error_info()
+        log = retval['log']
+        additional_info = '> command: %s\n> tcl errorInfo: %s\n> log: %s' % (cmd, err, log)
+        raise IxiaError(IxiaError.COMMAND_FAIL, additional_info)
 
 def printDict(obj, nested_level=0, output=sys.stdout):
     spacing = '   '
@@ -74,28 +74,28 @@ port_list               = '4/7 4/8 4/1 4/2'
 
 
 # #############################################################################
-# 								CONNECT AND PORT HANDLES
+#                        CONNECT AND PORT HANDLES
 # #############################################################################
 
 print('\n\nConnect to IxNetwork Tcl Server and get port handles...\n\n')
 
 connect_status = ixiangpf.connect(
-         device                 = chassis_ip,
- 	port_list              = port_list,
- 	ixnetwork_tcl_server   = ixnetwork_tcl_server,
- 	tcl_server             = chassis_ip,
+        device                 = chassis_ip,
+        port_list              = port_list,
+        ixnetwork_tcl_server   = ixnetwork_tcl_server,
+        tcl_server             = chassis_ip,
 #        config_file            = '/root/scripts/configfile',
         config_file            = configfile,
  )
 if connect_status['status'] != IxiaHlt.SUCCESS:
- 	ixnHLT_errorHandler('connect', connect_status)
+    ixnHLT_errorHandler('connect', connect_status)
 
 
 #connect_status = ixiangpf.connect(
-#	ixnetwork_tcl_server   = ixnetwork_tcl_server,
+#   ixnetwork_tcl_server   = ixnetwork_tcl_server,
 #)
 #if connect_status['status'] != IxiaHlt.SUCCESS:
-#	ixnHLT_errorHandler('connect', connect_status)
+#   ixnHLT_errorHandler('connect', connect_status)
 
 
 #############################################################################
@@ -107,7 +107,7 @@ test_control_status = ixiangpf.test_control(
         action =        'get_all_qt_handles',
 )
 if test_control_status['status'] != IxiaHlt.SUCCESS:
-	ixnHLT_errorHandler('test_control:  get_all_qt_handles', test_control_status)
+    ixnHLT_errorHandler('test_control:  get_all_qt_handles', test_control_status)
 
 qt_handle_list = test_control_status['qt_handle'].split()
 print("QT_handles:  ", qt_handle_list)
@@ -207,12 +207,12 @@ for test_handle in qt_handle_list:
         print("ResultPath: ", test_stats_status[test_handle]['result_path'])
 
 # #############################################################################
-# 								CLEANUP SESSION
+#                               CLEANUP SESSION
 # #############################################################################
 
 # cleanup_status = ixiangpf.cleanup_session(reset='1')
 # if cleanup_status['status'] != IxiaHlt.SUCCESS:
-# 	ixnHLT_errorHandler('cleanup_session', cleanup_status)
+#   ixnHLT_errorHandler('cleanup_session', cleanup_status)
 
 
 print('!!! TEST is FINISHED !!!')

@@ -1005,7 +1005,7 @@ def skip_because(*args, **kwargs):
                 if not self.orch.is_feature_supported(kwargs["feature"]):
                     skip = True
                     msg = "Skipped as feature %s not supported in this environment"%(
-				kwargs["feature"])
+                        kwargs["feature"])
                     raise testtools.TestCase.skipException(msg)
 
             if 'ha_setup' in kwargs:
@@ -1013,7 +1013,7 @@ def skip_because(*args, **kwargs):
                     skip = True
                     msg = "Skipped as not supported in non-HA setup"
                     raise testtools.TestCase.skipException(msg)
-            
+ 
             if "mx_gw" in kwargs:
                 if ((not get_os_env('MX_GW_TEST') == '1') and (kwargs["mx_gw"] == False)):
                     skip = True
