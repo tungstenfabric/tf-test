@@ -26,6 +26,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
 
     @classmethod
     def setUpClass(cls):
+        print("print works eeeee!!")
         super(AnalyticsTestSanity, cls).setUpClass()
     
     @preposttest_wrapper
