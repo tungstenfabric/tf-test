@@ -21,7 +21,7 @@ class TestNSIsolationSerial(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_common_namespaces_pods(self, prov_service = False, prov_ingress = False):
         service_ns1, ingress_ns1 = None, None
         service_ns2, ingress_ns2 = None, None
@@ -141,7 +141,7 @@ class TestNSIsolationSerial(BaseK8sTest):
         #Check 2:
         assert self.validate_nginx_lb([client1[0], client1[1]], client1[3].cluster_ip,
                                       test_pod=client3[2], expectation=False)
-    #end test_service_isolation_post_kube_manager_restart    
+    #end test_service_isolation_post_kube_manager_restart
 
     @skip_because(mx_gw = False)
     @preposttest_wrapper
@@ -195,7 +195,7 @@ class TestCustomIsolationSerial(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_common_namespaces_pods(self, prov_service = False):
         service_ns1 = None
         service_ns2 = None
@@ -255,12 +255,12 @@ class TestCustomIsolationSerial(BaseK8sTest):
                     namespace2, client4_ns2, vn_for_namespace]
         return (client1, client2)
     #end setup_common_namespaces_pods
-    
+
     @test.attr(type=['k8s_sanity','openshift_1'])
     @preposttest_wrapper
     def test_pods_custom_isolation_post_kube_manager_restart(self):
         """
-        Verify that after restart of contrail-kubemanager, pod reachability to 
+        Verify that after restart of contrail-kubemanager, pod reachability to
         and from custom isolated namespace/pod is not affected
         Verify following reachability:
         1. Verify reachability between pods and namespaces
@@ -287,12 +287,12 @@ class TestCustomIsolationSerial(BaseK8sTest):
         assert client2[5].ping_to_ip(client1[2].pod_ip, expectation=False)
         assert client2[5].ping_to_ip(client1[5].pod_ip)
     #end test_pods_custom_isolation_post_kube_manager_restart
-    
+
     @test.attr(type=['k8s_sanity','openshift_1'])
     @preposttest_wrapper
     def test_services_custom_isolation_post_kube_manager_restart(self):
         """
-        Verify that after restart of contrail-kubemanager, service reachability to 
+        Verify that after restart of contrail-kubemanager, service reachability to
         and from custom isolated namespace/pod is not affected
         Verify following reachability:
         1. Verify reachability between pods and services
@@ -347,7 +347,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_common_namespaces_pods(self, prov_service = False,
                                     prov_ingress = False,
                                     isolation = False):
@@ -387,7 +387,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
         if prov_service == True:
             service_ns1 = self.setup_http_service(namespace=namespace1.name,
                                           labels={'app': ns_1_label})
-            type = "LoadBalancer" if prov_ingress == False else None 
+            type = "LoadBalancer" if prov_ingress == False else None
             service_ns2 = self.setup_http_service(namespace=namespace2.name,
                                           labels={'app': ns_2_label},
                                           type=type)
@@ -404,7 +404,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
                     namespace2, ingress_ns2]
         return (client1, client2)
     #end setup_common_namespaces_pods
-   
+
     @test.attr(type=['openshift_1'])
     @preposttest_wrapper
     def test_pod_reachability_across_projects(self):
@@ -416,7 +416,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
         assert client1[2].ping_to_ip(client2[0].pod_ip)
         assert client2[2].ping_to_ip(client1[0].pod_ip)
     # end  test_pod_reachability_across_ns
-    
+
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_service_reachability_across_projects(self):
@@ -424,7 +424,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
         Check reachability of Service of different namespaces across different projects
         """
         client1, client2 = self.setup_common_namespaces_pods(prov_service = True)
-        # Service reachability within namespace/project 
+        # Service reachability within namespace/project
         assert self.validate_nginx_lb([client1[0], client1[1]], client1[3].cluster_ip,
                                       test_pod=client1[2])
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,
@@ -437,7 +437,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
         #External connectivity check
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].external_ips[0])
     # end  test_service_reachability_across_ns
-    
+
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ingress_reachability_across_projects(self):
@@ -446,7 +446,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
         """
         client1, client2 = self.setup_common_namespaces_pods(prov_service = True,
                                                              prov_ingress = True)
-        # Ingress reachability within namespace/project 
+        # Ingress reachability within namespace/project
         assert self.validate_nginx_lb([client1[0], client1[1]], client1[5].external_ips[0])
         # Ingress reachability across namespace/project
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[5].external_ips[0])
@@ -469,15 +469,15 @@ class TestProjectIsolationSerial(BaseK8sTest):
         assert client2[2].ping_to_ip(client2[0].pod_ip)
         assert client2[2].ping_to_ip(client1[0].pod_ip, expectation = False)
         assert client1[2].ping_to_ip(client2[0].pod_ip, expectation = False)
-        # Reachability of Services   
+        # Reachability of Services
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,
-                                      test_pod=client2[2]) 
+                                      test_pod=client2[2])
         assert self.validate_nginx_lb([client1[0], client1[1]], client1[3].cluster_ip,
                                       test_pod=client2[2])
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,
                                       test_pod=client1[2], expectation = False)
     # end  test_reachability_across_projects_with_isolated_namespace
-    
+
     @test.attr(type=['k8s_sanity'])
     @preposttest_wrapper
     def test_reachability_across_projects_with_kube_manager_restart(self):
@@ -490,7 +490,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
         assert client1[2].ping_to_ip(client1[0].pod_ip)
         assert client1[2].ping_to_ip(client2[0].pod_ip)
         assert client2[2].ping_to_ip(client1[0].pod_ip)
-        # Reachability of Services   
+        # Reachability of Services
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,
                                       test_pod=client2[2])
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,
@@ -502,7 +502,7 @@ class TestProjectIsolationSerial(BaseK8sTest):
         assert client1[2].ping_to_ip(client1[0].pod_ip)
         assert client1[2].ping_to_ip(client2[0].pod_ip)
         assert client2[2].ping_to_ip(client1[0].pod_ip)
-        # Reachability of Services   
+        # Reachability of Services
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,
                                       test_pod=client2[2])
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,

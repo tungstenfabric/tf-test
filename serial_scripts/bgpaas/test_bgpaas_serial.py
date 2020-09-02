@@ -24,7 +24,7 @@ class TestBGPaaS(BaseBGPaaS):
              6. Create new bgpaas service and verify BGPaaS session is UP.
         Maintainer: vageesant@juniper.net
         '''
- 
+
         bgpaas_fixture,bgpaas_vm1 = self.create_bird_bgpaas()
 
         port_start,port_end = self.get_global_service_port_range()
@@ -32,7 +32,7 @@ class TestBGPaaS(BaseBGPaaS):
         ret = self.set_global_service_port_range(port_start=port_start,port_end=new_port_end)
 
         if ret:
-           assert False,"BGP End Port range shrunk is allowed"  
+           assert False,"BGP End Port range shrunk is allowed"
         else:
            self.logger.info("BGP End Port range shrunk is not allowed")
         assert bgpaas_fixture.verify_in_control_node(bgpaas_vm1),"BGP session with Controller is not seen"
@@ -42,16 +42,16 @@ class TestBGPaaS(BaseBGPaaS):
         ret = self.set_global_service_port_range(port_start=port_start,port_end=new_port_end)
 
         if ret:
-           assert False,"BGP Start Port range shrunk is allowed"  
+           assert False,"BGP Start Port range shrunk is allowed"
         else:
            self.logger.info("BGP Start Port range shrunk is not allowed")
         assert bgpaas_fixture.verify_in_control_node(bgpaas_vm1),"BGP session with Controller is not seen"
         self.logger.info("BGP session with Controller is seen")
-     
+
         ret = self.set_global_service_port_range(port_start=new_port_start,port_end=new_port_end)
 
         if ret:
-           assert False,"BGP Start,End Port range shrunk is allowed"  
+           assert False,"BGP Start,End Port range shrunk is allowed"
         else:
            self.logger.info("BGP Start,End Port range shrunk is not allowed")
         assert bgpaas_fixture.verify_in_control_node(bgpaas_vm1),"BGP session with Controller is not seen"
@@ -63,7 +63,7 @@ class TestBGPaaS(BaseBGPaaS):
         ret = self.set_global_service_port_range(port_start=new_port_start,port_end=new_port_end)
 
         if ret:
-           assert False,"BGP Start Port range shrunk is allowed"  
+           assert False,"BGP Start Port range shrunk is allowed"
         else:
            self.logger.info("BGP Start,End Port range shrunk is not allowed")
         assert bgpaas_fixture.verify_in_control_node(bgpaas_vm1),"BGP session with Controller is not seen"
@@ -75,7 +75,7 @@ class TestBGPaaS(BaseBGPaaS):
         ret = self.set_global_service_port_range(port_start=new_port_start,port_end=new_port_end)
 
         if not ret:
-           assert False,"BGP Start,End Port range expand is NOT allowed"  
+           assert False,"BGP Start,End Port range expand is NOT allowed"
         else:
            self.logger.info("BGP Start,End Port range expand is allowed")
 
@@ -161,11 +161,11 @@ class TestBGPaaS(BaseBGPaaS):
             for rt_entry in rt_entries:
                if rt_entry['protocol'] == "BGP (bgpaas)":
                   route_seen = True
-         
+
         if route_seen:
            self.logger.info("route 9.9.9.9/32 is seen in controller")
         else:
-           assert False,"route 9.9.9.9/32 is seen NOT in Controller" 
+           assert False,"route 9.9.9.9/32 is seen NOT in Controller"
 
         ping_h = self.start_ping(test_vm, dst_ip="9.9.9.9")
 
@@ -205,7 +205,7 @@ class TestBGPaaS(BaseBGPaaS):
         if route_seen:
            self.logger.info("route 9.9.9.9/32 is seen in Controller after active controller is stopped")
         else:
-           assert False,"route 9.9.9.9/32 is NOT seen in Controller after active controller is stopped" 
+           assert False,"route 9.9.9.9/32 is NOT seen in Controller after active controller is stopped"
 
         time.sleep(30)
 
@@ -399,7 +399,7 @@ class TestBGPaaS(BaseBGPaaS):
            self.logger.info("there is no traffic loss on stopping one of the vrouter-agent")
         else:
            self.inputs.restart_service('contrail-vrouter-agent', [bgpaas_vm1.vm_node_data_ip,bgpaas_vm2.vm_node_data_ip],
-                                         container='agent') 
+                                         container='agent')
            assert False , "There is traffic loss when stopping one of the vrouter-agent"
 
         self.inputs.restart_service('contrail-vrouter-agent', [bgpaas_vm1.vm_node_data_ip],
@@ -412,7 +412,7 @@ class TestBGPaaS(BaseBGPaaS):
            self.logger.info("there is no traffic loss on starting again one of the vrouter-agent")
         else:
            self.inputs.restart_service('contrail-vrouter-agent', [bgpaas_vm1.vm_node_data_ip,bgpaas_vm2.vm_node_data_ip],
-                                         container='agent') 
+                                         container='agent')
            assert False,"There is traffic loss when active VMs vrouter-agent is started again"
 
         self.logger.info("stopping the secondary VMs vrouter-agent")

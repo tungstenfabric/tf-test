@@ -518,7 +518,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
         introspect_prefix_info = []
         as_path = "-"
         as4_path = "-"
-          
+
         vsrx_exp_routes = []
         if control_node_config['cluster_4b_capability'] and control_mx_bgp_type == "internal":
            as_path = "-"
@@ -634,7 +634,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
                  peer_vm_config['aggr_route'], vn_gw_ip, control_node_asn[0], peer_bgpaas_asn))
         return introspect_prefix_info,routes
 
-    def peer_route_from_external_mx(self,control_node_config,mx_config,mx1_config,mx2_config): 
+    def peer_route_from_external_mx(self,control_node_config,mx_config,mx1_config,mx2_config):
         mx1_asn = mx1_config['mx_asn']
         mx2_asn = mx2_config['mx_asn']
         if control_node_config['control_node_asn'] != mx_config['mx_asn']:
@@ -657,11 +657,11 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
             if mx1_asn > ASN4Base.AS_2BYTE_MAX:
                 mx1_asn_t = "%d" % ASN4Base.AS_TRANS
             else:
-                mx1_asn_t = mx1_asn 
+                mx1_asn_t = mx1_asn
             if mx2_asn > ASN4Base.AS_2BYTE_MAX:
                 mx2_asn_t = "%d" % ASN4Base.AS_TRANS
             else:
-                mx2_asn_t = mx2_asn 
+                mx2_asn_t = mx2_asn
             ext_mx_as_path  = "%s %s %s" % (mx_asn_t,mx1_asn_t,mx2_asn_t)
             ext_mx_as4_path = "%s %s %s" % (mx_config['mx_asn'][0],mx1_asn,mx2_asn)
         ext_mx_aggr_route,ext_mx_static_route = self.get_external_mx_configured_aggr_routes()
@@ -677,11 +677,11 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
             prefix_info = {
                'prefix': route, 'as_path': ext_mx_as_path, 'as4_path': ext_mx_as4_path}
             introspect_prefix_info.append(prefix_info)
-            
+
         prefix_info = {
                'prefix': ext_mx_aggr_route, 'as_path': ext_mx_as_path, 'as4_path': ext_mx_as4_path}
         introspect_prefix_info.append(prefix_info)
-   
+
         return introspect_prefix_info
 
     def generate_expected_routes(self, control_node_config, vn_fixture, mx_config, mx1_config, mx2_config, vm_fixt_list, vm_config_list):
@@ -712,7 +712,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
            vsrx2_routes.extend(exp_routes_from_mx)
 
         mx_routes = self.peer_route_to_mx(control_node_config,mx_config,vn_fixture,vm_fixt_list,vm_config_list)
-       
+
         if mx1_config:
            introspect_prefix_info_ext_mx_routes = self.peer_route_from_external_mx(control_node_config,mx_config,mx1_config,mx2_config)
            introspect_prefix_info_l.extend(introspect_prefix_info_ext_mx_routes)
@@ -756,7 +756,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
             as_path = prefix_info['as_path']
             if as_path == "-":
                as_path = None
-            as4_path = prefix_info['as4_path'] 
+            as4_path = prefix_info['as4_path']
             if as4_path == "-":
                as4_path = None
 
@@ -798,7 +798,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
         mx2_config["loopback_ip"] = ext_mx_info['loopback_ip']
         mx2_config['mgmt_ip'] = ext_mx_info['mgmt_ip']
         mx2_config['mx_name'] = ext_mx_info['name']
-        mx2_config['addnl_static_routes'] = self.get_external_mx_configured_addnl_static_routes() 
+        mx2_config['addnl_static_routes'] = self.get_external_mx_configured_addnl_static_routes()
         mx2_config['aggr_route'], mx2_config['static_routes'] = self.get_external_mx_configured_aggr_routes()
 
         self.external_route_config(mx1_config, mx2_config, vrf_target)

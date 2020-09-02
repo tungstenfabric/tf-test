@@ -179,7 +179,7 @@ class NovaHelper(object):
         for host in hosts:
             self.obj.aggregates.remove_host(agg_id,host)
         return
- 
+
     def delete_agg(self,agg_id):
         return self.obj.aggregates.delete(agg_id)
 
@@ -231,7 +231,7 @@ class NovaHelper(object):
     # end get_flavor
 
     def get_flavor_list(self):
-        flavor = [] 
+        flavor = []
         try:
             flavor = self.obj.flavors.list()
         except novaException:

@@ -11,7 +11,7 @@ import os
 import sys
 import test
 from tcutils.contrail_status_check import *
-from common.base import _GenericTestBaseMethods 
+from common.base import _GenericTestBaseMethods
 
 class TestXmpptests(XmppBase, ConfigPolicy, _GenericTestBaseMethods):
 

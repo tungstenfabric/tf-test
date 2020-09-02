@@ -113,7 +113,7 @@ class BaseBGPaaS(BaseNeutronTest, BaseHC):
                         'set policy-options policy-statement export-to-bgp term allow_local from protocol local',
                         'set policy-options policy-statement export-to-bgp term allow_local from protocol static', 'set policy-options policy-statement export-to-bgp term allow_local then next-hop ' +
                         str(bgp_ip),
-                        'set policy-options policy-statement export-to-bgp term allow_local then accept', 'set policy-options policy-statement export-to-bgp term deny_all then reject'	))
+                        'set policy-options policy-statement export-to-bgp term allow_local then accept', 'set policy-options policy-statement export-to-bgp term deny_all then reject' ))
         cmd_string = (';').join(cmdList)
         assert self.set_config_via_netconf(src_vm, dst_vm, cmd_string, timeout=10,
                                            device='junos', hostkey_verify="False"), 'Could not configure BGP thru Netconf'
@@ -264,7 +264,7 @@ class BaseBGPaaS(BaseNeutronTest, BaseHC):
                         self.logger.info(
                             'Node %s peering info:With Peer %s : %s peering is Current State is %s ' %
                             (entry['local_address'], bgp_router_name, entry['peer'], entry['state']))
-        return flap_info 
+        return flap_info
 
     def create_bird_bgpaas(self):
         vn_name = get_random_name('bgpaas_vn')
@@ -316,7 +316,7 @@ class BaseBGPaaS(BaseNeutronTest, BaseHC):
                static_route_cmd += "route %s %s;\n"%(rt["network"],rt["nexthop"])
            static_route_cmd += "}\n"
         if not export_filter_cmds:
-           export_filter = "export where source = RTS_STATIC;\n" 
+           export_filter = "export where source = RTS_STATIC;\n"
            export_filter_fn = ""
         else:
            export_filter = export_filter_cmds[0]
@@ -546,7 +546,7 @@ EOS
         if not bgpaas_parameters:
            return 50000,50512
         else:
-           return bgpaas_parameters.get_port_start(),bgpaas_parameters.get_port_end()  
+           return bgpaas_parameters.get_port_start(),bgpaas_parameters.get_port_end()
 
     def set_global_service_port_range(self,port_start,port_end):
         gsc_obj = self.connections.vnc_lib.global_system_config_read(fq_name=['default-global-system-config'])
@@ -557,7 +557,7 @@ EOS
            bgpaas_params.set_port_start(port_start)
         if port_end:
            bgpaas_params.set_port_end(port_end)
-        
+
         gsc_obj.set_bgpaas_parameters(bgpaas_params)
         try:
           self.connections.vnc_lib.global_system_config_update(gsc_obj)
@@ -607,7 +607,7 @@ EOS
     def create_and_attach_bgpaas(self,cnz_fixtures,vn,vm ,local_as,vip,ctrl_zone,bgpaas_fixture=None):
         peer_ips = []
         peer_as = self.connections.vnc_lib_fixture.get_global_asn()
-        if bgpaas_fixture is None:         
+        if bgpaas_fixture is None:
             bgpaas_fixture  = self.create_bgpaas(autonomous_system=local_as)
         self.logger.info('We will configure BGP on the VM')
         peer_ips.append(vn.get_subnets()[0]['gateway_ip'])
@@ -621,14 +621,14 @@ EOS
         else :
             self.attach_zones_to_bgpaas(None,cnz_fixtures[1],bgpaas_fixture)
             self.config_bgp_on_bird(vm, vm.vm_ip,local_as, [peer_ips[1]], peer_as)
-       
+
         self.attach_vmi_to_bgpaas(vm.vmi_ids[vm.vn_fq_name], bgpaas_fixture)
         self.logger.info('Attaching the VMI %s to the BGPaaS %s object'%
                                                  (vm.uuid , bgpaas_fixture.uuid))
         self.addCleanup(self.detach_vmi_from_bgpaas,vm.vmi_ids[vm.vn_fq_name],
                                                                       bgpaas_fixture)
         vm.run_cmd_on_vm(cmds=['sudo ip addr add %s dev eth0'%vip], as_sudo=True)
-        return bgpaas_fixture 
+        return bgpaas_fixture
 
     @retry(delay=5, tries=10)
     def verify_bgpaas_in_control_nodes_and_agent(self,bgpaas,vm):
@@ -636,15 +636,15 @@ EOS
             bgp_routers = [rtr.bgp_router_parameters.address for rtr in bgpaas.pri_zone.bgp_router_objs]
             if not bgpaas.verify_in_control_nodes(control_nodes=bgp_routers,peer_address=vm.vm_ip):
                 self.logger.info('primary peer not %s established to the bgp_router %s'%(vm.vm_ip,bgp_routers))
-                return False 
+                return False
         if hasattr(bgpaas, 'sec_zone'):
             bgp_routers = [rtr.bgp_router_parameters.address for rtr in bgpaas.sec_zone.bgp_router_objs]
             if not bgpaas.verify_in_control_nodes(control_nodes=bgp_routers,peer_address=vm.vm_ip):
                 self.logger.info('secondary peer not %s established to the bgp_router %s'%(vm.vm_ip,bgp_routers))
-                return False 
+                return False
         if not self.verify_control_node_zones_in_agent(vm,bgpaas):
                 return False
-        return True 
+        return True
 
     def flap_bgpaas_peering(self,vms):
         for vm in vms:

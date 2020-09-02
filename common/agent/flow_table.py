@@ -8,7 +8,7 @@ class FlowTable(object) :
        Data is got from queries similar to below:
         http://nodek1:8085/Snh_NextKFlowReq?x=
 
-        flow_table_entries : List got from agent introspect API 
+        flow_table_entries : List got from agent introspect API
                              get_vna_kflowresp()
     '''
 
@@ -27,12 +27,12 @@ class FlowTable(object) :
 
 class FlowEntry(object):
     '''
-    Object to represent a flow entry as got from 
+    Object to represent a flow entry as got from
         http://nodek1:8085/Snh_KFlowReq?flow_idx=
 
     Arguments:
     flow_entry_items : Flow entry dict as got from agent introspect
-    
+
     Ex flow_entry_items: {'index': '24', 'rflow': '43061', 'd_vrf_id': '1',
                           'proto': '6', 'insight': '0', 'bytes': '80',
                           'pkts': '2', 'vrf_id': '0', 'sip': '192.168.192.1',

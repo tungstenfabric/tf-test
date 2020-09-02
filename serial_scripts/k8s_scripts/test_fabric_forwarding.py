@@ -17,7 +17,7 @@ class TestFabricFWDRestarts(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_namespaces_pods_for_fabric_restart(self, isolation=False,ip_fabric_forwarding=False):
         """ common routine to create the namesapces and the pods  by enabling the fabric forwarding
             1.create 2 namespaces (ns1,ns2:enable fabric forwarding)
@@ -79,10 +79,10 @@ class TestFabricFWDRestarts(BaseK8sTest):
         client1, client2, client3 = self.setup_namespaces_pods_for_fabric_restart(isolation=True,
                                                                ip_fabric_forwarding=True)
         self.verify_ping_between_pods_across_namespaces_and_public_network(client1, client2, client3)
-        #perform the kube manager restart  
+        #perform the kube manager restart
         self.restart_kube_manager()
         self.verify_ping_between_pods_across_namespaces_and_public_network(client1, client2, client3)
-    #end test_fabric_fwd_with_kube_manager_restart 
+    #end test_fabric_fwd_with_kube_manager_restart
 
     @preposttest_wrapper
     def test_fabric_fwd_with_vrouter_agent_restart(self):

@@ -6,7 +6,7 @@ from __future__ import print_function
 # You can do 'python -m testtools.run -l vdns_tests'
 # Set the env variable PARAMS_FILE to point to your ini file. Else it will try to pick params.ini in PWD
 #
-from common.vdns.base import BasevDNSTest 
+from common.vdns.base import BasevDNSTest
 from builtins import str
 from builtins import range
 from builtins import object
@@ -77,7 +77,7 @@ class TestvDNSRestart(BasevDNSTest):
     def runTest(self):
         pass
     #end runTest
- 
+
     @preposttest_wrapper
     def test_vdns_controlnode_switchover(self):
         ''' This test tests control node switchover functionality
@@ -151,9 +151,9 @@ class TestvDNSRestart(BasevDNSTest):
 
     @preposttest_wrapper
     def scale_vdns_records_restart_named(self):
-        ''' 
+        '''
         This test verifies vdns record scaling as well as record update after named restart.
-        This test case is specifically for bug verification of bug ID 1583566 : [vDNS]: Records lost on named restart if scaled configuration is present 
+        This test case is specifically for bug verification of bug ID 1583566 : [vDNS]: Records lost on named restart if scaled configuration is present
         Steps:
             1.  Create vDNS server
             2.  Create 5000 records for the server.
@@ -168,7 +168,7 @@ class TestvDNSRestart(BasevDNSTest):
         domain_name = 'juniper.net'
         ttl = 100
         dns_data = VirtualDnsType( domain_name=domain_name, dynamic_records_from_client=True,
-                        default_ttl_seconds=ttl, record_order='random', reverse_resolution=True, 
+                        default_ttl_seconds=ttl, record_order='random', reverse_resolution=True,
                         external_visible = True)
         ipam_name = 'ipamTest'
         dns_server_name = "vdnsTest"
@@ -247,18 +247,18 @@ class TestvDNSRestart(BasevDNSTest):
             self.logger.debug("Number of records file on control node %s are %d." % (node, count))
             if count ==5000:
                 self.logger.info("All records restored correctly on control node %s" % node )
-            else : 
+            else :
                 self.logger.error("Records lost after named restart on control node %s" % node)
                 msg = "records lost after restart of named."
                 result = False
                 assert result, msg
     # end scale_vdns_records_restart_named
-    
+
     @preposttest_wrapper
     def test_agent_query_all_dns_servers_policy_fixed(self):
-        '''Agent to request all available named servers from Disocvery Server while 
+        '''Agent to request all available named servers from Disocvery Server while
            connecting to two in the list to send DNS records, but querying all.
-           This script is specifically written to test 
+           This script is specifically written to test
            Bug Id 1551987 : "Agent to query all available bind server for vDNS records"
            Also, this script assumes that DNS policy is *fixed* which is the default value.
            Steps:
@@ -286,7 +286,7 @@ class TestvDNSRestart(BasevDNSTest):
         dns_data = VirtualDnsType(
             domain_name=domain_name, dynamic_records_from_client=True,
             default_ttl_seconds=ttl, record_order='random', reverse_resolution=True)
-        vdns_fixt1 = self.useFixture(VdnsFixture(self.inputs, self.connections, 
+        vdns_fixt1 = self.useFixture(VdnsFixture(self.inputs, self.connections,
             vdns_name=dns_server_name, dns_data=dns_data))
         result, msg = vdns_fixt1.verify_on_setup()
         self.assertTrue(result, msg)
@@ -295,7 +295,7 @@ class TestvDNSRestart(BasevDNSTest):
         ipam_mgmt_obj = IpamType(
             ipam_dns_method='virtual-dns-server', ipam_dns_server=dns_server)
         # Associate IPAM with  VDNS server Object
-        ipam_fixt1 = self.useFixture(IPAMFixture(ipam_name, vdns_obj=vdns_fixt1.obj, 
+        ipam_fixt1 = self.useFixture(IPAMFixture(ipam_name, vdns_obj=vdns_fixt1.obj,
                 connections=self.connections, ipamtype=ipam_mgmt_obj))
         # Launch  VM with VN Created above.
         vn_fixt = self.useFixture(VNFixture(self.connections, self.inputs,\
@@ -305,13 +305,13 @@ class TestvDNSRestart(BasevDNSTest):
         for vm in vm_list:
             if 'agent1' in vm:
                 vm_fixture[vm] = self.useFixture(VMFixture(project_name=
-                    self.inputs.project_name, connections=self.connections, 
-                    vn_obj=vn_fixt.obj,vm_name=vm, 
+                    self.inputs.project_name, connections=self.connections,
+                    vn_obj=vn_fixt.obj,vm_name=vm,
                     node_name = self.inputs.compute_names[0]))
             elif 'agent2' in vm:
                 vm_fixture[vm] = self.useFixture(VMFixture(project_name=
                     self.inputs.project_name, connections=self.connections,
-                    vn_obj=vn_fixt.obj, vm_name=vm, 
+                    vn_obj=vn_fixt.obj, vm_name=vm,
                     node_name = self.inputs.compute_names[1]))
         for vm in vm_list:
             assert vm_fixture[vm].wait_till_vm_is_up()
@@ -330,10 +330,10 @@ class TestvDNSRestart(BasevDNSTest):
         # Getting the list of DNS servers in use by every Compute node
         for i in range(0,len(self.inputs.bgp_ips)):
             if "DNS query sent to named server : %s" % self.inputs.bgp_control_ips[i] in delta:
-                self.logger.debug("DNS query sent successfully to DNS server on %s" % 
+                self.logger.debug("DNS query sent successfully to DNS server on %s" %
                                   self.inputs.bgp_control_ips[i])
             else:
-                self.logger.error("DNS query not sent to DNS server running on %s" % 
+                self.logger.error("DNS query not sent to DNS server running on %s" %
                                   self.inputs.bgp_control_ips[i])
                 errmsg = "DNS query not sent to all DNS servers in the network"
                 self.logger.error(errmsg)
@@ -343,7 +343,7 @@ class TestvDNSRestart(BasevDNSTest):
             inspect_h = self.agent_inspect[entry]
             dns_list_all_compute_nodes.append(
                     inspect_h.get_vna_dns_server())
-            self.logger.debug("The compute node %s is connected to DNS servers: %s" 
+            self.logger.debug("The compute node %s is connected to DNS servers: %s"
                         %(entry,dns_list_all_compute_nodes[-1]))
         # Specifically for fixed policy, verifying that all agents connected to same set of DNS servers
         for i in range(0,(len(dns_list_all_compute_nodes)-1)):
@@ -373,7 +373,7 @@ class TestvDNSRestart(BasevDNSTest):
                 inspect_h = self.agent_inspect[entry]
                 new_dns_list.append(
                     inspect_h.get_vna_dns_server())
-                self.logger.debug("The compute node %s is connected to DNS servers: %s" 
+                self.logger.debug("The compute node %s is connected to DNS servers: %s"
                         %(entry,new_dns_list[-1]))
             if i == 0 and new_dns_list[0] == new_dns_list[1] and\
                 new_dns_list[0]==dns_list_all_compute_nodes[0]:
@@ -413,7 +413,7 @@ class TestvDNSRestart(BasevDNSTest):
                 continue
             elif new_dns_list[0] != dns_list_all_compute_nodes[0] and \
             new_dns_list[1] != dns_list_all_compute_nodes[1]:
-                # Allowing some time for new DNS server to populate the records. 
+                # Allowing some time for new DNS server to populate the records.
                 assert self.verify_ns_lookup_data(vm_fixture['vm1-agent1'],\
                                     cmd_for_agent2, vm_fixture['vm2-agent2'].vm_ip)
                 assert self.verify_ns_lookup_data(vm_fixture['vm1-agent1'],\
@@ -486,7 +486,7 @@ class TestvDNSRestart(BasevDNSTest):
                      'project4': 'vdns4',
                      'project5': 'vdns5',
                      'project6': 'vdns6'}
-    
+
     @preposttest_wrapper
     def test_vdns_with_same_zone(self):
         ''' Test vdns in same zone with multi projects/vdns-servers '''
@@ -629,8 +629,8 @@ class TestvDNSRestart(BasevDNSTest):
                 vm_fix[proj].ping_with_certainty(ip=var_obj.vm_list[proj]), msg)
         return True
     # end test_vdns_with_same_zone
-    
-    
+
+
     @preposttest_wrapper
     def test_vdns_with_diff_zone(self):
         ''' Test vdns in different zones with multi projects '''
@@ -782,7 +782,7 @@ class TestvDNS1(BasevDNSTest):
 
     def runTest(self):
         pass
-    #end runTest 
+    #end runTest
 
     # This test creates 16 levels of vdns servers vdns1,vdns2,vdns3...vdns16.
     #      The VDNS server are configured as shown below.
@@ -802,13 +802,13 @@ class TestvDNS1(BasevDNSTest):
     @skip_because(feature='multi-ipam')
     def test_vdns_tree_scaling(self):
         ''' 1. This test creates 16 levels of vdns servers vdns1,vdns2,vdns3...vdns16.
-               The VDNS server are configured as shown below. 
+               The VDNS server are configured as shown below.
                              vdns1 (domain: juniper.net)
-                             ^     
-                            /       
-                           /         
+                             ^
+                            /
+                           /
                          vdns2(domain: one.juniper.net)
-                         ^       
+                         ^
                         /
                        /
                       vdns3(domain: two.one.juniper.net)
@@ -820,7 +820,7 @@ class TestvDNS1(BasevDNSTest):
             5. Configure VN in IPAM created and launch VM in VN at each level
             6. perform NS lookup for each level
         Pass criteria: Step 6 should pass
-        Maintainer: cf-test@juniper.net  
+        Maintainer: cf-test@juniper.net
         '''
 
         ttl = 1000
@@ -957,7 +957,7 @@ class TestvDNS2(BasevDNSTest):
 
     def runTest(self):
         pass
-    #end runTest 
+    #end runTest
 
     @preposttest_wrapper
     @skip_because(feature='multi-ipam')

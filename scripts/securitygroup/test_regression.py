@@ -2700,7 +2700,7 @@ class SecurityGroupBasicRegressionTests1_contrail_vro(
     def setUpClass(cls):
         super(SecurityGroupBasicRegressionTests1_contrail_vro, cls).setUpClass()
         cls.option = 'contrail'
-    
+
     def is_test_applicable(self):
         if self.inputs.orchestrator == 'vcenter' and not self.inputs.vro_based:
             return(False, 'Skipping Test Vro server not preset on vcenter setup')

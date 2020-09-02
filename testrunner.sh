@@ -289,7 +289,7 @@ run_docker_cmd () {
         $docker ps -a --format "ID: {{.ID}}, Name: {{.Names}}" -f id=$id
     else
         echo "$docker run --privileged ${arg_env[*]} $arg_base_vol $local_vol $local_ssl_vol $key_vol $arg_testbed_vol $arg_params_vol --name $name $ci_image_arg $ct_folder -e FEATURE=$feature -e TEST_TAGS=$test_tags $dont_write_byte_code_arg -e SCENARIOS=$scenarios $arg_bg $arg_rm $arg_shell -t $image_name" > $tempfile
-    fi
+    fi 
     bash $tempfile | tee $run_log; rv=${PIPESTATUS[0]}
     return $rv
 }

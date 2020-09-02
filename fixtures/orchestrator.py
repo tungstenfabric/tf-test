@@ -81,8 +81,8 @@ class Orchestrator(with_metaclass(ABCMeta, object)):
    @abstractmethod
    def get_vm_list(self, name_pattern='', **kwargs):
        '''Returns a list of VM object matching pattern.'''
-       pass 
-   
+       pass
+
    @abstractmethod
    def get_vm_detail(self, vm_obj, **kwargs):
        '''Refreshes VM object.'''

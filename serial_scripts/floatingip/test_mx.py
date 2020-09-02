@@ -61,7 +61,7 @@ class TestSerialSanity_MX(base.FloatingIpBaseTest):
         '''
 
         result = True
-        fip_pool_name = self.inputs.fip_pool_name 
+        fip_pool_name = self.inputs.fip_pool_name
         vm1_name = 'vm200'
         vn1_name = get_random_name('vn200')
         vn1_subnets = ['12.1.1.0/24']
@@ -69,13 +69,13 @@ class TestSerialSanity_MX(base.FloatingIpBaseTest):
         mx_rt_wrong = '11111'
 
         vn1_fixture = self.useFixture(
-	    VNFixture(project_name=self.inputs.project_name,
-	    	  connections=self.connections, vn_name=vn1_name, inputs=self.inputs, subnets=vn1_subnets))
+        VNFixture(project_name=self.inputs.project_name,
+            connections=self.connections, vn_name=vn1_name, inputs=self.inputs, subnets=vn1_subnets))
         assert vn1_fixture.verify_on_setup()
 
         vm1_fixture = self.useFixture(
-	    VMFixture(project_name=self.inputs.project_name,
-	    	  connections=self.connections, vn_obj=vn1_fixture.obj, vm_name=vm1_name))
+        VMFixture(project_name=self.inputs.project_name,
+            connections=self.connections, vn_obj=vn1_fixture.obj, vm_name=vm1_name))
         vm1_fixture.wait_till_vm_is_up()
         assert vm1_fixture.verify_on_setup()
 
@@ -103,23 +103,23 @@ class TestSerialSanity_MX(base.FloatingIpBaseTest):
                 self.public_vn_obj.public_vn_fixture)
 
         self.logger.info(
-	    "BGP Peer configuraion done and trying to outside the VN cluster")
+        "BGP Peer configuraion done and trying to outside the VN cluster")
 
         if not vm1_fixture.ping_to_ip('www-int.juniper.net'):
             self.logger.info(
-	        "Here ping should fail as VN  is configured with wrong RT values" )
+            "Here ping should fail as VN  is configured with wrong RT values" )
         else:
             self.logger.error(
-	        "Ping should fail. But ping is successful even with wrong RT values")
+            "Ping should fail. But ping is successful even with wrong RT values")
             result = result and False
 
         # Change the RT value to correct one.
         routing_instance = self.public_vn_obj.public_vn_fixture.ri_name
         self.public_vn_obj.public_vn_fixture.del_route_target(
-	    routing_instance, self.inputs.router_asn, mx_rt_wrong)
+        routing_instance, self.inputs.router_asn, mx_rt_wrong)
         sleep(2)
         self.public_vn_obj.public_vn_fixture.add_route_target(
-	    routing_instance, self.inputs.router_asn, mx_rt)
+        routing_instance, self.inputs.router_asn, mx_rt)
         sleep(10)
 
         self.logger.info("Now trying to ping %s" % (self.inputs.public_host))
@@ -128,10 +128,10 @@ class TestSerialSanity_MX(base.FloatingIpBaseTest):
 
         # Reverting the RT value for fixture cleanup.
         self.public_vn_obj.public_vn_fixture.del_route_target(
-	    routing_instance, self.inputs.router_asn, mx_rt)
+        routing_instance, self.inputs.router_asn, mx_rt)
         sleep(2)
         self.public_vn_obj.public_vn_fixture.add_route_target(
-	    routing_instance, self.inputs.router_asn, mx_rt_wrong)
+        routing_instance, self.inputs.router_asn, mx_rt_wrong)
 
         # Removing further projects from floating IP pool. For cleanup
         self.logger.info('Removing project %s to FIP pool %s' %
@@ -141,7 +141,7 @@ class TestSerialSanity_MX(base.FloatingIpBaseTest):
 
         if not result:
             self.logger.error(
-	        'Test  ping outside VN cluster from VM %s failed' % (vm1_name))
+            'Test  ping outside VN cluster from VM %s failed' % (vm1_name))
             assert result
 
         return True

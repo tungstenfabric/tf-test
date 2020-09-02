@@ -19,7 +19,7 @@ class TestNSIsolation(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_common_namespaces_pods(self, prov_service = False):
         service_ns1 = None
         service_ns2 = None
@@ -104,7 +104,7 @@ class TestNSIsolation(BaseK8sTest):
         assert client3[2].ping_to_ip(client1[0].pod_ip, expectation=False)
         assert client3[2].ping_to_ip(client2[0].pod_ip, expectation=False)
     #end test_pods_isolation_negative
-    
+
     @test.attr(type=['openshift_1'])
     @preposttest_wrapper
     def test_communication_from_isolated_ns_via_service(self):
@@ -151,7 +151,7 @@ class TestCustomIsolation(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_common_namespaces_pods(self, prov_service = False, prov_ingress = False):
         service_ns1, ingress_ns1 = None, None
         service_ns2, ingress_ns2 = None, None
@@ -235,7 +235,7 @@ class TestCustomIsolation(BaseK8sTest):
         assert client1[6].ping_to_ip(client2[6].pod_ip)
     #end test_pod_custom_isolation
 
-    @test.attr(type=['openshift_1'])    
+    @test.attr(type=['openshift_1'])
     @preposttest_wrapper
     def test_namespace_custom_isolation(self):
         """
@@ -252,7 +252,7 @@ class TestCustomIsolation(BaseK8sTest):
         assert client2[6].ping_to_ip(client1[2].pod_ip, expectation=False)
         assert client2[6].ping_to_ip(client1[6].pod_ip)
     #end test_namespace_custom_isolation
-    
+
     @test.attr(type=['openshift_1'])
     @preposttest_wrapper
     def test_service_custom_isolation(self):
@@ -261,7 +261,7 @@ class TestCustomIsolation(BaseK8sTest):
         Verify following reachability:
         1. Pod inside custom isolated namespace should not be able to reach service within same namespace
            or any service outside the namespace.
-        2. After creating a  contrail network policy between Custom VN and service VN< pod inside custom 
+        2. After creating a  contrail network policy between Custom VN and service VN< pod inside custom
             isolated namespace should be able to reach service within and outside this namespace
         3. Pods inside non islated namespace should be able to reach service inside custom isolated namespace.
         """
@@ -302,7 +302,7 @@ class TestCustomIsolation(BaseK8sTest):
         assert self.validate_nginx_lb([client2[0], client2[1]], client2[3].cluster_ip,
                                       test_pod=client1[2])
     #end test_service_custom_isolation
-    
+
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ingress_custom_isolation(self):

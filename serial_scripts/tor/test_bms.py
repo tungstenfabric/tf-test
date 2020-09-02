@@ -48,11 +48,11 @@ class TestTor(BaseTorTest):
         bms_ip = get_an_ip(vn1_fixture.vn_subnet_objs[0]['cidr'],4)
         bms_mac = '00:00:00:00:00:01'
         vm_mac = '00:00:00:00:00:0a'
-        
+
         # BMS VMI
-        vmis=[self.setup_vmi(vn1_fixture.uuid, 
+        vmis=[self.setup_vmi(vn1_fixture.uuid,
                 mac_address=bms_mac,
-                fixed_ips=[{'subnet_id': vn1_fixture.vn_subnet_objs[0]['id'], 
+                fixed_ips=[{'subnet_id': vn1_fixture.vn_subnet_objs[0]['id'],
                             'ip_address': bms_ip,
                           }])
              ]
@@ -60,16 +60,16 @@ class TestTor(BaseTorTest):
         port1_obj = self.create_port(net_id=vn1_fixture.vn_id,
                                      mac_address=vm_mac)
         vm1_fixture = self.create_vm(vn1_fixture, port_ids=[port1_obj['id']])
-        self.setup_tor_port(self.tor1_fixture, port_index=0, 
+        self.setup_tor_port(self.tor1_fixture, port_index=0,
                             vlan_id=vlan_id, vmi_objs=vmis)
-        bms_fixture = self.setup_bms(self.tor1_fixture, port_index=0, 
+        bms_fixture = self.setup_bms(self.tor1_fixture, port_index=0,
                                      ns_mac_address=bms_mac, vlan_id=vlan_id)
-        
+
         vm1_fixture.wait_till_vm_is_up()
         assert vm1_fixture.ping_with_certainty(bms_ip),\
             self.logger.error('Unable to ping BMS IP %s from VM %s' % (
                 bms_ip, vm1_fixture.vm_ip))
-        self.logger.info('Ping from openstack VM to BMS IP passed')                          
+        self.logger.info('Ping from openstack VM to BMS IP passed')
 
         # Validate arps are learnt on the BMS/VM
         (ip1, mac1) = bms_fixture.get_arp_entry(ip_address=vm1_fixture.vm_ip)
@@ -184,11 +184,11 @@ class TestTor(BaseTorTest):
                                      ns_mac_address=vmis[1].mac_address)
 
         # Remove first bms' vmi from lif
-        lif1_obj.delete_virtual_machine_interface(vmis[0].uuid) 
+        lif1_obj.delete_virtual_machine_interface(vmis[0].uuid)
         self.do_ping_test(bms1_fixture, bms1_ip, bms2_ip, expectation=False)
 
-        # Add the bms' vmi back to lif 
-        lif1_obj.add_virtual_machine_interface(vmis[0].uuid) 
+        # Add the bms' vmi back to lif
+        lif1_obj.add_virtual_machine_interface(vmis[0].uuid)
         self.do_ping_test(bms1_fixture, bms1_ip, bms2_ip)
     # end test_add_remove_vmi_from_tor_lif
 
@@ -221,11 +221,11 @@ class TestTor(BaseTorTest):
                                      ns_mac_address=vmis[1].mac_address)
 
         # Remove first bms' vmi from lif
-        lif1_obj.delete_virtual_machine_interface(vmis[0].uuid) 
+        lif1_obj.delete_virtual_machine_interface(vmis[0].uuid)
         self.do_ping_test(bms1_fixture, bms1_ip, bms2_ip, expectation=False)
 
-        # Add the bms' vmi back to lif 
-        lif1_obj.add_virtual_machine_interface(vmis[0].uuid) 
+        # Add the bms' vmi back to lif
+        lif1_obj.add_virtual_machine_interface(vmis[0].uuid)
         self.do_ping_test(bms1_fixture, bms1_ip, bms2_ip)
 
         # Clear arps and check again
@@ -261,7 +261,7 @@ class TestTor(BaseTorTest):
             assert bms_ip in subnet_cidr, (
                 'BMS does not seem to have got IP from second subnet'
                 'BMS IP %s not in %s subnet' % (bms_ip, subnet_cidr))
-            
+
         self.do_ping_test(bms1_fixture, bms1_fixture.info['inet_addr'],
                           bms2_fixture.info['inet_addr'])
     # end test_with_multiple_subnets
@@ -274,7 +274,7 @@ class TestTor(BaseTorTest):
         '''
         result = True
         vn1_fixture = self.create_vn(disable_dns=True)
-        (pif_fixture, lif_fixture) = self.setup_tor_port(self.tor1_fixture, 
+        (pif_fixture, lif_fixture) = self.setup_tor_port(self.tor1_fixture,
             port_index=0)
         port_fixture = self.setup_vmi(vn1_fixture.uuid)
         lif_fixture.add_virtual_machine_interface(port_fixture.uuid)
@@ -295,8 +295,8 @@ class TestTor(BaseTorTest):
 
     @preposttest_wrapper
     def test_two_vmis_on_lif(self):
-        ''' 
-            Test multiple VMI on same logical interface 
+        '''
+            Test multiple VMI on same logical interface
         '''
         vn1_fixture = self.create_vn(disable_dns=True)
 
@@ -332,7 +332,7 @@ class TestTor(BaseTorTest):
                           bms2_fixture.info['inet_addr'])
 
         # Validate that MAC of bms3 is learnt on bms2
-        self.validate_arp(bms2_fixture, ip_address=bms3_ip, 
+        self.validate_arp(bms2_fixture, ip_address=bms3_ip,
             expected_mac=bms3_fixture.info['hwaddr'])
     # end  test_two_vmis_on_lif
 
@@ -341,7 +341,7 @@ class TestTor(BaseTorTest):
         '''
             On a lif, add a BMS
             Have a second BMS on the tor port, but unknown to Contrail
-            Validate that DHCP discover packets from unknown BMSs 
+            Validate that DHCP discover packets from unknown BMSs
             are flooded in the VN, by monitoring the pkts on a VM and BMS
         '''
         vn1_fixture = self.create_vn(disable_dns=True)
@@ -355,7 +355,7 @@ class TestTor(BaseTorTest):
             vmi_objs=[vmi1])
         (pif2_obj, lif2_obj) = self.setup_tor_port(self.tor2_fixture,
             vmi_objs=[vmi2])
-        bms1_fixture = self.setup_bms(self.tor1_fixture, 
+        bms1_fixture = self.setup_bms(self.tor1_fixture,
                                      ns_mac_address=vmi1.mac_address)
         bms2_fixture = self.setup_bms(self.tor2_fixture,
                                      ns_mac_address=vmi2.mac_address)
@@ -396,7 +396,7 @@ class TestTor(BaseTorTest):
             vmi_objs=[vmi1])
         (pif2_obj, lif2_obj) = self.setup_tor_port(self.tor2_fixture,
             vmi_objs=[vmi2])
-        bms1_fixture = self.setup_bms(self.tor1_fixture, 
+        bms1_fixture = self.setup_bms(self.tor1_fixture,
                                      ns_mac_address=vmi1.mac_address)
         bms2_fixture = self.setup_bms(self.tor2_fixture,
                                      ns_mac_address=vmi2.mac_address)
@@ -428,7 +428,7 @@ class TestTor(BaseTorTest):
         vmi2=self.setup_vmi(vn1_fixture.uuid)
         self.setup_tor_port(self.tor1_fixture, vmi_objs=[vmi1])
         self.setup_tor_port(self.tor2_fixture, vmi_objs=[vmi2])
-        bms1_fixture = self.setup_bms(self.tor1_fixture, 
+        bms1_fixture = self.setup_bms(self.tor1_fixture,
             ns_mac_address=vmi1.mac_address)
         bms2_fixture = self.setup_bms(self.tor2_fixture,
             ns_mac_address=vmi2.mac_address)
@@ -461,11 +461,11 @@ class TestTor(BaseTorTest):
         self.tor2_fixture.clear_mac(vn1_fixture.uuid, vmi2.mac_address)
         self.do_ping_test(bms1_fixture, bms1_ip, bms2_ip)
     # end test_unknown_unicast_forwarding
-        
+
 
     @preposttest_wrapper
     def test_enable_disable_unknown_unicast_forwarding(self):
-        ''' 
+        '''
             Validate that UUF is disabled by default
             After enabling it, validate that these packets are flooded
         '''
@@ -474,7 +474,7 @@ class TestTor(BaseTorTest):
 
         vmi1=self.setup_vmi(vn1_fixture.uuid)
         self.setup_tor_port(self.tor1_fixture, vmi_objs=[vmi1])
-        bms1_fixture = self.setup_bms(self.tor1_fixture, 
+        bms1_fixture = self.setup_bms(self.tor1_fixture,
             ns_mac_address=vmi1.mac_address)
         assert vm1_fixture.wait_till_vm_is_up()
 
@@ -487,7 +487,7 @@ class TestTor(BaseTorTest):
 
         # Clear MACs of the BMSs on the ToRs and check that ping fail
         self.tor1_fixture.clear_mac(vn1_fixture.uuid, vmi1.mac_address)
-        self.do_ping_test(vm1_fixture, vm1_fixture.vm_ip, bms1_ip, 
+        self.do_ping_test(vm1_fixture, vm1_fixture.vm_ip, bms1_ip,
             expectation=False)
 
         # Enable UUF and check that ping passes
@@ -516,12 +516,12 @@ class TestVxlanID(BaseTorTest):
         '''
             Create a VN and port
             Bind port to a lif and check BMS gets an IP
-            Delete the port and VN 
+            Delete the port and VN
             Repeat the above steps n times
-            This makes sure that consecutive vns continue to 
+            This makes sure that consecutive vns continue to
             get applied on the ToR with same Vxlan id
-            Refer Bug 1466731 
-        
+            Refer Bug 1466731
+
         '''
         iterations = 10
         old_vxlan_id = None
@@ -530,7 +530,7 @@ class TestVxlanID(BaseTorTest):
             current_vxlan_id = vn_fixture.get_vxlan_id()
             if not old_vxlan_id:
                 old_vxlan_id = current_vxlan_id
-                
+
             port_fixture = self.setup_vmi(vn_fixture.uuid, cleanup=False)
             (pif_fixture, lif_fixture) = self.setup_tor_port(
                 self.tor1_fixture,
@@ -539,7 +539,7 @@ class TestVxlanID(BaseTorTest):
             bms1_fixture = self.setup_bms(self.tor1_fixture,
                 port_index=0,
                 ns_mac_address=port_fixture.mac_address,
-                cleanup=False, 
+                cleanup=False,
                 verify=False)
             bms1_fixture.run_dhclient(timeout=20)
             bms_ip = bms1_fixture.info['inet_addr']
@@ -549,17 +549,17 @@ class TestVxlanID(BaseTorTest):
             port_fixture.cleanUp()
             vn_fixture.cleanUp()
             assert current_vxlan_id == old_vxlan_id, "Vxlan id reuse not \
-                happening. Current : %s, Earlier : %s" % (current_vxlan_id, 
-                                                          old_vxlan_id) 
+                happening. Current : %s, Earlier : %s" % (current_vxlan_id,
+                                                          old_vxlan_id)
             assert bms_ip, "BMS did not get an IP"
         # end for
     # end test_diff_vns_but_same_vxlan_id
-                
+
     @preposttest_wrapper
     def test_check_vxlan_id_reuse(self):
-        ''' 
-            Create a VN X 
-            Create another VN Y and check that the VNid is the next number 
+        '''
+            Create a VN X
+            Create another VN Y and check that the VNid is the next number
             Delete the two Vns
             On creating a VN again, verify that Vxlan id of X is used
              (i.e vxlan id gets reused)
@@ -608,7 +608,7 @@ class TwoToROneRouterBase(BaseTorTest):
     @classmethod
     def setUpClass(cls):
         super(TwoToROneRouterBase, cls).setUpClass()
-        
+
 
     @classmethod
     def tearDownClass(cls):
@@ -673,7 +673,7 @@ class TestVxlanIDWithRouting(TwoToROneRouterBase):
         self.phy_router_fixture.setup_physical_ports()
         self.extend_vn_to_physical_router(vn1_fixture, self.phy_router_fixture)
         self.extend_vn_to_physical_router(vn2_fixture, self.phy_router_fixture)
-        
+
         bms1_ip = bms1_fixture.info['inet_addr']
         bms2_ip = bms2_fixture.info['inet_addr']
         self.do_ping_test(bms1_fixture, bms1_ip, bms2_ip)
@@ -686,7 +686,7 @@ class TestVxlanIDWithRouting(TwoToROneRouterBase):
         self.restart_openvwitches([self.tor1_fixture, self.tor2_fixture])
         time.sleep(5)
 
-        # Do ping test again 
+        # Do ping test again
         self.do_ping_test(bms1_fixture, bms1_ip, bms2_ip)
         # Clear arps and check again
         self.clear_arps([bms1_fixture, bms2_fixture])
@@ -766,7 +766,7 @@ class TestBasicBMSInterVN(TwoToROneRouterBase):
         self.validate_bms_gw_mac(bms1_fixture, self.phy_router_fixture)
         self.validate_bms_gw_mac(bms2_fixture, self.phy_router_fixture)
     # end common_two_tors_inter_vn_test
-            
+
 
     @preposttest_wrapper
     def test_ping_between_two_tors_inter_vn(self):
@@ -778,7 +778,7 @@ class TestBasicBMSInterVN(TwoToROneRouterBase):
             Validate arp of gateway IP on the bmss
         '''
         self.common_two_tors_inter_vn_test(vxlan_mode='automatic')
-            
+
     # end test_ping_between_two_tors_inter_vn
 
     @preposttest_wrapper
@@ -807,9 +807,9 @@ class TestBasicBMSInterVN(TwoToROneRouterBase):
         vn2_vmi_fixture = self.setup_vmi(vn2_fixture.uuid)
         self.setup_tor_port(self.tor1_fixture, vmi_objs=[vn1_vmi_fixture])
         self.setup_tor_port(self.tor2_fixture, vmi_objs=[vn2_vmi_fixture])
-        bms1_fixture = self.setup_bms(self.tor1_fixture, 
+        bms1_fixture = self.setup_bms(self.tor1_fixture,
             ns_mac_address=vn1_vmi_fixture.mac_address)
-        bms2_fixture = self.setup_bms(self.tor2_fixture, 
+        bms2_fixture = self.setup_bms(self.tor2_fixture,
             ns_mac_address=vn2_vmi_fixture.mac_address)
 
         # Extend VNs to router
@@ -887,7 +887,7 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
         self.do_ping_test(self.bms1_fixture, bms1_ip, bms2_ip)
 
         # Check Gateway MAC on BMS is irb's MAC
-        self.validate_bms_gw_mac(self.bms1_fixture, 
+        self.validate_bms_gw_mac(self.bms1_fixture,
                                  self.phy_router_fixture)
         self.validate_bms_gw_mac(self.bms2_fixture,
                                  self.phy_router_fixture)
@@ -895,10 +895,10 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
 
     @preposttest_wrapper
     def test_routing_with_tor_agent_restarts(self):
-        ''' 
+        '''
             Verify reachability between 2 BMS restored after restart
-            of contrail tor agent service. 
-        '''  
+            of contrail tor agent service.
+        '''
         tor_agent_dicts = self.tor1_fixture.get_tor_agents_details()
         for tor_agent_dict in tor_agent_dicts:
             tor_agent_service = 'contrail-tor-agent-%s' % (
@@ -907,15 +907,15 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
             tor_agent_node = self.get_mgmt_ip_of_node(
                 tor_agent_dict['tor_tsn_ip'])
             self.inputs.restart_service(tor_agent_service, [tor_agent_node],
-										container='agent')
+                                        container='agent')
             self.do_reachability_checks()
     # end test_routing_with_tor_agent_restarts
-            
+
     @preposttest_wrapper
     def test_routing_with_ovs_restarts(self):
-        ''' 
+        '''
             Verify reachability between 2 BMS restored after restart
-            of ovs  service. 
+            of ovs  service.
         '''
         self.tor1_fixture.restart_ovs()
         self.do_reachability_checks()
@@ -937,7 +937,7 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
             [tsn_ip1], container='agent')
         time.sleep(5)
         new_tor1_tsn = self.tor1_fixture.get_remote_flood_vtep(
-            self.vn1_fixture.uuid) 
+            self.vn1_fixture.uuid)
         assert tsn_ip2 == new_tor1_tsn, (
             'TSN switchover didnt seem to happen, Expected : %s, Got : %s' %(
             tsn_ip2, new_tor1_tsn))
@@ -947,7 +947,7 @@ class TestExtendedBMSInterVN(TwoToROneRouterBase):
         retval, output = self.bms2_fixture.run_dhclient()
         assert retval, output
         self.do_reachability_checks()
-            
+
     # end test_routing_after_tsn_failover
 
 class TestBMSWithExternalDHCPServer(TwoToROneRouterBase):
@@ -992,11 +992,11 @@ class TestBMSWithExternalDHCPServer(TwoToROneRouterBase):
 
     @preposttest_wrapper
     def test_dhcp_behavior(self):
-        ''' 
-            Verify BMS can get IP from external DHCP serverm when DHCP 
+        '''
+            Verify BMS can get IP from external DHCP serverm when DHCP
             service is diabled in VN.
             Verify communication between BMS is successful when it got
-            IP from external DHCP server. 
+            IP from external DHCP server.
         '''
         self.setup_tor_port(self.tor1_fixture, port_index=0,
             vmi_objs=[self.vn1_vmi1_fixture])
@@ -1020,7 +1020,7 @@ class TestBMSWithExternalDHCPServer(TwoToROneRouterBase):
     def test_dhcp_forwarding_with_dhcp_disabled(self):
         '''
             Verify when DHCP service is diabled in VN, TSN floods the
-            DHCP request and it reecahes all the end host. 
+            DHCP request and it reecahes all the end host.
         '''
         self.setup_tor_port(self.tor1_fixture, port_index=0,
             vmi_objs=[self.vn1_vmi1_fixture])

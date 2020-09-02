@@ -167,7 +167,7 @@ def upload_to_webserver(config_file, report_config_file, elem):
         return False
     return True
 
-# end 
+# end
 
 if __name__ == "__main__":
     # accept sanity_params.ini, report_details.ini, result.xml

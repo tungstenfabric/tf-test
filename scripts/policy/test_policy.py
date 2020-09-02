@@ -316,8 +316,8 @@ class TestBasicPolicyConfig(BasePolicyTest):
     def test_policy_source_dest_cidr(self):
         '''Test CIDR as match criteria for source and destination
         1)Create vn and 3 vm's
-        2)Create policy with deny traffic and pass CIDR as source and destination 
-        3)Ping between vm1 and vm2 .Ping should fail 
+        2)Create policy with deny traffic and pass CIDR as source and destination
+        3)Ping between vm1 and vm2 .Ping should fail
         4)ping between vm1 and vm3 .Ping should pass'''
         vn1_name = get_random_name('vn1')
         vn1_subnets = ['192.168.10.0/24']

@@ -7,7 +7,7 @@ from floating_ip import *
 from tcutils.util import get_random_name
 
 class VerifyDynamicVgwCases(object):
- 
+
     def verify_dynamic_vgw_compute_ping(self):
 
         result = True
@@ -78,11 +78,11 @@ class VerifyDynamicVgwCases(object):
                              vgw_compute['username'],
                              vgw_compute['password'],
                              container='agent')
-        
+
         if not result:
             self.logger.error(
                 'Test  ping to underlay compute ip from VM %s failed' % (vm1_name))
 
-            assert result    
-                             
-        return True 
+            assert result
+
+        return True

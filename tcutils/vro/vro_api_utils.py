@@ -14,7 +14,7 @@ class AuthVRO(object):
 class SimpleAuthVRO(AuthVRO):
 
     def __init__(self,uname,passwd):
-        super(SimpleAuthVRO, self).__init__(uname,passwd)   
+        super(SimpleAuthVRO, self).__init__(uname,passwd)
 
     def get_auth(self):
         auth = dict()
@@ -64,7 +64,7 @@ class JsonDrv(object):
                 return response.headers,output
         return ''
 class VroUtilBase(object):
-    
+
     def __init__(self, ip, port, uname, passd, api_string='/vco/api/', workflow=None, template=None, drv=JsonDrv):
         self.uname = uname
         self.passd = passd
@@ -73,12 +73,12 @@ class VroUtilBase(object):
         self.api_string = api_string
         self.base_url = self.get_base_url
         self.drv = drv(uname, passd)
-        
-    
+
+
     @property
     def get_base_url(self):
         return 'https://' + self.ip + ':' + self.port + self.api_string
-    
+
     def get_query_url(self, path='workflows', query_string = None):
         #make query for catalog and workflows with query condition
         self.query_string = query_string
@@ -97,10 +97,10 @@ class VroUtilBase(object):
     def get_workflow_Staus(self):
         status = self.drv.execute.status
         return status
-    
+
     def dict_get(self, url):
         return self.drv.load(url)
-    
+
     def put(self, url, payload):
         return self.drv.put(url, payload)
 

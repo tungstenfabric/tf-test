@@ -20,8 +20,8 @@ class TestDSNAT(BaseDSNAT):
     def test_dsnat_udp_basic(self):
         '''
            configure port translation pools in the global vrouter config
-           create a test VN , enable SNAT, 
-           send UDP traffic from VM to fabric IP and verify the PAT happened, 
+           create a test VN , enable SNAT,
+           send UDP traffic from VM to fabric IP and verify the PAT happened,
                and the port been used in the range
         '''
         port_range = list(range(65000, 65010))
@@ -31,7 +31,7 @@ class TestDSNAT(BaseDSNAT):
         pp.append(self.define_port_translation_pool(protocol='udp',
                     start_port=port_range[0],
                     end_port=port_range[-1]))
-       
+
         pp.append(self.define_port_translation_pool(protocol='tcp',
                     start_port=port_range[0],
                     end_port=port_range[-1]))
@@ -76,7 +76,7 @@ class TestDSNAT(BaseDSNAT):
         '''
             Configure TCP port translation pool
             send TCP traffic from the VM to the fabric IP
-            Verify the Port address translation happened and the 
+            Verify the Port address translation happened and the
                port being used in the range of configured
         '''
         port_range = list(range(65000, 65010))
@@ -84,7 +84,7 @@ class TestDSNAT(BaseDSNAT):
         pp.append(self.define_port_translation_pool(protocol='tcp',
                     start_port=port_range[0],
                     end_port=port_range[-1]))
-       
+
         #assert self.verify_port_translation_pool(tcp_pp)
         assert self.vnc_h.set_port_translation_pool(pp)
 
@@ -248,7 +248,7 @@ class TestDSNAT(BaseDSNAT):
            send UDP traffic from VM to fabric IP and verify the PAT happened,
                and the port been used in the range
            configured discrete range of port translation pool of same protocol udp
-           send UDP traffic from VM to fabirc IP and verify ports been used in the 
+           send UDP traffic from VM to fabirc IP and verify ports been used in the
                combined range
         '''
         port_range1 = list(range(65000, 65010))
@@ -262,7 +262,7 @@ class TestDSNAT(BaseDSNAT):
         pp.append(self.define_port_translation_pool(protocol='tcp',
                     start_port=port_range1[0],
                     end_port=port_range1[-1]))
-    
+
         assert self.vnc_h.set_port_translation_pool(pp)
         assert self.verify_port_allocation_in_agent(pp)
 

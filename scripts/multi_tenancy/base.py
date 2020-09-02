@@ -31,7 +31,7 @@ class BaseMultitenancyTest(test_v1.BaseTestCase_v1):
     @classmethod
     def tearDownClass(cls):
         super(BaseMultitenancyTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
     # create users specified as array of tuples (name, password, role)
     # assumes admin user and tenant exists
@@ -53,7 +53,7 @@ class BaseMultitenancyTest(test_v1.BaseTestCase_v1):
         insecure = bool(os.getenv('OS_INSECURE',True))
         kc = ksclient.Client(
             username=self.inputs.stack_user, password=self.inputs.stack_password,
-            tenant_name=self.inputs.project_name, auth_url=auth_url, 
+            tenant_name=self.inputs.project_name, auth_url=auth_url,
             insecure=insecure)
         users = set([user.name for user in kc.users.list()])
         roles = set([user.name for user in kc.roles.list()])
@@ -82,16 +82,16 @@ class BaseMultitenancyTest(test_v1.BaseTestCase_v1):
             self.addCleanup(kc.roles.remove_user_role, user,
                             role_dict[user_role[name]], admin_tenant)
     # end keystobe_create_users
-    
+
     # display resource id-perms
     def print_perms(self, perms):
         return '%s/%s %d%d%d' \
             % (perms.permissions.owner, perms.permissions.group,
-               perms.permissions.owner_access, 
-               perms.permissions.group_access, 
+               perms.permissions.owner_access,
+               perms.permissions.group_access,
                perms.permissions.other_access)
     # end print_perms
-    
+
     # set id perms for object
     def set_perms(self, obj, mode=None, owner=None, group=None):
         perms = obj.get_id_perms()

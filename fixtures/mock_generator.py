@@ -11,7 +11,7 @@ from fabric.context_managers import settings, hide
 class MockGeneratorFixture(fixtures.Fixture):
 
     '''
-    Fixture to handle creation, verification and deletion of mock generator. 
+    Fixture to handle creation, verification and deletion of mock generator.
     '''
 
     def __init__(self, connections, inputs, num_generators,

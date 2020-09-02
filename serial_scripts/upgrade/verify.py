@@ -7,7 +7,7 @@ from vn_test import VNFixture
 from vm_test import VMFixture
 import fixtures
 from policy_test import PolicyFixture
-from floating_ip import FloatingIPFixture 
+from floating_ip import FloatingIPFixture
 from tcutils.topo.sdn_topo_setup import sdnTopoSetupFixture
 from .sdn_topo_with_multi_project import *
 from common.servicechain.config import ConfigSvcChain
@@ -40,7 +40,7 @@ class BaseResource(VerifySvcChain, BaseTestLbaas, BaseNeutronTest):
     def setup_common_objects(self, inputs, connections):
         self.inputs = inputs
         self.connections = connections
-        self.base_rel = get_release() 
+        self.base_rel = get_release()
         (self.vn11_name, self.vn11_subnets) = ("vn11", ["192.168.1.0/24"])
         (self.vn22_name, self.vn22_subnets) = ("vn22", ["192.168.2.0/24"])
         (self.fip_vn_name, self.fip_vn_subnets) = ("fip_vn", ['200.1.1.0/24'])
@@ -48,8 +48,8 @@ class BaseResource(VerifySvcChain, BaseTestLbaas, BaseNeutronTest):
          self.vn11_vm4_name) = ('vn11_vm1', 'vn11_vm2', 'vn11_vm3', 'vn11_vm4')
         self.vn22_vm1_name = 'vn22_vm1'
         self.vn22_vm2_name = 'vn22_vm2'
-        self.fvn_vm1_name = 'fvn_vm1' 
-        
+        self.fvn_vm1_name = 'fvn_vm1'
+
         # Configure 3 VNs, 2 of them vn11, vn22 and 1 fip_vn
         self.vn11_fixture = self.useFixture(
             VNFixture(project_name=self.inputs.project_name,
@@ -236,9 +236,9 @@ class BaseResource(VerifySvcChain, BaseTestLbaas, BaseNeutronTest):
 
 
 class VerifyFeatureTestCases(ConfigSecGroup):
-    
+
     def verify_config_before_feature_test(self):
-                
+
         result = True
         vn11_vm3_fixture = self.res.vn11_vm3_fixture
         vn11_vm4_fixture = self.res.vn11_vm4_fixture
@@ -289,7 +289,7 @@ class VerifyFeatureTestCases(ConfigSecGroup):
         return result
     # end verify_config_before_feature_test
 
-    
+
     def verify_config_after_feature_test(self):
         result = True
         assert self.res.verify_common_objects_without_collector()
@@ -439,7 +439,7 @@ class VerifyFeatureTestCases(ConfigSecGroup):
 
         return result
     # end verify_config_after_feature_test
-    
+
     def check_secgrp_traffic(self):
         result = True
         vn11_vm3_fixture = self.res.vn11_vm3_fixture
@@ -573,7 +573,7 @@ class VerifyFeatureTestCases(ConfigSecGroup):
         return result
     #end check_floatingip_traffic
 
-    # adding function to create more resources these will be created after feature test    
+    # adding function to create more resources these will be created after feature test
     def vn_add_delete(self):
 
         self.newvn_fixture = self.useFixture(
@@ -590,7 +590,7 @@ class VerifyFeatureTestCases(ConfigSecGroup):
 
         return True
     #end vn_add_delete
-    
+
     def vm_add_delete(self):
 
         vm1_name = 'vn11_vm1_mine'

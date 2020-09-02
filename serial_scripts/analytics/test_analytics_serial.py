@@ -256,7 +256,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
                 container='control')
             time.sleep(4)
             result = result and result1 and result2 and result3 and result4\
-                and result5 
+                and result5
             assert result
             return True
 

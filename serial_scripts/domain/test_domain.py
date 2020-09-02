@@ -44,7 +44,7 @@ class TestDomain(BaseDomainTest):
     @skip_because(keystone_version = 'v2.0')
     def test_domain_sanity(self):
         ''' Sanity Test for domain isolation.
-            One full circle of project, user, vm, vn creation 
+            One full circle of project, user, vm, vn creation
             with ping traffic between the VM's is tested in a
             newly created domain.
         '''
@@ -99,14 +99,14 @@ class TestDomain(BaseDomainTest):
             connections=proj_conn, project_fix=project_fix)
         assert ret,'Failed to setup and test common objects'
     # end test_domain_user_group
-    
+
     @preposttest_wrapper
     @skip_because(keystone_version = 'v2.0')
     def test_domain_with_diff_user_groups(self):
         ''' Test user group within a domain
             1) Create project1 and project2
-            2) Create user1 and user2 
-            3) Create user_group1 and attach user1 to it 
+            2) Create user1 and user2
+            3) Create user_group1 and attach user1 to it
             4) Create user_group2 and attach user2 to it
             5) Attach user_group1 to project1 with admin role and user_group2 as __member__ role to project2
             6) Try to create objects with user1 and user2 it should be allowed'''
@@ -198,7 +198,7 @@ class TestDomain(BaseDomainTest):
     @skip_because(keystone_version = 'v2.0')
     def test_perms_with_same_user_in_diff_projects(self):
         ''' Test user roles across projects in the same domain
-            1) Create project1 and project2 
+            1) Create project1 and project2
             2) Create and Attach user1 to project1 with admin role and as _member_ role to project2
             3) create VN1 under Project1
             4) project2 shouldnt be able to read VN1 using project2 creds'''
@@ -226,7 +226,7 @@ class TestDomain(BaseDomainTest):
                 subnets=['10.2.2.0/24']))
         assert not self.read_vn(proj_conn2,vn1_fixture.uuid)
     #end test_perms_with_same_user_in_diff_projects
-  
+
     @preposttest_wrapper
     @skip_because(keystone_version = 'v2.0')
     def test_perms_with_diff_users_in_diff_domains(self):
@@ -235,7 +235,7 @@ class TestDomain(BaseDomainTest):
             2)Try to create domain d2 with d1 creds it should not be allowed
             3)create domain d2 user2 project2
             4)Attach user2 to domain d2 as 'admin' and to project2 as '_member_
-            5)create VN1 under Project1 
+            5)create VN1 under Project1
             6)project2 shouldnt be able to read VN1 using project2 creds'''
         username1 = get_random_name('TestUser-1')
         password1 = get_random_name('TestUser-1')

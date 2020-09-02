@@ -3,9 +3,9 @@ import os
 import sys
 from time import sleep
 import fixtures
-import testtools                                                                
+import testtools
 import unittest
-import types                                                                 
+import types
 import time
 trafficdir = os.path.join(os.path.dirname(__file__), '../../tcutils/pkgs/Traffic')
 sys.path.append(trafficdir)

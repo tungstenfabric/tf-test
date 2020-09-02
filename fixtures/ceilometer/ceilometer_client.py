@@ -94,23 +94,23 @@ class Meter(object):
     @property
     def user_id(self):
         return self.meter.user_id
-    
+
     @property
     def name(self):
         return self.meter.name
-    
+
     @property
     def resource_id(self):
         return self.meter.resource_id
-    
+
     @property
     def source(self):
         return self.meter.source
-    
+
     @property
     def meter_id(self):
         return self.meter.meter_id
-    
+
     @property
     def project_id(self):
         return self.meter.project_id
@@ -118,15 +118,15 @@ class Meter(object):
     @property
     def type(self):
         return self.meter.type
-    
+
     @property
     def unit(self):
         return self.meter.unit
-    
+
 class Resource(object):
 
     """Represents one Ceilometer resource."""
-    
+
     def __init__(self, resource,ceilometer_usage=None):
         self.resource = resource
 
@@ -163,23 +163,23 @@ class Sample(object):
     @property
     def resource_id(self):
         return self.sample.resource_id
-    
+
     @property
     def counter_unit(self):
         return self.sample.counter_unit
-    
+
     @property
     def resource_metadata(self):
         return self.sample.resource_metadata
-    
+
     @property
     def counter_volume(self):
         return self.sample.counter_volume
-    
+
     @property
     def counter_name(self):
         return self.sample.counter_name
-    
+
     @property
     def counter_type(self):
         return self.sample.counter_type
@@ -213,8 +213,8 @@ def statistic_list(cclient, meter_name, query=None, period=None):
     statistics = cclient.\
         statistics.list(meter_name=meter_name, q=query, period=period)
     return [Statistic(s) for s in statistics]
-   
-    
+
+
 def main():
     auth_url = os.getenv('OS_AUTH_URL') or \
                 'http://10.204.216.7:5000/v2.0'
@@ -229,7 +229,7 @@ def main():
     cclient = CeilometerClient(auth_url, username,
                                  password,
                                  tenant_name,
-                                 c_url,insecure = True) 
+                                 c_url,insecure = True)
     cclient = cclient.get_cclient()
     #q = make_query(user_id='ffe9ce8cac3a4d3088bff11d34f7c09b', tenant_id='a4faf2a1d086459b89ec1b776ddf42dd')
     #q = make_query(tenant_id='a4faf2a1d086459b89ec1b776ddf42dd')
@@ -245,4 +245,4 @@ def main():
     print(abc)
 
 if __name__ == "__main__":
-    main()           
+    main()

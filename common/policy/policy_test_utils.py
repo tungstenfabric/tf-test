@@ -437,7 +437,7 @@ def icmpv6_rule_present(rules_list):
     return False
 
 def update_rules_with_icmpv6(af, rules_list):
-    '''This method creates new_rules_list and changes policy rule for protocol 
+    '''This method creates new_rules_list and changes policy rule for protocol
        icmp to icmpv6 in case of v6 testing
        or append new policy rule for protocol icmpv6 in case of dual stack testing,
        returns newly created rules list'''
@@ -475,7 +475,7 @@ def replace_cidr_rule_with_ipv6(rule_list, cidr_dict):
     return rule_list
 
 def update_cidr_rules_with_ipv6(af, rules_list, cidr_dict):
-    '''This method creates new rules list and changes policy rule with source/destination 
+    '''This method creates new rules list and changes policy rule with source/destination
        as cidr in case of v6 testing
        or append new policy rule with ipv6 cidr in case of dual stack testing,
        returns newly created rules list

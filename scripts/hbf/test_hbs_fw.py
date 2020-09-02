@@ -47,13 +47,13 @@ class TestNetworkPolicy(BaseK8sTest):
         assert cls._connections.k8s_client.set_label_for_hbf_nodes(labels={"type":None}), \
               "Error : could not label the nodes"
     def run_test(self,
-		vn1_name,
-		tag_type,
-		tag_value,
-		tag_obj_name,
-		vn2_name=None,
-		tag2_value=None,
-		inter_compute=False,
+        vn1_name,
+        tag_type,
+        tag_value,
+        tag_obj_name,
+        vn2_name=None,
+        tag2_value=None,
+        inter_compute=False,
                 cleanup=True):
         project_name = "k8s-" + self.namespace.name
         isolated_creds = IsolatedCreds(
@@ -67,19 +67,19 @@ class TestNetworkPolicy(BaseK8sTest):
         proj_inputs = isolated_creds.get_inputs(proj_fix)
         proj_connection = isolated_creds.get_connections(proj_inputs)
 
-	# Create VNs
+    # Create VNs
         vn1 = self.setup_vn(project_name =project_name,
-			    connections=proj_connection, inputs=proj_inputs, vn_name = vn1_name)
+                    connections=proj_connection, inputs=proj_inputs, vn_name = vn1_name)
         vn1_dict = {"domain": vn1.domain_name,
                    "project" : vn1.project_name,
                    "name": vn1.vn_name}
 
         if vn2_name != None:
              vn2 = self.setup_vn(project_name =project_name,
-			         connections=proj_connection, inputs=proj_inputs, vn_name = vn2_name)
+                         connections=proj_connection, inputs=proj_inputs, vn_name = vn2_name)
              vn2_dict = {"domain": vn2.domain_name,
-                   	"project" : vn2.project_name,
-                   	"name": vn2.vn_name}
+                    "project" : vn2.project_name,
+                    "name": vn2.vn_name}
 
              # Attach policy btw vn1 and vn2 to allow all traffic
              pol_rules_vn1_vn2 = [
@@ -112,50 +112,50 @@ class TestNetworkPolicy(BaseK8sTest):
         # Create 2 pods
         namespace_name = self.namespace.name
         compute_label_list, compute_count = self.connections.k8s_client.get_kubernetes_compute_labels()
-        compute_selector_1 = {'computenode': compute_label_list[0]} 
+        compute_selector_1 = {'computenode': compute_label_list[0]}
         if inter_compute and compute_count >= 2:
-        	compute_selector_2 = {'computenode': compute_label_list[1]}
+            compute_selector_2 = {'computenode': compute_label_list[1]}
         else:
-        	compute_selector_2 = compute_selector_1
+            compute_selector_2 = compute_selector_1
 
         pod1 = self.setup_busybox_pod(namespace=namespace_name,
-		 custom_isolation=True, fq_network_name=vn1_dict,
-		 compute_node_selector=compute_selector_1)
+         custom_isolation=True, fq_network_name=vn1_dict,
+         compute_node_selector=compute_selector_1)
         assert pod1.verify_on_setup()
         pod2 = self.setup_busybox_pod(namespace=namespace_name,
-		 custom_isolation=True,
-		 fq_network_name = (vn2_dict or vn1_dict),
-		 compute_node_selector=compute_selector_2)
+         custom_isolation=True,
+         fq_network_name = (vn2_dict or vn1_dict),
+         compute_node_selector=compute_selector_2)
         assert pod2.verify_on_setup()
         assert pod1.ping_with_certainty(pod2.pod_ip)
 
         self.addCleanup(self.perform_cleanup, pod1)
         self.addCleanup(self.perform_cleanup, pod2)
-	
-	# Create tags
+
+    # Create tags
         fq_name1 = ['default-domain', project_name,
-			 '%s=%s'%(tag_type, tag_value)]
+            '%s=%s'%(tag_type, tag_value)]
         tag1 = self.create_tag(fq_name=fq_name1,
-		 tag_type=tag_type, tag_value=tag_value,
-		 parent_type='project')
-       	self.addCleanup(self.vnc_h.delete_tag, id=tag1)
+            tag_type=tag_type, tag_value=tag_value,
+            parent_type='project')
+        self.addCleanup(self.vnc_h.delete_tag, id=tag1)
         if tag2_value != None:
-        	fq_name2 = ['default-domain', project_name,
-				 '%s=%s'%(tag_type, tag2_value)]
-        	tag2 = self.create_tag(fq_name=fq_name1,
-		 	tag_type=tag_type, tag_value=tag2_value,
-			 parent_type='project')
-        	self.addCleanup(self.vnc_h.delete_tag, id=tag2)
+            fq_name2 = ['default-domain', project_name,
+                '%s=%s'%(tag_type, tag2_value)]
+            tag2 = self.create_tag(fq_name=fq_name1,
+            tag_type=tag_type, tag_value=tag2_value,
+                parent_type='project')
+            self.addCleanup(self.vnc_h.delete_tag, id=tag2)
         app_tag_name = 'myk8s'
         fq_name3 = ['default-domain', project_name,
-			 '%s=%s'%('application', 'myk8s')]
+            '%s=%s'%('application', 'myk8s')]
         apptag = self.create_tag(fq_name=fq_name3,
-		 tag_type='application',
-		 tag_value=app_tag_name, parent_type='project')
-       	self.addCleanup(self.vnc_h.delete_tag, id=apptag)
-		
+            tag_type='application',
+            tag_value=app_tag_name, parent_type='project')
+        self.addCleanup(self.vnc_h.delete_tag, id=apptag)
 
-        # Apply tag
+
+    # Apply tag
         tag_obj_list = []
         tag_value_list = []
         if tag_obj_name == 'project':
@@ -169,7 +169,7 @@ class TestNetworkPolicy(BaseK8sTest):
                 tag_obj_list.append(tag_obj1)
                 tag_value_list.append(tag_value)
                 tag_obj2 = self.read_virtual_machine_interface(
-	                id=pod2.vmi_objs[0].uuid)
+                        id=pod2.vmi_objs[0].uuid)
                 tag_obj_list.append(tag_obj2)
                 tag_value_list.append(tag2_value or tag_value)
         elif tag_obj_name == 'vn':
@@ -184,9 +184,9 @@ class TestNetworkPolicy(BaseK8sTest):
                    tag_value_list.append(tag2_value or tag_value)
         for tag_obj, tagv in zip(tag_obj_list, tag_value_list):
             self.set_tag(tag_type=tag_type, tag_value=tagv,
-		         obj=tag_obj)
+                obj=tag_obj)
             self.set_tag(tag_type='application', tag_value=app_tag_name,
-		         obj=tag_obj)
+                obj=tag_obj)
 
         # Create FW rule
         site_ep1 = {'tags': ['%s=%s'%(tag_type, tag_value)]}
@@ -229,21 +229,21 @@ class TestNetworkPolicy(BaseK8sTest):
         #import pdb; pdb.set_trace()
         assert pod1.ping_with_certainty(pod2.pod_ip, expectation=True, count='5', hbf_enabled=True)
 
-	# Cleanups
+    # Cleanups
         for tag_obj in tag_obj_list:
              self.addCleanup(self.vnc_h.unset_tag,
                              tag_type=tag_type, obj=tag_obj)
              self.addCleanup(self.vnc_h.unset_tag,
                              tag_type='application', obj=tag_obj)
         '''
-       	self.addCleanup(self.vnc_h.delete_tag, id=tag1)
+        self.addCleanup(self.vnc_h.delete_tag, id=tag1)
         if tag2_value != None:
             self.addCleanup(self.vnc_h.delete_tag, id=tag2)
         self.addCleanup(self.vnc_h.delete_tag, id=apptag)
         '''
 
         return policy1_fixture, pod1, pod2, fwp_obj, project_name
- 
+
     ''' Test 16 '''
     @preposttest_wrapper
     def test_intra_vn_intra_compute_tag_tier_tagat_vn(self):
@@ -322,7 +322,7 @@ class TestNetworkPolicy(BaseK8sTest):
     def test_inter_vn_intra_compute_tag_tier_tagat_vmi(self):
          self.run_test(vn1_name='vn1',
                        vn2_name="vn2",
-	               tag_type='tier',
+                       tag_type='tier',
                        tag_value='myweb',
                        tag2_value='myapp',
                        tag_obj_name='vmi')
@@ -397,7 +397,7 @@ class TestNetworkPolicy(BaseK8sTest):
     @preposttest_wrapper
     def test_intra_vn_intra_compute_tag_tier_tagat_vmi(self):
          self.run_test(vn1_name='vn1', tag_type='tier', tag_value='myweb',
-                       tag2_value='myapp', tag_obj_name='vmi') 
+                       tag2_value='myapp', tag_obj_name='vmi')
 # end test_intra_vn_intra_compute_tag_tier_tagat_vmi
 
     @preposttest_wrapper
@@ -564,16 +564,16 @@ class TestNetworkPolicy(BaseK8sTest):
                 tag_value='myweb1',
                 tag_obj_name='vn', tag2_value='myweb2', cleanup=False)
         # Create application tag
-	# Create tag
+    # Create tag
         tag_type = 'tier'
         tag_value1 = 'myweb3'
         tag_value2 = 'myweb4'
         fq_name1 = ['default-domain', project_name,
-			 '%s=%s'%(tag_type, tag_value1)]
+            '%s=%s'%(tag_type, tag_value1)]
         fq_name2 = ['default-domain', project_name,
-			 '%s=%s'%(tag_type, tag_value2)]
+            '%s=%s'%(tag_type, tag_value2)]
         tier_tag_1 = self.create_tag(fq_name=fq_name1,
-		 tag_type=tag_type, tag_value=tag_value1, parent_type='project')
+            tag_type=tag_type, tag_value=tag_value1, parent_type='project')
         tier_tag_2 = self.create_tag(fq_name=fq_name2,
                  tag_type=tag_type, tag_value=tag_value2, parent_type='project')
 
@@ -581,22 +581,22 @@ class TestNetworkPolicy(BaseK8sTest):
         tag_obj2 = self.read_virtual_machine_interface(id=pod2.vmi_objs[0].uuid)
 
         self.set_tag(tag_type=tag_type, tag_value=tag_value1,
-		         obj=tag_obj1)
+            obj=tag_obj1)
         self.set_tag(tag_type=tag_type, tag_value=tag_value2,
-                         obj=tag_obj2)
+            obj=tag_obj2)
         self.set_tag(tag_type='application', tag_value='myk8s',
-                         obj=tag_obj1)
+            obj=tag_obj1)
         self.set_tag(tag_type='application', tag_value='myk8s',
-                         obj=tag_obj2)
+            obj=tag_obj2)
         site_ep1 = {'tags': ['%s=%s'%(tag_type, tag_value1)]}
         site_ep2 = {'tags': ['%s=%s'%(tag_type, tag_value2)]}
         fwr_fqname = ['default-domain', project_name, 'my_fwr_tier']
         fwr_uuid = self.vnc_h.create_firewall_rule(fq_name=fwr_fqname,
-			 parent_type='project', service_groups=[], protocol='icmp',
+            parent_type='project', service_groups=[], protocol='icmp',
                          source=site_ep1, destination=site_ep2 ,action='deny',
                          direction = "<>")
         rule_obj = self.vnc_h.firewall_rule_read(id=fwr_uuid)
-	#rule_obj.set_action_list(ActionListType(host_based_service=True,simple_action="deny"))
+        #rule_obj.set_action_list(ActionListType(host_based_service=True,simple_action="deny"))
         #self.vnc_h.firewall_rule_update(rule_obj)
         '''
         self.addCleanup(self.vnc_h.unset_tag,

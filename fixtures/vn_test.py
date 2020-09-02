@@ -231,7 +231,7 @@ class VNFixture(fixtures.Fixture):
                     vrf_id_dict.update({ip:vrf_id})
             self._vrf_ids = vrf_id_dict
         return self._vrf_ids
-	# end get_vrf_ids
+    # end get_vrf_ids
 
     @property
     def vrf_ids(self):
@@ -1564,7 +1564,7 @@ class VNFixture(fixtures.Fixture):
         return self.quantum_h.get_subnets_of_vn(self.uuid)
 
     def get_subnet_id_for_af(self, af):
-        return [subnet['id'] for subnet in self.vn_subnet_objs 
+        return [subnet['id'] for subnet in self.vn_subnet_objs
                 if get_af_type(subnet['cidr']) == af]
 
     def add_to_router(self, physical_router_id):

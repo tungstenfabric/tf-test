@@ -20,7 +20,7 @@ class TestIngress(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     @test.attr(type=['k8s_sanity'])
     @skip_because(mx_gw = False)
     @preposttest_wrapper
@@ -29,7 +29,7 @@ class TestIngress(BaseK8sTest):
             Create an ingress out of this service
             From the local node, do a wget on the ingress public ip
             Validate that service and its loadbalancing works
-            Restart kube-manager 
+            Restart kube-manager
             Validate that service and its loadbalancing works after
             restart
 
@@ -79,8 +79,8 @@ class TestIngress(BaseK8sTest):
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ingress_with_kube_apiserver_restart(self):
-        ''' 
-        Verifies that Kube APIs are correctly recieved and processed by Kube 
+        '''
+        Verifies that Kube APIs are correctly recieved and processed by Kube
         API server post kube-apiserver restart.
         Steps:
         1. Before creating any k8s object, restart the Kube API service
@@ -128,8 +128,8 @@ class TestIngress(BaseK8sTest):
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ingress_with_contrail_apiserver_restart(self):
-        ''' 
-        Verifies that Kube APIs are correctly recieved and processed by Contrail 
+        '''
+        Verifies that Kube APIs are correctly recieved and processed by Contrail
         API server post contrail-api restart.
         Steps:
         1. Before creating any k8s object, restart the contrail API server

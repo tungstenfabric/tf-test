@@ -24,7 +24,7 @@ class BaseHC(GenericTestBase):
                      connections=self.connections,
                      name=get_random_name(self.project_name),
                      hc_type=hc_type, delay=delay,
-                     probe_type=probe_type, timeout=timeout, 
+                     probe_type=probe_type, timeout=timeout,
                      max_retries=max_retries, http_url=http_url))
         if verify:
             hc_fixture.verify_on_setup()

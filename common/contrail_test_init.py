@@ -739,7 +739,7 @@ class TestInputs(with_metaclass(Singleton, object)):
             self.vro_username = self.vro_server['username']
             self.vro_password = self.vro_server['password']
             self.vro_port = str(self.vro_server['port'])
-                
+
 
     def get_os_env(self, var, default=''):
         if var in os.environ:
@@ -814,7 +814,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         nodemgr_cntrs = [x for x in containers if 'nodemgr' in x]
         containers = set(containers) - set(nodemgr_cntrs)
 
-        # Observed in Openshift scenario, recent container-name changes causing issue picking wrong container which is down/inactive after fail-over 
+        # Observed in Openshift scenario, recent container-name changes causing issue picking wrong container which is down/inactive after fail-over
         # and solving this with Sorting the Set and as this is simple sorting only and so should not impact any other scneario like Openstack/K8s etc
         nodemgr_cntrs = sorted(nodemgr_cntrs, reverse=True)
         containers = sorted(containers, reverse=True)
@@ -1455,8 +1455,8 @@ class ContrailTestInit(object):
         for host in bgp_ips:
             host_name = self.host_data[host]['name']
             issue_cmd = "python /usr/share/contrail-utils/provision_control.py \
-			--host_name '%s' --host_ip '%s' --router_asn '%s' \
-			--api_server_ip '%s' --api_server_port '%s' --oper '%s'" % (host_name,
+            --host_name '%s' --host_ip '%s' --router_asn '%s' \
+            --api_server_ip '%s' --api_server_port '%s' --oper '%s'" % (host_name,
                                                                host,
                                                                router_asn,
                                                                api_server_ip,
@@ -1484,9 +1484,9 @@ class ContrailTestInit(object):
         username = self.host_data[self.cfgm_ip]['username']
         password = self.host_data[self.cfgm_ip]['password']
         issue_cmd = "python /usr/share/contrail-utils/provision_mx.py \
-			--api_server_ip '%s' --api_server_port '%s' \
-			--router_name '%s' --router_ip '%s'  \
-			--router_asn '%s' --oper '%s'" % (
+            --api_server_ip '%s' --api_server_port '%s' \
+            --router_name '%s' --router_ip '%s'  \
+            --router_asn '%s' --oper '%s'" % (
             api_server_ip, api_server_port,
             router_name, router_ip, router_asn, oper)
         output = self.run_cmd_on_server(
@@ -1723,7 +1723,7 @@ class ContrailTestInit(object):
     def enable_vro(self, knob=False):
         self.vro_based = knob
     #end enable_vro
-    
+
 def _parse_args( args_str):
     parser = argparse.ArgumentParser()
     args, remaining_argv = parser.parse_known_args(args_str.split())

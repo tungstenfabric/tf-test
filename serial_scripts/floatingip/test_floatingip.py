@@ -42,7 +42,7 @@ class FloatingipTestSanity_restart(base.FloatingIpBaseTest):
     def setUpClass(cls):
         super(FloatingipTestSanity_restart, cls).setUpClass()
 
-    @test.attr(type='serial')	
+    @test.attr(type='serial')
     @preposttest_wrapper
     def test_service_restart_with_fip(self):
         '''Test restart of agent and control service with floating IP
@@ -398,8 +398,8 @@ class FloatingipTestSanity_restart(base.FloatingIpBaseTest):
                                     dest_ip = fvn1_vm1_traffic_fixture.vm_ip,
                                     dest_port = '0',
                                     proto = '1')
-        if fwd_flow: 
-            sport = fwd_flow.source_port 
+        if fwd_flow:
+            sport = fwd_flow.source_port
             flow_rec1 = inspect_h1.get_vna_fetchflowrecord(
                 nh=vn1_vm1_traffic_fixture.tap_intf[vn_fq_name]['flow_key_idx'],
                 sip=vn1_vm1_traffic_fixture.vm_ip,
@@ -513,5 +513,5 @@ class FloatingipTestSanity_restart(base.FloatingIpBaseTest):
 
 
 
-                                                                                                                                          
+
 

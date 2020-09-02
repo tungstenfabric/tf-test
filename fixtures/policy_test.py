@@ -325,7 +325,7 @@ class PolicyFixture(fixtures.Fixture):
         self.policy_obj = policy_rsp
         return policy_rsp
     # end  _create_policy
-    
+
     def set_policy_vro(self, policy_name, rules_list, policy_obj=None):
         '''create policy and rules from vro'''
         self.connections.orch.create_policy(name = policy_name, rules = rules_list)
@@ -334,7 +334,7 @@ class PolicyFixture(fixtures.Fixture):
         self._populate_attr()
         return self.policy_fq_name
     #end _set_policy_vro
-    
+
     def _set_policy_api(self, policy_name, rules_list, policy_obj=None):
         ''' Create a policy from the supplied rules
         Sample rules_list:
@@ -359,7 +359,7 @@ class PolicyFixture(fixtures.Fixture):
                'dest_network'  : vn1_name, 'dst_ports'     : [100,10],
              }
                 ]
-        '''              
+        '''
         np_rules = []
         for rule_dict in rules_list:
             source_vn = None
@@ -383,7 +383,7 @@ class PolicyFixture(fixtures.Fixture):
                 'dest_policy': None,
                 'dest_subnet': None,
                 'dst_ports': [PortType(-1, -1)],
-                'action_list': {} 
+                'action_list': {}
             }
             for key in rule_dict:
                 new_rule[key] = rule_dict[key]
@@ -552,7 +552,7 @@ class PolicyFixture(fixtures.Fixture):
 
         # end for
         self.logger.debug("Policy np_rules : %s" % (np_rules))
-        
+
         pol_entries = PolicyEntriesType(np_rules)
         if policy_obj:
             policy_obj.network_policy_entries = pol_entries
@@ -1093,7 +1093,7 @@ class PolicyFixture(fixtures.Fixture):
     # end verify_policy_in_vna
 
     def refresh_quantum_policy_obj(self):
-        # Rebuild the policy object to take care of cases where it takes time to update after instantiating the object 
+        # Rebuild the policy object to take care of cases where it takes time to update after instantiating the object
         if self.api_flag:
             return self
         self.policy_obj=self.quantum_h.get_policy_if_present(self.project_name, self.policy_name)
@@ -1188,7 +1188,7 @@ class PolicyFixture(fixtures.Fixture):
         """ Checks for policy details in Control-nodes.
         Validate control-node data against quantum and return False if any mismatch is found.
         """
-        # Refresh quantum policy object - self.policy_obj  
+        # Refresh quantum policy object - self.policy_obj
         return {'result':True ,'msg':'Skipping control node verification'}
         self.refresh_quantum_policy_obj()
         me = inspect.getframeinfo(inspect.currentframe())[2]
@@ -1225,7 +1225,7 @@ class PolicyFixture(fixtures.Fixture):
                 cn_rules = policy_test_utils.xlate_cn_rules(cn_rules)
             else:
                 cn_rules = []
-            self.logger.debug("Policy info in Control node %s: %s" % (cn, 
+            self.logger.debug("Policy info in Control node %s: %s" % (cn,
                 cn_rules))
             if isinstance(self.policy_obj, NetworkPolicy):
                 policy_info = self.policy_obj.network_policy_entries.exportDict()['PolicyEntriesType']['policy_rule']
