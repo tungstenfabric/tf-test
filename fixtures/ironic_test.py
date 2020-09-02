@@ -37,8 +37,12 @@ class IronicHelper(object):
         return openstack.OpenstackAuth(**kwargs)
 
     def setUp(self):
+        myopenstack_names = self.inputs.openstack_names[0]
+        self.logger.info(myopenstack_names)
+        self.logger.debug(myopenstack_names)
+        print("ERROR: setUp")
         if not self.inputs.host_data[self.inputs.openstack_names[0]]['containers'].get('ironic_conductor'):
-           return
+            return
         self.obj = client.get_client('1',
                        session=self.auth_h.get_session(scope='project'),
                        os_region_name=self.region_name)
