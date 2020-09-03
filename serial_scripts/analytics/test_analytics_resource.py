@@ -1144,10 +1144,10 @@ class AnalyticsTestSanityWithResource(
             'contrail-discovery', 'IfmapServer', 'XmppServer', 'contrail-analytics-nodemgr', 'contrail-control-nodemgr',
             'contrail-config-nodemgr', 'contrail-database-nodemgr', 'Contrail-WebUI-Nodemgr', 'contrail-vrouter-nodemgr',
             'Storage-Stats-mgr', 'Ipmi-Stats-mgr', 'InventoryAgent',
-            'contrail-tor-agent', 'contrail-broadview', 'contrail-kube-manager', 'contrail-mesos-manager']
+            'contrail-tor-agent', 'tf-broadview', 'contrail-kube-manager', 'contrail-mesos-manager']
 
         module_ = ['IfmapServer', 'XmppServer', 'Contrail-WebUI-Nodemgr', 'Storage-Stats-mgr', 'Storage-Stats-mgr', 'Ipmi-Stats-mgr',
-           'InventoryAgent', 'contrail-tor-agent', 'contrail-broadview', 'contrail-kube-manager', 'contrail-mesos-manager']
+           'InventoryAgent', 'contrail-tor-agent', 'tf-broadview', 'contrail-kube-manager', 'contrail-mesos-manager']
 
         module = list(set(module) - set(module_))
 
