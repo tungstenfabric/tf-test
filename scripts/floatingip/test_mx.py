@@ -38,7 +38,7 @@ class TestSanity_MX(base.FloatingIpBaseTest):
     @classmethod
     def setUpClass(cls):
         super(TestSanity_MX, cls).setUpClass()
-    
+
     @classmethod
     def tearDownClass(cls):
         super(TestSanity_MX, cls).tearDownClass()
@@ -96,7 +96,7 @@ class TestSanity_MX(base.FloatingIpBaseTest):
             self.public_vn_obj.public_vn_fixture.vn_id, vm1_fixture.vm_id, project_obj)
         self.addCleanup(self.public_vn_obj.fip_fixture.disassoc_and_delete_fip, fip_id)
 
-        assert self.public_vn_obj.fip_fixture.verify_fip(fip_id, vm1_fixture, 
+        assert self.public_vn_obj.fip_fixture.verify_fip(fip_id, vm1_fixture,
                 self.public_vn_obj.public_vn_fixture)
 
         vm1_fixture.wait_till_vm_up()
@@ -192,7 +192,7 @@ class TestSanity_MX(base.FloatingIpBaseTest):
             self.public_vn_obj.public_vn_fixture.vn_id, vm1_fixture.vm_id, project_obj)
 
         self.addCleanup(self.public_vn_obj.fip_fixture.disassoc_and_delete_fip, fip_id)
-        assert self.public_vn_obj.fip_fixture.verify_fip(fip_id, vm1_fixture, 
+        assert self.public_vn_obj.fip_fixture.verify_fip(fip_id, vm1_fixture,
                             self.public_vn_obj.public_vn_fixture)
         routing_instance = self.public_vn_obj.public_vn_fixture.ri_name
 
@@ -242,7 +242,7 @@ class TestSanity_MX(base.FloatingIpBaseTest):
         self.addCleanup(
             vn2_fixture.unbind_policies, vn2_fixture.vn_id, [
                 policy2_fixture.policy_fq_name])
-     
+
         vm1_fixture.wait_till_vm_up()
         vm2_fixture.wait_till_vm_up()
 

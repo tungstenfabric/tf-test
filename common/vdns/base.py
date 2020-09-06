@@ -50,7 +50,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
     @classmethod
     def tearDownClass(cls):
         super(BasevDNSTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 
     def verify_dns_record_order(self, record_order, test_type='test_record_order', record_num=10):
         ''' This test tests DNS record order.
@@ -377,7 +377,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
                     'File of size %sB not transferred via scp ' % size)
             assert transfer_result, 'File not transferred via scp'
 
-        
+
         sleep(20)
 
         for vm_name in vm_list:

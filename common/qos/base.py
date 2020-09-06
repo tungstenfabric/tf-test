@@ -52,7 +52,7 @@ class QosTestBase(BaseNeutronTest):
                             QosQueueFixture(**queue_dict))
             queue_fixtures.append(queue_fixture)
         return queue_fixtures
-    # end 
+    # end
 
     def setup_fcs(self, fcs_list):
         fc_fixtures = []
@@ -63,7 +63,7 @@ class QosTestBase(BaseNeutronTest):
                             QosForwardingClassFixture(**fc_dict))
             fc_fixtures.append(fc_fixture)
         return fc_fixtures
-    # end 
+    # end
 
     def setup_qos_config(self, name=None, dscp_map={}, dot1p_map={}, exp_map={},
                           **kwargs):
@@ -76,7 +76,7 @@ class QosTestBase(BaseNeutronTest):
                                              connections=self.connections,
                                              **kwargs))
         return qos_config_fixture
-    # end setup_qos_config 
+    # end setup_qos_config
 
     def setup_qos_config_on_vmi(self, qos_fixture, vmi_uuid):
         ret_val = qos_fixture.apply_to_vmi(vmi_uuid)
@@ -102,7 +102,7 @@ class QosTestBase(BaseNeutronTest):
         qos_fixture.cleanUp()
         self.remove_from_cleanups(qos_fixture.cleanUp)
     # end delete_qos_config
-    
+
     def validate_packet_qos_marking(self,
                                     src_vm_fixture,
                                     dest_vm_fixture,
@@ -128,17 +128,17 @@ class QosTestBase(BaseNeutronTest):
                                     offset = 110,
                                     **kwargs):
         '''
-            dest_compute_fixture should be supplied if underlay traffic is 
+            dest_compute_fixture should be supplied if underlay traffic is
             being checked
             dest_vm_fixture should be supplied if traffic is being checked for a
             specific estination VM
-            
+
             Few things to note:
             1. traffic_generator can be "scapy" or "hping"
             2. "scapy" is specifically used here to test l2 and IPv6 traffic only.
                For all other traffic, hping is being used.
             3. If queue_id is not None, then it do not validate  content of packets.
-                It just verify the count of packets through a queue. It use 
+                It just verify the count of packets through a queue. It use
                 "min_expected_pkts" to verify minimum packets transmitted.
         '''
         interval = kwargs.get('interval', 1) # interval in seconds
@@ -198,12 +198,12 @@ class QosTestBase(BaseNeutronTest):
                 init_pkt_count = self.get_queue_count(src_vm_fixture.vm_node_ip,
                                                       interface, queue_id)
             traffic_obj, scapy_obj = self._generate_scapy_traffic(
-                                                        src_vm_fixture, 
+                                                        src_vm_fixture,
                                                         src_compute_fixture,
                                                         interface,
-                                                        encap = encap, 
+                                                        encap = encap,
                                                         interval=interval,
-                                                        count=count, 
+                                                        count=count,
                                                         ether = ether,
                                                         dot1q = dot1q,
                                                         ipv6 = ipv6,
@@ -243,7 +243,7 @@ class QosTestBase(BaseNeutronTest):
                 session,pcap = traffic_obj.packet_capture_start(
                                     traffic_between_diff_networks =
                                      traffic_between_diff_networks)
-            
+
         sleep(traffic_duration)
         if queue_id == None:
             traffic_obj.packet_capture_stop()
@@ -278,7 +278,7 @@ class QosTestBase(BaseNeutronTest):
         self.inputs.run_cmd_on_server(src_compute_fixture.ip, "rm %s" % pcap)
         return True
     # end validate_packet_qos_marking
-    
+
     def validate_control_packet_dscp_marking(self, node_ip,
                                         expected_dscp,
                                         packet_src_ip = None,
@@ -297,7 +297,7 @@ class QosTestBase(BaseNeutronTest):
                 new_filter[0::2] = new_list
                 string = " ".join(new_filter)
                 filter.append(string)
-            else:    
+            else:
                 filter.append("src host %s" % packet_src_ip)
         if packet_dst_ip:
             if isinstance(packet_dst_ip, list):
@@ -380,24 +380,24 @@ class QosTestBase(BaseNeutronTest):
         This function starts full rate traffic using iperf3 utility.
         It verifies if traffic is flowing thorugh desired queues.
         It also verifies bandwidth and strictness values.
-        
+
         This function starts 2 parallel streams of iperf3 traffic
         to congest the egress port.
-        After creating congestion, it verifies for the BW and strictness 
+        After creating congestion, it verifies for the BW and strictness
         behavior
-        
+
         Set queue_type = rr (If traffic between 2 rr queues)
                              In this case expected_ratio_q1_q2 need to be updated
                        = strict (If traffic between 2 strict queues)
-                       = strcit_rr (If traffic between a strict and a rr queue)  
+                       = strcit_rr (If traffic between a strict and a rr queue)
                              In this case strict_queue_id need to be updated
                              Other queue will be assumed as Round robin
-        
+
         Note that iperf3 has some limitations.
         Some times when 2 parallel stream of high Bandwidth (7-10G) are started,
         one of the iperf3 stream do not get initiated until the first one completes.
         This result in wrong results.
-        Thus, we have come up to a number as "7G" where we the chances of other stream 
+        Thus, we have come up to a number as "7G" where we the chances of other stream
         not getting started are less.
         '''
         if protocol == 'udp':
@@ -424,7 +424,7 @@ class QosTestBase(BaseNeutronTest):
                                             interface,
                                             queue_id_vn2_traffic)
         iperf_stream1_obj = self._generate_iperf_traffic(
-                                                src_vn1_vm1_fixture, 
+                                                src_vn1_vm1_fixture,
                                                 dest_vn1_vm2_fixture,
                                                 bandwidth = bandwidth,
                                                 udp = udp,
@@ -432,7 +432,7 @@ class QosTestBase(BaseNeutronTest):
                                                 tos = tos_vn1,
                                                 port = 5203)
         iperf_stream2_obj = self._generate_iperf_traffic(
-                                                src_vn2_vm1_fixture, 
+                                                src_vn2_vm1_fixture,
                                                 dest_vn2_vm2_fixture,
                                                 bandwidth = bandwidth,
                                                 udp = udp,
@@ -522,7 +522,7 @@ class QosTestBase(BaseNeutronTest):
                     return False
         return True
     # end validate_queue_performance
-    
+
     def _generate_scapy_traffic(self, src_vm_fixture, src_compute_fixture,
                                 interface, encap = None, username = None,
                                 password = None, interval=1, count=1, **kwargs):
@@ -549,7 +549,7 @@ class QosTestBase(BaseNeutronTest):
                                     logger=self.logger,
                                     encap_type = encap)
         return traffic_obj, scapy_obj
-    
+
     def _generate_hping_traffic(self, src_vm_fixture, src_compute_fixture,
                                 interface, dest_ip =None, src_port = None,
                                 dest_port = None, encap = None, username = None,
@@ -610,12 +610,12 @@ class QosTestBase(BaseNeutronTest):
                                           logger=self.logger,
                                           encap_type = encap)
         return traffic_obj, hping_obj
-    
+
     def _generate_iperf_traffic(self, src_vm_fixture, dst_vm_fixture,
                                 **kwargs):
         params = OrderedDict()
         params["port"] = kwargs.get('port', 4203)
-        params["bandwidth"]  = kwargs.get('bandwidth', '1G')     
+        params["bandwidth"]  = kwargs.get('bandwidth', '1G')
         params["udp"] = kwargs.get('udp', True)
         if params["udp"] == True:
             params["length"] = kwargs.get('length', 65507)
@@ -629,7 +629,7 @@ class QosTestBase(BaseNeutronTest):
         iperf_obj.start(wait=kwargs.get('wait', False))
         return iperf_obj
 
-    def update_policy_qos_config(self, policy_fixture, qos_config_fixture, 
+    def update_policy_qos_config(self, policy_fixture, qos_config_fixture,
                                  operation = "add", entry_index =0):
         policy_entry = policy_fixture.get_entries()
         new_policy_entry = policy_entry
@@ -656,8 +656,8 @@ class QosTestBase(BaseNeutronTest):
         policy_id = policy_fixture.get_id()
         #policy_data = {'policy': {'entries': new_policy_entry}}
         policy_fixture.update_policy(policy_id, policy_data)
-    
-    def update_sg_qos_config(self, sg_fixture, qos_config_fixture, 
+
+    def update_sg_qos_config(self, sg_fixture, qos_config_fixture,
                              operation = "add"):
         sg_object = self.vnc_lib.security_group_read(id = sg_fixture.get_uuid())
         sg_rules = sg_object.get_security_group_entries().policy_rule
@@ -674,9 +674,9 @@ class QosTestBase(BaseNeutronTest):
         sg_entries.set_policy_rule(sg_rules)
         sg_object.set_security_group_entries(sg_entries)
         self.vnc_lib.security_group_update(sg_object)
-        
+
     def configure_fc_list_dynamically(self, queue_fixtures):
-        ''' Read queue_fixtures and dynamically create FC list 
+        ''' Read queue_fixtures and dynamically create FC list
             Also returns the corresponding logical ids list'''
         fcs = []
         logical_ids = []
@@ -692,9 +692,9 @@ class QosTestBase(BaseNeutronTest):
             fcs.append(fc_dict)
             logical_ids.append(queue_fixtures[count].queue_id)
         return fcs, logical_ids
-    
+
     def configure_map_dynamically(self, map_type, fcs):
-        ''' Read fc list and dynamically create dscp/dot1p/exp map 
+        ''' Read fc list and dynamically create dscp/dot1p/exp map
             map_type is either of "dscp", "dot1p" or "exp"'''
         map = {}
         if map_type == "dscp":
@@ -710,11 +710,11 @@ class QosTestBase(BaseNeutronTest):
             i = i + 1
             value = value - 1
         return map
-    
+
     @classmethod
     def get_qos_queue_params(cls, node_ip):
         '''
-        This method will populate multi queueing interface, it's speed and 
+        This method will populate multi queueing interface, it's speed and
         number of queue supported
         '''
         cls.fabric_interface = cls.agent_inspect[node_ip].\
@@ -733,10 +733,10 @@ class QosTestBase(BaseNeutronTest):
     def get_configured_queue_mapping(self, node_ip):
         '''
         This method will populate list of HW queues.
-        It also populates list of logical queues. Note that logical queue ID 
-        list only contains first element. eg, if logical_queue=[1, 6-10, 12-15] 
+        It also populates list of logical queues. Note that logical queue ID
+        list only contains first element. eg, if logical_queue=[1, 6-10, 12-15]
         for any single HW queue ,it picks only first element "1".
-        
+
         hw_queues = [3, 11, 18, 28, 36, 43, 53, 61]
         logical_ids = [1, 40, 70, 115, 140, 175, 180, 245]
         '''
@@ -754,7 +754,7 @@ class QosTestBase(BaseNeutronTest):
                 logical_id = int(list(hw_to_logical_value.values())[0][0].split('-')[0])
                 logical_ids.append(logical_id)
         return (hw_queues, logical_ids, default_queue)
-    
+
     def get_all_configured_logical_ids(self, node_ip):
         '''
         This method will populate list logical queues.
@@ -811,7 +811,7 @@ class QosTestBase(BaseNeutronTest):
                 (interface, queue_id)
         output = self.inputs.run_cmd_on_server(node_ip, cmd)
         packets = int(output.split(' ')[-1])
-        self.logger.debug("Number of packets in queue %d is %d" 
+        self.logger.debug("Number of packets in queue %d is %d"
                           % (queue_id, packets))
         return packets
 
@@ -841,7 +841,7 @@ class QosTestBase(BaseNeutronTest):
         return hw_queue
 
     def match_traffic(self, init_pkts, final_pkts, min_expected_pkts):
-        ''' 
+        '''
         It ask user for minimum expected packets in the duration of transmission
         If also take initial count and final count of packets during transmission period.
         It allows 1% error in expected packets and return the result.
@@ -862,7 +862,7 @@ class QosTestBase(BaseNeutronTest):
             self.logger.error("Traffic might not be queuing to the"
                               " correct queue")
             return False
-        
+
     def skip_tc_if_no_queue_config(self):
         if not self.inputs.qos_queue:
             self.logger.error("Qos Queue configurations not present."
@@ -870,7 +870,7 @@ class QosTestBase(BaseNeutronTest):
             skip = True
             msg = "Qos Queue configurations not present."
             raise testtools.TestCase.skipException(msg)
-    
+
     @classmethod
     def skip_tc_if_no_10G_interface(cls, interface_speed):
         interface_speed = int(interface_speed.split("Mb/s")[0])
@@ -880,7 +880,7 @@ class QosTestBase(BaseNeutronTest):
             skip = True
             msg = "DCB not supported on interface"
             raise testtools.TestCase.skipException(msg)
-    
+
     @classmethod
     def skip_tc_if_bond_interface(cls, interface_name):
         if 'bond' in interface_name:
@@ -904,11 +904,11 @@ class QosTestBase(BaseNeutronTest):
             cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd, container='agent')
         cmd = 'openstack-config --del %s QOS-NIANTIC' % (conf_file)
         cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd, container='agent')
-        
+
     @classmethod
     def update_conf_file_queueing(cls):
         '''
-        This function removes all QOS related configurations from 
+        This function removes all QOS related configurations from
         agent.conf and updates the agent.conf with some fixed static values
         which will be used across QOS queueing test cases
         '''
@@ -918,7 +918,7 @@ class QosTestBase(BaseNeutronTest):
         ## Now adding static entries
         cmds = []
         # Below 2 lines are used to create a empty Section named "QOS"
-        cmds.append('openstack-config --set %s QOS hack create' % 
+        cmds.append('openstack-config --set %s QOS hack create' %
                         (conf_file))
         cmds.append('openstack-config --del %s QOS hack' % (conf_file))
         cmds.append('openstack-config --set %s QUEUE-3 logical_queue [15]'
@@ -930,24 +930,24 @@ class QosTestBase(BaseNeutronTest):
         cmds.append('openstack-config --set %s QUEUE-28 logical_queue [115]'
                      % (conf_file))
         # Below 2 lines are used to create a empty Section named "QOS-NIANTEC"
-        cmds.append('openstack-config --set %s QOS-NIANTIC hack create' 
+        cmds.append('openstack-config --set %s QOS-NIANTIC hack create'
                         % (conf_file))
         cmds.append('openstack-config --del %s QOS-NIANTIC hack' % (conf_file))
-        cmds.append('openstack-config --set %s PG-0 scheduling strict' 
+        cmds.append('openstack-config --set %s PG-0 scheduling strict'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-0 bandwidth 0' 
+        cmds.append('openstack-config --set %s PG-0 bandwidth 0'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-1 scheduling rr' 
+        cmds.append('openstack-config --set %s PG-1 scheduling rr'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-1 bandwidth 60' 
+        cmds.append('openstack-config --set %s PG-1 bandwidth 60'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-2 scheduling strict' 
+        cmds.append('openstack-config --set %s PG-2 scheduling strict'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-2 bandwidth 0' 
+        cmds.append('openstack-config --set %s PG-2 bandwidth 0'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-3 scheduling rr' 
+        cmds.append('openstack-config --set %s PG-3 scheduling rr'
                     % (conf_file))
-        cmds.append('openstack-config --set %s PG-3 bandwidth 40' 
+        cmds.append('openstack-config --set %s PG-3 bandwidth 40'
                     % (conf_file))
         for cmd in cmds:
             cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd, container='agent')
@@ -959,7 +959,7 @@ class QosTestBase(BaseNeutronTest):
         assert cluster_status, 'Hash of error nodes and services : %s' % (
             error_nodes)
     # update_conf_file_queue_map
-    
+
     @classmethod
     def restore_conf_file_queueing(cls):
         '''
@@ -979,7 +979,7 @@ class QosTestBase(BaseNeutronTest):
                 break
         cmds = []
         # Below 2 lines are used to create a empty Section named "QOS"
-        cmds.append('openstack-config --set %s QOS hack create' % 
+        cmds.append('openstack-config --set %s QOS hack create' %
                         (conf_file))
         cmds.append('openstack-config --del %s QOS hack' % (conf_file))
         for elem in queue_mapping:
@@ -999,7 +999,7 @@ class QosTestBase(BaseNeutronTest):
                     cmds.append('openstack-config --set %s QUEUE-%s logical_queue "%s"'
                                 % (conf_file, key, value))
         # Below 2 lines are used to create a empty Section named "QOS-NIANTEC"
-        cmds.append('openstack-config --set %s QOS-NIANTIC hack create' 
+        cmds.append('openstack-config --set %s QOS-NIANTIC hack create'
                         % (conf_file))
         cmds.append('openstack-config --del %s QOS-NIANTIC hack' % (conf_file))
         for elem in queue_properties:
@@ -1020,7 +1020,7 @@ class QosTestBase(BaseNeutronTest):
         assert cluster_status, 'Hash of error nodes and services : %s' % (
             error_nodes)
     # update_conf_file_queue_map
-    
+
     @classmethod
     def configure_queue_features(cls):
         '''
@@ -1043,7 +1043,7 @@ class QosTestBase(BaseNeutronTest):
 
     def setup_control_dscp_values(self, control_dscp, dns_dscp, analytics_dscp):
         '''
-        This function read the global DSCP marking values for control packets 
+        This function read the global DSCP marking values for control packets
         and save it. Then it change the values to the one that user intend to
         use. It also adds a cleanup so that values can be reverted to initial
         values at the end.
@@ -1228,9 +1228,9 @@ class QosTestExtendedBase(QosTestBase):
         else:
             return (True, None)
     # end is_test_applicable
-    
+
 class TestQosPolicyBase(QosTestExtendedBase):
-    
+
     @classmethod
     def setUpClass(cls):
         super(TestQosPolicyBase, cls).setUpClass()
@@ -1285,7 +1285,7 @@ class TestQosPolicyBase(QosTestExtendedBase):
     # end tearDownClass
 
 class TestQosSVCBase(QosTestExtendedBase):
-    
+
     @classmethod
     def setUpClass(cls):
         super(TestQosSVCBase, cls).setUpClass()
@@ -1375,7 +1375,7 @@ class TestQosSVCBase(QosTestExtendedBase):
     # end tearDownClass
 
 class TestQosQueueProperties(QosTestExtendedBase):
-    
+
     @classmethod
     def setUpClass(cls):
         super(TestQosQueueProperties, cls).setUpClass()
@@ -1399,13 +1399,13 @@ class TestQosQueueProperties(QosTestExtendedBase):
 
 class FcIdGenerator(object):
     '''
-        This class parse through the FCs present and 
+        This class parse through the FCs present and
         return a unique FC ID which is not in use.
     '''
-    
+
     def __init__(self, vnc_lib):
         self.vnc_lib = vnc_lib
-    
+
     def get_free_fc_ids(self, number):
         ''' "number" is number of free fc_ids to be returned'''
         try:

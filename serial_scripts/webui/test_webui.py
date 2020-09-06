@@ -558,7 +558,7 @@ class WebuiTestSanity(base.WebuiBaseTest):
     def test_verify_config_networking_floating_ips(self):
         '''Test floating ips on config->Networking->Manage Floating IPs page
         '''
-        assert self.webui.verify_floating_ip_api_data(), 'Floating ips config data verification failed' 
+        assert self.webui.verify_floating_ip_api_data(), 'Floating ips config data verification failed'
         return True
     # end test_verify_config_networking_floating_ips
 

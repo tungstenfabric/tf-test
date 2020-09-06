@@ -455,7 +455,7 @@ class ConfigSvcChain(object):
 
         if self.inputs.vcenter_compute_ips:
             svc_img_name = VC_SVC_TYPE_PROPS[service_type][service_mode]
-        elif self.inputs.orchestrator == 'vcenter':#Fixing tinycore image 
+        elif self.inputs.orchestrator == 'vcenter':#Fixing tinycore image
                                                    #for vcenter-only mode
             svc_img_name = SVC_TYPE_PROPS[service_type][service_mode]
         else:

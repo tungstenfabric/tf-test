@@ -2698,9 +2698,9 @@ class FlapAgentScaleInit (object):
                         self.inputs.auth_ip, str(net), vn_name, oper)
                     self._log_print("INFO: %s" % cmd)
                     self.vn_cfg._run(cmd)
-                    # Adding route target for each block  
+                    # Adding route target for each block
                     if self.rt_per_block_enabled:
-                        self.vn_cfg._add_route_target(vn_name,64512,j) 
+                        self.vn_cfg._add_route_target(vn_name,64512,j)
                     #
                     # Check that vn is deleted before deleting next
                     #

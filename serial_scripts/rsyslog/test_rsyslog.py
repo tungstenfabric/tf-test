@@ -212,7 +212,7 @@ class TestRsyslog(BaseRsyslogTest):
 
         # send 10 messages with delay.
         with settings(host_string='%s@%s' % (self.inputs.host_data[
-                          comp_node_ip]['username'], 
+                          comp_node_ip]['username'],
                           comp_node_ip),
                       password=self.inputs.host_data[comp_node_ip]['password'],
                       warn_only=True, abort_on_prompts=False):
@@ -223,7 +223,7 @@ class TestRsyslog(BaseRsyslogTest):
 
         # verify through contrail logs.
         with settings(host_string='%s@%s' % (self.inputs.host_data[
-                          self.inputs.collector_ips[0]]['username'], 
+                          self.inputs.collector_ips[0]]['username'],
                           self.inputs.collector_ips[0]),
                       password=self.inputs.host_data[
                           self.inputs.collector_ips[0]]['password'],
@@ -258,7 +258,7 @@ class TestRsyslog(BaseRsyslogTest):
         # send 10 log messages without any delay.
         # no message should be lost in a tcp connection.
         with settings(host_string='%s@%s' % (self.inputs.host_data[
-                          comp_node_ip]['username'], 
+                          comp_node_ip]['username'],
                           comp_node_ip),
                       password=self.inputs.host_data[comp_node_ip]['password'],
                       warn_only=True, abort_on_prompts=False):
@@ -301,7 +301,7 @@ class TestRsyslog(BaseRsyslogTest):
 
         # send syslog messages of all facilities and severities and verify.
         with settings(host_string='%s@%s' % (self.inputs.host_data[
-                          comp_node_ip]['username'], 
+                          comp_node_ip]['username'],
                           comp_node_ip),
                       password=self.inputs.host_data[comp_node_ip]['password'],
                       warn_only=True, abort_on_prompts=False):
@@ -384,8 +384,8 @@ class TestRsyslog(BaseRsyslogTest):
                     "Error in transmitting or receiving some syslog severities.")
                 return False
 
-        # send 100 messages grater than 1024 bytes with a delay of 1 sec 
-        # between each message. This delay factor is expected to be brought 
+        # send 100 messages grater than 1024 bytes with a delay of 1 sec
+        # between each message. This delay factor is expected to be brought
         # down through bug fix.
         with settings(host_string='%s@%s' % (self.inputs.host_data[
                           comp_node_ip]['username'],

@@ -4,7 +4,7 @@ from tcutils.wrappers import preposttest_wrapper
 from vn_test import MultipleVNFixture
 from physical_router_fixture import PhysicalRouterFixture
 from common import isolated_creds
-from common.neutron.base import BaseNeutronTest 
+from common.neutron.base import BaseNeutronTest
 import physical_device_fixture
 from jnpr.junos import Device
 from time import sleep
@@ -31,7 +31,7 @@ class Test1553316(BaseNeutronTest):
     def is_test_applicable(self):
         if not list(self.inputs.dm_mx.values()):
            return (False, 'Physical routers data needs to be set in testbed.py to run this script')
-        if len(self.inputs.ext_routers) < 1:            
+        if len(self.inputs.ext_routers) < 1:
             return (False, 'Atleast 1 mx is needed')
         if not self.inputs.use_devicemanager_for_md5:
             return (False, 'Testbed is not enabled to test with Device Manager')
@@ -43,7 +43,7 @@ class Test1553316(BaseNeutronTest):
     @preposttest_wrapper
     def test_create_v6(self):
         """
-        Description: Verify v6 config is pushed to mx 
+        Description: Verify v6 config is pushed to mx
         """
         router_params = list(self.inputs.dm_mx.values())[0]
         self.phy_router_fixture = self.useFixture(PhysicalRouterFixture(
@@ -68,18 +68,18 @@ class Test1553316(BaseNeutronTest):
             project_name=self.inputs.project_name, connections=self.connections,
             vn_name=vn1_name, inputs=self.inputs, subnets=vn1_net))
         assert vn1_fixture.verify_on_setup()
-        self.extend_vn_to_physical_router(vn1_fixture, self.phy_router_fixture) 
+        self.extend_vn_to_physical_router(vn1_fixture, self.phy_router_fixture)
         sleep(20)
-        mx_handle = self.phy_router_fixture.get_connection_obj('juniper', 
-                    host=router_params['mgmt_ip'], 
-                    username=router_params['ssh_username'], 
-                    password=router_params['ssh_password'], 
+        mx_handle = self.phy_router_fixture.get_connection_obj('juniper',
+                    host=router_params['mgmt_ip'],
+                    username=router_params['ssh_username'],
+                    password=router_params['ssh_password'],
                     logger=[self.logger])
         cmd = 'show configuration groups __contrail__ routing-instances _contrail_%s-l3-%s' % (vn1_name, vn1_fixture.vn_network_id)
         cli_output = self.get_output_from_node(mx_handle, cmd)
         assert (not('invalid command' in cli_output)), "Bug 1553316 present. v6 CIDR config not pushed to mx"
 
-        return True 
+        return True
 
     #end test_create_v6
 

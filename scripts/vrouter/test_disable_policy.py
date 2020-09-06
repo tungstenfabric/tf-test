@@ -190,8 +190,8 @@ class DisablePolicyEcmp(BaseVrouterTest):
 
         self.disable_policy_for_vms(vm_fix_list)
 
-        port_list = [port1_obj, port2_obj]                                      
-        for port in port_list:                                                  
+        port_list = [port1_obj, port2_obj]
+        for port in port_list:
             self.config_aap(port['id'], vIP, mac=port['mac_address'])
 
         self.config_vrrp(vm1_fixture, vIP, '20')

@@ -112,7 +112,7 @@ class TestNetworkPolicy(BaseK8sTest):
         # Create 2 pods
         namespace_name = self.namespace.name
         compute_label_list, compute_count = self.connections.k8s_client.get_kubernetes_compute_labels()
-        compute_selector_1 = {'computenode': compute_label_list[0]} 
+        compute_selector_1 = {'computenode': compute_label_list[0]}
         if inter_compute and compute_count >= 2:
         	compute_selector_2 = {'computenode': compute_label_list[1]}
         else:
@@ -131,7 +131,7 @@ class TestNetworkPolicy(BaseK8sTest):
 
         self.addCleanup(self.perform_cleanup, pod1)
         self.addCleanup(self.perform_cleanup, pod2)
-	
+
 	# Create tags
         fq_name1 = ['default-domain', project_name,
 			 '%s=%s'%(tag_type, tag_value)]
@@ -153,7 +153,7 @@ class TestNetworkPolicy(BaseK8sTest):
 		 tag_type='application',
 		 tag_value=app_tag_name, parent_type='project')
        	self.addCleanup(self.vnc_h.delete_tag, id=apptag)
-		
+
 
         # Apply tag
         tag_obj_list = []
@@ -243,7 +243,7 @@ class TestNetworkPolicy(BaseK8sTest):
         '''
 
         return policy1_fixture, pod1, pod2, fwp_obj, project_name
- 
+
     ''' Test 16 '''
     @preposttest_wrapper
     def test_intra_vn_intra_compute_tag_tier_tagat_vn(self):
@@ -397,7 +397,7 @@ class TestNetworkPolicy(BaseK8sTest):
     @preposttest_wrapper
     def test_intra_vn_intra_compute_tag_tier_tagat_vmi(self):
          self.run_test(vn1_name='vn1', tag_type='tier', tag_value='myweb',
-                       tag2_value='myapp', tag_obj_name='vmi') 
+                       tag2_value='myapp', tag_obj_name='vmi')
 # end test_intra_vn_intra_compute_tag_tier_tagat_vmi
 
     @preposttest_wrapper

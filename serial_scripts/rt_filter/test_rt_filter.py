@@ -40,7 +40,7 @@ class TestBasicRTFilterRestart(BaseRtFilterTest):
                  2. Add a route-target entry to the VN.
                  3. Check the rt_group and  bgp.rtarget.0 table on the control nodes.
                  4. Restart the contrail-control amd contrail-vrouter services.
-        Pass criteria: The system-defined, user-defined route target of the VN and the VM IP should 
+        Pass criteria: The system-defined, user-defined route target of the VN and the VM IP should
             be seen in the respective tables, even after the restarts.
         Maintainer : ganeshahv@juniper.net
         '''
@@ -197,12 +197,12 @@ class TestBasicRTFilterRestart(BaseRtFilterTest):
     @preposttest_wrapper
     def test_rt_entry_with_multiple_ctrl_nodes(self):
         '''
-        Description: Validate that the dep_routes in the RTGroup Table and paths in the bgp.l3vpn.0 
+        Description: Validate that the dep_routes in the RTGroup Table and paths in the bgp.l3vpn.0
             corresponding to the VM is seen only in the control_node, the VM's compute node has a session with.
         Test steps:
                  1. Have a setup with more than 2 control nodes.
                  2. Create a VN and a VM in it.
-        Pass criteria: Check the dep_routes in the RTGroup Table and paths in the bgp.l3vpn.0 table 
+        Pass criteria: Check the dep_routes in the RTGroup Table and paths in the bgp.l3vpn.0 table
             of the ctrl node that the compute node has a XMPP peering with.
         Maintainer : ganeshahv@juniper.net
         '''

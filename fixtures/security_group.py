@@ -109,7 +109,7 @@ class SecurityGroupFixture(ContrailFixture):
             if self.inputs.is_gui_based_config():
                 self.webui.delete_security_group(self)
             elif self.inputs.vro_based:
-                self.orch.delete_security_group(self.secgrp_name) 
+                self.orch.delete_security_group(self.secgrp_name)
             else:
                 self.orch.delete_security_group(sg_id=self.secgrp_id, option=self.option)
             if self.verify_is_run or verify:
@@ -187,7 +187,7 @@ class SecurityGroupFixture(ContrailFixture):
         if not retval:
             errmsg = "Security group: %s not found in control node." % self.secgrp_fq_name
             return False, errmsg
-	
+
         return True, None
 
     @retry(delay=2, tries=5)

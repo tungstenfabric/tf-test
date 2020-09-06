@@ -88,8 +88,8 @@ class CustomFileHandler(logging.FileHandler):
             ts=''
         if 'BUILD_ID' in os.environ :
             build_id= os.environ.get('BUILD_ID')
-        #path=os.environ.get('%s',%cwd)+'/logs/' 
-        path=('%s'+'/logs/')%cwd 
+        #path=os.environ.get('%s',%cwd)+'/logs/'
+        path=('%s'+'/logs/')%cwd
         try:
             os.mkdir( path )
         except OSError:
@@ -111,7 +111,7 @@ def main():
     logger.setUp()
     dolog(logger.logger,'message1')
     logger.cleanUp()
-    
+
     logger = Contrail_Logger('Dummy_file_1')
     logger.setUp()
     dolog(logger.logger,'message2')

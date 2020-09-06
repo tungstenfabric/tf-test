@@ -1,7 +1,7 @@
 # License: CC-BY-SA-3.0
 # From http://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish
 #
-# Usage : 
+# Usage :
 # with timeout(seconds=3):
 #    sleep(4)
 
@@ -14,7 +14,7 @@ import _thread
 from time import sleep
 
 class TimeoutError(Exception):
-    pass  
+    pass
 
 class timeout(object):
     def __init__(self, seconds=1, error_message='Timeout'):

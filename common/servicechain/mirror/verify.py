@@ -72,7 +72,7 @@ class VerifySvcMirror(ConfigSvcMirror, ECMPVerify):
                 left_vm_fixture.vm_node_ip != right_vm_fixture.vm_node_ip:
                 count = count * 2
                 if fip:
-                    count = old_div((count * 3),4)  #Because the ping to FIP involves NAT. 
+                    count = old_div((count * 3),4)  #Because the ping to FIP involves NAT.
             if proto == 'icmp':
                 if not self.inputs.pcap_on_vm:
                     print(str(svm_name) + ':' + str(count))
@@ -432,9 +432,9 @@ class VerifySvcMirror(ConfigSvcMirror, ECMPVerify):
         assert left_vm_fixture.ping_to_ip(
             right_vm_fixture.vm_ip), errmsg
         #TODO
-        # Check this with Ankit 
+        # Check this with Ankit
         for svm_name, (session, pcap) in list(sessions.items()):
-            count = 6 
+            count = 6
             if left_vm_fixture.vm_node_ip != right_vm_fixture.vm_node_ip:
                 count = count * 2
             assert self.verify_icmp_mirror(svm_name, session, pcap, count)

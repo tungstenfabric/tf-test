@@ -1013,7 +1013,7 @@ def skip_because(*args, **kwargs):
                     skip = True
                     msg = "Skipped as not supported in non-HA setup"
                     raise testtools.TestCase.skipException(msg)
-            
+
             if "mx_gw" in kwargs:
                 if ((not get_os_env('MX_GW_TEST') == '1') and (kwargs["mx_gw"] == False)):
                     skip = True
@@ -1096,14 +1096,14 @@ def skip_because(*args, **kwargs):
                 val = kwargs['dpdk_cluster']
                 if self.inputs.is_dpdk_cluster == val:
                     skip = True
-                    msg = "Skipped as test is not supported if dpdk_cluster=%s " % val 
+                    msg = "Skipped as test is not supported if dpdk_cluster=%s " % val
                     raise testtools.TestCase.skipException(msg)
 
             if 'ssl_enabled' in kwargs:
                 val = self.inputs.contrail_configs.get('SSL_ENABLE', False)
                 if kwargs['ssl_enabled'] == val:
                     skip = True
-                    msg = "Skipped as test is not supported in ssl_enabled=%s " % val 
+                    msg = "Skipped as test is not supported in ssl_enabled=%s " % val
                     raise testtools.TestCase.skipException(msg)
 
             if "analytics_nodes" in kwargs:
@@ -1220,7 +1220,7 @@ def get_lock(text):
 
 def is_ip_mine(ip):
     ''' Returns true if the ip is local
-    Note that if check is run on a container, the container should be using 
+    Note that if check is run on a container, the container should be using
     host networking
     '''
     for iface in netifaces.interfaces():

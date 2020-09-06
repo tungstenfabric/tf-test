@@ -26,7 +26,7 @@ class BaseDomainTest(test_v1.BaseTestCase_v1):
 # end BaseDomainTest class
 
     def create_project(self,domain_name,project_name,username, password):
-        
+
         return self.useFixture(ProjectFixture(
             domain_name=domain_name,
             project_name=project_name,

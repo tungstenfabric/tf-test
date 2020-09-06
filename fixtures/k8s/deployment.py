@@ -84,7 +84,7 @@ class DeploymentFixture(fixtures.Fixture):
 
     def delete(self):
         if not self.already_exists:
-            # Delete RS first 
+            # Delete RS first
             # https://github.com/kelproject/pykube/issues/87
             self.k8s_client.delete_replica_set(self.namespace, self.name)
             return self.k8s_client.delete_deployment(self.namespace, self.name)

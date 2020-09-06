@@ -113,7 +113,7 @@ class HeatStackFixture(fixtures.Fixture):
         do_cleanup = True
         self.logger.info('Deleting Stack %s' % self.stack_name)
         if self.already_present:
-            do_cleanup = False    
+            do_cleanup = False
         if do_cleanup:
             self.heat_obj = self.useFixture(HeatFixture(connections=self.connections))
             self.heat_client_obj = self.heat_obj.obj

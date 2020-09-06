@@ -16,7 +16,7 @@ from tcutils.test_lib.contrail_utils import check_xmpp_is_stable
 from .cores import *
 
 def detailed_traceback():
-    buf = io.BytesIO() if sys.version_info[0] == 2 else io.StringIO() 
+    buf = io.BytesIO() if sys.version_info[0] == 2 else io.StringIO()
     cgitb.Hook(format="text", file=buf).handle(sys.exc_info())
     tb_txt = buf.getvalue()
     buf.close()
@@ -68,7 +68,7 @@ def preposttest_wrapper(function):
             #        connections=self.connections):
             #    log.warn("Pre-Test validation failed.."
             #             " Skipping test %s" % (function.__name__))
-      #WA for bug 1362020 
+      #WA for bug 1362020
       #          assert False, "Test did not run since Pre-Test validation failed\
       #                         due to BGP/XMPP connection issue"
 
@@ -76,7 +76,7 @@ def preposttest_wrapper(function):
             result = None
             (test_valid, reason) = self.is_test_applicable()
             if not test_valid:
-                raise self.skipTest(reason) 
+                raise self.skipTest(reason)
             log.info('Initial checks done. Running the testcase now')
             log.info('')
             result = function(self, *args, **kwargs)

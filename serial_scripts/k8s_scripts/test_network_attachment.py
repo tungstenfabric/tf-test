@@ -518,7 +518,7 @@ class TestNetworkAttachment(BaseK8sTest):
             load-balanced using NodePort service from with in the cluster
             outside of the cluster
             nginx pods are multi interfaced pods
-            
+
         '''
         app = 'http_nodeport_test'
         labels = {'app': app}
@@ -572,19 +572,19 @@ class TestNetworkAttachment(BaseK8sTest):
         # Now validate ingress from public network
         assert self.validate_nginx_lb([pod1[0], pod2[0]], service.external_ips[0])
     # end test_service_with_type_loadbalancer
-    
+
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ingress_fanout_with_multi_intf_backends(self):
         '''
-        Creating a fanout ingress with 2 different host having 
-        2 different path along with a default backend 
+        Creating a fanout ingress with 2 different host having
+        2 different path along with a default backend
         This host are supported by repective service.
-        Service has required backend pod with required path 
+        Service has required backend pod with required path
         mentioned in ingress rule.
         From the local node, do a wget on the ingress public ip
         Validate that service and its loadbalancing works
-        backend pods are with multi interfaces 
+        backend pods are with multi interfaces
         '''
         app1 = 'http_test1'
         app2 = 'http_test2'
@@ -595,9 +595,9 @@ class TestNetworkAttachment(BaseK8sTest):
         path1 = 'foo'
         path2 = 'bar'
         host1 = 'foo.bar.com'
-        host2 = 'bar.foo.com' 
-        ingress_name = 'testingress' 
-       
+        host2 = 'bar.foo.com'
+        ingress_name = 'testingress'
+
         namespace = self.setup_namespace(name='default')
         assert namespace.verify_on_setup()
 
@@ -611,7 +611,7 @@ class TestNetworkAttachment(BaseK8sTest):
         pod1, pod2 = self.common_setup_for_multi_intf(namespace=namespace.name, labels=labels1, nginx=True)
         pod3, pod4 = self.common_setup_for_multi_intf(namespace=namespace.name, labels=labels2, nginx=True)
 
-        rules = [{'host': host1, 
+        rules = [{'host': host1,
                   'http': {'paths': [{
                                     'path':'/'+path1,
                                     'backend': { 'service_name': service_name1,
@@ -626,10 +626,10 @@ class TestNetworkAttachment(BaseK8sTest):
                                     'backend': { 'service_name': service_name2,
                                                  'service_port': 80
                                                }
-                                    }]    
+                                    }]
                          }
                  }]
-   
+
         default_backend = {'service_name': service_name1,
                            'service_port': 80}
 
@@ -657,7 +657,7 @@ class TestNetworkAttachment(BaseK8sTest):
         assert self.validate_nginx_lb([pod1[0], pod2[0]], ingress.external_ips[0], path=path1, host=host1)
         assert self.validate_nginx_lb([pod3[0], pod4[0]], ingress.external_ips[0], path=path2, host=host2)
 
-        # Validate wget fails on negative cases 
+        # Validate wget fails on negative cases
         self.logger.info("Negative Check: Wget should fail. Trying with wrong path")
         assert not self.validate_nginx_lb([pod1[0], pod2[0]], ingress.cluster_ip,
                                       test_pod=pod5, path='wrongpath', host=host1)
@@ -676,7 +676,7 @@ class TestNetworkAttachment(BaseK8sTest):
         pod1, pod2 = self.common_setup_for_multi_intf(ip_fabric_forwarding=True, ip_fabric_snat=True)
         self.verify_rechability_between_multi_intf_pods(pod1, pod2)
         #perform the kube manager restart
-        #Note:Few more checks need ot be added 
+        #Note:Few more checks need ot be added
         self.restart_kube_manager()
         self.verify_rechability_between_multi_intf_pods(pod1, pod2)
     #end test_fabric_fwd_with_kube_manager_restart

@@ -95,7 +95,7 @@ class AuthToken(DynamicArgs):
 
 class HeatClient(DynamicArgs):
 
-    """Returns heat clent  
+    """Returns heat clent
     :Parameters:
       - `heat_url`: heat_url
       - `auth_token`: auth_token
@@ -162,7 +162,7 @@ class HeatCli(object):
             print('Stack delete FAILED')
         else:
             print('Stack delete SUCCESS')
-             
+
 
     def update_stack(self):
         pass
@@ -208,8 +208,8 @@ class Inputs(object):
         self.logger = contrail_logging.getLogger(__name__)
         self.openstack_ip = openstack_ip
         self.host_data = dict()
-        nested_set(self.host_data,[self.openstack_ip,'username'],username) 
-        nested_set(self.host_data,[self.openstack_ip,'password'],password) 
+        nested_set(self.host_data,[self.openstack_ip,'username'],username)
+        nested_set(self.host_data,[self.openstack_ip,'password'],password)
 
     def run_cmd_on_server(self, server_ip, issue_cmd, username=None,
                           password=None, pty=True):
@@ -282,7 +282,7 @@ def main(args_str = None):
 
     if (script_args.operation == 'create'):
         heat_cli.create_stack(tenant_name, stack_name=script_args.stack_name, template=template)
-   
+
     if (script_args.operation == 'delete'):
         heat_cli.delete_stack(tenant_name, script_args.stack_name)
 

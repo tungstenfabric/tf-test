@@ -113,7 +113,7 @@ class TestHbsFirewall(BaseK8sTest):
         # Create 2 pods
         namespace_name = self.namespace.name
         compute_label_list, compute_count = self.connections.k8s_client.get_kubernetes_compute_labels()
-        compute_selector_1 = {'computenode': compute_label_list[0]} 
+        compute_selector_1 = {'computenode': compute_label_list[0]}
         if inter_compute and compute_count >= 2:
              compute_selector_2 = {'computenode': compute_label_list[1]}
         else:
@@ -219,7 +219,7 @@ class TestHbsFirewall(BaseK8sTest):
             site_ep2 = None
         fwr_fqname = ['default-domain', project_name, 'my_fwr']
         fwr_uuid = self.vnc_h.create_firewall_rule(fq_name=fwr_fqname,
-                                                   parent_type='project', 
+                                                   parent_type='project',
                                                    service_groups=[], protocol='icmp',
                                                    source=site_ep1,
                                                    destination=(site_ep2 or site_ep1), action='pass',
@@ -281,7 +281,7 @@ class TestHbsFirewall(BaseK8sTest):
         assert pod1.ping_with_certainty(pod2.pod_ip, expectation=True, count='5', hbf_enabled=True)
         assert pod2.ping_with_certainty(pod1.pod_ip, expectation=True, count='5', hbf_enabled=True)
         assert pod3.ping_with_certainty(pod4.pod_ip, expectation=False, count='5', hbf_enabled=True)
-        assert pod4.ping_with_certainty(pod3.pod_ip, expectation=False, count='5', hbf_enabled=True) 
+        assert pod4.ping_with_certainty(pod3.pod_ip, expectation=False, count='5', hbf_enabled=True)
         #self.setup_csrx(namespace_name=namespace_name, delete=True)
     # test_hbs_with_contrail_apiserver_restart
 

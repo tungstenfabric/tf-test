@@ -35,7 +35,7 @@ class TestProjectBasic(BaseProjectTest):
         project_name = get_random_name('project128')
         user_fixture= self.useFixture(UserFixture(
             connections=self.admin_connections,
-            username=self.inputs.admin_username, 
+            username=self.inputs.admin_username,
             password=self.inputs.admin_password))
         project_fixture_obj = self.useFixture(ProjectFixture(
             username=self.inputs.admin_username,

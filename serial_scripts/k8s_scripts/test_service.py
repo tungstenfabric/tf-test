@@ -26,7 +26,7 @@ class TestService(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_service_with_kube_manager_restart(self):
@@ -85,7 +85,7 @@ class TestService(BaseK8sTest):
            with user definned nodeport ad also the auto assigned nodeport
            1.access the mnodeport from outside the cluster
            2.access the odeport from with in the cluster
-              a. with in the same namespace 
+              a. with in the same namespace
               b. from the different namespace
         """
         for node_ip in self.cn_list :
@@ -98,11 +98,11 @@ class TestService(BaseK8sTest):
              assert self.validate_nginx_lb([pdslist[3], pdslist[4]], node_ip,
                                             nodePort=svclist[1].nodePort)
 
-             #access the Nodeport from outside the namespace 
+             #access the Nodeport from outside the namespace
              assert self.validate_nginx_lb([pdslist[0], pdslist[1]], node_ip,
                                             test_pod = pdslist[6],
                                             nodePort=svclist[0].nodePort)
-     
+
              assert self.validate_nginx_lb([pdslist[3], pdslist[4]], node_ip,
                                             test_pod = pdslist[6],
                                             nodePort=svclist[1].nodePort)

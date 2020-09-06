@@ -1,5 +1,5 @@
-from __future__ import print_function                                                             
-from builtins import object 
+from __future__ import print_function
+from builtins import object
 import time
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -150,7 +150,7 @@ class Client(object):
         # TODO match_expressions
         #return client.UnversionedLabelSelector(match_labels=match_labels)
         return client.V1LabelSelector(match_labels=match_labels)
-    
+
     def _get_ip_block_selector(self, cidr="", _except=[]):
         # TODO match_expressions
         #return client.UnversionedLabelSelector(match_labels=match_labels)
@@ -377,16 +377,16 @@ class Client(object):
 
     def delete_pod(self, namespace, name, grace_period_seconds=0, orphan_dependents=False):
         '''
-        grace_period_seconds: Type  int , The duration in seconds before the object 
-                              should be deleted. Value must be non-negative integer. 
-                              The value zero indicates delete immediately. If this 
+        grace_period_seconds: Type  int , The duration in seconds before the object
+                              should be deleted. Value must be non-negative integer.
+                              The value zero indicates delete immediately. If this
                               value is nil, the default grace period for the specified
                               type will be used. Defaults to a per object value if not
                               specified. zero means delete immediately. (optional)
 
-        orphan_dependents:    Type bool | Should the dependent objects be orphaned. 
-                              If true/false, the \"orphan\" finalizer will be added 
-                              to/removed from the object's finalizers list. (optional)         
+        orphan_dependents:    Type bool | Should the dependent objects be orphaned.
+                              If true/false, the \"orphan\" finalizer will be added
+                              to/removed from the object's finalizers list. (optional)
         '''
         body = client.V1DeleteOptions()
         self.logger.info('Deleting pod %s:%s' % (namespace, name))
@@ -396,9 +396,9 @@ class Client(object):
 
     def read_pod(self, name, namespace='default'):
         '''
-        exact = Type bool | Should the export be exact.  Exact export maintains 
+        exact = Type bool | Should the export be exact.  Exact export maintains
                             cluster-specific fields like 'Namespace' (optional)
-        export = Type bool | Should this value be exported.  Export strips fields 
+        export = Type bool | Should this value be exported.  Export strips fields
                             that a user can not specify. (optional)
         '''
         return self.v1_h.read_namespaced_pod(name, namespace)
@@ -670,7 +670,7 @@ class Client(object):
         '''
         Delete a replica set in a deployment
         To ensure cases where pods dont end up being cleaned ,
-        this set the replica count of deployment to 0, waits for the pods to 
+        this set the replica count of deployment to 0, waits for the pods to
         go away and then delete the rs
         '''
         self.logger.info('Deleting replica set of deployment %s' %(deployment))
@@ -682,7 +682,7 @@ class Client(object):
             self.wait_till_pod_cleanup(namespace, name)
             self.v1_beta_h.delete_namespaced_replica_set(name, namespace, body,
                 orphan_dependents=False)
-    # end delete_replica_set 
+    # end delete_replica_set
 
     def set_service_isolation(self, namespace, enable=True):
         ns_obj = self.v1_h.read_namespace(namespace)
@@ -815,7 +815,7 @@ class Client(object):
             print("Exception when calling CustomObjectsApi->get_namespaced_custom_object: %s\n" % e)
             return None
         return api_response
-    #Create te daemonset 
+    #Create te daemonset
     def create_daemonset(self, namespace='default',
                          name=None, metadata=None,
                          spec=None):
@@ -852,7 +852,7 @@ class Client(object):
     def delete_daemonset(self,
                          name,
                          namespace="default"):
-        '''Delete the  daemonset ''' 
+        '''Delete the  daemonset '''
         try:
            api_response = self.apps_v1_h.read_namespaced_daemon_set(name, namespace)
            pprint(api_response)

@@ -28,7 +28,7 @@ class TestService(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     @test.attr(type=['openshift_1'])
     @preposttest_wrapper
     def test_service_1(self):
@@ -91,7 +91,7 @@ class TestService(BaseK8sTest):
                   assert self.validate_nginx_lb([pod1, pod2], service.cluster_ip,
                                             test_pod = pod4,
                                             nodePort=service.nodePort,
-                                            expectation=False) 
+                                            expectation=False)
 
     # end test_service_type_nodeport__without_namespace_isolation
 
@@ -195,7 +195,7 @@ class TestService(BaseK8sTest):
         service = self.setup_http_service(namespace=namespace.name,
                                           labels=labels)
         assert service.verify_on_setup()
-        
+
         for i in range(0, 10):
             pod = self.setup_nginx_pod(namespace=namespace.name, labels=labels)
             all_pods.append(pod)
@@ -310,7 +310,7 @@ class TestServiceExternalIP(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     @test.attr(type=['k8s_sanity'])
     @skip_because(mx_gw = False)
     @preposttest_wrapper

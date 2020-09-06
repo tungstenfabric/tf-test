@@ -24,8 +24,8 @@ class TestDeployment(BaseK8sTest):
     @preposttest_wrapper
     def test_deployment_with_kube_manager_restart(self):
         ''' Create a deployment object with 3 pod replicas and Verify http service works across the pod replicas
-            Verify deletion of the deployment object cleans up all the pods which it had created 
-            Restart kube manager on all the control nodes and verify redeploying the deployment object with pod replicas take into effect 
+            Verify deletion of the deployment object cleans up all the pods which it had created
+            Restart kube manager on all the control nodes and verify redeploying the deployment object with pod replicas take into effect
             Re-verify the deployment passes and pods work as expected using http service with new set of replicas
         '''
 
@@ -54,7 +54,7 @@ class TestDeployment(BaseK8sTest):
                                       test_pod=client_pod)
         self.perform_cleanup(dep)
         self.sleep(35)
-        '''After restart of the Kube Manager recreate the deployment obect 
+        '''After restart of the Kube Manager recreate the deployment obect
            With additional pod replicas'''
         dep = self.setup_nginx_deployment(name=depname,
                                           replicas=5,
@@ -76,8 +76,8 @@ class TestDeployment(BaseK8sTest):
     @preposttest_wrapper
     def test_deployment_with_agent_restart(self):
         ''' Create a deployment object with 3 pod replicas and Verify http service works across the pod replicas
-            Verify deletion of the deployment object cleans up all the pods which it had created 
-            Restart vrouter agent on all the nodes and verify redeploying the deployment object with pod replicas take into effect 
+            Verify deletion of the deployment object cleans up all the pods which it had created
+            Restart vrouter agent on all the nodes and verify redeploying the deployment object with pod replicas take into effect
             Re-verify the deployment passes and pods work as expected using http service with new set of replicas
         '''
         client_pod = self.setup_busybox_pod()
@@ -103,7 +103,7 @@ class TestDeployment(BaseK8sTest):
                                       test_pod=client_pod)
         self.perform_cleanup(dep)
         self.sleep(2)
-        '''After restart of the vrouter agent recreate the deployment obect 
+        '''After restart of the vrouter agent recreate the deployment obect
            With additional pod replicas'''
         dep = self.setup_nginx_deployment(name=depname,
                                           replicas=5,

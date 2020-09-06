@@ -43,7 +43,7 @@ class TestvDNSBasic0(BasevDNSTest):
 
     def runTest(self):
         pass
-    #end runTest 
+    #end runTest
 
     # This Test test vdns functionality-- On VM launch agent should dynamically update dns records to dns agent.
     # This test verifies the same functionality and should able to refer VM by
@@ -52,16 +52,16 @@ class TestvDNSBasic0(BasevDNSTest):
     @test.attr(type=['ci_sanity', 'sanity', 'vcenter', 'suite1', 'vcenter_compute'])
     @preposttest_wrapper
     def test_vdns_ping_same_vn(self):
-        ''' 
+        '''
         Test:- Test vdns functionality. On VM launch agent should dynamically update dns records to dns agent
-            1.  Create vDNS server 
-            2.  Create IPAM using above vDNS data 
-            3.  Create VN using above IPAM and launch 2 VM's within it 
-            4.  Ping between these 2 VM's using dns name 
-            5.  Try to delete vDNS server which has IPAM back-reference[Negative case] 
-            6.  Add CNAME VDNS record for vm1-test and verify we able to ping by alias name 
+            1.  Create vDNS server
+            2.  Create IPAM using above vDNS data
+            3.  Create VN using above IPAM and launch 2 VM's within it
+            4.  Ping between these 2 VM's using dns name
+            5.  Try to delete vDNS server which has IPAM back-reference[Negative case]
+            6.  Add CNAME VDNS record for vm1-test and verify we able to ping by alias name
         Pass criteria: Step 4,5 and 6 should pass
-         
+
         Maintainer: cf-test@juniper.net
         '''
         vn1_ip = '10.10.10.0/24'

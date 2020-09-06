@@ -303,7 +303,7 @@ class TestQos(QosTestExtendedBase):
 
     @preposttest_wrapper
     def test_qos_remark_based_on_default_fc(self):
-        ''' 
+        '''
         To test dafault FC ID 0 works as expected
         Steps:
         1. Configure FC ID 0 which is default FC for all Qos Configs.
@@ -341,7 +341,7 @@ class TestQos(QosTestExtendedBase):
 
     @preposttest_wrapper
     def test_default_fc_update(self):
-        ''' 
+        '''
         To test dafault FC ID values can be modified
         Steps:
         1. Create a qos config and use default FC ID as 0.
@@ -386,7 +386,7 @@ class TestQos(QosTestExtendedBase):
             Have VMs A and B
             Apply qos-config1 to vmi on VM A and validate the marking happens
             as per fc1.
-            Apply qos-config2 on vhost interface and verify that all packets 
+            Apply qos-config2 on vhost interface and verify that all packets
             going out of vhost interface are marked as per fc2
         '''
         fc_ids= self.fc_id_obj.get_free_fc_ids(2)
@@ -442,7 +442,7 @@ class TestQos(QosTestExtendedBase):
             Create qos-config2 for remarking DSCP 10 to fc2(DSCP 20) for fabric
             Have VMs A and B
             Apply qos-config1 to vmi on VM A
-            Validate that qos-config2's dscp rewrite is applied on traffic 
+            Validate that qos-config2's dscp rewrite is applied on traffic
             which is getting into the dest VM B
             On the fabric link on compute node hosting B, qos-config1's values
             should be observed
@@ -556,13 +556,13 @@ class TestQosPolicy(TestQosPolicyBase):
 
     @preposttest_wrapper
     def test_qos_config_and_fc_update_for_dscp_map_on_policy(self):
-        ''' 
+        '''
             To test that qos config works correctly even after editing the
             FC and Qos config parameters.
             Steps:
             1. Create a qos config for remarking DSCP 0-9 to fc1(DSCP 62 & EXP 6)
             2. Apply the qos config to policy between VN1 and VN2
-            3. Update the qos-config to map DSCP 0-9 to fc 2(DSCP 2 & EXP 4) 
+            3. Update the qos-config to map DSCP 0-9 to fc 2(DSCP 2 & EXP 4)
             4. Validate that packets on fabric from A to B have DSCP marked to 2
                and mpls exp marked as 4
             5. Update the FC 2 with dscp 12 and exp as 2
@@ -570,9 +570,9 @@ class TestQosPolicy(TestQosPolicyBase):
                and mpls exp marked as 2
             7. Update FC 2 with fc_id 12
             8. Set entries in qos-config to point dscp 10-19 to fc id 12
-            9. Validate that packets with dscp 0-9 on fabric from A to B have 
+            9. Validate that packets with dscp 0-9 on fabric from A to B have
                DSCP marked to 12 and mpls exp marked to 2.
-            10.Validate that packets with dscp 10-19 on fabric from A to B have 
+            10.Validate that packets with dscp 10-19 on fabric from A to B have
                DSCP marked to 62 and mpls exp marked to 6.
         '''
         fc_ids= self.fc_id_obj.get_free_fc_ids(2)

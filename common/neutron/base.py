@@ -37,7 +37,7 @@ class BaseNeutronTest(GenericTestBase):
     def setUpClass(cls):
         cls.public_vn_obj = None
         super(BaseNeutronTest, cls).setUpClass()
-        cls.vnc_h = ContrailVncApi(cls.vnc_lib, cls.logger) 
+        cls.vnc_h = ContrailVncApi(cls.vnc_lib, cls.logger)
         if cls.inputs.admin_username:
             public_creds = cls.admin_isolated_creds
         else:
@@ -291,7 +291,7 @@ class BaseNeutronTest(GenericTestBase):
 
     def config_aap(self, port, prefix, prefix_len=32, mac='', aap_mode='active-standby', contrail_api=False, left_vn_name=None):
         if left_vn_name is not None:
-            self.vnc_h.add_allowed_address_pair(prefix, si_fq_name=port,   
+            self.vnc_h.add_allowed_address_pair(prefix, si_fq_name=port,
 prefix_len=prefix_len, mac=mac, mode=aap_mode, left_vn_name=left_vn_name)
         else:
             self.logger.info('Configuring AAP on port %s' % port)
@@ -304,7 +304,7 @@ prefix_len=prefix_len, mac=mac, mode=aap_mode, left_vn_name=left_vn_name)
                 port_dict = {'allowed_address_pairs': [
                     {"ip_address": prefix + '/' + str(prefix_len), "mac_address": mac}]}
                 port_rsp = self.update_port(port, port_dict)
-         # end config_aap 
+         # end config_aap
 
 
     def config_vrrp_on_vsrx(self, src_vm=None, dst_vm=None, vip=None, priority='100', interface='ge-0/0/1'):
@@ -323,7 +323,7 @@ prefix_len=prefix_len, mac=mac, mode=aap_mode, left_vn_name=left_vn_name)
         cmd_string = (';').join(cmdList)
         assert self.set_config_via_netconf(src_vm, dst_vm,
                       cmd_string, timeout=10, device='junos', hostkey_verify="False", reboot_required=False), 'Could not configure VRRP thru Netconf'
-        # end config_vrrp_on_vsrx 
+        # end config_vrrp_on_vsrx
 
 
     @retry(delay=5, tries=20)
@@ -782,7 +782,7 @@ EOS
             self.logger.error('keepalived not running in %s' % vm.vm_name)
         return result
     # end keepalive_chk
- 
+
     def service_keepalived(self, vm, action):
         keepalive_chk_cmd = 'service keepalived %s' %(action)
         vm.run_cmd_on_vm(cmds=[keepalive_chk_cmd], as_sudo=True)

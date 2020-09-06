@@ -40,20 +40,20 @@ class TestRouteAggregate(GenericTestBase, VerifySvcFirewall):
         agg_fixture.attach_route_aggregate_to_si(si=si.si_obj, interface='right')
         self.addCleanup(agg_fixture.remove_route_aggregate_from_si, si.si_obj)
         time.sleep(3)
-        assert agg_fixture.verify_route_aggregate_in_control(right_vn, left_vm, agg_prefix[0]),'Route aggreegates Not found in control' 
+        assert agg_fixture.verify_route_aggregate_in_control(right_vn, left_vm, agg_prefix[0]),'Route aggreegates Not found in control'
 
-    @preposttest_wrapper    
+    @preposttest_wrapper
     def test_with_multiple_route_aggregation_prefixes(self):
         '''
         1)create svc
         2)Create Route Aggrgates left_agg,Right agg and give prefixes
         3)Attach Route Aggregate to svc left intf
         4)Verify in control Node for Route aggregates
-        5)ping to from left VM to Right Vm 
+        5)ping to from left VM to Right Vm
         6)Remove Route Aggregatee from left intf
         7)Attach Route Aggregate to svc right intf
         8)Verify in control Node for Route aggregates
-        9)ping to from left VM to Right Vm 
+        9)ping to from left VM to Right Vm
         '''
         svc_info = self.verify_svc_chain(svc_img_name='cirros_in_net', service_mode='in-network',
                                      create_svms=True)

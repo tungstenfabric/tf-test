@@ -67,7 +67,7 @@ class TestECMPMultipleSC(GenericTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMP
     # end test_ecmp_svc_in_network_with_multiple_service_chains
 
 class TestECMPRestart(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic, ECMPVerify):
-    
+
     @classmethod
     def setUpClass(cls):
         super(TestECMPRestart, cls).setUpClass()

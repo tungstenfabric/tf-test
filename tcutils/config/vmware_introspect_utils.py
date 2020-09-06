@@ -32,7 +32,7 @@ def get_vcenter_plugin_introspect_elements(vcenterclient):
             master = Master(child)
             vcenterplugin['master'] = master.master
             if not istrue(master.master[0]):
-                return False 
+                return False
             else:
                 return True
         elif (child.tag == 'pluginSessions'):
@@ -90,7 +90,7 @@ class VRouterDetails(Result):
         for element in self['VirtualNetworks']['list']:
             net = element['name']
             for vm in element['VirtualMachineInterfaces']['list']:
-                self.virtual_machines.append(VirtualMachinesInVcenter(net,vm)) 
+                self.virtual_machines.append(VirtualMachinesInVcenter(net,vm))
 
 class VirtualNetworks(object):
     '''Represents one virtual network in the vcenter'''
@@ -155,9 +155,9 @@ class interfaces(object):
                 intf_dct.update(dct)
             intfs.append(intf_dct)
         interfaces = {}
-        interfaces['interfaces'] = intfs 
-        return interfaces 
-    
+        interfaces['interfaces'] = intfs
+        return interfaces
+
 class VirtualMachinesInterface(object):
     def __init__(self,d):
         self.d = d
@@ -195,13 +195,13 @@ class VRouterStats(object):
         vstats ={}
         stats =  element.getchildren()
         for stat in stats:
-            ele = stat.getchildren()  
+            ele = stat.getchildren()
             for ele1 in ele:
                 d = {}
-                d[ele1.tag] = ele1.text  
-                vstats.update(d)  
+                d[ele1.tag] = ele1.text
+                vstats.update(d)
         vrouterStats={}
-        vrouterStats['vRouterStats'] = vstats 
+        vrouterStats['vRouterStats'] = vstats
         self.return_list.append(VMWarePluginResult(vrouterStats))
 
     @property
@@ -215,15 +215,15 @@ class ApiServerInfo(object):
         cfgm_info ={}
         stats =  element.getchildren()
         for stat in stats:
-            ele = stat.getchildren()  
+            ele = stat.getchildren()
             for ele1 in ele:
                 d = {}
-                d[ele1.tag] = ele1.text  
-                cfgm_info.update(d)  
+                d[ele1.tag] = ele1.text
+                cfgm_info.update(d)
         api_info={}
-        api_info['ApiServerInfo'] = cfgm_info 
+        api_info['ApiServerInfo'] = cfgm_info
         self.return_list.append(VMWarePluginResult(api_info))
-    
+
     @property
     def apiserverinfo(self):
         return [ele.apiserverinfo() for ele in self.return_list]
@@ -235,15 +235,15 @@ class VCenterServerInfo(object):
         cfgm_info ={}
         stats =  element.getchildren()
         for stat in stats:
-            ele = stat.getchildren()  
+            ele = stat.getchildren()
             for ele1 in ele:
                 d = {}
-                d[ele1.tag] = ele1.text  
-                cfgm_info.update(d)  
+                d[ele1.tag] = ele1.text
+                cfgm_info.update(d)
         api_info={}
-        api_info['VCenterServerInfo'] = cfgm_info 
+        api_info['VCenterServerInfo'] = cfgm_info
         self.return_list.append(VMWarePluginResult(api_info))
-    
+
     @property
     def vcenterserverinfo(self):
         return [ele.vcenterserverinfo() for ele in self.return_list]
@@ -264,12 +264,12 @@ class VMWareInspect (VerificationUtilBase):
         path = 'Snh_vRoutersTotal?x=%s' %query_val
         val = self.dict_get(path)
         return val.xpath('./VirtualRouters/list')
-    
+
     def get_vcenter_plugin_vrouter_details(self,query_val,*args):
         path = 'Snh_vRouterDetail?x=%s' %query_val
         val = self.dict_get(path)
         return val.xpath('./VRouterInfo/VRouterInfoStruct')
-    
+
     def get_vcm_vm_details(self,query_val,*args):
         path = 'Snh_VirtualMachineRequest?uuid=&name=%s' %query_val
         val = self.dict_get(path)
@@ -280,7 +280,7 @@ class VMWarePluginResult(Result):
         Returns value from the below link
         http://<ip>:9090/Snh_VCenterPluginInfo
     '''
-    
+
     def master(self):
         return self['master']
 
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     va = VMWareInspect('10.204.216.183')
     class Inputs(object):
         def __init__(self):
-            self.cfgm_ips = ['10.204.216.61','10.204.216.62','10.204.216.63'] 
+            self.cfgm_ips = ['10.204.216.61','10.204.216.62','10.204.216.63']
     r = get_vm_details(va,'test_vm1')
     import pdb;pdb.set_trace()
     import pprint

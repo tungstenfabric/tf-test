@@ -14,7 +14,7 @@ class TestQosNegative(QosTestBase):
     def tearDownClass(cls):
         super(TestQosNegative, cls).tearDownClass()
     # end tearDownClass
-    
+
     @preposttest_wrapper
     def test_invalid_range_for_fc(self):
         '''
@@ -55,7 +55,7 @@ class TestQosNegative(QosTestBase):
     @preposttest_wrapper
     def test_invalid_range_for_qc(self):
         '''
-        Validate that incorrect values while configuring Qos config are 
+        Validate that incorrect values while configuring Qos config are
         not accepted:
         Verify following:
         1. To verify that DSCP > 63 in dscp map is not accepted

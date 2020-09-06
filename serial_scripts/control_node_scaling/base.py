@@ -12,5 +12,5 @@ class BaseBGPScaleTest(test_v1.BaseTestCase_v1):
     @classmethod
     def tearDownClass(cls):
         super(BaseBGPScaleTest, cls).tearDownClass()
-    #end tearDownClass 
+    #end tearDownClass
 

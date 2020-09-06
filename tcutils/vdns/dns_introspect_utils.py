@@ -29,7 +29,7 @@ class DnsAgentInspect (VerificationUtilBase):
 
     def get_dnsa_config(self, domain='default-domain'):
         '''
-        method: get_dnsa_config returns a list 
+        method: get_dnsa_config returns a list
         returns None if not found, a dict w/ attrib.
         '''
         path = 'Snh_PageReq?x=AllEntries%20VdnsServersReq'
@@ -58,10 +58,10 @@ class DnsAgentInspect (VerificationUtilBase):
         return_data = EtreeToDict(xpath).get_all_entry(rec_data)
         return return_data['records']
     # end of get_dnsa_config
-    
+
     def get_connected_rabbitmq(self):
         '''
-        Return the rabbitMQ server to which 
+        Return the rabbitMQ server to which
         '''
         path = 'Snh_ConfigClientInfoReq?'
         xpath = './ConfigClientInfoResp/amqp_conn_info/ConfigAmqpConnInfo/url'

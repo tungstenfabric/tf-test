@@ -9,10 +9,10 @@ from vn_policy_test import VN_Policy_Fixture
 class TestEvpnt6SPStyle(Evpnt6TopologyBase):
     enterprise_style = False
     def _verify_multinode_sanity(self, bms_node=None):
-        ''' 
+        '''
             VM1 ,VM2 and VM3 in different compute nodes.
-            Send IGMP join from all 3 . 
-            Send IGMP leave from all 3 VMs. 
+            Send IGMP join from all 3 .
+            Send IGMP leave from all 3 VMs.
             VM should get traffic on IGMP join, on leave traffic should stop.
         '''
 
@@ -33,7 +33,7 @@ class TestEvpnt6SPStyle(Evpnt6TopologyBase):
         ################################################################
 
         self.logger.info('#1 Before sending igmp join , VM shouldnt receive traffic')
- 
+
         traffic = {'stream1': {'src':['bms'],                 # Multicast source
                              'rcvrs': [],     # Multicast receivers
                              'non_rcvrs': ['vm1','vm2','vm3'],        # Non Multicast receivers
@@ -70,7 +70,7 @@ class TestEvpnt6SPStyle(Evpnt6TopologyBase):
         # Send and verify IGMP reports and multicast traffic
 
         assert self.send_verify_mcastv2(vm_fixtures, traffic, igmp ,vxlan)
-           
+
         #3 Send igmp leave , VMs should not get multicast traffic.
         #########################################################
         self.logger.info('#3 Send igmp leave , VMs should not get multicast traffic.')
@@ -177,7 +177,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
     @preposttest_wrapper
     def test_evpnt6_restart(self):
-        ''' 
+        '''
             Verify VMs are getting traffic only from subscribed groups.
             Verify evpn multicast after agent restart.
             Verify evpn multicast after control plane flap.
@@ -191,7 +191,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
         interface = bms_fixture.get_mvi_interface()
         bms_fixture.config_mroute(interface,'225.1.1.1','255.255.255.255')
 
-        #1 Send igmp join from different groups , VM should get traffic only form  subscribed groups 
+        #1 Send igmp join from different groups , VM should get traffic only form  subscribed groups
         ###########################################################################################
 
         self.logger.info('#1 Send igmp join from different groups , VM should get traffic only form  subscribed groups')
@@ -227,7 +227,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
         # Send and verify IGMP reports and multicast traffic
         assert self.send_verify_mcastv2(vm_fixtures, traffic, igmp,vxlan)
-        
+
         #2 Restart agent and recheck functionality
         ###########################################################################################
         self.logger.info('#2 Restart agent and recheck functionality')
@@ -265,15 +265,15 @@ class TestEvpnt6(TestEvpnt6SPStyle):
         time.sleep(60)
         # Send and verify IGMP reports and multicast traffic
         assert self.send_verify_mcastv2(vm_fixtures, traffic, igmp,vxlan)
- 
+
         #4 Ensure entries are removed after timeout
         ###########################################################################################
         self.logger.info('#4 Ensure entries are removed after timeout')
 
-        # After 220 sec igmp entry should time out 
+        # After 220 sec igmp entry should time out
 
         time.sleep(240)
-  
+
         traffic = {'stream1': {'src':['bms'],                 # Multicast source
                              'rcvrs': [],     # Multicast receivers
                              'non_rcvrs': ['vm1','vm2','vm3'],        # Non Multicast receivers
@@ -309,7 +309,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
         #1 Disable igmp . Traffic is flooded using type 3 routes.
         #######################################################################################
         self.logger.info('#1 Disable igmp . Traffic is flooded using type 3 routes.')
-        
+
         vn1_fixture = vm_fixtures['vn1']
         self.vn1_fixture.set_igmp_config(False)
         self.connections.vnc_lib_fixture.set_global_igmp_config(igmp_enable=False)
@@ -351,7 +351,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
         self.enable_snooping(prouters)
 
 
- 
+
         #2 Enable igmp at global level. Test type 6 functionality.
         #######################################################################################
 
@@ -408,7 +408,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
     @preposttest_wrapper
     def test_multicast_policy(self):
-        ''' 
+        '''
             VM1 ,VM2 and VM3 in different compute nodes.
             Add multicast policy to block multicast traffic.On applying policy multicast traffic should be discarded.
             On removing policy multicast traffic should be allowed.
@@ -430,7 +430,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
         name = 'policy1'
         pol1 =[{'action' : 'deny' ,'source' : '0.0.0.0','group' : '225.1.1.1'}]
         pol2 =[{'action' : 'pass' ,'source' : '0.0.0.0','group' : '225.1.1.2'}]
-  
+
         policy_obj = self.useFixture(MulticastPolicyFixture(name=name,policy=pol1,connections=self.connections))
         self.logger.info('!!!!!!!!!!!!!!!!!!!!! uuid is %s ' %(policy_obj.uuid))
         name2 = 'policy2'
@@ -462,7 +462,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
         self.send_igmp_reportv2(vm_fixtures['vm3'], igmp)
 
         time.sleep(5)
-  
+
         traffic = {'stream1': {'src':['bms'],                 # Multicast source
                              'rcvrs': [],     # Multicast receivers
                              'non_rcvrs': ['vm1','vm2','vm3'],        # Non Multicast receivers
@@ -475,7 +475,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
                   }
 
         result = result & self.send_verify_mcast_traffic(vm_fixtures, traffic, igmp, vxlan,False)
-    
+
         if result:
             self.logger.info('Multicast entry removed after timeout')
         else:
@@ -542,10 +542,10 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
     @preposttest_wrapper
     def test_source_within_cluster(self):
-        ''' 
+        '''
             VM1 ,VM2 and VM3 in different compute nodes.
-            Send IGMP join from all 3 . 
-            Send IGMP leave from all 3 VMs. 
+            Send IGMP join from all 3 .
+            Send IGMP leave from all 3 VMs.
             VM should get traffic on IGMP join, on leave traffic should stop.
         '''
 
@@ -566,7 +566,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
         ################################################################
 
         self.logger.info('#1 Before sending igmp join , VM shouldnt receive traffic')
- 
+
         traffic = {'stream1': {'src':['bms'],                 # Multicast source
                              'rcvrs': [],     # Multicast receivers
                              'non_rcvrs': ['vm1','vm2','vm3'],        # Non Multicast receivers
@@ -583,10 +583,10 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
     @preposttest_wrapper
     def test_evpnt6_singlenode_sanity(self):
-        ''' 
+        '''
             VM1 ,VM2 and VM3 in same compute nodes.
-            Send IGMP join from all 3 . 
-            Send IGMP leave from all 3 VMs. 
+            Send IGMP join from all 3 .
+            Send IGMP leave from all 3 VMs.
             VM should get traffic on IGMP join, on leave traffic should stop.
         '''
 
@@ -645,7 +645,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
         # Send and verify IGMP reports and multicast traffic
         result = result & self.send_verify_mcastv2(vm_fixtures, traffic, igmp,vxlan)
-           
+
         #3 Send igmp leave , VMs should not get multicast traffic.
         #########################################################
         self.logger.info('#3 Send igmp leave , VMs should not get multicast traffic..')
@@ -708,10 +708,10 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
     @preposttest_wrapper
     def test_evpnt6_multigroup_basic(self):
-        ''' 
+        '''
             Send multiple (*,G)  for different groups.
             Ensure Type6 route is generated for each group.Send traffic to all groups.
-            
+
         '''
 
 
@@ -772,7 +772,7 @@ class TestEvpnt6(TestEvpnt6SPStyle):
 
         # Send and verify IGMP reports and multicast traffic
         result = result & self.send_verify_mcastv2(vm_fixtures, traffic, igmp,vxlan)
-           
+
         #3 Send igmp leave , VMs should not get multicast traffic.
         #########################################################
         self.logger.info('#3 Send igmp leave , VMs should not get multicast traffic.')
@@ -838,7 +838,7 @@ class TestEvpnt6MultiVn(Evpnt6MultiVnBase):
 
     @preposttest_wrapper
     def test_evpnt6_multivn_basic(self):
-        ''' 
+        '''
             Create multiple VN and send igmp join form each VN.
             Ensure type 6 routes are generated and VM should get multicast traffic.
         '''
@@ -875,7 +875,7 @@ class TestEvpnt6MultiVn(Evpnt6MultiVnBase):
 
             self.logger.info('Testing vm %s bms %s bms source %s ' %(vm_name,bms_name,bms_fixture.bms_ip))
 
-          
+
             traffic = {'stream1': {'src':[bms_name],                 # Multicast source
                              'rcvrs': [vm_name],     # Multicast receivers
                              'non_rcvrs': [],        # Non Multicast receivers

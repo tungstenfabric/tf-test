@@ -202,7 +202,7 @@ class VMFixture(fixtures.Fixture):
                 self.image_name = image['name']
                 self.set_image_details(self.vm_obj)
             except Exception as e:
-                pass 
+                pass
 
     def setUp(self):
         super(VMFixture, self).setUp()
@@ -956,7 +956,7 @@ class VMFixture(fixtures.Fixture):
                     self.local_ips[vn_fq_name] = self.get_tap_intf_of_vmi(
                         vmi)['mdata_ip_addr']
                 except Exception as e:
-                    self.logger.exception(e) 
+                    self.logger.exception(e)
         return self.local_ips
 
     def get_local_ip(self, refresh=False):
@@ -1236,9 +1236,9 @@ class VMFixture(fixtures.Fixture):
                     "Ping to Metadata IP %s of VM %s failed!" %
                     (self.local_ips[vn_fq_name], self.vm_name))
                     vn_obj = self.vnc_lib_h.virtual_network_read(fq_name = vn_fq_name.split(":"))
-                    #The below code is just to make sure that 
+                    #The below code is just to make sure that
                     #vn is assigned a gateway.In some cases(specifically vcenter case),
-                    #it was observed that the gateway was not assigned to the vn 
+                    #it was observed that the gateway was not assigned to the vn
                     for ipam_ref in vn_obj.network_ipam_refs:
                         for ipam_subnet in ipam_ref['attr'].get_ipam_subnets():
                             gateway = ipam_subnet.get_default_gateway()
@@ -2708,7 +2708,7 @@ class VMFixture(fixtures.Fixture):
     # end verify_vm_flows_removed
 
     def start_webserver(self, listen_port=8000, content=None):
-        '''Start Web server on the specified port.                                                                                                                                                                                          
+        '''Start Web server on the specified port.
         '''
         host = self.inputs.host_data[self.vm_node_ip]
         try:
@@ -3205,7 +3205,7 @@ class VMFixture(fixtures.Fixture):
     def setup_subintf(self, device=None, vlan=None):
         cmd = 'vconfig add %s %s; dhclient %s.%s'%(device, vlan, device, vlan)
         self.run_cmd_on_vm([cmd], timeout=60, as_sudo=True)
-    
+
     def get_route_nh_from_host(self, compute_ip, vrf_id, prefix):
         #cmd = "rt --dump %s | grep %s | awk \'{print $5}\'" %(vrf_id, prefix)
         rt_dict = {}
@@ -3216,7 +3216,7 @@ class VMFixture(fixtures.Fixture):
         output = self.inputs.run_cmd_on_server(compute_ip, cmd, container='agent')
         if output:
             rt_values = output.split()[:-1]
-            rt_dict = dict(zip(rt_keys,rt_values)) 
+            rt_dict = dict(zip(rt_keys,rt_values))
             if int(rt_dict['nh_id']) > 0:
                 nh_cmd = 'nh --get %s'%rt_dict['nh_id']
                 output = self.inputs.run_cmd_on_server(compute_ip, nh_cmd, container='agent')
@@ -3236,12 +3236,12 @@ class VMFixture(fixtures.Fixture):
                             nh_dict['flags'] = 'TUNNEL'
                 rt_dict['nh'] = nh_dict
             return [rt_dict]
-                    
+
         return []
-                
-                
-            
-        
+
+
+
+
 
     def __repr__(self):
         return '<VMFixture: %s>' % (self.vm_name)

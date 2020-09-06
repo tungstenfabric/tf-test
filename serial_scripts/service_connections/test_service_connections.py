@@ -6,7 +6,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
     @classmethod
     def setUpClass(cls):
         super(TestServiceConnectionsSerial, cls).setUpClass()
-    
+
     @preposttest_wrapper
     def test_add_remove_control_from_agent(self):
         '''
@@ -21,7 +21,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         '''
         self.skip_if_setup_incompatible("agent", 1, "control", 3)
         result = True
-        in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent", 
+        in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         self.add_remove_server("remove", in_use_servers[0], "CONTROL-NODE",
@@ -112,11 +112,11 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
                                  "removal of entry in .conf file")
         assert result, "Unexpected Connection"
     #end test_add_remove_collector_from_agent
-    
+
     @preposttest_wrapper
     def test_add_remove_rabbitmq_from_control(self):
         '''
-        Verify that on removing the entry from contail-control.conf file 
+        Verify that on removing the entry from contail-control.conf file
         "rabbitmq_server_list" section, the connection to that server is lost.
         Steps:
         1. Check the connections of control to RabbitMQ
@@ -144,14 +144,14 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
             else:
                 self.logger.info("Connections switched to other server after "
                                  "removal of entry in .conf file")
-        
+
         assert result, "Unexpected Connection"
     #end test_add_remove_rabbitmq_from_control
-    
+
     @preposttest_wrapper
     def test_add_remove_rabbitmq_from_dns(self):
         '''
-        Verify that on removing the entry from contail-dns.conf file 
+        Verify that on removing the entry from contail-dns.conf file
         "rabbitmq_server_list" section, the connection to that server is lost.
         Steps:
         1. Check the connections of DNS to RabbitMQ
@@ -181,7 +181,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
                                  "removal of entry in .conf file")
         assert result, "Unexpected Connection"
     #end test_add_remove_rabbitmq_from_dns
-    
+
     @preposttest_wrapper
     def test_recovery_from_errored_configdb_entry_in_control(self):
         '''
@@ -189,9 +189,9 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         and SIGHUP is issued, the connection is resumed.
         This test case is to verify scenario of bug1690715
         Steps:
-        1. Check the connections of Control to Config DB. 
+        1. Check the connections of Control to Config DB.
         2. Change the entry to an invalid IP and issue SIGHUP.
-        3. Verify that connection is lost 
+        3. Verify that connection is lost
         3. Again edit and correct the entry of config DB and issue SIGHUP
         4. Verify that connection is resumed.
         '''
@@ -245,11 +245,11 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
                               " valid entries are updated in config db list")
         assert result, "Unexpected Connection"
     #end test_recovery_from_errored_configdb_entry_in_control
-    
+
     @preposttest_wrapper
     def test_add_remove_collector_from_config_nodemgr(self):
         '''
-        Verify that on removing the entry from contail-config-nodemgr.conf file 
+        Verify that on removing the entry from contail-config-nodemgr.conf file
         [Collector] server_list section, the connection to that server is lost.
         Steps:
         1. Check the connections of collector and config-nodemgr.
@@ -281,7 +281,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
                                  "removal of entry in .conf file")
         assert result, "Unexpected Connection"
     #end test_add_remove_collector_from_config_nodemgr
-    
+
     @preposttest_wrapper
     def test_control_convergence_on_agent_restart(self):
         '''
@@ -378,7 +378,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         4. Start the controller stopped in step 2.
         '''
         self.skip_if_setup_incompatible("agent", 1, "control", 3)
-        in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent", 
+        in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         self.inputs.stop_service("contrail-control",[in_use_servers[0]],
@@ -389,7 +389,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
                         "xmpp", "control")
         self.sleep(15) # Agent retries to connect to previous Controller 4 times in an interval of 1,2,4,8 seconds
         new_in_use_servers, status, ports = self.get_all_in_use_servers(
-                                            "xmpp" ,"agent", 
+                                            "xmpp" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         if len(new_in_use_servers) == 2 and \
@@ -400,7 +400,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
             self.logger.error("Connection not switched to new Controller")
             assert False, "Unexpected Connection"
     #end test_control_agent_connection_on_control_restart
-    
+
     @preposttest_wrapper
     def test_dns_agent_connection_on_dns_restart(self):
         '''
@@ -413,7 +413,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         4. Start the DNS server stopped in step 2.
         '''
         self.skip_if_setup_incompatible("agent", 1, "control", 3)
-        in_use_servers, status, ports = self.get_all_in_use_servers("dns" ,"agent", 
+        in_use_servers, status, ports = self.get_all_in_use_servers("dns" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         self.inputs.stop_service("contrail-dns",[in_use_servers[0]],
@@ -425,7 +425,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
                         "dns", "control")
         self.sleep(15) # Agent retries to connect to previous DNS Server 4 times in an interval of 1,2,4,8 seconds
         new_in_use_servers, status, ports = self.get_all_in_use_servers(
-                                            "dns" ,"agent", 
+                                            "dns" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         if len(new_in_use_servers) == 2 and \
@@ -436,7 +436,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
             self.logger.error("Connection not switched to new DNS server")
             assert False, "Unexpected Connection"
     #end test_dns_agent_connection_on_dns_restart
-    
+
     @preposttest_wrapper
     def test_collector_agent_connection_on_collector_restart(self):
         '''
@@ -449,7 +449,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         4. Start the Collector stopped in step 2.
         '''
         self.skip_if_setup_incompatible("agent", 1, "analytics", 2)
-        in_use_servers, status, ports = self.get_all_in_use_servers("collector" ,"agent", 
+        in_use_servers, status, ports = self.get_all_in_use_servers("collector" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         self.inputs.stop_service("contrail-collector",[in_use_servers[0]],
@@ -461,7 +461,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
                         "collector", "analytics")
         self.sleep(15) # Agent retries to connect to previous Collector 4 times in an interval of 1,2,4,8 seconds
         new_in_use_servers, status, ports = self.get_all_in_use_servers(
-                                            "collector" ,"agent", 
+                                            "collector" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         if in_use_servers[0] not in new_in_use_servers \
@@ -471,7 +471,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
             self.logger.error("Connection not switched to new Collector")
             assert False, "Unexpected Connection"
     #end test_collector_agent_connection_on_collector_restart
-    
+
     @preposttest_wrapper
     def test_rabbitmq_control_connection_on_rabbitmq_restart(self):
         '''
@@ -500,7 +500,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
             self.logger.error("Connection not switched to new RabbitMQ server")
             assert False, "Unexpected Connection"
     #end test_rabbitmq_control_connection_on_rabbitmq_restart
-    
+
     @preposttest_wrapper
     def test_rabbitmq_dns_connection_on_rabbitmq_restart(self):
         '''
@@ -529,7 +529,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
             self.logger.error("Connection not switched to new RabbitMQ server")
             assert False, "Unexpected Connection"
     #end test_rabbitmq_dns_connection_on_rabbitmq_restart
-    
+
     @preposttest_wrapper
     def disabled_test_control_agent_connection_after_active_control_restart_agent_sighup(self):
         '''
@@ -537,21 +537,21 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         Expectations:
         1. If an active server goes down/up, then the client which switched connection
            due to server restart will reallocate resource/load balance after giving a SIGHUP.
-        2. If an server which is not connected to the client goes down, then client should 
-           not reallocate/load balance on SIGHUP. It should retain previous connections. 
+        2. If an server which is not connected to the client goes down, then client should
+           not reallocate/load balance on SIGHUP. It should retain previous connections.
         Steps:
         1. Check the Controller to which contrail-vrouter-agent is connected to.
         2. Stop that Controller service
         3. Check that contrail-vrouter-agent immediately switches to new collector.
         4. Start the Controller stopped in step 2.
-        5. Issue SIGHUPs on client to verify that the client should lose previous 
+        5. Issue SIGHUPs on client to verify that the client should lose previous
            connection and should take part in re-allocation or load  balancing.
         6. Stop and start the Controller service to which the client do not connect.
-        7. Issue SIGHUPs on client to verify that the client should not lose the 
+        7. Issue SIGHUPs on client to verify that the client should not lose the
            previous connections as it was not affected due to server restart.
         '''
         self.skip_if_setup_incompatible("agent", 1, "control", 3)
-        in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent", 
+        in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         self.inputs.stop_service('control', [in_use_servers[0]], container='control')
@@ -577,7 +577,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         if new_in_use_servers != servers_in_use \
             and all(x == 'Up' for x in status):
             self.logger.info("The client which was affected due to down/up of server "
-                            " has successfully taken part in reallocation/load " 
+                            " has successfully taken part in reallocation/load "
                             " balancing after issuing SIGHUP")
         else:
             self.logger.error("The client which was affected due to down/up of server "
@@ -625,21 +625,21 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         Expectations:
         1. If an active server goes down/up, then the client which switched connection
            due to server restart will reallocate resource/load balance after giving a SIGHUP.
-        2. If an server which is not connected to the client goes down, then client should 
-           not reallocate/load balance on SIGHUP. It should retain previous connections. 
+        2. If an server which is not connected to the client goes down, then client should
+           not reallocate/load balance on SIGHUP. It should retain previous connections.
         Steps:
         1. Check the Collector to which contrail-vrouter-agent is connected to.
         2. Stop that Collector service
         3. Check that contrail-vrouter-agent immediately switches to new collector.
         4. Start the collector stopped in step 2.
-        5. Issue SIGHUPs on client to verify that the client should lose previous 
+        5. Issue SIGHUPs on client to verify that the client should lose previous
            connection and should take part in re-allocation or load  balancing.
         6. Stop and start the Collector service to which the client do not connect.
-        7. Issue SIGHUPs on client to verify that the client should not lose the 
+        7. Issue SIGHUPs on client to verify that the client should not lose the
            previous connections as it was not affected due to server restart.
         '''
         self.skip_if_setup_incompatible("agent", 1, "collector", 2)
-        in_use_servers, status, ports = self.get_all_in_use_servers("collector" ,"agent", 
+        in_use_servers, status, ports = self.get_all_in_use_servers("collector" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
         self.inputs.stop_service('collector', [in_use_servers[0]], container='collector')
@@ -665,7 +665,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         if new_in_use_servers != servers_in_use \
             and all(x == 'Up' for x in status):
             self.logger.info("The client which was affected due to down/up of server "
-                            " has successfully taken part in reallocation/load " 
+                            " has successfully taken part in reallocation/load "
                             " balancing after issuing SIGHUP")
         else:
             self.logger.error("The client which was affected due to down/up of server "
@@ -713,28 +713,28 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         Expectations:
         1. If an active server goes down/up, then the client which switched connection
            due to server restart will reallocate resource/load balance after giving a SIGHUP.
-        2. If an server which is not connected to the client goes down, then client should 
-           not reallocate/load balance on SIGHUP. It should retain previous connections. 
+        2. If an server which is not connected to the client goes down, then client should
+           not reallocate/load balance on SIGHUP. It should retain previous connections.
         Steps:
         1. Check the Collector to which contrail-control is connected to.
         2. Stop that Collector service
         3. Check that contrail-control immediately switches to new collector.
         4. Start the collector stopped in step 2.
-        5. Issue SIGHUPs on client to verify that the client should lose previous 
+        5. Issue SIGHUPs on client to verify that the client should lose previous
            connection and should take part in re-allocation or load  balancing.
         6. Stop and start the Collector service to which the client do not connect.
-        7. Issue SIGHUPs on client to verify that the client should not lose the 
+        7. Issue SIGHUPs on client to verify that the client should not lose the
            previous connections as it was not affected due to server restart.
         '''
         self.skip_if_setup_incompatible("control", 1, "collector", 2)
-        in_use_servers, status, ports = self.get_all_in_use_servers("collector" ,"control", 
+        in_use_servers, status, ports = self.get_all_in_use_servers("collector" ,"control",
                                             "contrail-control",
                                             self.inputs.bgp_control_ips[0])
         self.inputs.stop_service('collector', [in_use_servers[0]], container='collector')
         self.sleep(15)
         self.inputs.start_service('collector', [in_use_servers[0]], container='collector')
         new_in_use_servers, status, ports = self.get_all_in_use_servers(
-                                            "collector", "control", "contrail-control", 
+                                            "collector", "control", "contrail-control",
                                             self.inputs.bgp_control_ips[0])
         if in_use_servers[0] not in new_in_use_servers \
             and all(x == 'Up' for x in status):
@@ -753,7 +753,7 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         if new_in_use_servers != servers_in_use \
             and all(x == 'Up' for x in status):
             self.logger.info("The client which was affected due to down/up of server "
-                            " has successfully taken part in reallocation/load " 
+                            " has successfully taken part in reallocation/load "
                             " balancing after issuing SIGHUP")
         else:
             self.logger.error("The client which was affected due to down/up of server "

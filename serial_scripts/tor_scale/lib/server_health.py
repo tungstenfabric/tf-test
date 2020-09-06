@@ -33,10 +33,10 @@ class ServerHealth(object):
                            output = self.get_cpu_memory_usage_for_single_service(each_host,each_service)
                            if output != '':
                                cpu_memory_dict[each_host][each_service] = output
-       return cpu_memory_dict         
+       return cpu_memory_dict
 
     def copy_psutil_file (self, host_name):
-      
+
         host_node = {'username': self.inputs.host_data[
                              host_name]['username'],
                          'password': self.inputs.host_data[
@@ -47,7 +47,7 @@ class ServerHealth(object):
         copy_file_to_server(host_node, path, '/tmp', 'process_status.py')
 
     def get_cpu_memory_usage_for_single_service (self, host_name, service_name):
-     
+
         cmd = "python /tmp/process_status.py %s" %(service_name)
         output = self.inputs.run_cmd_on_server(
                    self.inputs.host_data[host_name]['host_ip'],
@@ -56,9 +56,9 @@ class ServerHealth(object):
         output = ast.literal_eval(output)
         return output
 
-       
-         
 
-    
+
+
+
 
 

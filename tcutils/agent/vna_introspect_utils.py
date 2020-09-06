@@ -1442,7 +1442,7 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
             else:
                 return []
     # end get_fw_policy
-    
+
     def get_aps(self, aps_fq_name = None):
         '''
         Get list of all Application Policy Set created on agent

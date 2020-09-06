@@ -294,4 +294,4 @@ class VerifyVgwCases(object):
             assert result
 
         return True
-   
+

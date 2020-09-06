@@ -1428,7 +1428,7 @@ class FloatingipTestSanity2(base.FloatingIpBaseTest):
         if self.inputs.orchestrator == 'vcenter' and not self.inputs.vro_based:
             return(False, 'Skipping Test Vro server not preset on vcenter setup')
         return (True, None)
-    
+
     @test.attr(type=['vcenter','vro'])
     @set_attr("vro_based")
     @preposttest_wrapper
@@ -1683,7 +1683,7 @@ class FloatingipTestSanity2(base.FloatingIpBaseTest):
             self.input_file, stack_user=project_fixture1.project_username,
             stack_password=project_fixture1.project_user_password,
             stack_tenant=projects[0], logger = self.logger)
-        project_connections1 = ContrailConnections(project_inputs1,self.logger) 
+        project_connections1 = ContrailConnections(project_inputs1,self.logger)
         self.connections = ContrailConnections(self.inputs, self.logger)
         self.logger.info(
             'Default SG to be edited for allow all on project: %s' %

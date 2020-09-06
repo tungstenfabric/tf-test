@@ -30,7 +30,7 @@ class BaseTraffic(object):
         if not tool and not (proto == TCP or proto == UDP):
             tool = SCAPY
 
-        if tool == NETCAT: 
+        if tool == NETCAT:
             from tcutils.traffic_utils.netcat_traffic import Netcat
             return Netcat()
         elif tool == SCAPY:

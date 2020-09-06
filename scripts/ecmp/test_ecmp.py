@@ -43,7 +43,7 @@ class TestECMPSanity(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic
                               create_svms=True,
                               **self.common_args)
     # end test_ecmp_svc_v2_transparent_with_3_instance
-    
+
     @preposttest_wrapper
     def test_ecmp_svc_in_network_with_3_instance(self):
         """
@@ -637,7 +637,7 @@ class TestECMPwithSVMChange(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMP
             for svm in svms:
                 if svm.id == to_be_deleted_svm.vm_id:
                     svms.remove(svm)
-            si_fixture.verify_svm()        
+            si_fixture.verify_svm()
             svms = self.get_svms_in_si(si_fixture)
             new_count = len(svms)
             errmsg = 'The SVMs count has not decreased'
@@ -1144,7 +1144,7 @@ class TestECMPVro(TestECMPSanity):
     def setUpClass(cls):
         cls.vro_based = True
         super(TestECMPVro, cls).setUpClass()
-    
+
     def is_test_applicable(self):
         if self.inputs.orchestrator == 'vcenter' and not self.inputs.vro_based:
            return(False, 'Skipping Test Vro server not present on vcenter setup')

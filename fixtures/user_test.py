@@ -22,8 +22,8 @@ class UserFixture(fixtures.Fixture):
             # with dummy fixture objects
             return
         self.created = False
-        self.username = username 
-        self.password = password 
+        self.username = username
+        self.password = password
         self.tenant = tenant
         self.role = role
         self.email = str(username) + "@example.com"
@@ -78,7 +78,7 @@ class UserFixture(fixtures.Fixture):
             self.logger.info('Deleting user %s' %self.username)
             self.auth.delete_user(self.username)
             if self.verify_is_run:
-                assert self.verify_on_cleanup()            
+                assert self.verify_on_cleanup()
         else:
             self.logger.debug('Skipping the deletion of User %s' %
                               self.username)

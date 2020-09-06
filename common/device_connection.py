@@ -30,10 +30,10 @@ class AbstractConnection(with_metaclass(abc.ABCMeta, object)):
 
 # end AbstractConnection
 
-    
+
 class SSHConnection(AbstractConnection):
     '''
-    :param host     : Mgmt IP of the host 
+    :param host     : Mgmt IP of the host
     :param username
     :param password
     '''
@@ -63,7 +63,7 @@ class SSHConnection(AbstractConnection):
                 if as_sudo:
                     output = sudo(cmd)
                 else:
-                    output = run(cmd, shell=True) 
+                    output = run(cmd, shell=True)
                 self.logger.debug('Command :%s, Succeeded: %s' % (
                     cmd, output.succeeded))
                 self.logger.debug('Output:  %s' % (output))
@@ -175,7 +175,7 @@ class NetconfConnection(AbstractConnection):
     def delete_interface(self, pi_name):
         stmt = "delete interfaces %s unit 0"%pi_name
         self.config([stmt])
-    
+
     def restart(self, process_name):
         #TODO Not sure of apis other than cli
         self.handle.cli('restart %s' % (process_name))
@@ -190,8 +190,8 @@ class NetconfConnection(AbstractConnection):
     # end get_mac_address
 
     def get_mac_in_arp_table(self, ip_address):
-        # From 'show arp' output, get the MAC address 
-        # of a IP 
+        # From 'show arp' output, get the MAC address
+        # of a IP
         xml_resp = self.handle.rpc.get_arp_table_information(no_resolve=True)
         arp_entries = xml_resp.findall('arp-table-entry')
         for arp_entry in arp_entries:
@@ -201,9 +201,9 @@ class NetconfConnection(AbstractConnection):
                     '%s' % (mac, ip_address, self.host))
                 return mac
         self.logger.warn('IP %s not found in arp table of %s' % (
-            ip_address, self.host)) 
+            ip_address, self.host))
         return None
-    # end get_mac_in_arp_table 
+    # end get_mac_in_arp_table
 
     def get_assisted_replicated_role(self):
         output = self.handle.rpc.get_evpn_multicast_snooping_ar_replicators_data()
@@ -214,7 +214,7 @@ class NetconfConnection(AbstractConnection):
         return EtreeToDict('physical-interface/logical-interface').get_all_entry(output)
 
     def clear_interfaces_statistics(self):
-        return self.handle.rpc.clear_interfaces_statistics_all() 
+        return self.handle.rpc.clear_interfaces_statistics_all()
 
 # end NetconfConnection
 

@@ -107,7 +107,7 @@ class TestFlowScaling(BaseFlowTest):
         #import pdb; pdb.set_trace()
         #time.sleep(5)
         FlowCountList = []
-        src_vm_obj = self.traffic_scenarios['1to2'][0] 
+        src_vm_obj = self.traffic_scenarios['1to2'][0]
         from datetime import datetime
         self.logger.info(datetime.now().time())
         for index in range(240):

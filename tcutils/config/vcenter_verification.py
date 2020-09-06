@@ -48,14 +48,14 @@ class VMWareVerificationLib(object):
        except Exception as e:
            self.logger.error(e)
            return True
-               
+
     def get_vmi_from_vcenter_introspect(self, vrouter_ip,vm_name, *args):
        intfs = []
        self.get_introspect(vrouter_ip)
        vm_details = vmware_introspect_utils.get_vm_details(self.vcntr_introspect, vm_name)
        return vm_details.virtual_machine['interfaces']
-                
-        
+
+
 
 if __name__ == '__main__':
     va =  vmware_introspect_utils.VMWareInspect('10.204.216.183')

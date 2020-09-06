@@ -110,7 +110,7 @@ class TestVcenterSerial(BaseVnVmTest):
             "Ping from %s to %s failed" % (vn1_vm1_name, vn1_vm2_name)
         assert vm2_fixture.ping_with_certainty(dst_vm_fixture=vm1_fixture),\
             "Ping from %s to %s failed" % (vn1_vm2_name, vn1_vm1_name)
-       
+
         vn1_vm1_name = get_random_name('vm1_after_reboot')
         vn1_vm2_name = get_random_name('vm2_after_reboot')
         vm1_fixture = self.create_vm(vn_fixture=vn1_fixture, vm_name=vn1_vm1_name, image_name='vcenter_tiny_vm')
@@ -135,7 +135,7 @@ class TestVcenterSerial(BaseVnVmTest):
                4. Verify contrail-status
                5. ping between the vms
         Pass criteria: Contrail status should be active after restart  and ping between the VM has to work.'''
- 
+
         vn1_name = get_random_name('vn50')
         vn1_vm1_name = get_random_name('vm1')
         vn1_vm2_name = get_random_name('vm2')
@@ -202,10 +202,10 @@ class TestVcenterEAM(BaseVnVmTest):
         if self.orch.get_eam_issues(agency):
             self.orch.eam_resolve_issue(agency)
             assert self.orch.verify_eam_agency_status(agency),'Issues not got resolved'
-            assert self.orch.verify_contrail_vm_state(contrail_vm),'Eam failed to power on contrail-vm'    
+            assert self.orch.verify_contrail_vm_state(contrail_vm),'Eam failed to power on contrail-vm'
         else:
             assert False,'agency Issues not got generated'
-    
+
     @preposttest_wrapper
     def test_vcenter_eam_maintenance_mode(self):
         '''1)put host in maintenance mode
@@ -222,7 +222,7 @@ class TestVcenterEAM(BaseVnVmTest):
         if self.orch.get_eam_issues(agency):
             self.orch.eam_resolve_issue(agency)
             assert self.orch.verify_eam_agency_status(agency),'Issues not got resolved'
-            assert self.orch.verify_host_state(host,expected='exit_maintenance_mode'),'Eam failed to exit host from maintenace_mode'    
+            assert self.orch.verify_host_state(host,expected='exit_maintenance_mode'),'Eam failed to exit host from maintenace_mode'
         else:
             self.orch.manage_esxi_host(host.name,operation='exit_maintenance_mode')
             assert False,'agency Issues not got generated'
@@ -243,7 +243,7 @@ class TestVcenterEAM(BaseVnVmTest):
         if self.orch.get_eam_issues(agency):
             self.orch.eam_resolve_issue(agency)
             assert self.orch.verify_eam_agency_status(agency),'Issues not got resolved'
-            assert self.orch.verify_host_state(host,expected='exit_standby_mode'),'Eam failed to exit host from standby_mode'    
+            assert self.orch.verify_host_state(host,expected='exit_standby_mode'),'Eam failed to exit host from standby_mode'
         else:
             self.orch.manage_esxi_host(host.name,operation='exit_standby_mode')
             assert False,'agency Issues not got generated'

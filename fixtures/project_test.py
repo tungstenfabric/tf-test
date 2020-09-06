@@ -58,7 +58,7 @@ class ProjectFixture(fixtures.Fixture):
                               self.inputs.admin_password,
                               self.inputs.admin_tenant, self.inputs)
             else:
-                # Kubernetes 
+                # Kubernetes
                 # Set no auth for now
                 self.auth = None
     # end __init__
@@ -158,7 +158,7 @@ class ProjectFixture(fixtures.Fixture):
             do_cleanup = True
         if do_cleanup:
             if not self.check_no_project_references():
-                self.logger.warn('One or more references still present' 
+                self.logger.warn('One or more references still present'
                     ', will not delete the project %s' % (self.project_name))
                 return
             if self.auth:

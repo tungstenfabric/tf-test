@@ -33,13 +33,13 @@ def _vim_obj(typestr, **kwargs):
 
 def _wait_for_task (task):
     time.sleep(2)
-    state = task.info.state 
+    state = task.info.state
     while (state == vim.TaskInfo.State.queued or
            state == vim.TaskInfo.State.running):
         time.sleep(2)
-        state = task.info.state 
+        state = task.info.state
 
-    state = task.info.state 
+    state = task.info.state
     if state != vim.TaskInfo.State.success:
         if state == vim.TaskInfo.State.error:
             raise ValueError(task.info.error.localizedMessage)
@@ -72,10 +72,10 @@ class NFSDatastore(with_metaclass(Singleton, object)):
         if vc._find_obj(vc._dc, 'ds', {'name':self.name}):
             self.nas_ds=vc._find_obj(vc._dc, 'ds', {'name':self.name})
             if self.nas_ds.summary.accessible:#In vrouter gateway scenario, we are not provisioning
-                return                   #the vcenter server/reimaging the esxi hosts,we are only provisioning 
-                                         #the contrail-controllers.Hence, the nfs datastore becomes 
-                                         #in-accessiable.We need to create and mount the nfs datastore again. 
-                
+                return                   #the vcenter server/reimaging the esxi hosts,we are only provisioning
+                                         #the contrail-controllers.Hence, the nfs datastore becomes
+                                         #in-accessiable.We need to create and mount the nfs datastore again.
+
         username = inputs.host_data[self.server]['username']
         password = inputs.host_data[self.server]['password']
         with settings(host_string=username+'@'+self.server, password=password,
@@ -99,11 +99,11 @@ class NFSDatastore(with_metaclass(Singleton, object)):
         if not self.nas_ds:
             return
         for vm in self.nas_ds.vm:
-            vm.UnregisterVM()  
+            vm.UnregisterVM()
         hosts = [host for cluster in self.vc._dc.hostFolder.childEntity for host in cluster.host]
         for host in hosts:
-            host.configManager.datastoreSystem.RemoveDatastore(self.nas_ds)  
-                    
+            host.configManager.datastoreSystem.RemoveDatastore(self.nas_ds)
+
 
 class VcenterPvtVlanMgr(with_metaclass(Singleton, object)):
 
@@ -119,7 +119,7 @@ class VcenterPvtVlanMgr(with_metaclass(Singleton, object)):
 class VcenterVlanMgr(with_metaclass(Singleton, VcenterPvtVlanMgr)):
 
     def __init__(self, dvs):
-        self._vlans = list(range(1,4096)) 
+        self._vlans = list(range(1,4096))
 
 
 class VcenterOrchestrator(Orchestrator):
@@ -138,7 +138,7 @@ class VcenterOrchestrator(Orchestrator):
         self._connect_to_vcenter()
         if self._inputs.orchestrator == 'vcenter':
             self._vlanmgmt = VcenterPvtVlanMgr(self._vs)
-        else: 
+        else:
             self._vlanmgmt = VcenterVlanMgr(self._vs)
         self._create_keypair()
         self._nfs_ds = NFSDatastore(self._inputs, self)
@@ -157,7 +157,7 @@ class VcenterOrchestrator(Orchestrator):
                     cluster_spec.dasConfig = config_spec
                     task = cluster.ReconfigureCluster_Task(cluster_spec, True)
                     _wait_for_task(task)
-                
+
 
     def get_default_image(self,image_name):
         if (image_name == 'ubuntu' or  image_name == 'cirros' ):
@@ -194,9 +194,9 @@ class VcenterOrchestrator(Orchestrator):
                 context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
                 context.verify_mode = ssl.CERT_NONE
                 self._si = connect.SmartConnect(
-                       host=self._host, 
-                       port=self._port, 
-                       user=self._user, 
+                       host=self._host,
+                       port=self._port,
+                       user=self._user,
                        pwd=self._passwd,
                        sslContext=context)
 
@@ -226,7 +226,7 @@ class VcenterOrchestrator(Orchestrator):
         if len(self.get_hosts()) == 0:
             raise Exception("Datacenter %s has no hosts" % self._dc_name)
         self._computes = self._get_computes()
-    
+
     @retry_for_value(delay=2, tries=5)
     def _find_obj (self, root, vimtype, param):
         self._content = self._si.RetrieveContent()
@@ -264,7 +264,7 @@ class VcenterOrchestrator(Orchestrator):
         zones=[]
         for k,v in list(self._clusters_hosts.items()):
             if v:
-                zones.append(k)  
+                zones.append(k)
         return zones
         #return self._clusters_hosts.keys()
 
@@ -325,7 +325,7 @@ class VcenterOrchestrator(Orchestrator):
                 run('wget %s -P %s' % (url_vmdk, dst),timeout=300)
                 try:
                     if 'no' in self._images_info[image].get('shrinked_vmdk','yes'):
-                    #This is not shrinked vmdk which could be expanded with 
+                    #This is not shrinked vmdk which could be expanded with
                     #vmkfs tools.So just copy the image and vmdk file poiniting
                     #to the raw image and return the vmtx path
                         vmdk_file = self._images_info[image].get('vmdk', None)
@@ -407,7 +407,7 @@ class VcenterOrchestrator(Orchestrator):
             _wait_for_task(vm_obj.Destroy())
 
      #######################################
-     # Increasing The Retries 
+     # Increasing The Retries
      #######################################
     @retry(tries=35, delay=5)
     def wait_till_vm_is_active(self, vm_obj, **kwargs):
@@ -446,7 +446,7 @@ class VcenterOrchestrator(Orchestrator):
                 continue
             self._log.debug("Powering on %s" % vm.name)
             _wait_for_task(vm.PowerOn())
-    
+
     def enter_standby_mode(self, name):
         host = self._find_obj(self._dc, 'host', {'name' : name})
         assert host, "Unable to find host %s" % name
@@ -461,7 +461,7 @@ class VcenterOrchestrator(Orchestrator):
             _wait_for_task(vm.PowerOff())
         self._log.debug("EnterStandby mode on host %s" % name)
         _wait_for_task(host.EnterStandbyMode(90))
-    
+
     def exit_standby_mode(self, name):
         host = self._find_obj(self._dc, 'host', {'name' : name})
         assert host, "Unable to find host %s" % name
@@ -476,7 +476,7 @@ class VcenterOrchestrator(Orchestrator):
                 continue
             self._log.debug("Powering on %s" % vm.name)
             _wait_for_task(vm.PowerOn())
-        
+
     def add_networks_to_vm(self, vm_obj, vns):
         nets = [self._find_obj(self._dc, 'dvs.PortGroup', {'name':vn_obj.name}) for vn_obj in vns]
         vm_obj.add_networks(nets)
@@ -503,7 +503,7 @@ class VcenterOrchestrator(Orchestrator):
 
     def get_networks_of_vm(self, vm_obj, **kwargs):
          return vm_obj.nets[:]
-         
+
     @retry(tries=10, delay=5)
     def is_vm_deleted(self, vm_obj, **kwargs):
         return self._find_obj(self._dc, 'vm', {'name' : vm_obj.name}) == None
@@ -532,10 +532,10 @@ class VcenterOrchestrator(Orchestrator):
         return vm_list
 
     def get_vm_detail(self, vm_obj, **kwargs):
-        if vm_obj.get_from_plugin_introspect(): 
-            return vm_obj.get_from_plugin_introspect() 
+        if vm_obj.get_from_plugin_introspect():
+            return vm_obj.get_from_plugin_introspect()
         else:
-            return vm_obj.get()  
+            return vm_obj.get()
 
     def get_console_output(self, vm_obj, **kwargs):
         return None
@@ -546,7 +546,7 @@ class VcenterOrchestrator(Orchestrator):
 
         if not len(getattr(vm_obj,'ips')) == len(getattr(vm_obj,'nets')):
             self.get_vm_detail(vm_obj)
-        
+
         if vn_name:
             ret = vm_obj.ips.get(vn_name, None)
         else:
@@ -617,7 +617,7 @@ class VcenterOrchestrator(Orchestrator):
         if self.inputs.vro_based:
             return self.delete_vn_vro(vn_obj.name)
         return self.vnc_h.delete_vn_api(vn_obj)
- 
+
     def get_vn_obj_if_present(self, vn_name, **kwargs):
         pg = self._find_obj(self._dc, 'dvs.PortGroup', {'name' : vn_name})
         if pg:
@@ -680,7 +680,7 @@ class VcenterOrchestrator(Orchestrator):
     def poweroff_vm(self,vm_obj):
         vm_obj=vm_obj.vcenter._find_obj(vm_obj.vcenter._dc, 'vm', {'name' : vm_obj.name})
         _wait_for_task(vm_obj.PowerOff())
- 
+
     def poweron_vm(self,vm_obj):
         vm_obj=vm_obj.vcenter._find_obj(vm_obj.vcenter._dc, 'vm', {'name' : vm_obj.name})
         _wait_for_task(vm_obj.PowerOn())
@@ -690,7 +690,7 @@ class VcenterOrchestrator(Orchestrator):
         context = ssl._create_unverified_context()
         vpxdStub = self._si._stub
         hostname = vpxdStub.host.split(":")[0]
-  
+
         eamStub = SoapStubAdapter(host=hostname,
                                           version = "eam.version.version1",
                                           path = "/eam/sdk",
@@ -894,7 +894,7 @@ class VcenterVN(object):
                        defaultPortConfig=_vim_obj('dvs.PortConfig',
                         vlan=_vim_obj('dvs.VLan', vlanId=vlan),
                        securityPolicy=_vim_obj('dvs.PortGroupSecurity',
-                                      allowPromiscuous=vim.BoolPolicy(value=True), 
+                                      allowPromiscuous=vim.BoolPolicy(value=True),
                                       macChanges=vim.BoolPolicy(value=True),
                                       forgedTransmits=vim.BoolPolicy(value=True))),
                        vendorSpecificConfig=ipam_setting)
@@ -944,7 +944,7 @@ class VcenterVN(object):
         except Exception as e:#vcenter gateway mode,where we create normal vlan
             vlan = vn_obj.config.defaultPortConfig.vlan.vlanId
             vn.vlan =  vlan
-            
+
         try:
             vn.ip_pool_id = vn_obj.summary.ipPoolId
             pool = vcenter._find_obj(vcenter._dc, 'ip.Pool', {'id':vn.ip_pool_id})
@@ -952,7 +952,7 @@ class VcenterVN(object):
             ip_list = list(vn.prefix.iter_hosts())
         except Exception as e:
             pass
-        vn.get() 
+        vn.get()
         return vn
 
     @retry(tries=30, delay=5)
@@ -992,8 +992,8 @@ class VcenterVM(object):
         vm.networks = networks
         vm.nets = [net.name for net in networks]
         #below 2 attributes needed for vcenter gateway
-        #as we create vmis/logical interface, we can update the below lists lif and port objects, it will ease the delete vm 
-        #, we just need to  call vm.ports[<index>].cleanUP and same for lif objects 
+        #as we create vmis/logical interface, we can update the below lists lif and port objects, it will ease the delete vm
+        #, we just need to  call vm.ports[<index>].cleanUP and same for lif objects
         vm.ports = []
         vm.lifs = []
         vm.ips = {}
@@ -1051,21 +1051,21 @@ class VcenterVM(object):
         if getattr(self,'ips'):
             if len(self.ips) == len(self.nets):
                 self.status='ACTIVE'
-                return True 
-   
-        #search the introspect first,as it is expected to be updated 
+                return True
+
+        #search the introspect first,as it is expected to be updated
         #before the vm comes up and vmwaretools to retrun values of
         #ip and mac.Most of the delay in vcenter was caused by this wait
         #on vmware tools.The retry, on the occasion that vm actually not up,
         #to respond to ping,ssh etc is delayed till vm fixture,like nova cases.
-        #It improved the timing running a case in vcenter scenario   
+        #It improved the timing running a case in vcenter scenario
         if self.vcenter.inputs.vcenter_gw_setup:
             for intf in vm.guest.net:
                 self.ips[intf.network] = intf.ipAddress[0]
                 self.macs[intf.network] = intf.macAddress
                 self.status='ACTIVE'
             return len(self.ips) == len(self.nets)
-        else: 
+        else:
             return self.get_from_plugin_introspect()
 
     def get_from_plugin_introspect(self,vm=None):
@@ -1074,7 +1074,7 @@ class VcenterVM(object):
             for intf in intfs:
                 vn_uuid = intf['vn_uuid']
                 vn_obj = self.vcenter.vnc_h.get_vn_obj_from_id(vn_uuid)
-                vn_name = str(vn_obj.name) 
+                vn_name = str(vn_obj.name)
                 self.ips[vn_name] = intf['ip_address']
                 self.macs[vn_name] = intf['mac_address']
             self.status='ACTIVE'
@@ -1129,12 +1129,12 @@ class VcenterVM(object):
                     nicspec.operation = _vimtype_dict['dev.Ops.edit']
                     nicspec.device = dev
                     nicspec.device.wakeOnLanEnabled = True
-                    dvs_port_connection = _vimtype_dict['dvs.PortConn']() 
+                    dvs_port_connection = _vimtype_dict['dvs.PortConn']()
                     dvs_port_connection.portgroupKey = net.key
                     dvs_port_connection.switchUuid= self.vcenter._vs.uuid
                     nicspec.device.backing = _vimtype_dict['dev.DVPBackingInfo']()
                     nicspec.device.backing.port = dvs_port_connection
-             
+
                     nicspec.device.connectable = _vimtype_dict['dev.ConnectInfo']()
                     nicspec.device.connectable.startConnected = True
                     nicspec.device.connectable.allowGuestControl = True
@@ -1181,7 +1181,7 @@ class VcenterVM(object):
             password = 'ubuntu'
             vm_id = self.id
             cmd = './vmware-tools-distrib/vmware-install.pl -d'#Assuming that package is there in the disk image,
-            try:                                               #but not installed 
+            try:                                               #but not installed
                 vcenter.run_a_command(vm_id,user,password,cmd_path,cmd)
                 return True
             except Exception as e:
@@ -1193,7 +1193,7 @@ class VcenterVM(object):
         user = 'ubuntu'
         password = 'ubuntu'
         vm_id = vm.id
-        for intf in intfs: 
+        for intf in intfs:
             args = 'ifconfig %s up'%(intf)
             try:
                 vcenter.run_a_command(vm_id,user,password,cmd_path,args)

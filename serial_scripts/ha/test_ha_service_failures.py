@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from .base import HABaseTest 
+from .base import HABaseTest
 import time
 from tcutils.wrappers import preposttest_wrapper
 from tcutils.util import skip_because
@@ -17,7 +17,7 @@ class TestHAService(HABaseTest):
         ''' Test keystone service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('keystone', [self.inputs.cfgm_ips[0]],
                                                    container='keystone')
@@ -27,7 +27,7 @@ class TestHAService(HABaseTest):
         ''' Test glance service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('glance-api', [self.inputs.cfgm_ips[0]],
                                                    container='glance')
@@ -37,7 +37,7 @@ class TestHAService(HABaseTest):
         ''' Test mysql service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('mysql', [self.inputs.cfgm_ips[0]],
                                                    container='mysql')
@@ -47,7 +47,7 @@ class TestHAService(HABaseTest):
         ''' Test nova-api service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('nova-api', [self.inputs.cfgm_ips[0]],
                                                    container='nova')
@@ -57,7 +57,7 @@ class TestHAService(HABaseTest):
         ''' Test nova conductor service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('nova-conductor', [self.inputs.cfgm_ips[0]],
                                                    container='nova-conductor')
@@ -67,7 +67,7 @@ class TestHAService(HABaseTest):
         ''' Test nova scheduler service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('nova-scheduler', [self.inputs.cfgm_ips[0]],
                                                    container='nova-scheduler')
@@ -79,7 +79,7 @@ class TestHAService(HABaseTest):
         ''' Test api-server service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('contrail-api', [self.inputs.cfgm_ips[0]],
                                                    container='api-server')
@@ -88,7 +88,7 @@ class TestHAService(HABaseTest):
         ''' Test schema service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         ret = self.ha_service_single_failure_test('contrail-schema', [self.inputs.cfgm_ips[0]],
                                                   container='schema')
@@ -100,7 +100,7 @@ class TestHAService(HABaseTest):
         ''' Test svc monitor service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         ret = self.ha_service_single_failure_test('contrail-svc-monitor', [self.inputs.cfgm_ips[0]],
                                                   container='svc-monitor')
@@ -113,20 +113,20 @@ class TestHAService(HABaseTest):
         ''' Test contrail-control service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         ret =  self.ha_service_single_failure_test('contrail-control', [self.inputs.bgp_ips[0]],
                                                    container='control')
         time.sleep(60)
         self.ha_service_restart('contrail-vrouter-agent', self.inputs.compute_ips)
-        return ret 
+        return ret
 
     @preposttest_wrapper
     def test_ha_dns_single_failure(self):
         ''' Test dns service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('contrail-dns', [self.inputs.bgp_ips[0]],
                                                    container='dns')
@@ -136,7 +136,7 @@ class TestHAService(HABaseTest):
         ''' Test named service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('contrail-named', [self.inputs.bgp_ips[0]],
                                                    container='named')
@@ -147,7 +147,7 @@ class TestHAService(HABaseTest):
         ''' Test rabbitmq service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('rabbitmq-server', [self.inputs.cfgm_ips[0]],
                                                    container='rabbitmq')
@@ -157,7 +157,7 @@ class TestHAService(HABaseTest):
         ''' Test zookeeper service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('zookeeper', [self.inputs.cfgm_ips[0]],
                                                    container='controller')
@@ -167,7 +167,7 @@ class TestHAService(HABaseTest):
         ''' Test cassandra service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('contrail-database', [self.inputs.ds_server_ip[0]],
                                                    container='config-cassandra')
@@ -177,19 +177,19 @@ class TestHAService(HABaseTest):
         ''' Test mysql service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         ret = self.ha_service_single_failure_test('haproxy', [self.inputs.cfgm_ips[0]],
                                                   container='haproxy')
         time.sleep(20)
         return ret
- 
+
 #    @preposttest_wrapper
 #    def test_ha_keepalived_single_failure(self):
 #        ''' Test mysql service instance failure
 #            Ensure that that system is operational when a signle service
 #            instance fails. System should bypass the failure.
-#            Pass crietria: Should be able to spawn a VM 
+#            Pass crietria: Should be able to spawn a VM
 #        '''
 #        return self.ha_service_single_failure_test('keepalived', [self.inputs.cfgm_ips[0]])
 
@@ -198,7 +198,7 @@ class TestHAService(HABaseTest):
         ''' Test neutron-server service instance failure
             Ensure that that system is operational when a signle service
             instance fails. System should bypass the failure.
-            Pass crietria: Should be able to spawn a VM 
+            Pass crietria: Should be able to spawn a VM
         '''
         return self.ha_service_single_failure_test('neutron-server', [self.inputs.cfgm_ips[0]],
                                                    container='neutron')

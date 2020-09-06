@@ -421,7 +421,7 @@ class IGMPTestBase(BaseVrouterTest):
                                 if route_type == 7:
                                     mvpn_route = "7-"+".+"+srcaddr+","+maddr
 
-                                  
+
                                 if route_type == 4 and vn_name == 'vn2':
                                     self.logger.info('Since IGMP join is from VN1 , type 4 wont be there in VN2')
                                     expectation = False

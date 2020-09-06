@@ -132,7 +132,7 @@ class ConfigScale(object):
         finally:
             return self.lif_fixture
 
-  
+
     def get_tor_info(self, tor_id):
         tor_id = tor_id.replace("TOR", "")
         tor_dict = self.inputs.tor_agent_data

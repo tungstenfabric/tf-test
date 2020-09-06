@@ -5,14 +5,14 @@ import psutil
 
 class ProcessStatus(object):
 
-    output_dict={}    
-    process_name = sys.argv[1]       
+    output_dict={}
+    process_name = sys.argv[1]
 
     def get_process_status (self, process_name):
 
         for proc in psutil.process_iter():
             if proc.name() == process_name:
-                cpu_percent= proc.cpu_percent(interval=3)  
+                cpu_percent= proc.cpu_percent(interval=3)
                 memory_percent= proc.memory_percent()
                 rss= proc.memory_info().rss
                 vms= proc.memory_info().vms
