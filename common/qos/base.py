@@ -952,8 +952,8 @@ class QosTestBase(BaseNeutronTest):
         for cmd in cmds:
             cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd, container='agent')
         cls.inputs.restart_service("contrail-vrouter-agent",
-                                     [cls.qos_node_ip],
-									container='agent')
+                                    [cls.qos_node_ip],
+                                    container='agent')
         cluster_status, error_nodes = ContrailStatusChecker(
                                     ).wait_till_contrail_cluster_stable()
         assert cluster_status, 'Hash of error nodes and services : %s' % (
@@ -1013,8 +1013,8 @@ class QosTestBase(BaseNeutronTest):
         for cmd in cmds:
             cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd, container='agent')
         cls.inputs.restart_service("contrail-vrouter-agent",
-                                     [cls.qos_node_ip],
-									container='agent')
+                                    [cls.qos_node_ip],
+                                    container='agent')
         cluster_status, error_nodes = ContrailStatusChecker(
                                     ).wait_till_contrail_cluster_stable()
         assert cluster_status, 'Hash of error nodes and services : %s' % (

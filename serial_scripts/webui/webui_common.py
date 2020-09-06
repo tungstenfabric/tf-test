@@ -440,8 +440,8 @@ class WebuiCommon(object):
                     pass
                 return False
             self.logger.info(
-	        "Click on save button %s successful" %
-	        (element_type))
+            "Click on save button %s successful" %
+            (element_type))
         else:
             self.logger.info("Click on icon + %s successful" % (element_type))
         return True

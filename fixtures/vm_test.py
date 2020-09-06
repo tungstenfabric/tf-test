@@ -1224,7 +1224,7 @@ class VMFixture(fixtures.Fixture):
                 host_string='%s@%s' % (host['username'], self.vm_node_ip),
                 password=host['password'],
                     warn_only=True, abort_on_prompts=False):
-                #		output = run('ping %s -c 1' % (self.local_ips[vn_fq_name]))
+                #       output = run('ping %s -c 1' % (self.local_ips[vn_fq_name]))
                 #                expected_result = ' 0% packet loss'
                 output = safe_run('ping %s -c 2 -W %s' %
                                  (self.local_ips[vn_fq_name], timeout))

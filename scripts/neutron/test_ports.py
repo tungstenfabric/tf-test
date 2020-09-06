@@ -1037,7 +1037,7 @@ class TestPorts(BaseNeutronTest):
         6. Cause a keepalived mastership switchover.
         7. The vIP and FIP should still be accessible via the new VRRP master.
         
-	Maintainer: ganeshahv@juniper.net
+    Maintainer: ganeshahv@juniper.net
         '''
 
         self.logger.info('Create a FVN. Create a FIP-Pool and FIP')

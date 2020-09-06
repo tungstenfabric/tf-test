@@ -4747,7 +4747,7 @@ class AnalyticsVerification(fixtures.Fixture):
                     found = True 
                     break
             if found:
-               	return stat_table
+                return stat_table
         return None
            
     #@retry(delay=5, tries=10)

@@ -15,7 +15,7 @@ class KeystoneCommands(object):
 
     def __init__(self, username=None, password=None, tenant=None,
                  domain_name=None, auth_url=None, insecure=True, region_name=None,
-		 cert=None, key=None, cacert=None, version=None, logger=None, scope='domain'):
+         cert=None, key=None, cacert=None, version=None, logger=None, scope='domain'):
         self.sessions = dict()
         self.logger = logger or contrail_logging.getLogger(__name__)
         self.auth_url = auth_url
