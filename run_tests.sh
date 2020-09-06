@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -x
-
+sudo  grep -r -l "docker " * | sudo xargs  sed -i "s/docker /podman /g"
 declare -a pids
 trap resume_pids 10 1 2 3 6
 source tools/common.sh
