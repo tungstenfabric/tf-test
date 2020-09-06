@@ -52,6 +52,10 @@ while getopts ":T:t:p:f:h" opt; do
   esac
 done
 
+which docker || ln -s "$(which podman)" /usr/bin/docker
+echo "INFO: which podman: $(which podman)" || true
+echo "INFO: which docker: $(which docker)" || true
+
 TESTBED=${testbed_input:-${TESTBED:-'/opt/contrail/utils/fabfile/testbeds/testbed.py'}}
 CONTRAIL_FABPATH=${contrail_fabpath_input:-${CONTRAIL_FABPATH:-'/opt/contrail/utils'}}
 CONTRAIL_TEST_FOLDER=${contrail_test_folder:-${CONTRAIL_TEST_FOLDER:-'/contrail-test'}}
