@@ -81,6 +81,16 @@ if "check_output" not in dir(subprocess):  # duck punch it in!
     subprocess.check_output = f
 
 
+def determine_containerization_engine():
+    if os.path.exists('/.dockerenv'):
+        return "docker"
+    pid = os.getpid()
+    with open('/proc/{}/cgroup'.format(pid), 'rt') as ifh:
+        if 'libpod' in ifh.read():
+            return "podman"
+    return False
+
+
 class TestInputs(with_metaclass(Singleton, object)):
     '''
        Class that would populate testbedinfo from parsing the
@@ -96,6 +106,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.input_file = input_file
         self.logger = logger or contrail_logging.getLogger(__name__)
 
+        self.docker = determine_containerization_engine()
         self.tor_agent_data = {}
         self.sriov_data = {}
         self.dpdk_data = {}
@@ -739,7 +750,7 @@ class TestInputs(with_metaclass(Singleton, object)):
             self.vro_username = self.vro_server['username']
             self.vro_password = self.vro_server['password']
             self.vro_port = str(self.vro_server['port'])
-                
+
 
     def get_os_env(self, var, default=''):
         if var in os.environ:
@@ -774,7 +785,7 @@ class TestInputs(with_metaclass(Singleton, object)):
     # end get_os_version
 
     def get_active_containers(self, host):
-        cmd = "docker ps -f status=running --format {{.Names}} 2>/dev/null"
+        cmd = "docker ps -f status=running --format {{.Names}}"
         output = self.run_cmd_on_server(host, cmd, as_sudo=True)
         containers = [x.strip('\r') for x in output.split('\n')]
         return containers
@@ -803,7 +814,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         host_dict['containers'] = {}
         if  host_dict.get('type', None) == 'esxi':
             return
-        cmd = 'docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk \'{print $NF}\''
+        cmd = 'docker ps -a | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner\|placement" | awk \'{print $NF}\''
         output = self.run_cmd_on_server(host_dict['host_ip'], cmd, as_sudo=True)
         # If not a docker cluster, return
         if not output:
@@ -814,7 +825,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         nodemgr_cntrs = [x for x in containers if 'nodemgr' in x]
         containers = set(containers) - set(nodemgr_cntrs)
 
-        # Observed in Openshift scenario, recent container-name changes causing issue picking wrong container which is down/inactive after fail-over 
+        # Observed in Openshift scenario, recent container-name changes causing issue picking wrong container which is down/inactive after fail-over
         # and solving this with Sorting the Set and as this is simple sorting only and so should not impact any other scneario like Openstack/K8s etc
         nodemgr_cntrs = sorted(nodemgr_cntrs, reverse=True)
         containers = sorted(containers, reverse=True)
@@ -990,6 +1001,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         '''
         container : name or id of the container
         '''
+        issue_cmd = issue_cmd.replace("docker", self.docker)
         if server_ip in list(self.host_data.keys()):
             if not username:
                 username = self.host_data[server_ip]['username']
@@ -1031,6 +1043,7 @@ class ContrailTestInit(object):
             stack_tenant=None,
             stack_domain=None,
             logger=None):
+        self.docker = determine_containerization_engine()
         self.connections = None
         self.logger = logger or contrail_logging.getLogger(__name__)
         self.inputs = TestInputs(input_file, self.logger)
@@ -1311,7 +1324,7 @@ class ContrailTestInit(object):
 
     def is_container_up(self, host, service):
         container = self.host_data[host]['containers'][service]
-        cmd = "docker ps -f NAME=%s -f status=running 2>/dev/null"%container
+        cmd = "docker ps -f name=%s -f status=running"%container
         for i in range(3):
             output = self.run_cmd_on_server(host, cmd, as_sudo=True)
             if not output or 'Up' not in output:
@@ -1455,8 +1468,8 @@ class ContrailTestInit(object):
         for host in bgp_ips:
             host_name = self.host_data[host]['name']
             issue_cmd = "python /usr/share/contrail-utils/provision_control.py \
-			--host_name '%s' --host_ip '%s' --router_asn '%s' \
-			--api_server_ip '%s' --api_server_port '%s' --oper '%s'" % (host_name,
+                --host_name '%s' --host_ip '%s' --router_asn '%s' \
+                --api_server_ip '%s' --api_server_port '%s' --oper '%s'" % (host_name,
                                                                host,
                                                                router_asn,
                                                                api_server_ip,
@@ -1484,9 +1497,9 @@ class ContrailTestInit(object):
         username = self.host_data[self.cfgm_ip]['username']
         password = self.host_data[self.cfgm_ip]['password']
         issue_cmd = "python /usr/share/contrail-utils/provision_mx.py \
-			--api_server_ip '%s' --api_server_port '%s' \
-			--router_name '%s' --router_ip '%s'  \
-			--router_asn '%s' --oper '%s'" % (
+            --api_server_ip '%s' --api_server_port '%s' \
+            --router_name '%s' --router_ip '%s'  \
+            --router_asn '%s' --oper '%s'" % (
             api_server_ip, api_server_port,
             router_name, router_ip, router_asn, oper)
         output = self.run_cmd_on_server(
@@ -1723,7 +1736,7 @@ class ContrailTestInit(object):
     def enable_vro(self, knob=False):
         self.vro_based = knob
     #end enable_vro
-    
+
 def _parse_args( args_str):
     parser = argparse.ArgumentParser()
     args, remaining_argv = parser.parse_known_args(args_str.split())
