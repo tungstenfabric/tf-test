@@ -1005,7 +1005,7 @@ def skip_because(*args, **kwargs):
                 if not self.orch.is_feature_supported(kwargs["feature"]):
                     skip = True
                     msg = "Skipped as feature %s not supported in this environment"%(
-				kwargs["feature"])
+                           kwargs["feature"])
                     raise testtools.TestCase.skipException(msg)
 
             if 'ha_setup' in kwargs:

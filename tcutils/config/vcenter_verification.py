@@ -38,7 +38,7 @@ class VMWareVerificationLib(object):
 
     @retry(delay=10, tries=10)
     def verify_vm_not_in_vcenter(self, vrouter_ip,vm_name, *args):
-       	#everytime verify_vm_in_vcenter should be called with introspect refreshe
+       #everytime verify_vm_in_vcenter should be called with introspect refreshe
        self.get_introspect(vrouter_ip)
        vm_details = vmware_introspect_utils.get_vm_details(self.vcntr_introspect, vm_name)
        try:

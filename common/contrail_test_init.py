@@ -1455,8 +1455,8 @@ class ContrailTestInit(object):
         for host in bgp_ips:
             host_name = self.host_data[host]['name']
             issue_cmd = "python /usr/share/contrail-utils/provision_control.py \
-			--host_name '%s' --host_ip '%s' --router_asn '%s' \
-			--api_server_ip '%s' --api_server_port '%s' --oper '%s'" % (host_name,
+                --host_name '%s' --host_ip '%s' --router_asn '%s' \
+                --api_server_ip '%s' --api_server_port '%s' --oper '%s'" % (host_name,
                                                                host,
                                                                router_asn,
                                                                api_server_ip,
@@ -1484,9 +1484,9 @@ class ContrailTestInit(object):
         username = self.host_data[self.cfgm_ip]['username']
         password = self.host_data[self.cfgm_ip]['password']
         issue_cmd = "python /usr/share/contrail-utils/provision_mx.py \
-			--api_server_ip '%s' --api_server_port '%s' \
-			--router_name '%s' --router_ip '%s'  \
-			--router_asn '%s' --oper '%s'" % (
+            --api_server_ip '%s' --api_server_port '%s' \
+            --router_name '%s' --router_ip '%s'  \
+            --router_asn '%s' --oper '%s'" % (
             api_server_ip, api_server_port,
             router_name, router_ip, router_asn, oper)
         output = self.run_cmd_on_server(

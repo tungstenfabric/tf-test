@@ -236,12 +236,12 @@ class TestECMPFeature(ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffi
         """
          Description: Validate ECMP with v2 service chaining in-network-nat mode datapath having service instance
          Test steps:
-           1.	Creating vm's - vm1 and vm2 in networks vn1 and vn2.
-           2.	Creating a service instance in in-network-nat mode with 3 instances and
+           1.   Creating vm's - vm1 and vm2 in networks vn1 and vn2.
+           2.   Creating a service instance in in-network-nat mode with 3 instances and
                 left-interface of the service instances sharing the IP and enabled for static route.
 
-           3.	Creating a service chain by applying the service instance as a service in a policy between the VNs.
-           4.	Checking for ping and tcp traffic between vm1 and vm2.
+           3.   Creating a service chain by applying the service instance as a service in a policy between the VNs.
+           4.   Checking for ping and tcp traffic between vm1 and vm2.
          Pass criteria: Ping between the VMs should be successful and TCP traffic should reach vm2 from vm1.
          Maintainer : ganeshahv@juniper.net
         """

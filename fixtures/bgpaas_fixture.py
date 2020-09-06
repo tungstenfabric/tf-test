@@ -22,7 +22,7 @@ class BGPaaSFixture(vnc_api_test.VncLibFixture):
         self.local_autonomous_system = kwargs.get(
             'local_autonomous_system') or None
         self.created = False
-#	if self.inputs.verify_thru_gui():
+#    if self.inputs.verify_thru_gui():
 #            self.browser = self.connections.browser
 #            self.browser_openstack = self.connections.browser_openstack
 #            self.webui = WebuiTest(self.connections, self.inputs)
