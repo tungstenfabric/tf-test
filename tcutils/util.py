@@ -1153,6 +1153,7 @@ def get_build_sku(openstack_node_ip, openstack_node_password='c0ntrail123', user
         if container:
             cmd = 'docker exec -it %s /bin/bash -c \'%s\'' % (container, cmd)
         try:
+            cmd.replace("docker", _determine_containerization_engine())
             with hide('everything'), settings(host_string=host_str,
                                               user=user,
                                               password=openstack_node_password):
