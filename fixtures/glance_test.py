@@ -45,6 +45,7 @@ class GlanceHelper(object):
         return openstack.OpenstackAuth(**kwargs)
 
     def create_image(self, name, filename=None, public=True, **kwargs):
+        kwargs.update({'disk_format': 'raw'})
         if public:
            kwargs.update({'visibility': 'public'})
         obj = self.obj.images.create(name=name, **kwargs)
