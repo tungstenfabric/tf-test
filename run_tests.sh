@@ -431,6 +431,7 @@ function apply_junitxml_patch {
 function setup_physical_routers {
 ( 
 export PYTHONPATH=$PATH:$PWD:$PWD/fixtures;
+cat /contrail-test/contrail_test_input.yaml
 ${PYTHON} tools/setup_physical_routers.py $TEST_CONFIG_FILE
 )
 }
