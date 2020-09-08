@@ -936,7 +936,7 @@ class SmgrFixture(fixtures.Fixture):
                            "contrail-analytics-nodemgr    active",
                            "contrail-collector            active",
                            "contrail-query-engine         active",
-                           "contrail-snmp-collector       active",
+                           "tf-snmp-collector       active",
                            "contrail-topology             active"]
                 for line in pattern:
                   if line not in output:

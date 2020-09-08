@@ -2207,7 +2207,7 @@ class AnalyticsVerification(fixtures.Fixture):
     def verify_alarms(self, role, alarm_type='process-status', service=None, verify_alarm_cleared=False):
         result = True
         analytics = self.inputs.collector_ips[0]
-        underlay = self.inputs.run_cmd_on_server(analytics, 'contrail-status | grep contrail-snmp-collector',
+        underlay = self.inputs.run_cmd_on_server(analytics, 'contrail-status | grep tf-snmp-collector',
                                                  container='analytics')
         cfgm_processes = ['contrail-config-nodemgr',
             'contrail-device-manager', 'contrail-schema', 'contrail-svc-monitor']

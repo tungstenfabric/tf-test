@@ -1274,7 +1274,7 @@ class ContrailTestInit(object):
                'contrail-analytics-api': 'analytics-api',
                'contrail-query-engine': 'query-engine',
                'contrail-analytics-nodemgr': 'analytics-nodemgr',
-               'contrail-snmp-collector': 'snmp-collector',
+               'tf-snmp-collector': 'snmp-collector',
                'contrail-topology': 'topology',
                'contrail-database': 'analytics-cassandra',
                'contrail-database-nodemgr': 'analyticsdb-nodemgr',
