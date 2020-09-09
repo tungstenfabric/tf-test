@@ -162,6 +162,6 @@ class O7kLib:
         user = self.get_user_dct(user_name, project_name, domain_name)
         role = self.get_role_dct(role_name)
         project = self.find_project(project_name)
-        domain = self.find_domain(domain_name)
+        # domain = self.find_domain(domain_name)
         self.keystone.roles.grant(role=role, user=user, project=project)
         logging.info(f"User '{user_name}' assigned '{role_name}' role")
