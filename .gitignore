@@ -6,3 +6,4 @@ Dockerfile.nofromargs
 *.tgz
 *.gz
 *.zip
+.vscode
