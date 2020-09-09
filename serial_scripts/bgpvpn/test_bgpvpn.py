@@ -5,10 +5,10 @@ from tcutils.wrappers import preposttest_wrapper
 from bgpvpn_test import BgpvpnFixture
 
 class TestBgpvpn(BaseBgpvpn):
-    
+
     def setUp(self):
         super(TestBgpvpn, self).setUp()
-    
+
     @preposttest_wrapper
     def test_bgpvpn_basic(self):
         '''
@@ -32,7 +32,7 @@ class TestBgpvpn(BaseBgpvpn):
         assert self.ping_from_mx(mx_params['mgmt_ip'], [ping_cmd])
         bgpvpn_fixture.disassociate_bgpvpn_from_vn(self.vn_fixture.obj)
         assert not bgpvpn_fixture.verify_route_target_in_control(self.vn_fixture, search_value=rt)
-        
+
     @preposttest_wrapper
     def test_l3_bgpvpn_with_l3_vn(self):
         '''
@@ -56,7 +56,7 @@ class TestBgpvpn(BaseBgpvpn):
         assert self.ping_from_mx(mx_params['mgmt_ip'], [ping_cmd])
         bgpvpn_fixture.disassociate_bgpvpn_from_vn(self.vn_fixture.obj)
         assert not bgpvpn_fixture.verify_route_target_in_control(self.vn_fixture, search_value=rt)
-    
+
     @preposttest_wrapper
     def test_l2_bgpvpn_with_l2_vn(self):
         '''
@@ -79,7 +79,7 @@ class TestBgpvpn(BaseBgpvpn):
         assert self.ping_from_mx(mx_params['mgmt_ip'], [ping_cmd])
         bgpvpn_fixture.disassociate_bgpvpn_from_vn(self.vn_fixture.obj)
         assert not bgpvpn_fixture.verify_route_target_in_control(self.vn_fixture, search_value=rt)
-    
+
     @preposttest_wrapper
     def test_bgpvpn_logical_router(self):
         '''
@@ -107,11 +107,11 @@ class TestBgpvpn(BaseBgpvpn):
         bgpvpn_fixture.disassociate_bgpvpn_from_lr(self.lr_obj)
         assert not bgpvpn_fixture.verify_route_target_in_control(self.vn1_fixture, search_value=rt)
         assert not bgpvpn_fixture.verify_route_target_in_control(self.vn2_fixture, search_value=rt)
-    
+
     @preposttest_wrapper
     def test_bgpvpn_update_RT(self):
         '''
-            1)Create BGP VPN bgpvn1 
+            1)Create BGP VPN bgpvn1
             2)Create VN1 in L2 mode and VM1
             3) Associate bgpvpn1 to VN1
             4)Ping from MX to VM and pingg should fail
@@ -134,7 +134,7 @@ class TestBgpvpn(BaseBgpvpn):
         assert self.ping_from_mx(mx_params['mgmt_ip'], [ping_cmd])
         bgpvpn_fixture.disassociate_bgpvpn_from_vn(self.vn_fixture.obj)
         assert not bgpvpn_fixture.verify_route_target_in_control(self.vn_fixture, search_value=rt)
-        
+
     @preposttest_wrapper
     def test_bgpvpn_attach_to_multiple_vns(self):
         '''
@@ -168,8 +168,8 @@ class TestBgpvpn(BaseBgpvpn):
         bgpvpn_fixture.disassociate_bgpvpn_from_vn(self.vn_fixture.obj)
         bgpvpn_fixture.disassociate_bgpvpn_from_vn(self.vn_fixture2.obj)
         assert not bgpvpn_fixture.verify_route_target_in_control(self.vn_fixture, search_value=rt)
-    
-    
+
+
     @preposttest_wrapper
     def test_bgpvpn_flap_bgp_session(self):
         '''

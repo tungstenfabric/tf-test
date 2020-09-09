@@ -281,7 +281,7 @@ class TestRouterSNAT(BaseNeutronTest):
         vm2_name = get_random_name('vm_public')
         vn1_name = get_random_name('vn_private')
         vn1_subnets = [get_random_cidr()]
-        self.allow_default_sg_to_allow_all_on_project(self.inputs.project_name) 
+        self.allow_default_sg_to_allow_all_on_project(self.inputs.project_name)
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
         vn1_fixture.verify_on_setup()
         vm1_fixture = self.create_vm(vn1_fixture, vm1_name,
@@ -299,7 +299,7 @@ class TestRouterSNAT(BaseNeutronTest):
         self.add_vn_to_router(router_dict['id'], vn1_fixture)
         assert self.verify_snat(vm1_fixture)
         assert self.verify_snat_with_fip(self.public_vn_obj, \
-                vm2_fixture, vm1_fixture, connections= self.connections, 
+                vm2_fixture, vm1_fixture, connections= self.connections,
                 inputs = self.inputs)
 
     @preposttest_wrapper
@@ -329,7 +329,7 @@ class TestRouterSNAT(BaseNeutronTest):
         assert project_fixture_obj1.verify_on_setup()
 
         proj_connection = project_fixture_obj.get_project_connections\
-                            (username='test_usr', password='testusr123') 
+                            (username='test_usr', password='testusr123')
         proj_connection1 = project_fixture_obj1.get_project_connections\
                             (username='test_usr1', password= 'testusr1231')
         vm1_name = get_random_name('vm1_vn1_private')
@@ -387,7 +387,7 @@ class TestRouterSNAT(BaseNeutronTest):
                 router_dict['id'],
                 self.public_vn_obj.public_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn2_fixture)
-     
+
         assert self.verify_snat(vm2_fixture)
 
     @preposttest_wrapper
@@ -486,10 +486,10 @@ class TestRouterSNAT(BaseNeutronTest):
                 self.public_vn_obj.public_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn2_fixture)
         assert self.verify_snat(vm2_fixture)
-        assert self.verify_snat_with_fip(self.public_vn_obj, vm3_fixture, 
+        assert self.verify_snat_with_fip(self.public_vn_obj, vm3_fixture,
                     vm1_fixture, connections= self.admin_connections, inputs = self.admin_inputs)
 
-        assert self.verify_snat_with_fip(self.public_vn_obj, vm3_fixture, 
+        assert self.verify_snat_with_fip(self.public_vn_obj, vm3_fixture,
                     vm1_fixture, connections= self.admin_connections, inputs = self.admin_inputs)
 
     @preposttest_wrapper
@@ -516,22 +516,22 @@ class TestRouterSNAT(BaseNeutronTest):
             self.public_vn_obj.public_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn1_fixture)
         assert self.verify_snat(vm1_fixture)
-        assert self.verify_snat_with_fip(self.public_vn_obj, 
-                vm2_fixture, vm1_fixture, connections= self.connections, 
+        assert self.verify_snat_with_fip(self.public_vn_obj,
+                vm2_fixture, vm1_fixture, connections= self.connections,
                 inputs = self.inputs)
 
         self.delete_vn_from_router(router_dict['id'], vn1_fixture)
 
         assert not self.verify_snat(vm1_fixture, expectation=False)
-        assert self.verify_snat_with_fip(self.public_vn_obj, vm2_fixture, 
-                                             vm1_fixture, 
+        assert self.verify_snat_with_fip(self.public_vn_obj, vm2_fixture,
+                                             vm1_fixture,
                                              connections=self.connections,
                                              inputs = self.inputs)
 
         self.add_vn_to_router(router_dict['id'], vn1_fixture, cleanup=False)
         assert self.verify_snat(vm1_fixture)
-        assert self.verify_snat_with_fip(self.public_vn_obj, 
-                    vm2_fixture, vm1_fixture, connections= self.connections, 
+        assert self.verify_snat_with_fip(self.public_vn_obj,
+                    vm2_fixture, vm1_fixture, connections= self.connections,
                     inputs = self.inputs)
 
     @preposttest_wrapper
@@ -581,7 +581,7 @@ class TestRouterSNAT(BaseNeutronTest):
 
     def verify_snat_with_fip(self, public_vn_obj, public_vm_fix, \
                             vm_fixture, connections, inputs):
-        fip_fixture = public_vn_obj.fip_fixture 
+        fip_fixture = public_vn_obj.fip_fixture
         ext_vn_fixture = public_vn_obj.public_vn_fixture
         result = True
         assert fip_fixture.verify_on_setup()

@@ -89,7 +89,7 @@ class FloatingIpBaseTest(test_v1.BaseTestCase_v1):
         if len(host_list) > 1:
             self.compute_1 = host_list[0]
             self.compute_2 = host_list[1]
-        
+
 
 class CreateAssociateFip(fixtures.Fixture):
 

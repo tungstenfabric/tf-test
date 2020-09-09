@@ -34,7 +34,7 @@ class TestFabricSecurityGroup(BaseFabricTest):
         Verify different traffic scenarios based on rules defined
         Delete security group attached to BMS
         Update the rules defined and apply back the SG to BMS
-        Verify based on updated rules 
+        Verify based on updated rules
         Pass Criteria:Traffic should be verified based on rules defined
         '''
         vn1 = self.create_vn()
@@ -79,7 +79,7 @@ class TestFabricSecurityGroup(BaseFabricTest):
         # Apply SG to BMS
         bms1.add_security_groups([sg1.uuid, sg2.uuid])
         sleep(60)
-    
+
         # TCP Traffic from bms1 to vm1 should pass
         # UDP Traffic from bms1 to vm1 should pass
         # Ping Traffic from bms1 to vm1 should pass

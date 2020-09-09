@@ -64,14 +64,14 @@ class BaseMaxFlowsTest(BaseVrouterTest):
         cls.cleanup_flow_timeout()
         super(BaseVrouterTest, cls).tearDownClass()
 
-    #end tearDownClass 
+    #end tearDownClass
 
     @classmethod
     def set_flow_timeout(cls, compute_fixtures, flow_timeout=80):
         for cmp_fix in compute_fixtures:
             cmp_fix.set_flow_aging_time(flow_timeout)
         return True
-   
+
     @classmethod
     def cleanup_flow_timeout(cls, compute_fixtures=None):
         if compute_fixtures is None:
@@ -79,12 +79,12 @@ class BaseMaxFlowsTest(BaseVrouterTest):
         for cmp_fix in compute_fixtures:
             cmp_fix.set_flow_aging_time(cmp_fix.default_values['DEFAULT']['flow_cache_timeout'])
         return True
-   
+
 
     def update_encap_priority(self, encaps):
         self.addCleanup(self.set_encap_priority, encaps=self.get_encap_priority())
         return self.set_encap_priority(encaps)
-    
+
     def setup_vns(self, vn=None):
         '''Setup VN
            Input vn format:
@@ -177,7 +177,7 @@ class BaseMaxFlowsTest(BaseVrouterTest):
         compute_nodes = self.orch.get_hosts()
         compute_nodes_len = len(compute_nodes)
         index = random.randint(0,compute_nodes_len-1)
-        vm_index = 0        
+        vm_index = 0
         vm_keys = [each_key for each_key in vm if re.match(r'vm\d+',each_key)]
         for each_vm in vm_keys:
             vm_id = each_vm
@@ -204,7 +204,7 @@ class BaseMaxFlowsTest(BaseVrouterTest):
                 node_name = compute_nodes[index]
                 vm_fixture = self.create_vm(vn_objs=vn_fix_obj_list,
                                         port_ids=vmi_fix_uuid_list,
-                                        node_name=node_name, image_name='ubuntu', 
+                                        node_name=node_name, image_name='ubuntu',
                                         flavor='contrail_flavor_small')
             else:
                 vm_node_name = vm[vm_id].get('node', None)
@@ -222,7 +222,7 @@ class BaseMaxFlowsTest(BaseVrouterTest):
                                             port_ids=vmi_fix_uuid_list,
                                             node_name=node_name, image_name=image_name)
             vm_fixtures[vm_id] = vm_fixture
-            vm_index = vm_index + 1 
+            vm_index = vm_index + 1
 
 
         for vm_fixture in list(vm_fixtures.values()):

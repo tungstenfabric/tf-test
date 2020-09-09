@@ -50,7 +50,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         cls.ixia_linux_host = cls.inputs.ixia_linux_host_ip
         cls.ixia_host = cls.inputs.ixia_host_ip
         cls.spirent_linux_host = cls.inputs.spirent_linux_host_ip
-        cls.mx1_ip = cls.inputs.ixia_mx_ip 
+        cls.mx1_ip = cls.inputs.ixia_mx_ip
         cls.mx2_ip = cls.inputs.spirent_mx_ip
         cls.mx_user = cls.inputs.ixia_mx_username
         cls.mx_password = cls.inputs.ixia_mx_password
@@ -73,7 +73,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
 
     @classmethod
     def tearDownClass(cls):
-        cls.results_file.close()  
+        cls.results_file.close()
         cls.del_availability_zone()
         cls.nova_flavor_key_delete()
         super(PerfBase, cls).tearDownClass()
@@ -86,7 +86,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
     def update_hosts(self):
         host_list = self.connections.orch.get_hosts()
         self.kvm_hosts = copy.deepcopy(host_list)
-        self.dpdk_hosts = [self.inputs.host_data[host]['name'] for host in self.inputs.dpdk_ips] 
+        self.dpdk_hosts = [self.inputs.host_data[host]['name'] for host in self.inputs.dpdk_ips]
         self.netronome_hosts = []
         for host in host_list:
             if host in self.dpdk_hosts:
@@ -96,14 +96,14 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
     @classmethod
     def create_availability_zone(self):
         zones = self.connections.orch.get_zones()
-        self.agg_id = {} 
-        if 'kvm' not in zones: 
+        self.agg_id = {}
+        if 'kvm' not in zones:
             self.agg_id['kvm_id'] = self.connections.orch.create_agg('kvm','kvm')
             self.connections.orch.add_host_to_agg(self.agg_id['kvm_id'],self.kvm_hosts)
-        if 'dpdk' not in zones: 
+        if 'dpdk' not in zones:
             self.agg_id['dpdk_id']= self.connections.orch.create_agg('dpdk','dpdk')
             self.connections.orch.add_host_to_agg(self.agg_id['dpdk_id'],self.dpdk_hosts)
-        return 
+        return
 
     @classmethod
     def del_availability_zone(self):
@@ -113,21 +113,21 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         if 'dpdk_id' in self.agg_id:
             self.connections.orch.del_host_from_agg(self.agg_id['dpdk_id'],self.dpdk_hosts)
             self.connections.orch.delete_agg(self.agg_id['dpdk_id'])
-        return 
+        return
 
     def set_test_config(self,**kwargs):
-        self.perf_conf = {} 
-        self.perf_conf['profile_name'] = kwargs.get('profile_name') 
-        self.perf_conf['proto']  = kwargs.get('proto') 
-        self.perf_conf['cores']  = kwargs.get('cores') 
-        self.perf_conf['family'] = kwargs.get('family') 
-        self.perf_conf['si']     = kwargs.get('si') 
-        self.perf_conf['image']  = kwargs.get('image') 
+        self.perf_conf = {}
+        self.perf_conf['profile_name'] = kwargs.get('profile_name')
+        self.perf_conf['proto']  = kwargs.get('proto')
+        self.perf_conf['cores']  = kwargs.get('cores')
+        self.perf_conf['family'] = kwargs.get('family')
+        self.perf_conf['si']     = kwargs.get('si')
+        self.perf_conf['image']  = kwargs.get('image')
         self.perf_conf['encap']  = kwargs.get('encap','MPLSoGRE')
-        self.perf_conf['zone'] = kwargs.get('zone','kvm')  
-        self.perf_conf['multiq'] = kwargs.get('multiq',False) 
-        self.perf_conf['traffic'] = kwargs.get('traffic','ixia') 
-        self.perf_conf['flow'] = kwargs.get('flow',None) 
+        self.perf_conf['zone'] = kwargs.get('zone','kvm')
+        self.perf_conf['multiq'] = kwargs.get('multiq',False)
+        self.perf_conf['traffic'] = kwargs.get('traffic','ixia')
+        self.perf_conf['flow'] = kwargs.get('flow',None)
         if self.perf_conf['traffic'] is 'ixia':
             self.perf_conf['left-rt'] = self.rt['ixia'][0]
             self.perf_conf['right-rt'] = self.rt['ixia'][1]
@@ -145,7 +145,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         self.logger.info("zone       : %s"%self.perf_conf['zone'])
         self.logger.info("multiq     : %s"%self.perf_conf['multiq'])
         self.logger.info("traffic    : %s"%self.perf_conf['traffic'])
-        return  
+        return
 
     @classmethod
     def nova_flavor_key_delete(self):
@@ -167,20 +167,20 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         if image:
             image.update(properties=properties)
         return True
- 
+
     def update_image_flavor_options(self):
         self.get_zones(refresh=True)
-        # setting numa nodes 
-        extra_specs = { 'hw:numa_nodes':'1' }  
+        # setting numa nodes
+        extra_specs = { 'hw:numa_nodes':'1' }
         self.nova_flavor_update(extra_specs)
-        # if multiq is enabled 
+        # if multiq is enabled
         if self.perf_conf['multiq']:
             properties = {'hw_vif_multiqueue_enabled': True}
             self.nova_image_update(properties=properties)
         # if dpdk or netronome is enabled
 
         if 'dpdk' in self.perf_conf['zone']:
-            extra_specs = {  'hw:mem_page_size': 'large' }  
+            extra_specs = {  'hw:mem_page_size': 'large' }
             self.nova_flavor_update(extra_specs)
 
         # if hw acceleration is enabled
@@ -210,7 +210,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
             self.vn1_fixture= self.useFixture(VNFixture(project_name= self.inputs.project_name, connections= self.connections,vn_name=self.vn1_name, inputs= self.inputs, subnets= self.vn1_subnets,router_asn=self.inputs.router_asn, rt_number=left_rt))
             self.vn2_fixture= self.useFixture(VNFixture(project_name= self.inputs.project_name, connections= self.connections,vn_name=self.vn2_name, inputs= self.inputs, subnets= self.vn2_subnets,router_asn=self.inputs.router_asn, rt_number=right_rt))
 
-        # Create service instance 
+        # Create service instance
         self.svc_tmp_name = 'perf_svc_template'
         self.svc_int_prefix = 'perf_vm_'
         self.svc_policy_name = 'perf_svc_policy'
@@ -241,7 +241,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
                     svm_name = get_random_name("pt_svm" + str(i))
                     pt_name = get_random_name("port_tuple" + str(i))
                     svm_fixture = self.config_and_verify_vm(
-                                 svm_name, image_name=self.perf_conf['image'], vns=[self.vn1_fixture, self.vn2_fixture], 
+                                 svm_name, image_name=self.perf_conf['image'], vns=[self.vn1_fixture, self.vn2_fixture],
                                  count=1, flavor=self.nova_flavor[str(self.perf_conf['cores'])],
                                  zone=self.perf_conf['zone'],node_name=host)
                     port_tuples_props = []
@@ -264,7 +264,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
             action_list.append(si_fq_name)
 
         self.project.set_sec_group_for_allow_all()
-        # Create a policy 
+        # Create a policy
         self.rules = [{'direction': '<>',
                  'protocol': 'any',
                  'source_network': self.vn1_name,
@@ -287,10 +287,10 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         cmd='for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor ; do echo performance > $f; cat $f; done'
         out = self.inputs.run_cmd_on_server(self.host, cmd)
         cmd='service  irqbalance stop'
-        out = self.inputs.run_cmd_on_server(self.host, cmd) 
+        out = self.inputs.run_cmd_on_server(self.host, cmd)
         nics = ','.join(self.host_numa[self.host]['nics'])
         cmd='for intf in {%s}; do for i in $(grep $intf /proc/interrupts | awk {\'print $1\'} | sed s/://g);  do echo "0,%s" > /proc/irq/"$i"/smp_affinity ; done ; done'%(nics,self.cpu_intr_mask)
-        out = self.inputs.run_cmd_on_server(self.host, cmd) 
+        out = self.inputs.run_cmd_on_server(self.host, cmd)
         return True
 
     def update_post_perf_tunings(self):
@@ -301,7 +301,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         if 'kvm' in self.perf_conf['zone']:
             if not self.set_process_cpu(self.host,'vhost'):
                 self.logger.error("Not able to pin cpu :%s "%'vhost')
-           # TODO later 
+           # TODO later
             if not self.update_txquelen(self.host):
                 self.logger.error("Not able to update tap")
         return True
@@ -315,17 +315,17 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         cmd = 'ps ax | pgrep %s'%process
         pids = self.inputs.run_cmd_on_server(host, cmd)
         pids = pids.replace("\r","").split("\n")
-        cpus_to_pin = [] 
+        cpus_to_pin = []
         numa_id = 'cpu_numa_%s'%self.host_numa[host]['numa'][0]
         self.logger.info("Numa Id : %s"%numa_id)
         for pid in pids:
-            cpus_to_pin = [] 
+            cpus_to_pin = []
             cores = 1 if process == 'vhost' else int(self.perf_conf['cores'])
             for core in range(cores):
                 core_id = self.get_cpu_core(self.host_cpu[host][numa_id])
                 if core_id is not None:
                     cpus_to_pin.append(str(core_id))
-                else: 
+                else:
                     self.logger.error("Not able to get CPU core to pin %s"%process)
             cpus_to_pin_str  = ','.join(cpus_to_pin)
             self.logger.info("cpus to pin the process %s :pid : %s:  %s"%(process,pid,cpus_to_pin_str))
@@ -335,9 +335,9 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
 
     def get_cpu_core(self,cpu_id):
         if len(cpu_id):
-            return cpu_id.pop(0) 
+            return cpu_id.pop(0)
         else:
-            return None 
+            return None
 
     def get_hosts(self):
         host = []
@@ -364,14 +364,14 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         for node in self.inputs.bgp_control_ips:
                 self.inputs.restart_service('contrail-control', [node],
                                             container='control')
-        return 
+        return
 
     def get_nics_numa_node(self,host_name):
-        numa_nodes = [] 
+        numa_nodes = []
         nics = []
-        os_name = self.inputs.get_os_version(host_name) 
+        os_name = self.inputs.get_os_version(host_name)
         if 'kvm' in self.perf_conf['zone']:
-            if 'ubuntu' in os_name: 
+            if 'ubuntu' in os_name:
                 cmd = ''
                 cmd = "mac=$(ifconfig | grep vhost0 | awk {\'print $5\'}) ; ifconfig | grep $mac | awk {\'print $1\'}"
                 nics = self.inputs.run_cmd_on_server(host_name,cmd)
@@ -393,7 +393,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         if 'netronome' in self.perf_conf['zone']:
             #TODO
             self.logger.info("Netronome mapping of nics ")
-       
+
         if not nics:
             self.logger.error("NICs not present in two NUMA NODES")
             return nics,numa_nodes
@@ -406,7 +406,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
             #TODO , need to get the nodes properly
             numa_nodes =  ['0']
 
-        numa_nodes = list(set(numa_nodes)) 
+        numa_nodes = list(set(numa_nodes))
 
         if (len(numa_nodes) > 1 ):
             self.logger.info("NICs present in two NUMA NODES")
@@ -453,25 +453,25 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
     def configure_mx(self,encap,handle):
         cmd = []
         if encap == 'MPLSoUDP':
-            if handle.host  == self.mx1_ip: 
+            if handle.host  == self.mx1_ip:
                 cmd.append('set groups ixia_flow routing-options dynamic-tunnels contrail udp')
                 cmd.append('set groups ixia_flow protocols bgp group contrail export test1-export')
-            elif handle.host == self.mx2_ip: 
+            elif handle.host == self.mx2_ip:
                 cmd.append('set groups __contrail__ routing-options dynamic-tunnels __contrail__ udp')
-                cmd.append('set groups __contrail__ protocols bgp group __contrail__ export test1-export') 
+                cmd.append('set groups __contrail__ protocols bgp group __contrail__ export test1-export')
 
         elif encap == 'MPLSoGRE':
-            if handle.host  == self.mx1_ip: 
+            if handle.host  == self.mx1_ip:
                 cmd.append('set groups ixia_flow routing-options dynamic-tunnels contrail gre')
                 cmd.append('delete groups ixia_flow protocols bgp group contrail export test1-export')
-            elif handle.host == self.mx2_ip: 
+            elif handle.host == self.mx2_ip:
                 cmd.append('set groups __contrail__ routing-options dynamic-tunnels __contrail__ gre')
-                cmd.append('delete groups __contrail__ protocols bgp group __contrail__ export test1-export') 
+                cmd.append('delete groups __contrail__ protocols bgp group __contrail__ export test1-export')
 
         self.logger.info("MX configuration cmd executed %s"%cmd)
 
-        cli_output = handle.config(stmts = cmd,ignore_errors=True,timeout = 120) 
-        
+        cli_output = handle.config(stmts = cmd,ignore_errors=True,timeout = 120)
+
         self.restart_control()
 
         return True
@@ -566,17 +566,17 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         self.logger.info("Result : %s "%res)
         out = '\ntest: %s \nencap : %s   \ncores : %s  \nfamily: %s  \ninstances : %s \n'%(self.test_name,
                                   self.perf_conf['encap'],self.perf_conf['cores'],self.perf_conf['family'],self.perf_conf['si'])
-        self.print_results("test_profile: %s"%self.perf_conf['profile_name']) 
-        self.print_results(out) 
-        self.print_results(res) 
-        self.print_results('\n') 
+        self.print_results("test_profile: %s"%self.perf_conf['profile_name'])
+        self.print_results(out)
+        self.print_results(res)
+        self.print_results('\n')
         cmd = 'wget -O /tmp/AggregateResults.csv %s'%res
         res = self.inputs.run_cmd_on_server(self.host,cmd)
         cmd = 'cat /tmp/AggregateResults.csv ; sleep 5 ; rm /tmp/AggregateResults.csv'
         res = self.inputs.run_cmd_on_server(self.host,cmd)
         self.logger.info(res)
         self.logger.info(res)
-        self.print_results(res) 
+        self.print_results(res)
         self.print_results("\n==================================================================\n")
         return True
 
@@ -585,7 +585,7 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         cmd = "rm -rf /root/spirent/tests/%s/results; source /root/.bash_profile ;(nohup tclsh /root/spirent/tests/%s/test.tcl > results 2>&1 &); sleep 5" %(script_name, script_name)
         result = self.inputs.run_cmd_on_server(self.spirent_linux_host, cmd, self.spirent_linux_user , self.spirent_linux_passwd )
         self.logger.info("Spirent Test Running: %s "%result)
-        cnt = 0 
+        cnt = 0
         while True:
             if self.verify_spirent_test():
                self.logger.info("Finished running")
@@ -626,10 +626,10 @@ class PerfBase(test_v1.BaseTestCase_v1,VerifySvcMirror):
         self.logger.info("%s"%http_logs)
         out = '\ntest: %s \nencap : %s   \ncores : %s  \nfamily: %s  \ninstances : %s \ntest_profile: %s \n'%(self.test_name,
                                   self.perf_conf['encap'],self.perf_conf['cores'],self.perf_conf['family'],self.perf_conf['si'],self.perf_conf['profile_name'])
-        self.print_results(out) 
-        self.print_results(logs) 
-        self.print_results(http_logs) 
-        self.print_results("\n") 
+        self.print_results(out)
+        self.print_results(logs)
+        self.print_results(http_logs)
+        self.print_results("\n")
         if self.perf_conf['flow'] is 'flow':
             cmd = ' python /root/performance_results/performance_analysis_tool.py -f  %s/results/merged/client/realtime.csv  -o test.html -j time_vs_conn_rate_flow_tests ; sleep 5'%remote_dir
 

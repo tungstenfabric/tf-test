@@ -49,7 +49,7 @@ class OpenstackOrchestrator(Orchestrator):
        return vcntr
 
    def get_network_handler(self):
-       if not self.quantum_h: 
+       if not self.quantum_h:
            self.quantum_h = quantum_test.QuantumHelper(auth_h=self.auth_h,
                                           region_name=self.region_name,
                                           inputs=self.inputs)
@@ -189,7 +189,7 @@ class OpenstackOrchestrator(Orchestrator):
        return self.quantum_h.delete_vn(vn_obj['network']['id'])
 
    def get_vn_id(self, vn_obj, option='orch', **kwargs):
-        try: 
+        try:
            return vn_obj['network']['id']
         except Exception as e:
            self.logger.debug("VcenterVN object.Vrouter as gw setup...")
@@ -429,7 +429,7 @@ class OpenstackAuth(OrchestratorAuth):
                                         cacert=self.certbundle,
                                         logger=self.logger,
                                         scope=self.scope)
-       
+
    def get_domain_id(self, name='Default'):
         return self.keystone.get_domain_id(name)
 
@@ -452,16 +452,16 @@ class OpenstackAuth(OrchestratorAuth):
 
    def create_domain(self,domain_name):
        return self.keystone.create_domain(domain_name)
-        
+
    def delete_domain(self, domain_name):
        self.keystone.delete_domain(domain_name)
-   
+
    def update_domain(self,domain_id, domain_name, description, enabled):
        return self.keystone.update_domain(domain_id=domain_id, domain_name=domain_name,
                                     description=description,enabled=enabled)
-   
+
    def get_domain(self,domain_id):
-       return self.keystone.get_domain(domain_id=domain_id) 
+       return self.keystone.get_domain(domain_id=domain_id)
 
    def create_project(self, name, domain_name=None):
        return self.keystone.create_project(name, domain_name)
@@ -521,7 +521,7 @@ class OpenstackAuth(OrchestratorAuth):
 
    def get_auth_h(self):
        return self.keystone
- 
+
    def create_user_group(self,group,domain_name):
        try:
            self.keystone.create_group(group,domain_name)

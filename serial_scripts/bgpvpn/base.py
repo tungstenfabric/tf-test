@@ -2,7 +2,7 @@ from common.base import GenericTestBase
 from tcutils.util import get_random_name, get_random_cidr
 
 class BaseBgpvpn(GenericTestBase):
-    
+
     @classmethod
     def setUpClass(cls):
         super(BaseBgpvpn, cls).setUpClass()
@@ -99,7 +99,7 @@ class BaseBgpvpn(GenericTestBase):
                 cleanup_cmds.append('delete groups bgpvpn')
                 cleanup_cmds.append('delete apply-groups bgpvpn')
                 self.addCleanup(self.run_mx_cmds, router_params['mgmt_ip'], cleanup_cmds)
-    
+
     def create_vrf_on_mx(self):
         self.logger.info("Create VRF configuration in MX")
         router_params = list(self.inputs.physical_routers_data.values())[0]
@@ -126,7 +126,7 @@ class BaseBgpvpn(GenericTestBase):
         mx_handle.disconnect()
         assert cli_output[0], "Not able to push config to mx"
         return cli_output
-    
+
     def ping_from_mx(self,mx_ip, cmd):
         cli_output = self.run_mx_cmds(mx_ip, cmd)
         return cli_output

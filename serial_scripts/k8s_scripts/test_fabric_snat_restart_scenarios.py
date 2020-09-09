@@ -1,5 +1,5 @@
 """Test module for ip fabric snat for k8s
-   this module contains the restart and reboot scenario based 
+   this module contains the restart and reboot scenario based
    testcases to verify the behavior of the ip fabric snat with k8s
 """
 from common.k8s.base import BaseK8sTest
@@ -26,7 +26,7 @@ class TestFabricSNATRestarts(BaseK8sTest):
     def parallel_cleanup(self):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
-    
+
     def setup_common_namespaces_pods(self, isolation=False, ip_fabric_snat=False,
                                      ip_fabric_forwarding=False):
         """ common routine to create the namesapces and the pods  by enabling the fabric snat
@@ -114,7 +114,7 @@ class TestFabricSNATRestarts(BaseK8sTest):
         self.restart_kube_manager()
         self.verify_ping_between_pods_across_namespaces_and_public_network(client1, client2,
                                                                            client3, client4)
-        
+
     #end test_snat_with_kube_manager_restart
 
     @test.attr(type=['k8s_sanity'])
@@ -159,7 +159,7 @@ class TestFabricSNATRestarts(BaseK8sTest):
     def test_snat_with_docker_restart(self):
         """
             1.verifies pods can reach to public network when snat is enabled
-            2.restart the docker service 
+            2.restart the docker service
             3.re verify  pods can reach to public network when snat is enabled
         """
         client1, client2, client3, client4 = self.setup_common_namespaces_pods(isolation=True,
@@ -178,7 +178,7 @@ class TestFabricSNATRestarts(BaseK8sTest):
     def test_snat_with_kubelet_restart_on_slave(self):
         """
             1.verifies pods can reach to public network when snat is enabled
-            2.restart the docker service  
+            2.restart the docker service
             3.re verify  pods can reach to public network when snat is enabled
         """
         client1, client2, client3, client4 = self.setup_common_namespaces_pods(isolation=True,

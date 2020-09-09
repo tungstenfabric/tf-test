@@ -57,7 +57,7 @@ class BaseDM(VerifySecGroup):
 
         self.create_physical_dev()
         self.create_vn()
-  
+
     def create_physical_dev(self):
 
         #mx config using device manager
@@ -176,7 +176,7 @@ class BaseDM(VerifySecGroup):
         for i in range(len(self.output_from_mx)):
             if 'invalid command' in self.output_from_mx[i]:
                 return False, str(self.phy_router_fixture[i].name)
-        return True, 'all mx have correct output' 
+        return True, 'all mx have correct output'
 
     def delete_vn_from_devices(self):
 
@@ -255,7 +255,7 @@ class BaseDM(VerifySecGroup):
     def change_vn_forwarding_mode(self, mode):
 
         self.vn1_fixture.add_forwarding_mode(project_fq_name=self.inputs.project_fq_name, vn_name=self.vn1_name, forwarding_mode = mode)
-        self.vn2_fixture.add_forwarding_mode(project_fq_name=self.inputs.project_fq_name, vn_name=self.vn2_name, forwarding_mode = mode) 
+        self.vn2_fixture.add_forwarding_mode(project_fq_name=self.inputs.project_fq_name, vn_name=self.vn2_name, forwarding_mode = mode)
 
     def change_global_vn_config(self, mode):
 
@@ -313,7 +313,7 @@ class BaseDM(VerifySecGroup):
                 else:
                     break
             if j == 12:
-                assert False, "Policy not added after 120 sec" 
+                assert False, "Policy not added after 120 sec"
         return True
 
     def check_policy_removed_on_mx(self, cmd, rt_value):
@@ -327,7 +327,7 @@ class BaseDM(VerifySecGroup):
                 else:
                     break
             if j == 12:
-                assert False, "Policy not deleted after 120 sec"    
+                assert False, "Policy not deleted after 120 sec"
         return True
 
     def get_old_as(self):
@@ -359,7 +359,7 @@ class BaseDM(VerifySecGroup):
 
         self.is_dm_going_through()
         global_as = re.findall('\d+', self.output_from_mx[0])[0]
-        cmd = 'show configuration groups __contrail__ protocols bgp group __contrail_external__ neighbor %s peer-as' % self.inputs.bgp_ips[0] 
+        cmd = 'show configuration groups __contrail__ protocols bgp group __contrail_external__ neighbor %s peer-as' % self.inputs.bgp_ips[0]
         self.does_mx_have_config(cmd)
 
         self.is_dm_going_through()

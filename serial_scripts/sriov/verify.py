@@ -19,7 +19,7 @@ class VerifySriovCases(object):
         '''
         Configure two SRIOV VM in Same phynets and same VN.
         VMs are configure across compute node.
-        Verify the commonication over SRIOV NIC.  
+        Verify the commonication over SRIOV NIC.
         '''
         result = True
         sriov_compute_list= self.get_sriov_enabled_compute_list()
@@ -118,7 +118,7 @@ class VerifySriovCases(object):
         '''
         Verify Nova can schdule VM to all the VF of a PF.
         Nova should though error when VF is exhausted.
-        After clearing one VF that should be rsusable   
+        After clearing one VF that should be rsusable
         '''
         result = True
         sriov_compute_list= self.get_sriov_enabled_compute_list()
@@ -183,8 +183,8 @@ class VerifySriovCases(object):
                 port_ids = [ports1['id'],ports2['id']])))
             vm1_sriov_ip=self.ip_increment(vm1_sriov_ip,1)
             vm1_mgmt_ip=self.ip_increment(vm1_mgmt_ip,1)
-      
-            # Wait tillVM is UP 
+
+            # Wait tillVM is UP
             assert vm_fixture_list[x].wait_till_vm_is_up()
         self.logger.info(
                 'Further VM launch should fail  on compute %s. Max number of VF utilized' % (compute_1))
@@ -192,7 +192,7 @@ class VerifySriovCases(object):
                     subnet_id=subnet1_objects[0]['id'], ip_address=vm1_sriov_ip, sriov=True)
         ports2=vn3_fixture.create_port(vn3_fixture.vn_id,
                     subnet_id=subnet2_objects[0]['id'],ip_address=vm1_mgmt_ip)
-        
+
         vm_fixture_error=self.useFixture(
             VMFixture(
                 project_name=self.inputs.project_name,
@@ -208,7 +208,7 @@ class VerifySriovCases(object):
 
         # Force delete the VM
         status=self.vm_force_delete(vm_fixture_error)
-        self.remove_from_cleanups(vm_fixture_error) 
+        self.remove_from_cleanups(vm_fixture_error)
         self.logger.info(
                 'Delete a VM to freeup one VF on Compute %s' % (compute_1))
         vm_fixture_list[3].cleanUp(), 'Cleanup failed VM, Check logs'
@@ -236,15 +236,15 @@ class VerifySriovCases(object):
                 node_name=compute_1,
                 port_ids = [ports1['id'],ports2['id']]))
         assert vm_fixture_new.wait_till_vm_is_up(),"New VM failed to launch"
-   
+
     # End virtual_function_exhaustion_and_resue
 
     def communication_between_two_sriov_vm_with_large_mtu (self):
         '''
         Configure two SRIOV VM in Same phynets and same VN.
         VMs are configure across compute node.
-        Configure higher MTU value. 
-        Verify Ping with higher packet size.  
+        Configure higher MTU value.
+        Verify Ping with higher packet size.
         '''
 
         result = True
@@ -341,7 +341,7 @@ class VerifySriovCases(object):
         # Bring the intreface up forcefully
         self.bringup_interface_forcefully(vm1_fixture)
         self.bringup_interface_forcefully(vm2_fixture)
-   
+
         # Configure IP address
         cmd_to_pass1 = ['ifconfig eth1 %s' % (vm1_sriov_ip)]
         vm1_fixture.run_cmd_on_vm(cmds=cmd_to_pass1, as_sudo=True, timeout=60)

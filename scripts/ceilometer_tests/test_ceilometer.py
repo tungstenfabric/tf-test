@@ -17,7 +17,7 @@ class CeilometerTest(
         cls.res.setUp(cls.inputs, cls.connections, cls.public_vn_obj)
         cls.auth = cls.connections.auth
         cls.cclient = ceilometer_client.CeilometerClient(cls.auth)
-        cls.cclient = cls.cclient.get_cclient() 
+        cls.cclient = cls.cclient.get_cclient()
 
     @classmethod
     def tearDownClass(cls):
@@ -38,10 +38,10 @@ class CeilometerTest(
     def test_resources_by_admin_tenant(self):
         """Verifying ceilometer resources - admin tenant"""
         tenant_id = self.auth.get_project_id('admin')
-        tenant_id = "".join(tenant_id.split('-')) 
+        tenant_id = "".join(tenant_id.split('-'))
         q = ceilometer_client.make_query(tenant_id = tenant_id)
         result = None
-        result =  ceilometer_client.resource_list(self.cclient,query=q) 
+        result =  ceilometer_client.resource_list(self.cclient,query=q)
         if not result:
             self.logger.error("Ceilometer resource list did not work...")
             assert False
@@ -49,15 +49,15 @@ class CeilometerTest(
             self.logger.info("Ceilometer resource list did  work...")
             assert True
         return True
-            
+
     @preposttest_wrapper
     def test_resources_by_user_tenant(self):
         """Verifying ceilometer resources - user tenant"""
         tenant_id = self.auth.get_project_id(self.inputs.project_name)
-        tenant_id = "".join(tenant_id.split('-')) 
+        tenant_id = "".join(tenant_id.split('-'))
         q = ceilometer_client.make_query(tenant_id = tenant_id)
         result = None
-        result =  ceilometer_client.resource_list(self.cclient,query=q) 
+        result =  ceilometer_client.resource_list(self.cclient,query=q)
         if not result:
             self.logger.error("Ceilometer resource list did not work...")
             assert False
@@ -73,7 +73,7 @@ class CeilometerTest(
                 continue
         if not r1:
             self.logger.error("VM NOT shown as resource list ")
-            assert False 
+            assert False
         return True
 
     @preposttest_wrapper
@@ -94,11 +94,11 @@ class CeilometerTest(
         time.sleep(60)
         self.logger.info('Starting verification...')
         tenant_id = self.auth.get_project_id(self.inputs.project_name)
-        tenant_id = "".join(tenant_id.split('-')) 
+        tenant_id = "".join(tenant_id.split('-'))
         q = ceilometer_client.make_query(resource_id = self.res.vm1_fixture.vm_id)
         result = None
         #result =  ceilometer_client.sample_list(self.cclient,'ip.floating.transmit.packets',\
-        #                                    query = q) 
+        #                                    query = q)
         meters = ['ip.floating.transmit.packets','ip.floating.receive.packets',\
                     'ip.floating.transmit.bytes','ip.floating.receive.bytes']
         for m in meters:
@@ -120,6 +120,6 @@ class CeilometerTest(
                 self.logger.error("%s meter did not show up in sample list "%(m))
                 assert False
             else:
-                self.logger.info("%s meter volumn %s"%(m,r1.counter_volume)) 
+                self.logger.info("%s meter volumn %s"%(m,r1.counter_volume))
         return True
 

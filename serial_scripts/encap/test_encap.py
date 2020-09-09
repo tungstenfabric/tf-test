@@ -195,7 +195,7 @@ class TestEncapCases(base.BaseEncapTest):
             self.logger.info("Read the existing encap priority")
             existing_encap = self.connections.read_vrouter_config_encap()
 
-            self.logger.info('Setting new Encap before continuing')            
+            self.logger.info('Setting new Encap before continuing')
             config_id = self.connections.update_vrouter_config_encap(
                 'MPLSoUDP', 'MPLSoGRE', 'VXLAN')
             self.logger.info('Created.UUID is %s' % (config_id))

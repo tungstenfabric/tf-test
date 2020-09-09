@@ -9,7 +9,7 @@ def start_traffic_pktgen(obj, vm_fix, src_min_ip='', src_max_ip='', dest_ip='', 
     """
     obj.logger.info("Sending traffic...")
     try:
-	cmd = '~/pktgen_new.sh %s %s %s %s %s' % (src_min_ip,
+        cmd = '~/pktgen_new.sh %s %s %s %s %s' % (src_min_ip,
                                                            src_max_ip, dest_ip, dest_min_port, dest_max_port)
         vm_fix.run_cmd_on_vm(cmds=[cmd], as_sudo=True)
     except Exception as e:
@@ -28,16 +28,16 @@ def start_traffic_pktgen_between_vm(obj, sr_vm_fix, dst_vm_fix, dest_min_port=10
     """This method starts traffic between VMs using pktgen"""
 
     start_traffic_pktgen(obj, sr_vm_fix, src_min_ip = sr_vm_fix.vm_ip, src_max_ip = sr_vm_fix.vm_ip,
-				dest_ip=dst_vm_fix.vm_ip, dest_min_port=dest_min_port,
-				dest_max_port = dest_max_port)
+                dest_ip=dst_vm_fix.vm_ip, dest_min_port=dest_min_port,
+                dest_max_port = dest_max_port)
 
-def start_tcpdump_on_vm(obj, vm_fix, vn_fix, filters='-v'): 
+def start_tcpdump_on_vm(obj, vm_fix, vn_fix, filters='-v'):
     compute_ip = vm_fix.vm_node_ip
     compute_user = obj.inputs.host_data[compute_ip]['username']
     compute_password = obj.inputs.host_data[compute_ip]['password']
     session = ssh(compute_ip, compute_user, compute_password)
     vm_tapintf = vm_fix.tap_intf[vn_fix.vn_fq_name]['name']
-    pcap = '/tmp/%s.pcap' % vm_tapintf 
+    pcap = '/tmp/%s.pcap' % vm_tapintf
     cmd = 'sudo tcpdump -ni %s %s -w %s' % (vm_tapintf, filters, pcap)
     execute_cmd(session, cmd, obj.logger)
 
@@ -50,8 +50,8 @@ def stop_tcpdump_on_vm_verify_cnt(obj, session, pcap, exp_count=None):
     out, err = execute_cmd_out(session, cmd, obj.logger)
     count = int(out.strip('\n'))
     if exp_count and count != exp_count:
-	obj.logger.warn("%s packets are found in tcpdump output but expected %s" % (count, exp_count))	
-	return False
+        obj.logger.warn("%s packets are found in tcpdump output but expected %s" % (count, exp_count))
+        return False
     elif count == 0:
         obj.logger.warn("No packets are found in tcpdump output but expected something")
         return False
@@ -61,5 +61,5 @@ def stop_tcpdump_on_vm_verify_cnt(obj, session, pcap, exp_count=None):
     execute_cmd(session, cmd, obj.logger)
     cmd = 'sudo kill $(pidof tcpdump)'
     execute_cmd(session, cmd, obj.logger)
-    return True 
+    return True
 

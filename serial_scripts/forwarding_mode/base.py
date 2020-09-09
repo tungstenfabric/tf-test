@@ -14,11 +14,11 @@ class BaseForwardingMode(test.BaseTestCase):
                 cls.inputs, input_file = cls.input_file, \
                 logger = cls.logger)
         cls.isolated_creds.setUp()
-        cls.project = cls.isolated_creds.create_tenant() 
+        cls.project = cls.isolated_creds.create_tenant()
         cls.isolated_creds.create_and_attach_user_to_tenant()
         cls.inputs = cls.isolated_creds.get_inputs()
         cls.inputs.set_af('v4')
-        cls.connections = cls.isolated_creds.get_conections() 
+        cls.connections = cls.isolated_creds.get_conections()
         cls.orch = cls.connections.orch
         cls.quantum_h= cls.connections.quantum_h
         cls.nova_h = cls.connections.nova_h
@@ -29,7 +29,7 @@ class BaseForwardingMode(test.BaseTestCase):
         cls.analytics_obj=cls.connections.analytics_obj
         cls.api_s_inspect = cls.connections.api_server_inspect
         cls.gl_forwarding_mode = None
-        
+
     #end setUpClass
 
     @classmethod
@@ -37,7 +37,7 @@ class BaseForwardingMode(test.BaseTestCase):
         cls.isolated_creds.delete_tenant()
         super(BaseForwardingMode, cls).tearDownClass()
         cls.vnc_lib_fixture.set_global_forwarding_mode(None)
-    #end tearDownClass 
+    #end tearDownClass
 
     def create_vn(self, *args, **kwargs):
         return self.useFixture(
@@ -56,5 +56,5 @@ class BaseForwardingMode(test.BaseTestCase):
                     image_name=image_name,
                     *args, **kwargs
                     ))
-    
+
 

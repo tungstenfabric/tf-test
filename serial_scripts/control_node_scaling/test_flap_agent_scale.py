@@ -655,15 +655,15 @@ class FlapAgentScaleInit (object):
         #
         # Get localhost IP
         #
-#	if 'TEST_CONFIG_FILE' in os.environ :
+#   if 'TEST_CONFIG_FILE' in os.environ :
 #            self.ini_file= os.environ.get('TEST_CONFIG_FILE')
 #        else:
 #            self.ini_file= 'sanity_params.ini'
 #        self.inputs= ContrailTestInit(
 #                self.ini_file, stack_user=self._args.username,
 #                stack_password=self._args.password, project_fq_name=['default-domain', 'default-project'])
-#	self.inputs.setUp()
-#	cmd = 'resolveip -s `hostname`'
+#   self.inputs.setUp()
+#   cmd = 'resolveip -s `hostname`'
 #        cmd = "ip addr show | \grep '192\.168\.200' | awk '{print $2}' | cut -d '/' -f 1"
 #        status, ip = self._get_subprocess_info(cmd)
 #
@@ -2698,9 +2698,9 @@ class FlapAgentScaleInit (object):
                         self.inputs.auth_ip, str(net), vn_name, oper)
                     self._log_print("INFO: %s" % cmd)
                     self.vn_cfg._run(cmd)
-                    # Adding route target for each block  
+                    # Adding route target for each block
                     if self.rt_per_block_enabled:
-                        self.vn_cfg._add_route_target(vn_name,64512,j) 
+                        self.vn_cfg._add_route_target(vn_name,64512,j)
                     #
                     # Check that vn is deleted before deleting next
                     #

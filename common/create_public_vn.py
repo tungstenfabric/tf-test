@@ -48,8 +48,8 @@ class PublicVn(with_metaclass(Singleton, object)):
             self.connections = self.isolated_creds.get_connections(self.inputs)
             if self.isolated_creds.__class__.__name__ == 'AdminIsolatedCreds':
                 # If AdminIsolatedCreds, one could add user to tenant
-                # Else, it is assumed that the administrator has taken 
-                # care 
+                # Else, it is assumed that the administrator has taken
+                # care
                 self.isolated_creds.create_and_attach_user_to_tenant(
                     self.project,
                     self.isolated_creds.username,

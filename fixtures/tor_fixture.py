@@ -54,9 +54,9 @@ class ToRFixture(physical_device_fixture.PhysicalDeviceFixture):
     :param controller_ip : vip to which tor connects to in case of HA mode
     :param tor_ovs_protocol     : pssl/tcp
     :param priv_key_file        : private key file (SSL). Default is
-                                  contrail-test/tools/tor/sc-privkey.pem 
-    :param cert_privkey_file    : Cert for private key file. Default is 
-                                  contrail-test/tools/tor/sc-cert.pem 
+                                  contrail-test/tools/tor/sc-privkey.pem
+    :param cert_privkey_file    : Cert for private key file. Default is
+                                  contrail-test/tools/tor/sc-cert.pem
 
     Inherited optional parameters:
     :param domain   : default is default-domain
@@ -114,7 +114,7 @@ class ToRFixture(physical_device_fixture.PhysicalDeviceFixture):
         return self.device_details['tor_agent_dicts']
 
     def get_active_tor_agent_ip(self, key='ip'):
-        ''' Currently TSN and Tor-agent are supposed to have a 1:1 
+        ''' Currently TSN and Tor-agent are supposed to have a 1:1
             relationship
             Get the details from any of the logical switches on the TOR
 
@@ -143,7 +143,7 @@ class ToRFixture(physical_device_fixture.PhysicalDeviceFixture):
     # end get_backup_tor_agent_ip
 
     def restart_backup_tor_agent(self):
-        ''' the tor_agent strings here are of the format 
+        ''' the tor_agent strings here are of the format
             root@10.204.216.51:3
         '''
         active_ta = self.get_active_tor_agent_ip()
@@ -159,7 +159,7 @@ class ToRFixture(physical_device_fixture.PhysicalDeviceFixture):
 
     def clear_mac(self, vn_uuid, mac_address):
         pass
-        
+
     def get_other_tor_agent(self, tor_agent_ip):
         pass
 
@@ -208,7 +208,7 @@ class QFXFixture(ToRFixture, AbstractToR):
     def config_ovsdb(self):
         stmts = []
 
-        # Delete all ovsdb config first 
+        # Delete all ovsdb config first
         self._delete_ovsdb_config()
         if 'pssl' in self.tor_ovs_protocol:
             stmts.append('set protocols ovsdb controller %s protocol ssl port '\
@@ -228,7 +228,7 @@ class QFXFixture(ToRFixture, AbstractToR):
         self.logger.debug('Configuring QFX : ' % (stmts))
         self.tor_session.config(stmts)
     # end remove_ovsdb
-        
+
     def restart_ovs(self, *args, **kwargs):
         ''' Ex : ovsdb-server, virtual-tunnel-end-point-management
 
@@ -311,7 +311,7 @@ class QFXFixture(ToRFixture, AbstractToR):
 #                return tunnel_key
 #        return None
 #    # end get_vxlan_id_on_tor
-        
+
 
 class OpenVSwitchFixture(ToRFixture, AbstractToR):
     '''
@@ -334,7 +334,7 @@ class OpenVSwitchFixture(ToRFixture, AbstractToR):
             self.remote = ' -r ssl:%s:%s ' % (self.controller_ip, self.tor_ovs_port)
         else:
             self.remote = ' -r ptcp:%s ' % (self.tor_ovs_port)
-        self.common_cmd_str += '%s' % (self.remote) 
+        self.common_cmd_str += '%s' % (self.remote)
         pwd = os.getcwd()
         self.cacert_file = '/tmp/%s-cacert.pem' % (self.name)
 
@@ -345,9 +345,9 @@ class OpenVSwitchFixture(ToRFixture, AbstractToR):
             self.config_ovsdb()
 
     def cleanUp(self):
-        # Workaround for issue in ovs-vtep where the local-macs 
+        # Workaround for issue in ovs-vtep where the local-macs
         # are not deleted on deleting the bindings
-        # We manually go ahead and clear the local-macs 
+        # We manually go ahead and clear the local-macs
         # so that tor-agent deletes the logical switch
         self.delete_all_local_macs()
 
@@ -378,7 +378,7 @@ class OpenVSwitchFixture(ToRFixture, AbstractToR):
             prefix = '--db=unix:/var/run/openvswitch/db-%s.sock ' % (self.name)
         else:
             prefix = ''
-        args = prefix + args 
+        args = prefix + args
 
         output = self.tor_session.run_cmd(['vtep-ctl %s' % (args)])
         return output[0]
@@ -424,7 +424,7 @@ class OpenVSwitchFixture(ToRFixture, AbstractToR):
         start_cmd = self.common_cmd_str + ' -T init'
         self._run_ovs_tool_cmd(start_cmd)
         self.add_ports()
-    # end config_ovsdb 
+    # end config_ovsdb
 
     def remove_ovsdb(self):
         stop_cmd = self.common_cmd_str + ' -T stop'
@@ -493,7 +493,7 @@ class OpenVSwitchFixture(ToRFixture, AbstractToR):
         return lines
 
     def get_remote_flood_vtep(self, vn_uuid=None):
-        ''' 
+        '''
             Returns the current flood vtep on the TOR
             If VN UUID is passed, lookup is done for the corresponding logical
             switch.
@@ -509,7 +509,7 @@ class OpenVSwitchFixture(ToRFixture, AbstractToR):
             ip = match.group(1)
         return ip
     # end get_remote_flood_vtep
-        
+
     def clear_mac(self, vn_uuid, mac_address):
         logical_switch = 'Contrail-%s' % (vn_uuid)
         self.vtep_ctl('del-ucast-local %s %s' % (logical_switch, mac_address))
@@ -522,7 +522,7 @@ class OpenVSwitchFixture(ToRFixture, AbstractToR):
         # Ovs-vtep doesnt learn MACs automatically after clearing MAC
         # Restart ovs-vtep for now
         self.restart_ovs()
-    # end clear_mac 
+    # end clear_mac
 
 
 class ToRFixtureFactory(object):
@@ -563,5 +563,5 @@ if __name__ == "__main__":
     #    tunnel_ip='10.204.216.195', ports=['torport2'], tor_ovs_port='6633', tor_ovs_protocol='pssl', controller_ip='10.204.216.184')
     #ovs_fix2.setUp()
     #ovs_fix2.config_ovsdb()
-        
+
     pass

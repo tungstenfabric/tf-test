@@ -28,7 +28,7 @@ class EC2Base(object):
         self.tenant_id = None
 
     def run_cmd_on_os_node(self, cmd):
-        ''' 
+        '''
         Run cmd on openstack node
         '''
         with settings(

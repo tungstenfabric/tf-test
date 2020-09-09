@@ -278,7 +278,7 @@ class VerifyVgwCases(object):
         # Restart vrouter service
         self.logger.info('Will restart compute  services now')
         self.inputs.restart_service('contrail-vrouter-agent', [vgw_compute],
-									container='agent')
+                                    container='agent')
         sleep(30)
 
         # Try ping after vrouter restart
@@ -294,4 +294,4 @@ class VerifyVgwCases(object):
             assert result
 
         return True
-   
+

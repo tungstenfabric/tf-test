@@ -26,13 +26,13 @@ def change_tests_name(doc):
         for el in elem:
             classname = el.get('classname').split('.')[-1]
             name = el.get('name')
-            name = "%s.%s"%(classname,name) 
+            name = "%s.%s"%(classname,name)
             el.set('name',name)
         el = elem[0]
-        pkg = el.get('classname').split('.')[0] 
+        pkg = el.get('classname').split('.')[0]
         root.set('name',pkg)
     except Exception as e:
-        print('could not change test cases names')     
+        print('could not change test cases names')
 
 def _make_url(log_location, classname, name):
     name = name.split('[')[0]

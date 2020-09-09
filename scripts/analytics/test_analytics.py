@@ -1,13 +1,13 @@
 # Need to import path to test/fixtures and test/scripts/
 # Ex : export PYTHONPATH='$PATH:/root/test/fixtures/:/root/test/scripts/'
-# 
+#
 # To run tests, you can do 'python -m testtools.run tests'. To run specific tests,
 # You can do 'python -m testtools.run -l tests'
 # Set the env variable PARAMS_FILE to point to your ini file. Else it will try to pick params.ini in PWD
-# 
+#
 from analytics import base
 import os
-import time    
+import time
 import fixtures
 import testtools
 import re
@@ -27,7 +27,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
     @classmethod
     def setUpClass(cls):
         super(AnalyticsTestSanity, cls).setUpClass()
-    
+
     @preposttest_wrapper
     def test_redis_stunnel_provision(self):
         ''' Test verify redis & stunnel services
@@ -112,7 +112,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
         '''
         assert self.analytics_obj.verify_bgp_router_uve_xmpp_and_bgp_count()
         return True
-    
+
     @preposttest_wrapper
     def test_colector_uve_module_sates(self):
         '''Test to validate collector uve.
@@ -122,8 +122,8 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
                         'contrail-analytics-nodemgr']
         for process in process_list:
             result = result and self.analytics_obj.verify_collector_uve_module_state\
-							(self.inputs.collector_names[0],\
-							self.inputs.collector_names[0],process)
+                            (self.inputs.collector_names[0],\
+                            self.inputs.collector_names[0],process)
         assert result
         return True
 
@@ -134,7 +134,7 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
         start_time=self.analytics_obj.get_time_since_uptime(self.inputs.cfgm_ip)
         assert self.analytics_obj.verify_message_table(start_time= start_time)
         return True
-    
+
     @preposttest_wrapper
     def test_config_node_uve_states(self):
         '''Test to validate config node uve.
@@ -144,10 +144,10 @@ class AnalyticsTestSanity(base.AnalyticsBaseTest):
                         'contrail-schema']
         for process in process_list:
             result = result and self.analytics_obj.verify_cfgm_uve_module_state(self.inputs.collector_names[0],
-				self.inputs.cfgm_names[0],process)
+                self.inputs.cfgm_names[0],process)
         assert result
         return True
-    
+
     @preposttest_wrapper
     def test_verify_hrefs(self):
         ''' Test all hrefs for collector/agents/bgp-routers etc
@@ -161,11 +161,11 @@ class AnalyticsTestSanity1(base.AnalyticsBaseTest):
     @classmethod
     def setUpClass(cls):
         super(AnalyticsTestSanity1, cls).setUpClass()
-    
+
     def runTest(self):
         pass
     #end runTest
-    
+
     @preposttest_wrapper
     def test_stats_tables(self):
         '''Test object tables.
@@ -173,7 +173,7 @@ class AnalyticsTestSanity1(base.AnalyticsBaseTest):
         start_time=self.analytics_obj.get_time_since_uptime(self.inputs.cfgm_ip)
         assert self.analytics_obj.verify_stats_tables(start_time= start_time)
         return True
-    
+
     @preposttest_wrapper
     def test_verify__bgp_router_uve_up_xmpp_and_bgp_count(self):
         ''' Test bgp-router uve for up bgp peer/xmpp peer count
@@ -181,28 +181,28 @@ class AnalyticsTestSanity1(base.AnalyticsBaseTest):
         '''
         assert self.analytics_obj.verify_bgp_router_uve_up_xmpp_and_bgp_count()
         return True
-    
-    
+
+
     @preposttest_wrapper
     def test_verify_bgp_peer_uve(self):
         ''' Test to validate bgp peer uve
 
         '''
-        abc= self.analytics_obj.get_peer_stats_info_tx_proto_stats(self.inputs.collector_ips[0],
-			(self.inputs.bgp_names[0],self.inputs.bgp_names[1]))
+        abc = self.analytics_obj.get_peer_stats_info_tx_proto_stats(self.inputs.collector_ips[0],
+            (self.inputs.bgp_names[0],self.inputs.bgp_names[1]))
         assert abc
         return True
-    
+
 class AnalyticsTestSanity2(base.AnalyticsBaseTest):
 
     @classmethod
     def setUpClass(cls):
         super(AnalyticsTestSanity2, cls).setUpClass()
-    
+
     def runTest(self):
         pass
     #end runTest
-    
+
     @preposttest_wrapper
     def itest_object_tables_parallel_query(self):
         '''Test object tables.
@@ -330,7 +330,7 @@ class AnalyticsTestSanity3(base.AnalyticsBaseTest):
 
         '''
         self.analytics_obj.verify_process_and_connection_infos_agent()
-    
+
     @test.attr(type=['cb_sanity', 'sanity', 'vcenter', 'vcenter_compute'])
     @preposttest_wrapper
     def test_verify_process_status_config(self):
@@ -338,7 +338,7 @@ class AnalyticsTestSanity3(base.AnalyticsBaseTest):
 
         '''
         self.analytics_obj.verify_process_and_connection_infos_config()
-    
+
     @test.attr(type=['cb_sanity', 'sanity', 'vcenter', 'vcenter_compute'])
     @preposttest_wrapper
     def test_verify_process_status_control_node(self):
@@ -346,7 +346,7 @@ class AnalyticsTestSanity3(base.AnalyticsBaseTest):
 
         '''
         self.analytics_obj.verify_process_and_connection_infos_control_node()
-    
+
     @test.attr(type=['cb_sanity', 'sanity', 'vcenter', 'vcenter_compute'])
     @preposttest_wrapper
     def test_verify_process_status_analytics_node(self):
@@ -354,7 +354,7 @@ class AnalyticsTestSanity3(base.AnalyticsBaseTest):
 
         '''
         self.analytics_obj.verify_process_and_connection_infos_analytics_node()
-    
+
     @test.attr(type=['sanity', 'vcenter'])
     @preposttest_wrapper
     def test_verify_generator_connections_to_collector_node(self):
@@ -372,7 +372,7 @@ class AnalyticsTestSanity3(base.AnalyticsBaseTest):
     #    start_time = self.analytics_obj.getstarttime(self.inputs.collector_ip)
     #    purge_id = self.analytics_obj.get_purge_id(20)
     #    assert self.analytics_obj.verify_purge_info_in_database_uve(purge_id,start_time)
-    
+
     @test.attr(type=['sanity', 'vcenter', 'vcenter_compute'])
     @preposttest_wrapper
     def test_db_nodemgr_status(self):

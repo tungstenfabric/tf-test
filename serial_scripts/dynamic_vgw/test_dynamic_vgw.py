@@ -23,9 +23,9 @@ class TestDynamicVgwCases(base.BaseVgwTest, VerifyDynamicVgwCases):
     def test_dynamic_vgw_compute_ping(self):
         '''
         Test to validate dynamic VGW creation and communication from overlay VM to compute IP
-         1: Create VGW interface dynamicaly 
+         1: Create VGW interface dynamicaly
          2. Create corresponding vn and launch VM
-         3. Ping from VM to the compute where VGW is created 
+         3. Ping from VM to the compute where VGW is created
          4. Delete VGW interface
 
          Pass criteria:  Step 3 should pass

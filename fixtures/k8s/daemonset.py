@@ -6,8 +6,8 @@ from tcutils.util import get_random_name, retry
 
 class DaemonSetFixture(fixtures.Fixture):
     '''
-    Create a daemonset 
-    Refer https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1SaemonSet.md 
+    Create a daemonset
+    Refer https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1SaemonSet.md
     '''
     def __init__(self,
                  connections,

@@ -37,7 +37,7 @@ class TestSVCV2Mirror(BaseMirrorTest, VerifySvcMirror):
     @preposttest_wrapper
     def test_svc_v2_mirroring_with_2_analyzer(self):
         """Validate the service chain mirroring with three analyzers"""
-        #TODO 
+        #TODO
         # Need to add rule for udp and validate second mirror instance
         return self.verify_svc_mirroring(si_count=2)
 
@@ -72,7 +72,7 @@ class TestSVCV2MirrorFIP(BaseMirrorTest, VerifySvcMirror):
     @preposttest_wrapper
     def test_svc_v2_mirroring_with_floating_ip_with_2_analyzer(self):
         """Validate the service chain mirroring with floating IP with 2 analyzer"""
-        #TODO 
+        #TODO
         # Need to add rule for udp and validate second mirror instance
         return self.verify_svc_mirroring_with_floating_ip(max_inst=2)
 
@@ -100,7 +100,7 @@ class TestSVCV2MirrorPolicy(BaseMirrorTest, VerifySvcMirror):
     @preposttest_wrapper
     def test_svc_v2_mirroring_with_unidirection_rule_with_2_analyzer(self):
         """Validate the service chain mirroring with allow traffic in unidirection rule"""
-        #TODO 
+        #TODO
         # Need to add rule for udp and validate second mirror instance
         return self.verify_svc_mirroring_unidirection()
 

@@ -82,11 +82,11 @@ class IngressFixture(fixtures.Fixture):
 
             lb_ips = []
             # As per software handling all external_ips will be listed first and
-            # Cluster IP will be at the end of list. 
-            for item in  self.obj.status.load_balancer.ingress: 
+            # Cluster IP will be at the end of list.
+            for item in  self.obj.status.load_balancer.ingress:
                 lb_ips.append(item.ip)
-            self.cluster_ip =  lb_ips[-1] 
-            del lb_ips[-1] 
+            self.cluster_ip =  lb_ips[-1]
+            del lb_ips[-1]
             self.external_ips = lb_ips
         else:
             self.external_ips = None
@@ -167,21 +167,21 @@ class IngressFixture(fixtures.Fixture):
                          self.name))
         return True
     # end verify_ingress_in_k8s
-    
+
     @retry(delay=1, tries=10)
     def verify_ingress_in_kube_manager(self):
         km_h = self.connections.get_kube_manager_h()
         self.lb_info = km_h.get_svc_or_ingress_lb_info(uuid = self.uuid)
         if self.lb_info:
-            self.logger.info('Ingress %s with uuid %s found in kube manager' 
+            self.logger.info('Ingress %s with uuid %s found in kube manager'
                              % (self.name, self.uuid))
         else:
-            self.logger.warn('Ingress %s with uuid %s not found in kube manager' 
+            self.logger.warn('Ingress %s with uuid %s not found in kube manager'
                              % (self.name, self.uuid))
             return False
         return True
     # end verify_service_in_kube_manager
-    
+
     @retry(delay=1, tries=10)
     def verify_ingress_not_in_kube_manager(self):
         km_h = self.connections.get_kube_manager_h()

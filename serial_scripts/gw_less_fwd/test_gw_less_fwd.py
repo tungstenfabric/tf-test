@@ -1658,10 +1658,10 @@ class TestGWLessFWD(GWLessFWDTestBase):
     def test_gw_less_fwd_fip_4518_with_FIP(self):
         '''
             Test Gateway less forwarding functionality with floating-ip to cover Riot Games CEM-4518 with FIP
-            Min Topology  cn1-vm1--+        
-                            VN1    |       +--vm4--cn2 
-                          cn2-vm2--+ --FIP | VN2 
-                            VN1    |       +--------- 
+            Min Topology  cn1-vm1--+
+                            VN1    |       +--vm4--cn2
+                          cn2-vm2--+ --FIP | VN2
+                            VN1    |       +---------
                           cn1-vm3--+
 
             Scenario 1:IP Fabric is enabled on vn1 and vn2 with fip from Vn1
@@ -1670,10 +1670,10 @@ class TestGWLessFWD(GWLessFWDTestBase):
                      3.ping from local host to fip should be through underlay
                      4.ping from remote compute to fip should be through underlay
                      5.ping to fip from vn2 vm should be successful with policy bteween vn1 and vn2
- 
+
             In all above cases, floating ip is created from vn1 and applied it
             on vn1 VMs . Verify FIP is preesnt on default routing instance
-            only when IP fabric is enabled on VN (vn1). 
+            only when IP fabric is enabled on VN (vn1).
         '''
         # VN parameters. IP Fabric forwarding is enabled on both VNs Initially
         vn = {'count':2,
@@ -1704,7 +1704,7 @@ class TestGWLessFWD(GWLessFWDTestBase):
 
         # Policy parameters. Configuring a policy between between ip-fabric vn
         # and vn1 to allow communication between compute node and VMs in vn1.
-        # policy between vn1 and vn2 
+        # policy between vn1 and vn2
         policy = {'count':2,
                   'p1': {
                       'rules': [
@@ -1738,7 +1738,7 @@ class TestGWLessFWD(GWLessFWDTestBase):
         obj_dict['policy_fixtures'] = policy_fixtures
         #IP Fabric is enabled on both the VNs (vn1 and vn2)
         # Configuring FIP. FIP pool is created from vn1 and applied on vm1
-        # reach from vn2 vm to fip 
+        # reach from vn2 vm to fip
         self.logger.info("IP Fabric is enabled on both the VNs (vn1 and vn2)")
         vn_id = vn_fixtures['vn1'].vn_id
         vmi_id = vmi_fixtures['vmi1'].uuid
@@ -1784,7 +1784,7 @@ class TestGWLessFWD(GWLessFWDTestBase):
                              'as expected' %(src_vm_ip, vm_fixtures['vm1'].vm_ip))
         else:
             assert result, "Ping from VM: %s to VM: %s is NOT successful" %(
-                src_vm_ip, vm_fixtures['vm1'].vm_ip) 
+                src_vm_ip, vm_fixtures['vm1'].vm_ip)
 
         #all the vms should should reach the vhost1 of all the computes
         new_dict = {}
@@ -1828,7 +1828,7 @@ class TestGWLessFWD(GWLessFWDTestBase):
             assert result, "Ping from VM: %s to VM: %s is NOT successful" %(
                 src_vm_ip, vm_fixtures['vm1'].vm_ip)
 
-        #vn1 vm to vn2 vm    
+        #vn1 vm to vn2 vm
         src_vm_fixture = vm_fixtures['vm1']
         src_vm_ip = src_vm_fixture.vm_ip
         result = src_vm_fixture.ping_with_certainty(vm_fixtures['vm4'].vm_ip, count=3)
@@ -1840,7 +1840,7 @@ class TestGWLessFWD(GWLessFWDTestBase):
             assert result, "Ping from VM: %s to VM: %s is NOT successful" %(
                 src_vm_ip, vm_fixtures['vm4'].vm_ip)
 
-        #  computes nodes to fip 
+        #  computes nodes to fip
         compute_node_ips = set()
         for vm_fixture in list(vm_fixtures.values()):
             compute_node_ips.add(vm_fixture.get_compute_host())

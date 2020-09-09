@@ -128,7 +128,7 @@ class TestHbsEnabledProject(BaseK8sTest):
               ["default-domain"] +["k8s-%s"%(namespace1_name)] + [hbs1_name])
         hbs_config_disabled = self.verify_host_based_service(namespace_name=namespace1_name,
                                hbs_obj_name=hbs1_name, enabled=False)
-        assert hbs_config_disabled, "Host Based Service verification failed, check logs" 
+        assert hbs_config_disabled, "Host Based Service verification failed, check logs"
         # Again verify hbs on namespace2_name and namespace2_name
         hbs_config = self.verify_host_based_service(namespace_name=namespace2_name, hbs_obj_name=hbs2_name)
         assert hbs_config == True, "Host Based Service verification Passesd"
@@ -305,7 +305,7 @@ class TestHbsEnabledProject(BaseK8sTest):
         #hbs3_name=get_random_name("hbsobj")
         #hbs3_fix = self.useFixture(HbsFixture(connections=self.connections, name=hbs3_name,
         #                           namespace = namespace1_name))
-        #self.setup_csrx(namespace_name=namespace1_name) 
+        #self.setup_csrx(namespace_name=namespace1_name)
         #hbs_config = self.verify_host_based_service(namespace_name=namespace1_name,
         #hbs_obj_name=hbs3_name)
 

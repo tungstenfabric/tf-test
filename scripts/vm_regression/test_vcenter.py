@@ -113,10 +113,10 @@ class TestVcenter(BaseVnVmTest):
         '''
         Description:
         Test steps:
-               1. Launch 2 VN 
+               1. Launch 2 VN
                2.Launch one vm in net1
                3.Verify vm in contrail components
-               4.Change the interface of vm to net2 
+               4.Change the interface of vm to net2
                5. Verify VM in contrail-components
         Pass criteria: Inteface change should be reflected in all contrail-components.
         Maintainer : sunilbasker@juniper.net
@@ -133,7 +133,7 @@ class TestVcenter(BaseVnVmTest):
         assert vm2_fixture.verify_on_setup()
         assert vm2_fixture.ping_with_certainty(dst_vm_fixture=vm1_fixture, expectation=False),\
             "Ping from %s to %s is expected to fail" % (vm2_fixture.vm_name, vm1_fixture.vm_name)
-        vm1_fixture.orch.change_network_to_vm(vm1_fixture.vm_obj,vn2_fixture.vn_name) 
+        vm1_fixture.orch.change_network_to_vm(vm1_fixture.vm_obj,vn2_fixture.vn_name)
         vm1_fixture.read(refresh=True)
         vm1_fixture.orch.poweroff_vm(vm1_fixture.vm_obj)
         vm1_fixture.orch.poweron_vm(vm1_fixture.vm_obj)

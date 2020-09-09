@@ -215,7 +215,7 @@ class TestBmsLcm(BaseFabricTest):
            self.vm_fixture = self.create_vm(vn_fixture=self.vn_fixture,
                                     image_name="ubuntu-traffic")
            assert self.vm_fixture.wait_till_vm_is_up()
-       
+
         mac_node_dict = {}
         for node in bms_nodes_filtered:
             for interface in node['interfaces']:
@@ -317,7 +317,7 @@ class TestBmsLcmSPStyle(TestBmsLcm):
         bms_nodes_filtered = self.bms_node_add_delete("all")
         time.sleep(60)
         self.bms_vm_add_delete(bms_count=3,bms_nodes_filtered=bms_nodes_filtered)
-    
+
     @test.attr(type=['lcm_sanity'])
     @preposttest_wrapper
     def test_bms_all_serial(self):
@@ -333,7 +333,7 @@ class TestBmsLcmSPStyle(TestBmsLcm):
         self.skip_test_bms_single_interface(skip_delete)
         self.skip_test_bms_multi_homing(skip_delete)
         self.skip_test_bms_lag(skip_delete)
- 
+
     @test.attr(type=['lcm_sanity'])
     @preposttest_wrapper
     def test_bms_serial_one_instance(self):
@@ -343,7 +343,7 @@ class TestBmsLcmSPStyle(TestBmsLcm):
         self.bms_delete_nodes()
         self.skip_test_bms_single_interface(skip_delete)
         self.skip_test_bms_multi_homing(skip_delete)
-        self.skip_test_bms_lag(skip_delete) 
+        self.skip_test_bms_lag(skip_delete)
 
 class TestBmsLcmEPStyle(TestBmsLcm):
     enterprise_style=True
@@ -386,5 +386,5 @@ class TestBmsLcmEPStyle(TestBmsLcm):
         self.bms_delete_nodes()
         self.skip_test_bms_single_interface(skip_delete)
         self.skip_test_bms_multi_homing(skip_delete)
-        self.skip_test_bms_lag(skip_delete) 
+        self.skip_test_bms_lag(skip_delete)
 

@@ -31,7 +31,7 @@ class Multicloud(BaseK8sTest):
         Underlay ping between cloud nodes from the Onprem
         """
         output = ''
-        pkt_size = '-s %s' %jumboframe if jumboframe else '' 
+        pkt_size = '-s %s' %jumboframe if jumboframe else ''
         cmd = "ping -c %s %s %s" % (count, pkt_size, ip)
         try:
             output = run_cmd_on_server(cmd, host, 'root','c0ntrail123')
@@ -50,7 +50,7 @@ class Multicloud(BaseK8sTest):
             self.logger.info('Ping check to IP %s from controller %s with '
                                 'expectation %s passed' % (ip, host, result))
         return True
-    
+
     def tag_verification(self, vpc_count,cloud_instances,build_tag):
         for key,value in self.inputs.host_data.items():
             if key in cloud_instances:
@@ -112,7 +112,7 @@ class Multicloud(BaseK8sTest):
                                     assert  False , "Docker has not exited, please check if the command executed properly"
                             else:
                                 assert  False , "Docker is not up on the gateway, the TC cant continue"
-    
+
     #To check VRRP membership after FLAP
     @retry(delay=10, tries=24)
     def mastership_check(self,ip,docker):
@@ -123,7 +123,6 @@ class Multicloud(BaseK8sTest):
 
 
 
-                                        
 
 
 
@@ -133,4 +132,5 @@ class Multicloud(BaseK8sTest):
 
 
 
-                    
+
+

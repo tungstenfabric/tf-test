@@ -272,7 +272,7 @@ class BaseHeatTest(GenericTestBase):
         svc_img_name = env['parameters'].get('image', None)
         flavor = env['parameters'].get('flavor', None)
         svc_type = env['parameters']['type']
-        # Does not matter what if_details has, since svc template would have 
+        # Does not matter what if_details has, since svc template would have
         # already got created
         if_details = { 'management': {}, 'left': {}, 'right': {} }
         svc_mode = env['parameters']['mode']

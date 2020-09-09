@@ -93,7 +93,7 @@ class Scapy(BaseTraffic):
 
         self.sender = sender
         self.receiver = receiver
-        return True 
+        return True
 
 
     def stop(self):

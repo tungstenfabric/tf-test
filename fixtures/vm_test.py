@@ -202,7 +202,7 @@ class VMFixture(fixtures.Fixture):
                 self.image_name = image['name']
                 self.set_image_details(self.vm_obj)
             except Exception as e:
-                pass 
+                pass
 
     def setUp(self):
         super(VMFixture, self).setUp()
@@ -956,7 +956,7 @@ class VMFixture(fixtures.Fixture):
                     self.local_ips[vn_fq_name] = self.get_tap_intf_of_vmi(
                         vmi)['mdata_ip_addr']
                 except Exception as e:
-                    self.logger.exception(e) 
+                    self.logger.exception(e)
         return self.local_ips
 
     def get_local_ip(self, refresh=False):
@@ -1224,7 +1224,7 @@ class VMFixture(fixtures.Fixture):
                 host_string='%s@%s' % (host['username'], self.vm_node_ip),
                 password=host['password'],
                     warn_only=True, abort_on_prompts=False):
-                #		output = run('ping %s -c 1' % (self.local_ips[vn_fq_name]))
+                #        output = run('ping %s -c 1' % (self.local_ips[vn_fq_name]))
                 #                expected_result = ' 0% packet loss'
                 output = safe_run('ping %s -c 2 -W %s' %
                                  (self.local_ips[vn_fq_name], timeout))
@@ -1236,9 +1236,9 @@ class VMFixture(fixtures.Fixture):
                     "Ping to Metadata IP %s of VM %s failed!" %
                     (self.local_ips[vn_fq_name], self.vm_name))
                     vn_obj = self.vnc_lib_h.virtual_network_read(fq_name = vn_fq_name.split(":"))
-                    #The below code is just to make sure that 
+                    #The below code is just to make sure that
                     #vn is assigned a gateway.In some cases(specifically vcenter case),
-                    #it was observed that the gateway was not assigned to the vn 
+                    #it was observed that the gateway was not assigned to the vn
                     for ipam_ref in vn_obj.network_ipam_refs:
                         for ipam_subnet in ipam_ref['attr'].get_ipam_subnets():
                             gateway = ipam_subnet.get_default_gateway()
@@ -2708,7 +2708,7 @@ class VMFixture(fixtures.Fixture):
     # end verify_vm_flows_removed
 
     def start_webserver(self, listen_port=8000, content=None):
-        '''Start Web server on the specified port.                                                                                                                                                                                          
+        '''Start Web server on the specified port.
         '''
         host = self.inputs.host_data[self.vm_node_ip]
         try:

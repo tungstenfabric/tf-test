@@ -143,7 +143,7 @@ def vm2dict(dc, cluster, host, vm, summary):
             for d in hardware:
                 if hasattr(d, 'macAddress'):
                     macaddress = d.macAddress
-            vlanId = port.config.setting.vlan.vlanId 
+            vlanId = port.config.setting.vlan.vlanId
             host = vm.runtime.host.name
             key = port.key
     vmnet = summary['net']
@@ -161,15 +161,15 @@ def vm2dict(dc, cluster, host, vm, summary):
                 return NameToIPMap(vmname=vmname,
                            ip=None,
                            vlanId=None,
-                           host=host,port=key,  
+                           host=host,port=key,
                            macaddress = macaddress)
     else:
         return NameToIPMap(vmname=vmname,
                            ip=None,
                            vlanId=None,
-                           host=host,port=key,  
+                           host=host,port=key,
                            macaddress = macaddress)
-    
+
 class NameToIPMap(object):
     def __init__(self,vmname=None,ip=None,
                  vlanId=None,host=None,
@@ -191,7 +191,7 @@ def PrintVmInfo(vm):
     #print("Found VM:", vm.name + "(" + vmPowerState + ")")
     return GetVMNics(vm)
 
-       
+
 def GetVMNics(vm):
     for dev in vm.config.hardware.device:
         if isinstance(dev, vim.vm.device.VirtualEthernetCard):
@@ -323,7 +323,7 @@ class Args(object):
         self.user = user
         self.password = password
 
-def print_ips(inputs): 
+def print_ips(inputs):
     inputs = inputs
     server = inputs.inputs.vcenter_server
     port = inputs.inputs.vcenter_port
@@ -356,7 +356,7 @@ def print_ips(inputs):
                 vms = host.vm
                 for vm in vms:  # Iterate through each VM on the host
                     if vm.config.template:
-                        continue 
+                        continue
                     vmname = vm.summary.config.name
                     if 'ContrailVM' in vmname:
                         continue
@@ -365,11 +365,11 @@ def print_ips(inputs):
                     vm_list.append(vm2dict(dc.name, cluster.name, hostname, vm, summary))
 #    for vm in vm_list:
 #        print "Vm: %s"%vm
-    return vm_list    
-      
+    return vm_list
+
 @retry(tries=10, delay=3)
 def if_failed(inputs,logger):
-    inputs = inputs 
+    inputs = inputs
     vm_list = print_ips(inputs)
     if ip_not_set(vm_list,logger):
         logger.info('Ip not set')
@@ -378,13 +378,13 @@ def if_failed(inputs,logger):
         logger.info('Duplicate ip')
         return False
     if not duplicate_vlan(vm_list,logger):
-        logger.info('Duplicate vlan') 
+        logger.info('Duplicate vlan')
         return False
     if not if_any_change(vm_list,None,logger):
-        logger.info('Duplicate vlan') 
+        logger.info('Duplicate vlan')
         return False
     return True
-     
+
 def ip_not_set(vm_list,logger):
     for vm in vm_list:
         if hasattr(vm, 'ip'):
@@ -393,7 +393,7 @@ def ip_not_set(vm_list,logger):
             else:
                 logger.info('IP not set for %s: '%vm)
                 return True
-        else: 
+        else:
             logger.info('IP not set for %s: '%vm)
     return False
 
@@ -410,7 +410,7 @@ def duplicate_ip(vm_list,logger):
             logger.info('IP not set for %s: '%vm)
     return True
 
-def duplicate_vlan(vm_list,logger): 
+def duplicate_vlan(vm_list,logger):
     d = defaultdict(list)
     for vm in vm_list:
         d[vm.host].append(vm.vlanId)
@@ -424,32 +424,32 @@ def duplicate_vlan(vm_list,logger):
             else:
                 logger.info('Duplicate vlan %s in %s: '%(vlan,k))
                 return False
-    return True     
+    return True
 
 def if_any_change(vm_list1,vm_list2,logger):
     if not vm_list2:
-        return True   
+        return True
     vms = [vm for vm in vm_list1 for vm1 in vm_list2 if vm.name == vm1.name and vm.ip != vm1.ip]
     if vms:
         for vm in vms:
-           logger.error("IP changed for vm %s"%(vm))  
+           logger.error("IP changed for vm %s"%(vm))
            return False
     else:
-        logger.info("IP did not change for any vm")   
-    return True        
-   
+        logger.info("IP did not change for any vm")
+    return True
+
 def verify_trigger(inputs,trigger,logger):
     inputs = inputs
     for host in hosts:
        vm_list1 = print_ips(inputs)
-       enter_maintenance_mode(host) 
+       enter_maintenance_mode(host)
        time.sleep(120)
        vm_list2 = print_ips(inputs)
        if not if_failed(inputs,logger):
            return False
        if not if_any_change(vm_list1,vm_list2,logger):
            return False
-       exit_maintenance_mode(host) 
+       exit_maintenance_mode(host)
        time.sleep(120)
        if not if_failed(inputs,logger):
            return False
@@ -478,4 +478,4 @@ def _wait_for_task (task):
             raise ValueError(task.info.error.localizedMessage)
         raise ValueError("Something went wrong in wait_for_task")
     return
-          
+

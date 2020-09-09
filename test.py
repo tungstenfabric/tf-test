@@ -76,7 +76,7 @@ class BaseTestCase(TagsHack,
         if hasattr(super(BaseTestCase, cls), 'setUpClass'):
             super(BaseTestCase, cls).setUpClass()
         cls.setUpClassCalled = True
-        
+
         if 'TEST_CONFIG_FILE' in os.environ :
             cls.input_file= os.environ.get('TEST_CONFIG_FILE')
         else:
@@ -113,7 +113,7 @@ class BaseTestCase(TagsHack,
             self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
-		os.environ.get('OS_STDOUT_CAPTURE') == '1'):
+            os.environ.get('OS_STDOUT_CAPTURE') == '1'):
             stdout = self.useFixture(fixtures.StringStream('stdout')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stdout', stdout))
         if (os.environ.get('OS_STDERR_CAPTURE') == 'True' or
@@ -134,7 +134,7 @@ class BaseTestCase(TagsHack,
 
     def addDetail(self, logfile, text):
         if type(text) is str:
-            super(BaseTestCase, self).addDetail(logfile, 
+            super(BaseTestCase, self).addDetail(logfile,
                   content.text_content(text))
         else:
             super(BaseTestCase, self).addDetail(logfile, text)
