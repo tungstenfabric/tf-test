@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "373e9fd7_ef17aa03",
+        "filename": "docker/base/Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-10T17:59:25Z",
+      "side": 1,
+      "message": "If the repo files are not found then this layer would bail out hence we copied Dockerfile as a hack",
+      "revId": "552ea3782a41c4f1f4e2038e22633780c567c8ea",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
