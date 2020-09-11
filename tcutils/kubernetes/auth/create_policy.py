@@ -86,6 +86,3 @@ def create_and_apply_policies(resource={}, match=[]):
 # policies = create_policies(resource={'verbs': ['get'], 'resources': ['Pod']})
 # policy_dict = construct_config_map_dict(policies)
 # create_config_map_file(policy_dict)
-resource = {}
-resource['resources'] = ['Pod']
-create_policies(resource=resource)
