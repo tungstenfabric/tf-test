@@ -7,3 +7,4 @@ Dockerfile.nofromargs
 *.gz
 *.zip
 .vscode
+.env

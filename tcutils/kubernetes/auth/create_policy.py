@@ -3,7 +3,7 @@ import pprint
 import os
 
 
-def construct_config_map(policies=None):
+def construct_config_map_dict(policies=None):
     policy_dict = {}
     policy_dict['apiVersion'] = 'v1'
     policy_dict['kind'] = 'ConfigMap'
@@ -76,7 +76,16 @@ def create_policies(resource={}, match=[]):
     return policies
 
 
-pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['Pod']}))
-policies = create_policies(resource={'verbs': ['get'], 'resources': ['Pod']})
-policy_dict = construct_config_map(policies)
-create_config_map_file(policy_dict)
+def create_and_apply_policies(resource={}, match=[]):
+    policies = create_policies(resource=resource, match=match)
+    policy_dict = construct_config_map_dict(policies)
+    create_config_map_file(policy_dict)
+
+
+# pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['Pod']}))
+# policies = create_policies(resource={'verbs': ['get'], 'resources': ['Pod']})
+# policy_dict = construct_config_map_dict(policies)
+# create_config_map_file(policy_dict)
+resource = {}
+resource['resources'] = ['Pod']
+create_policies(resource=resource)
