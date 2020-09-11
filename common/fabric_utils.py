@@ -70,10 +70,10 @@ class FabricUtils(object):
         return (True, fabric)
 
     def onboard_fabric(self, fabric_dict, wait_for_finish=True,
-                       name=None, cleanup=False, enterprise_style=True, dc_asn=None):
+                       name=None, cleanup=False, enterprise_style=True, dc_asn=None ,serList=None):
         interfaces = {'physical': [], 'logical': []}
         devices = list()
-        name = get_random_name(name) if name else get_random_name('fabric')
+        name = name if name else get_random_name('fabric')
 
         fq_name = ['default-global-system-config',
                    'fabric_onboard_template']
@@ -89,12 +89,14 @@ class FabricUtils(object):
                    "supplemental_day_0_cfg":[{"name": dct["supplemental_day_0_cfg"]["name"],\
                                               "cfg": dct["supplemental_day_0_cfg"]["cfg"]}
                         for dct in list(self.inputs.physical_routers_data.values()) \
-                           if dct.get('supplemental_day_0_cfg')],
+                           if dct.get('supplemental_day_0_cfg') \
+                               if serList is None or dct["serial_number"] in serList],
                    'device_to_ztp': [{"serial_number": dct['serial_number'], \
                                       "hostname": dct['name'], \
                                       "supplemental_day_0_cfg": dct.get("supplemental_day_0_cfg",{}).get('name','')} \
                        for dct in list(self.inputs.physical_routers_data.values()) \
-                           if dct.get('serial_number')],
+                           if dct.get('serial_number') \
+                               if serList is None or dct["serial_number"] in serList],
                    'node_profiles': [{"node_profile_name": profile}
                        for profile in fabric_dict.get('node_profiles')\
                                       or NODE_PROFILES],
