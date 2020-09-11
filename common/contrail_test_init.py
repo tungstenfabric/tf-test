@@ -803,7 +803,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         host_dict['containers'] = {}
         if  host_dict.get('type', None) == 'esxi':
             return
-        cmd = 'docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk \'{print $NF}\''
+        cmd = 'docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner\|placement" | awk \'{print $NF}\''
         output = self.run_cmd_on_server(host_dict['host_ip'], cmd, as_sudo=True)
         # If not a docker cluster, return
         if not output:
@@ -1311,7 +1311,7 @@ class ContrailTestInit(object):
 
     def is_container_up(self, host, service):
         container = self.host_data[host]['containers'][service]
-        cmd = "docker ps -f NAME=%s -f status=running 2>/dev/null"%container
+        cmd = "docker ps -f name=%s -f status=running 2>/dev/null"%container
         for i in range(3):
             output = self.run_cmd_on_server(host, cmd, as_sudo=True)
             if not output or 'Up' not in output:
