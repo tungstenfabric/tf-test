@@ -43,11 +43,14 @@ def construct_config_map_dict(policies=None):
 
 
 def create_config_map_file(policy_dict, filename=None):
+    DIR = os.path.dirname(os.path.realpath(__file__))
     if filename is None:
-        DIR = os.path.dirname(os.path.realpath(__file__))
         filename = os.path.join(DIR, 'auth_policy.yaml')
+    else:
+        filename = os.path.join(DIR, filename)
     yaml = YAML()
     yaml.dump(policy_dict, open(filename, 'w'))
+    return filename
 
 
 def create_policies(resource={}, match=[]):
@@ -76,13 +79,14 @@ def create_policies(resource={}, match=[]):
     return policies
 
 
-def create_and_apply_policies(resource={}, match=[]):
+def create_and_apply_policies(resource={}, match=[], filename=None):
     policies = create_policies(resource=resource, match=match)
     policy_dict = construct_config_map_dict(policies)
-    create_config_map_file(policy_dict)
+    filename = create_config_map_file(policy_dict, filename=filename)
 
 
 # pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['Pod']}))
 # policies = create_policies(resource={'verbs': ['get'], 'resources': ['Pod']})
 # policy_dict = construct_config_map_dict(policies)
 # create_config_map_file(policy_dict)
+# create_and_apply_policies(resource={'verbs': ['get', 'create'], 'resources': ['Pod']}, filename='')

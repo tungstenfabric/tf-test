@@ -8,10 +8,10 @@ metadata:
 data:
   policies:
   - resource:
-      verbs:
-      - get
       resources:
       - Pod
+      verbs:
+      - '*'
       version:
       - '*'
       namespace:
