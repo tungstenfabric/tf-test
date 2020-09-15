@@ -107,3 +107,76 @@ class TestZtp(ZtpBaseTest):
             spine.add_virtual_network(public_vn.uuid)
         time.sleep(10)
         assert vm.ping_with_certainty(self.inputs.public_host)
+
+
+class TestZtpWithErb(ZtpBaseTest):
+
+    def is_test_applicable(self):
+        result, msg = super(TestZtpWithErb, self).is_test_applicable()
+        if result:
+            msg = 'Need devices with erb_ucast_gw rb_roles'
+            ucast_gw = False
+            for device_dict in list(self.inputs.physical_routers_data.values()):
+                if 'erb_ucast_gw' in (device_dict.get('rb_roles') or []) \
+                   and device_dict['role'] == 'leaf':
+                    ucast_gw = True
+                if ucast_gw:
+                    if self.get_bms_nodes(rb_role='erb_ucast_gw'):
+                        return (True, None)
+                    else:
+                        msg = "Unable to find bms nodes attached to leafs " \
+                              "with erb_ucast_gw rb_role"
+                        return False, msg
+            else:
+                return False, msg
+        return False, msg
+
+    def setUp(self):
+        for device, device_dict in list(self.inputs.physical_routers_data.items()):
+            if device_dict['role'] == 'leaf':
+                if 'erb_ucast_gw' in (device_dict.get('rb_roles') or []):
+                    self.rb_roles[device] = ['ERB-UCAST-Gateway']
+            elif device_dict['role'] == 'spine':
+                self.rb_roles[device] = ['lean', 'Route-Reflector']
+        super(TestZtpWithErb, self).setUp()
+
+
+    @preposttest_wrapper
+    def test_fabric_erb_intervn_basic(self):
+        '''
+           Create VN vn1
+           Create VNs per BMS node
+           Create Logical Router and add all the VNs
+           Create VM on vn1
+           Create untagged BMS instances on respective VNs
+           Check ping connectivity across all the instances
+        '''
+        time.sleep(40)
+        self.inputs.set_af('dual')
+        self.addCleanup(self.inputs.set_af, 'v4')
+        bms_fixtures = list()
+        bms_vns = dict()
+        vn1 = self.create_vn()
+        vn2 = self.create_vn()
+        bms_nodes = self.get_bms_nodes(rb_role='erb_ucast_gw')
+        for bms in bms_nodes:
+            bms_vns[bms] = self.create_vn()
+
+
+        vm1 = self.create_vm(vn_fixture=vn1, image_name='cirros-0.4.0')
+        vm2 = self.create_vm(vn_fixture=vn2, image_name='cirros-0.4.0')
+        vlan = 4000
+        erb_devices = list()
+        for bms in bms_nodes:
+            bms_fixtures.append(self.create_bms(
+                bms_name=bms,
+                vlan_id=vlan,
+                vn_fixture=bms_vns[bms]))
+            vlan = vlan + 1
+            erb_devices.extend(self.get_associated_prouters(bms))
+
+        self.create_logical_router([vn1, vn2] + list(bms_vns.values()), devices=set(erb_devices))
+
+        vm1.wait_till_vm_is_up()
+        vm2.wait_till_vm_is_up()
+        self.do_ping_mesh(bms_fixtures + [vm1, vm2])
