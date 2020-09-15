@@ -5,6 +5,7 @@ from physical_device_fixture import PhysicalDeviceFixture
 from pif_fixture import PhysicalInterfaceFixture
 from lif_fixture import LogicalInterfaceFixture
 from bms_fixture import BMSFixture
+from port_fixture import PortFixture
 from port_profile import PortProfileFixture
 from storm_control_profile import StormControlProfileFixture
 from tcutils.util import retry, get_random_name
@@ -17,7 +18,7 @@ NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
                  'juniper-qfx5k', 'juniper-qfx5k-lean', 'juniper-srx']
 VALID_OVERLAY_ROLES = ['dc-gateway', 'crb-access', 'dci-gateway',
                        'ar-client', 'crb-gateway', 'erb-ucast-gateway',
-                       'crb-mcast-gateway', 'ar-replicator','route-reflector']
+                       'crb-mcast-gateway', 'ar-replicator','route-reflector', 'collapsed-spine']
 DEFAULT_UPGRADE_PARAMS = {
     'bulk_device_upgrade_count': 4,
     'health_check_abort': True,
@@ -560,7 +561,7 @@ class FabricUtils(object):
             return False
         return True
 
-    def create_bms(self, bms_name, **kwargs):
+    def create_bms(self, bms_name, verify_bms=True, **kwargs):
         self.logger.info('Creating bms %s'%bms_name)
         kwargs['fabric_fixture'] = kwargs.get('fabric_fixture') or self.fabric
         bms = self.useFixture(BMSFixture(
@@ -570,8 +571,58 @@ class FabricUtils(object):
                               **kwargs))
         status, msg = bms.run_dhclient()
         assert status, 'DHCP failed to fetch address'
-        bms.verify_on_setup()
+        if verify_bms:
+            bms.verify_on_setup()
         return bms
+
+    def configure_l2_vlan(self, **kwargs):
+        self.logger.info('Creating l2 vlan configuration')
+        kwargs['fabric_fixture'] = kwargs.get('fabric_fixture') or self.fabric
+        device_fixture = PhysicalDeviceFixture(
+            connections=self.connections, **kwargs)
+        conn = device_fixture.get_connection_obj('juniper', **kwargs)
+        kwargs['conn'] = conn
+        stmt = '''set interfaces {0} unit 0 family ethernet-switching interface-mode trunk
+                set interfaces {0} unit 0 family ethernet-switching vlan members {1}
+                set vlans {1} vlan-id {2}'''.format(kwargs.get('pi_name', ''), kwargs.get('vlan_name', ''),
+                                                    kwargs.get('vlan_id', 0))
+        conn.config(stmt.split('\n'))
+        self.addCleanup(self.delete_l2_vlan, **kwargs)
+
+    def delete_l2_vlan(self, **kwargs):
+        import pdb
+        # pdb.set_trace()
+        up_link = kwargs.get('up_link', False)
+        stmt = list()
+        stmt.append('delete interfaces {0} unit 0'.format(kwargs.get('pi_name', '')))
+        if up_link:
+            stmt.append('delete vlans {0}'.format(kwargs.get('vlan_name', '')))
+        conn = kwargs.get('conn', None)
+        conn.config(stmt)
+        conn.disconnect()
+
+    def create_vmi(self, **kwargs):
+        self.logger.info('Creating vmi')
+        info = list()
+        for interface in kwargs.get('interfaces', []):
+            intf_dict = dict()
+            intf_dict['switch_info'] = interface.get('tor', '')
+            intf_dict['port_id'] = interface.get('tor_port', '')
+            intf_dict['fabric'] = kwargs.get('fabric_fixture', None).name
+            info.append(intf_dict)
+        binding_profile = {'local_link_information': info}
+        port_fixture = PortFixture(
+                                 connections=self.connections,
+                                 vn_id=kwargs.get('vnid', ''),
+                                 api_type='contrail',
+                                 vlan_id=kwargs.get('vlan_id', 0),
+                                 binding_profile=binding_profile,
+                                 tor_port_vlan_tag=kwargs.get('vlan_tag', 0),
+                                 port_group_name=kwargs.get('name', None),
+                                 create_iip=True,
+                             )
+        port_fixture.setUp()
+        return port_fixture
 
     def create_vpg(self, interfaces=None, **kwargs):
         fabric_fixture = kwargs.get('fabric_fixture') or self.fabric
