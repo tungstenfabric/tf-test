@@ -63,6 +63,7 @@ class BMSFixture(fixtures.Fixture):
         self._interface = None
         self.ironic_node_obj = None
         self.ironic_node_id = None
+        self.vmi_create = kwargs.get('vmi_create', True)
         self.copied_files = dict()
     # end __init__
 
@@ -456,7 +457,7 @@ class BMSFixture(fixtures.Fixture):
         if self.is_ironic_node:
            return
         try:
-            if not self.port_fixture:
+            if not self.port_fixture and self.vmi_create:
                 self.create_vmi()
             if not self.external_dhcp_server and \
                not self.bms_ip and not self.bms_ip6:
@@ -465,7 +466,7 @@ class BMSFixture(fixtures.Fixture):
                         self.bms_ip = address
                     elif get_af_type(address) == 'v6':
                         self.bms_ip6 = address
-            if not self.bms_mac:
+            if not self.bms_mac and self.vmi_create:
                 self.bms_mac = self.port_fixture.mac_address
             if not self.bms_gw_ip and not self.bms_gw_ip6:
                 for subnet in self.vn_fixture.vn_subnet_objs:
