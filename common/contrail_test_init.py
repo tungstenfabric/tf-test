@@ -1311,7 +1311,7 @@ class ContrailTestInit(object):
 
     def is_container_up(self, host, service):
         container = self.host_data[host]['containers'][service]
-        cmd = "docker ps -f NAME=%s -f status=running 2>/dev/null"%container
+        cmd = "docker ps -f name=%s -f status=running 2>/dev/null"%container
         for i in range(3):
             output = self.run_cmd_on_server(host, cmd, as_sudo=True)
             if not output or 'Up' not in output:
