@@ -1589,9 +1589,11 @@ class VNFixture(fixtures.Fixture):
         return True
     # end set_unknown_unicast_forwarding
 
-    def get_an_ip(self, cidr=None, index=2):
+    def get_an_ip(self, cidr=None, index=2, random_ip=False):
         if not cidr:
             cidr = self.vn_subnet_objs[0]['cidr']
+        if random_ip:
+            return get_random_ip(cidr)
         return get_an_ip(cidr, index)
     # end get_an_ip
 
