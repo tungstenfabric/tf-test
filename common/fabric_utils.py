@@ -17,7 +17,7 @@ NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
                  'juniper-qfx5k', 'juniper-qfx5k-lean', 'juniper-srx']
 VALID_OVERLAY_ROLES = ['dc-gateway', 'crb-access', 'dci-gateway',
                        'ar-client', 'crb-gateway', 'erb-ucast-gateway',
-                       'crb-mcast-gateway', 'ar-replicator','route-reflector']
+                       'crb-mcast-gateway', 'ar-replicator','route-reflector', 'collapsed-spine']
 DEFAULT_UPGRADE_PARAMS = {
     'bulk_device_upgrade_count': 4,
     'health_check_abort': True,
@@ -463,6 +463,10 @@ class FabricUtils(object):
         payload = {'fabric_fq_name': fabric.fq_name, 'role_assignments': list()}
         for device, role in roles_dict.items():
             if role == 'leaf':
+                # skip role assignment of leaf devices with Collapsed-l2
+                # role in case of collapsed-spine topology.
+                if rb_roles.get(device.name) == ['Collapsed-l2']:
+                    continue
                 routing_bridging_role = rb_roles.get(
                     device.name, ['CRB-Access'])
             elif role == 'pnf':
