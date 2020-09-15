@@ -1,6 +1,7 @@
 from ruamel.yaml import YAML
 import pprint
 import os
+import time
 
 
 def construct_config_map_dict(policies=None):
@@ -79,14 +80,23 @@ def create_policies(resource={}, match=[]):
     return policies
 
 
+def apply_policies(filename):
+    os.system(
+        f'juju config kubernetes-master keystone-policy="$(cat {filename})"')
+    time.sleep(20)
+    #MSG Need to reduce sleep time and add check_policy_in_config_map
+
+
+
 def create_and_apply_policies(resource={}, match=[], filename=None):
     policies = create_policies(resource=resource, match=match)
     policy_dict = construct_config_map_dict(policies)
     filename = create_config_map_file(policy_dict, filename=filename)
+    apply_policies(filename)
 
 
 # pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['Pod']}))
 # policies = create_policies(resource={'verbs': ['get'], 'resources': ['Pod']})
 # policy_dict = construct_config_map_dict(policies)
 # create_config_map_file(policy_dict)
-# create_and_apply_policies(resource={'verbs': ['get', 'create'], 'resources': ['Pod']}, filename='')
+# create_and_apply_policies(resource={'verbs': ['get', 'create'], 'resources': ['Pod']}, filename='policy.yaml')

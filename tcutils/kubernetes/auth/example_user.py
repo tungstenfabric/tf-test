@@ -1,4 +1,4 @@
-from lib.o7k_lib import O7kLib
+from tcutils.kubernetes.auth.lib.o7k_lib import O7kLib
 from subprocess import check_output
 
 
