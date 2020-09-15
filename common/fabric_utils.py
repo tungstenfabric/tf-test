@@ -5,6 +5,7 @@ from physical_device_fixture import PhysicalDeviceFixture
 from pif_fixture import PhysicalInterfaceFixture
 from lif_fixture import LogicalInterfaceFixture
 from bms_fixture import BMSFixture
+from port_fixture import PortFixture
 from port_profile import PortProfileFixture
 from storm_control_profile import StormControlProfileFixture
 from tcutils.util import retry, get_random_name
@@ -17,7 +18,7 @@ NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
                  'juniper-qfx5k', 'juniper-qfx5k-lean', 'juniper-srx']
 VALID_OVERLAY_ROLES = ['dc-gateway', 'crb-access', 'dci-gateway',
                        'ar-client', 'crb-gateway', 'erb-ucast-gateway',
-                       'crb-mcast-gateway', 'ar-replicator','route-reflector']
+                       'crb-mcast-gateway', 'ar-replicator','route-reflector', 'collapsed-spine']
 DEFAULT_UPGRADE_PARAMS = {
     'bulk_device_upgrade_count': 4,
     'health_check_abort': True,
@@ -463,6 +464,8 @@ class FabricUtils(object):
         payload = {'fabric_fq_name': fabric.fq_name, 'role_assignments': list()}
         for device, role in roles_dict.items():
             if role == 'leaf':
+                if not rb_roles.get(device.name):
+                    continue
                 routing_bridging_role = rb_roles.get(
                     device.name, ['CRB-Access'])
             elif role == 'pnf':
