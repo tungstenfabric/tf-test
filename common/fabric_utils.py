@@ -5,6 +5,7 @@ from physical_device_fixture import PhysicalDeviceFixture
 from pif_fixture import PhysicalInterfaceFixture
 from lif_fixture import LogicalInterfaceFixture
 from bms_fixture import BMSFixture
+from port_fixture import PortFixture
 from port_profile import PortProfileFixture
 from storm_control_profile import StormControlProfileFixture
 from tcutils.util import retry, get_random_name
@@ -17,7 +18,7 @@ NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
                  'juniper-qfx5k', 'juniper-qfx5k-lean', 'juniper-srx']
 VALID_OVERLAY_ROLES = ['dc-gateway', 'crb-access', 'dci-gateway',
                        'ar-client', 'crb-gateway', 'erb-ucast-gateway',
-                       'crb-mcast-gateway', 'ar-replicator','route-reflector']
+                       'crb-mcast-gateway', 'ar-replicator','route-reflector', 'collapsed-spine']
 DEFAULT_UPGRADE_PARAMS = {
     'bulk_device_upgrade_count': 4,
     'health_check_abort': True,
@@ -572,6 +573,40 @@ class FabricUtils(object):
         assert status, 'DHCP failed to fetch address'
         bms.verify_on_setup()
         return bms
+
+    def configure_l2_vlan(self, **kwargs):
+        self.logger.info('Creating l2 vlan configuration')
+        kwargs['fabric_fixture'] = kwargs.get('fabric_fixture') or self.fabric
+        name = kwargs.get('name')
+        device_fixture = PhysicalDeviceFixture(
+            connections=self.connections, name=name, **kwargs)
+        device_fixture.configure_l2_vlan_on_device(**kwargs)
+
+    def create_vmi(self, interfaces=None, **kwargs):
+        vnid = kwargs.get('vnid')
+        vlan_id = kwargs.get('vlan_id')
+        vlan_tag = kwargs.get('vlan_tag')
+        self.logger.info('Creating vmi')
+        interfaces = interfaces
+        info = list()
+        for interface in interfaces:
+            intf_dict = dict()
+            intf_dict['switch_info'] = interface['tor']
+            intf_dict['port_id'] = interface['tor_port']
+            intf_dict['fabric'] = kwargs.get('fabric_fixture').name
+            info.append(intf_dict)
+        binding_profile = {'local_link_information': info}
+        port_fixture = PortFixture(
+                                 connections=self.connections,
+                                 vn_id=vnid,
+                                 api_type='contrail',
+                                 vlan_id=vlan_id,
+                                 binding_profile=binding_profile,
+                                 tor_port_vlan_tag=vlan_tag,
+                                 create_iip=True,
+                             )
+        port_fixture.setUp()
+        return port_fixture
 
     def create_vpg(self, interfaces=None, **kwargs):
         fabric_fixture = kwargs.get('fabric_fixture') or self.fabric

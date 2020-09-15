@@ -140,6 +140,8 @@ class PhysicalDeviceFixture(vnc_api_test.VncLibFixture):
 
     def setUp(self):
         super(PhysicalDeviceFixture, self).setUp()
+        if self.role == 'l2':
+            return
         if not self.dm_managed:
             return
         try:
@@ -259,6 +261,23 @@ class PhysicalDeviceFixture(vnc_api_test.VncLibFixture):
 
     def delete_interface(self, pi_name):
         self.netconf.delete_interface(pi_name)
+
+    def configure_l2_vlan_on_device(self, **kwargs):
+        pi_name = kwargs.get('pi_name')
+        vlan_name = kwargs.get('vlan_name')
+        vlan_id = kwargs.get('vlan_id')
+        stmt = '''set interfaces {0} unit 0 family ethernet-switching interface-mode trunk
+        set interfaces {0} unit 0 family ethernet-switching vlan members {1}
+        set vlans {1} vlan-id {2}'''.format(pi_name, vlan_name, vlan_id)
+        self.netconf.config(stmt.split('\n'))
+        self.addCleanup(self.delete_l2_vlan(**kwargs))
+
+    def delete_l2_vlan(self, **kwargs):
+        pi_name = kwargs.get('pi_name')
+        vlan_name = kwargs.get('vlan_name')
+        stmt = '''delete interfaces {0} unit 0
+        delete vlans {1}'''.format(pi_name, vlan_name)
+        self.netconf.config(stmt.split('\n'))
 
     @retry(tries=12, delay=5)
     def validate_interfaces_status(self, interfaces, status):
