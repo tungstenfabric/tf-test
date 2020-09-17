@@ -1,0 +1,3 @@
+fabric3
+ruamel.yaml
+python-keystoneclient

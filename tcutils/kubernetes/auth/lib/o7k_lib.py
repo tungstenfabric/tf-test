@@ -97,7 +97,7 @@ class O7kLib:
         except http.Conflict:
             logging.warning("Duplicate Project, not creating")
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def create_domain(self, domain_name):
         try:
@@ -106,7 +106,7 @@ class O7kLib:
         except http.Conflict:
             logging.warning("Duplicate Domain, not creating")
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def create_user(self, user, password, email='', project_name=None,
                     enabled=True, domain_name=None):
