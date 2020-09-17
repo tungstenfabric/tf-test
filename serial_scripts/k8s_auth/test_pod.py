@@ -21,10 +21,7 @@ def pod_with_all_operations_for_custom_user_project_domain():
 
     #Test required operation
     #Need to be able to create, delete, get Pod
-    output = check_output('kubectl apply -f templates.pod.yaml',
-                          shell=True, universal_newlines=True)
-    if 'created' in output:
-        print("Pod created")
+    Util.create_resource('pod')
 
     
     #Shouldn't be able to create Deployment, Service, Ingress, NAD, Namespace, DaemonSet and NetworkPolicy
