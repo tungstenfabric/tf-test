@@ -460,8 +460,7 @@ class TestInputs(with_metaclass(Singleton, object)):
                     with settings(
                         host_string='%s@%s' % (username, host_data['host_ip']),
                         password=password, warn_only=True, abort_on_prompts=False):
-                        if exists(self.kube_config_file):
-                            self.k8s_master_ip = host_data['host_ip'] #K8s Currently only supports 1 master
+                        self.k8s_master_ip = host_data['host_ip'] #K8s Currently only supports 1 master
             if 'k8s_node' in roles:
                 self.k8s_slave_ips.append(host_data['host_ip'])
             if 'contrail_command' in roles:
