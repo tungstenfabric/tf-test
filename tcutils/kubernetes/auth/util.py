@@ -3,7 +3,8 @@ from subprocess import check_output
 import logging
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
-#MSG Create a Logger class
+# MSG Create a Logger class
+
 
 class Util:
     cwd = os.path.dirname(os.path.realpath(__file__))
@@ -17,6 +18,12 @@ class Util:
         'ingress': f'{cwd}/templates/ingress.yaml',
         'daemonset': f'{cwd}/templates/daemonset.yaml',
     }
+
+    @staticmethod
+    def exec_kubectl_cmd_on_file(verb, template_file):
+        kubectl = 'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443'
+        return check_output(f'{kubectl} {verb} -f {template_file}', shell=True, universal_newlines=True)
+
     @staticmethod
     def source_stackrc(user_name='admin', password='password', project_name='admin', domain_name='admin_domain', auth_url=None):
         os.environ['OS_IDENTITY_API_VERSION'] = '3'
@@ -27,15 +34,13 @@ class Util:
         os.environ['OS_PASSWORD'] = password
         os.environ['OS_AUTH_URL'] = auth_url
         os.environ['OS_DOMAIN_NAME'] = domain_name
-        
 
     @staticmethod
     def create_resource(resource):
         try:
-            output = check_output(f'kubectl create -f {Util.templates[resource]}', shell=True, universal_newlines=True)
+            output = Util.exec_kubectl_cmd_on_file(
+                verb='create', template_file=Util.templates[resource])
             if 'created' in output:
                 logging.info(f'{resource} created')
         except Exception as e:
             logging.error(e)
-
-        
