@@ -107,3 +107,87 @@ class TestZtp(ZtpBaseTest):
             spine.add_virtual_network(public_vn.uuid)
         time.sleep(10)
         assert vm.ping_with_certainty(self.inputs.public_host)
+
+
+
+
+class TestZtpWorkFlow(ZtpBaseTest):
+
+    def setUp(self):
+        for device, device_dict in list(self.inputs.physical_routers_data.items()):
+            if 'dc_gw' in (device_dict.get('rb_roles') or []):
+                if device_dict['role'] == 'spine':
+                    self.rb_roles[device] = ['DC-Gateway', 'Route-Reflector']
+        super(TestZtpWorkFlow, self).setUp()
+
+
+    @preposttest_wrapper
+    def test_ztp_workflow(self):
+
+        self.inputs.set_af('dual')
+        self.addCleanup(self.inputs.set_af, 'v4')
+        bms_fixtures = list()
+
+        fabric_dict = self.inputs.fabrics[0]
+        self.logger.info("Workflow to remove/Add device.")
+        mgmt_ip =list()
+        leaf = self.leafs[0]
+        serNum = [self.inputs.physical_routers_data[leaf.name]['serial_number']]
+
+        # Workflow to remove leaf.
+        self.logger.info("Remove device from fabric.")
+        self.cleanup_discover(self.fabric, [leaf])
+        mgmt_ip.append({'cidr' : str(leaf.mgmt_ip + '/32')})
+
+        # Zeroize removed leaf.
+
+        self.logger.info("Zeroize removed leaf.")
+        netconf_sessions = dict()
+        device = self.inputs.physical_routers_data[leaf.name]
+        port=device.get('console_port',None)
+
+        if port:
+            handle = NetconfConnection(host=device['console'],username=device['ssh_username'],password=device['ssh_password'],port=device.get('console_port',None),mode='telnet')
+            handle.connect()
+            handle.zeroize()
+        else:
+            handle = NetconfConnection(host = device['mgmt_ip'],username=device['ssh_username'],password=device['ssh_password'])
+            handle.connect()
+            try:
+                handle.config(url='/root/cfg_ztp', overwrite=True,merge=False, timeout=30)
+            except XMLSyntaxError:
+                pass
+        handle.disconnect()
+        time.sleep(40)
+
+
+        # Workflow to add leaf to fabric
+        self.logger.info("Add device to fabric.")
+        
+        fabric_dict['namespaces'].update({'management' : mgmt_ip})
+        fabName = self.fabric.name
+        self.fabric, self.devices, self.interfaces = \
+                self.onboard_fabric(fabric_dict, cleanup=False,
+                    enterprise_style=True,name=fabName,serList=serNum)
+
+        # Add roles to newly added devices.
+        self.logger.info("Add roles to newly added devices.")
+        self._populate_attrs()
+        self.assign_roles(self.fabric, self.devices)
+
+        # Reonboard devices
+        self.logger.info("Workflow to reonboard device.")
+
+        self.onboard([self.leafs[0]])
+
+
+        # Test traffic
+        self.logger.info("Test traffic.")
+
+        vn = self.create_vn()
+        vm1 = self.create_vm(vn_fixture=vn, image_name='cirros-0.4.0')
+        for bms in self.get_bms_nodes():
+            bms_fixtures.append(self.create_bms(bms_name=bms, vlan_id=10,
+                vn_fixture=vn))
+        vm1.wait_till_vm_is_up()
+        self.do_ping_mesh(bms_fixtures + [vm1])
