@@ -22,7 +22,7 @@ data:
           },
           {
             "type": "project",
-            "values": ["admin"]
+            "values": ["new_project"]
           }
         ]
       }

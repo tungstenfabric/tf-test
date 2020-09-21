@@ -81,9 +81,12 @@ def create_policies(resource={}, match=[]):
 
 
 def apply_policies(filename):
+    print(f"Filename:{filename}")
     os.system(
         f'juju config kubernetes-master keystone-policy="$(cat {filename})"')
+    print("Applying Config. Sleeping 20s")
     time.sleep(20)
+    os.system('juju config kubernetes-master keystone-policy')
     #MSG Need to reduce sleep time and add check_policy_in_config_map
 
 
