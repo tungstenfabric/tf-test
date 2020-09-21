@@ -1044,7 +1044,7 @@ class BaseVrouterTest(BaseNeutronTest, VerifySvcMirror):
             self.logger.error("ECMP routes not found in any agent")
             return False
 
-
+    @retry(delay=1, tries=5)
     def verify_traffic_for_ecmp(self, sender_vm_fix,
                                 dest_vm_fix_list, dest_ip, flow_count=0):
         '''
@@ -1095,6 +1095,7 @@ class BaseVrouterTest(BaseNeutronTest, VerifySvcMirror):
                 ret = verify_tcpdump_count(self, session[vm], pcap[vm])
             else:
                 ret = verify_tcpdump_count(self, None, None, vm_fix_pcap_pid_files=vm_fix_pcap_pid_files[vm])
+                assert ret, ("Traffic verification for ECMP failed")
             if ret:
                 self.logger.info("Tcpdump verification on VM %s passed" %
                                     vm.get_vm_ips(af=af)[0])
