@@ -436,6 +436,44 @@ for i in range(0,$numgrp):
             return True
 
 
+    def send_verify_intervn_mcast(self, vm_fixtures, traffic, igmp, vxlan_id,assertFlag=True):
+
+        self.logger.info('Sending IGMPv3 report as per configuration')
+        result = self.send_igmp_reportsv2(vm_fixtures, traffic, igmp)
+
+        if result:
+            self.logger.info('Successfully sent IGMPv3 reports')
+        else:
+            assert result, "Error in sending IGMPv3 reports"
+
+        # Start tcpdump on receivers
+        self.logger.info('Starting tcpdump on mcast receivers')
+        session, pcap = self.start_tcpdump_mcast_rcvrs(vm_fixtures, traffic)
+
+        # Send multicast traffic
+        time.sleep(40)
+        result = self.send_igmp_reportsv2(vm_fixtures, traffic, igmp)
+        self.logger.info('Sending mcast data traffic from mcast source')
+        result = self.send_mcast_streams(vm_fixtures, traffic)
+
+        time.sleep(25)
+
+        if result:
+            self.logger.info('Successfully sent multicast data traffic')
+        else:
+            assert result, "Error in sending multicast data traffic"
+
+        # Verify multicast traffic
+        self.logger.info('Verifying mcast data traffic on mcast receivers')
+        result = self.verify_mcast_streams(session, pcap, traffic, igmp)
+
+        if result:
+            self.logger.info('Successfully verified multicast data traffic on all receivers')
+        else:
+            if assertFlag:
+                assert result, "Error in verifying multicast data traffic on all receivers"
+        return result
+
     def send_verify_mcastv2(self, vm_fixtures, traffic, igmp, vxlan_id,assertFlag=True):
         '''
             Send and verify IGMP report and multicast traffic
