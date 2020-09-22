@@ -169,6 +169,129 @@ class TestEvpnt6SPStyle(Evpnt6TopologyBase):
                         for device in devices})
         self._verify_multinode_sanity(bms_node=bms_node)
 
+    def cleanup_cli(self,spines):
+        cmd = []
+        cmd.append('delete groups mcastgw')
+        cmd.append('delete apply-groups mcastgw')
+        for prouter in spines:
+            prouter.netconf.config(stmts=cmd, timeout=120)
+
+
+    @skip_because(function='filter_bms_nodes', rb_role='erb_ucast_gw',min_bms_count=2)
+    @preposttest_wrapper
+    def test_crb_mcast(self, bms_node=None):
+        ''' 
+            Make sure bms/vm in different VN is getting multicast packet on sending igmp join.
+        '''
+
+        time.sleep(60)
+
+        vxlan1 = random.randrange(400, 405)
+        bms = self.get_bms_nodes(rb_role='erb_ucast_gw')
+        
+        vn1_fixture = self.create_vn(vxlan_id=vxlan1,
+                                          forwarding_mode='l2_l3')
+        vn1_fixture.set_igmp_config()
+        vxlan2 = random.randrange(406, 410)
+        vn2_fixture = self.create_vn(vxlan_id=vxlan2,
+                                          forwarding_mode='l2_l3')
+        vn2_fixture.set_igmp_config()
+
+        erb_devices = list()
+        for bmsN in bms:
+            erb_devices.extend(self.get_associated_prouters(bmsN))
+        erb_devices.extend(self.spines)
+
+        self.create_logical_router([vn1_fixture ,vn2_fixture] , devices=set(erb_devices))
+
+        time.sleep(60)
+
+        # WA till CEM-15484 is fixed.
+        cmd = []
+        cmd.append('set groups mcastgw routing-instances <__contrail_ctest-Router*> protocols pim passive')
+        cmd.append('set apply-groups mcastgw')
+        for prouter in self.spines:
+            prouter.netconf.config(stmts=cmd, timeout=120)
+
+        self.addCleanup(self.cleanup_cli,self.spines)
+
+
+        bms_fixture1 = self.create_bms(bms_name=bms[0],
+            vn_fixture=vn1_fixture,
+            vlan_id=vxlan1)
+        interface = bms_fixture1.get_mvi_interface()
+        bms_fixture1.config_mroute(interface,'225.1.1.1','255.255.255.255')
+
+
+        igmp = {'type': 22,                # IGMPv3 Report
+                'numgrp': 1,               # Number of group records
+                'gaddr': '225.1.1.1'       # Multicast group address
+               }
+
+        bms_fixture2 = self.create_bms(bms_name=bms[1],
+            vn_fixture=vn2_fixture,
+            vlan_id=vxlan2)
+        interface = bms_fixture2.get_mvi_interface()
+        bms_fixture2.config_mroute(interface,'225.1.1.1','255.255.255.255')
+
+
+        
+        vm2_fixture = self.create_vm(vn_fixture=vn2_fixture,
+            image_name='ubuntu', vm_name="vm2")
+
+        # Wait till vm is up
+        assert vm2_fixture.wait_till_vm_is_up()
+
+
+        vm_fixtures = {'bms1':bms_fixture1,'bms2':bms_fixture2, 'vn1':vn1_fixture ,'vn2':vn2_fixture, 'vm2':vm2_fixture,}
+
+
+        time.sleep(20)
+
+
+        self.logger.info('#1 Make sure bms/vm in different VN is getting multicast packet on sending igmp join.')
+ 
+        traffic = {'stream1': {'src':['bms1'],                 # Multicast source
+                             'rcvrs': ['bms2','vm2'],     # Multicast receivers
+                             'non_rcvrs': [],        # Non Multicast receivers
+                             'maddr': '225.1.1.1',          # Multicast group address
+                             'mnet': '225.1.1.1/32',        # Multicast group address
+                             'source': bms_fixture1.bms_ip,  # Multicast group address
+                             'pcount':10,                 # Num of packets
+                             'count':1                   # Num of groups
+                               }
+                  }
+
+        assert self.send_verify_intervn_mcast(vm_fixtures, traffic, igmp,vxlan1)
+
+
+        self.logger.info('#3 Send igmp leave , VMs should not get multicast traffic.')
+
+        igmp = {'type': 23,                   # IGMPv3 Report
+              'numgrp': 1,                    # Number of group records
+              'gaddr': '225.1.1.1'       # Multicast group address
+               }
+
+        interface = bms_fixture2.get_mvi_interface()
+        self.send_igmp_reportv2(vm_fixtures['bms2'], igmp,interface)
+        time.sleep(10)
+
+        traffic = {'stream1': {'src':['bms1'],                 # Multicast source
+                             'rcvrs': [],     # Multicast receivers
+                             'non_rcvrs': ['bms2','vm2'],        # Non Multicast receivers
+                             'maddr': '225.1.1.1',        # Multicast group address
+                             'mnet': '225.1.1.1/32',        # Multicast group address
+                             'source': bms_fixture1.bms_ip,  # Multicast group address
+                             'pcount':10,                 # Num of packets
+                             'count':1                   # Num of packets
+                               }
+                  }
+
+        assert self.send_verify_intervn_mcast(vm_fixtures, traffic, igmp,vxlan1)
+
+        return True
+
+
 class TestEvpnt6(TestEvpnt6SPStyle):
     enterprise_style = True
     @preposttest_wrapper
