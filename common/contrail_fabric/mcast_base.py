@@ -71,7 +71,10 @@ class Evpnt6base(BaseFabricTest):
         # Send IGMPv3 membership reports from multicast receivers
         for stream in list(traffic.values()):
             for rcvr in stream['rcvrs']:
-                result = self.send_igmp_reportv2(vm_fixtures[rcvr], igmp)
+                interface = "eth0"
+                if isinstance(vm_fixtures[rcvr],BMSFixture):
+                    interface = vm_fixtures[rcvr].get_mvi_interface()
+                result = self.send_igmp_reportv2(vm_fixtures[rcvr], igmp,interface)
         return True
 
     def verify_evpn_routes(self, route_type, vxlan_id,ip,vm_fixtures=None, igmp=None, expectation=True):
@@ -193,7 +196,7 @@ class Evpnt6base(BaseFabricTest):
 
         return result
 
-    def send_igmp_reportv2(self, rcv_vm_fixture, igmp, **kwargs):
+    def send_igmp_reportv2(self, rcv_vm_fixture, igmp,interface="eth0", **kwargs):
         '''
             Sends IGMP Report from VM :
                 mandatory args:
@@ -209,10 +212,10 @@ class Evpnt6base(BaseFabricTest):
         igmpv2['gaddr'] = igmp.get('gaddr')
         igmpv2['numgrp'] = igmp.get('numgrp')
         scapy_obj = self._generate_igmp_trafficv2(rcv_vm_fixture,
-                                                    igmpv2=igmpv2)
+                                                    igmpv2=igmpv2,interface=interface)
         return
 
-    def _generate_igmp_trafficv2(self, rcv_vm_fixture, **kwargs):
+    def _generate_igmp_trafficv2(self, rcv_vm_fixture,interface, **kwargs):
         '''
             Generate IGMPv3 joins/leaves from multicast receiver VMs
         '''
@@ -244,16 +247,17 @@ group = ipaddress.ip_address(group)
 payload = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 for i in range(0,$numgrp):
     a=IP(dst=str(dip))/IGMP(gaddr=str(group),type=$type)/payload
-    send(a, iface='eth0',inter=1.000000,count=1)
+    send(a, iface='$interface',inter=1.000000,count=1)
     group = group + 1
     if type == 22:
         dip = dip + 1
 
            ''')
 
-        python_code = python_code.substitute(dst_ip=dip,group=group,numgrp=numgrp,type=type)
+        python_code = python_code.substitute(dst_ip=dip,group=group,numgrp=numgrp,type=type,interface=interface)
 
-        rcv_vm_fixture.run_python_code(python_code)
+        rcv_vm_fixture.run_python_code(python_code) 
+
 
 
     def verify_igmp_report(self, vm_fixture, vrf_id, igmp, expectation=True):
@@ -311,16 +315,23 @@ for i in range(0,$numgrp):
             # Start the tcpdump on receivers
             for rcvr in stream['rcvrs']:
                 filters = '\'src host %s and net %s\'' % (src_ip, net)
-                session[rcvr], pcap[rcvr] = start_tcpdump_for_vm_intf(
-                    self, vm_fixtures[rcvr], vm_fixtures[rcvr].vn_fq_name,
-                    filters=filters)
+                if isinstance(vm_fixtures[rcvr],BMSFixture):
+                    session[rcvr], pcap[rcvr] = vm_fixtures[rcvr].start_tcpdump(filters=filters)
+                else:
+                    session[rcvr], pcap[rcvr] = start_tcpdump_for_vm_intf(
+                        self, vm_fixtures[rcvr], vm_fixtures[rcvr].vn_fq_name,
+                        filters=filters)
+
 
             # Start the tcpdump on non receivers
             for rcvr in stream['non_rcvrs']:
                 filters = '\'src host %s and net %s\'' % (src_ip, net)
-                session[rcvr], pcap[rcvr] = start_tcpdump_for_vm_intf(
-                    self, vm_fixtures[rcvr], vm_fixtures[rcvr].vn_fq_name,
-                    filters=filters)
+                if isinstance(vm_fixtures[rcvr],BMSFixture):
+                    session[rcvr], pcap[rcvr] = vm_fixtures[rcvr].start_tcpdump(filters=filters)
+                else:
+                    session[rcvr], pcap[rcvr] = start_tcpdump_for_vm_intf(
+                        self, vm_fixtures[rcvr], vm_fixtures[rcvr].vn_fq_name,
+                        filters=filters)
 
         return session, pcap
 
@@ -435,6 +446,44 @@ for i in range(0,$numgrp):
                          % (src_ip, grp_ip, compute_ip, tap_intf, vrf_id))
             return True
 
+
+    def send_verify_intervn_mcast(self, vm_fixtures, traffic, igmp, vxlan_id,assertFlag=True):
+
+        self.logger.info('Sending IGMPv3 report as per configuration')
+        result = self.send_igmp_reportsv2(vm_fixtures, traffic, igmp)
+
+        if result:
+            self.logger.info('Successfully sent IGMPv3 reports')
+        else:
+            assert result, "Error in sending IGMPv3 reports"
+
+        # Start tcpdump on receivers
+        self.logger.info('Starting tcpdump on mcast receivers')
+        session, pcap = self.start_tcpdump_mcast_rcvrs(vm_fixtures, traffic)
+
+        # Send multicast traffic
+        time.sleep(40)
+        result = self.send_igmp_reportsv2(vm_fixtures, traffic, igmp)
+        self.logger.info('Sending mcast data traffic from mcast source')
+        result = self.send_mcast_streams(vm_fixtures, traffic)
+
+        time.sleep(25)
+
+        if result:
+            self.logger.info('Successfully sent multicast data traffic')
+        else:
+            assert result, "Error in sending multicast data traffic"
+
+        # Verify multicast traffic
+        self.logger.info('Verifying mcast data traffic on mcast receivers')
+        result = self.verify_mcast_streams(session, pcap, traffic, igmp)
+
+        if result:
+            self.logger.info('Successfully verified multicast data traffic on all receivers')
+        else:
+            if assertFlag:
+                assert result, "Error in verifying multicast data traffic on all receivers"
+        return result
 
     def send_verify_mcastv2(self, vm_fixtures, traffic, igmp, vxlan_id,assertFlag=True):
         '''
