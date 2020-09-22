@@ -60,6 +60,7 @@ class BMSFixture(fixtures.Fixture):
         self.bms_created = False
         self.bond_created = False
         self.mvlanintf = None
+        self.pvlanintf = None
         self._interface = None
         self.ironic_node_obj = None
         self.ironic_node_id = None
@@ -413,6 +414,7 @@ class BMSFixture(fixtures.Fixture):
             get_random_string(2, chars=string.ascii_letters))
         # Truncate the interface name length to 15 char due to linux limitation
         self.mvlanintf = mvlanintf[-15:]
+        self.pvlanintf = pvlanintf
         self.logger.info('BMS mvlanintf: %s' % self.mvlanintf)
         macaddr = 'address %s'%self.bms_mac if self.bms_mac else ''
         self.run('ip link add %s link %s %s type macvlan mode bridge'%(
@@ -653,7 +655,7 @@ class BMSFixture(fixtures.Fixture):
 
     def start_tcpdump(self, filters=''):
         (session, pcap) = start_tcpdump_for_intf(self.mgmt_ip, self.username,
-            self.password, self.mvlanintf, filters, self.logger)
+            self.password, self.pvlanintf, filters, self.logger)
         return (session, pcap)
 
     def stop_tcpdump(self, session, pcap):
