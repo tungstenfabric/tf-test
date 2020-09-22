@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "65adf9e3_55e0cd64",
+        "filename": "common/fabric_utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 593,
+      "author": {
+        "id": 843
+      },
+      "writtenOn": "2020-09-22T08:07:08Z",
+      "side": 1,
+      "message": "remove the import",
+      "revId": "8f08629b533d0b49adb2284e9c2ddbadff31e1ae",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "faffa561_d2634c4b",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_collapsed_spine.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 843
+      },
+      "writtenOn": "2020-09-22T08:07:08Z",
+      "side": 1,
+      "message": "check if you can, modify --\u003e (device_dict.get(\u0027rb_roles\u0027) or []) to device_dict.get(\u0027rb_roles\u0027,[])",
+      "revId": "8f08629b533d0b49adb2284e9c2ddbadff31e1ae",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3009578f_d56199d6",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_collapsed_spine.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 843
+      },
+      "writtenOn": "2020-09-22T08:07:08Z",
+      "side": 1,
+      "message": "modify (device_dict.get(\u0027role\u0027) or []) --\u003e same as above check.",
+      "revId": "8f08629b533d0b49adb2284e9c2ddbadff31e1ae",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
