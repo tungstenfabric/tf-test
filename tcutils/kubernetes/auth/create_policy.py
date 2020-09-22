@@ -60,9 +60,9 @@ def create_policies(resource={}, match=[]):
     if resource.get('resources') is None:
         resource['resources'] = ['*']
     if resource.get('version') is None:
-        resource['version'] = ['*']
+        resource['version'] = '*'
     if resource.get('namespace') is None:
-        resource['namespace'] = ['*']
+        resource['namespace'] = '*'
 
     if len(match) == 0:
         role_dict = {
