@@ -1,0 +1,14 @@
+{
+  "apiVersion": "v1",
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "k8s-auth-policy",
+    "namespace": "kube-system",
+    "labels": {
+      "k8s-app": "k8s-keystone-auth"
+    }
+  },
+  "data": {
+    "policies": "[\n  {\n    \"resource\": {\n      \"verbs\": [\"*\"],\n      \"resources\": [\"*\"],\n      \"version\": \"*\",\n      \"namespace\": \"*\"\n    },\n    \"match\": [\n      {\n        \"type\": \"role\",\n        \"values\": [\"*\"]\n      },\n      {\n        \"type\": \"project\",\n        \"values\": [\"admin\"]\n      }\n    ]\n  }\n]\n"
+  }
+}

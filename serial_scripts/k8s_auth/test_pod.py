@@ -40,18 +40,19 @@ def pod_with_all_operations_for_custom_user_project_domain():
 # pod_with_all_operations_for_custom_user_project_domain()
 def test():
     resource = {}
-    resource['resources'] = ['pod']
+    resource['resources'] = ['*']
     role_dict = {
         'type': 'role',
         'values': ['*']
     }
     project_dict = {
         'type': 'project',
-        'values': ['new_project']
+        'values': ['admin']
     }
+    match = [role_dict, project_dict]
     policies = create_policy.create_policies(resource, match)
-    policy_dict = construct_config_map_dict(policies)
-    filename = create_config_map_file(policy_dict)
+    policy_dict = create_policy.construct_config_map_dict(policies)
+    create_policy.create_config_map_file(policy_dict)
 
 
 # pod_with_all_operations_for_custom_user_project_domain()
