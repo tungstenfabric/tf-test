@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7af13a6_b9961882",
+        "filename": "scripts/ecmp/test_ecmp.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1118,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-09-23T08:11:18Z",
+      "side": 1,
+      "message": "This change not required",
+      "revId": "7fc3ede92625a9de175f5b50a3cbd3f83727cd04",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dff3f964_44d61180",
+        "filename": "scripts/ecmp/test_ecmp.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1145,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-09-23T08:11:18Z",
+      "side": 1,
+      "message": "rewrite as \"class TestECMPIPv6Fragments(BaseNeutronTest, VerifyIntfMirror, ECMPTestBase, VerifySvcFirewall, ECMPSolnSetup, ECMPTraffic, ECMPVerify):\" otherwise the test cases will also be inherited",
+      "revId": "7fc3ede92625a9de175f5b50a3cbd3f83727cd04",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9f25687e_103eb7c2",
+        "filename": "scripts/ecmp/test_ecmp.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1151,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-09-23T08:11:18Z",
+      "side": 1,
+      "message": "rewrite as\nsuper(TestECMPIPv6Fragments, cls).setUpClass()",
+      "revId": "7fc3ede92625a9de175f5b50a3cbd3f83727cd04",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
