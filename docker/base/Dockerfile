@@ -5,6 +5,7 @@ COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
 
 # back up mirrors before overwriting
 RUN cp -r /etc/yum.repos.d /etc/yum.repos.d.orig
+
 # prepare custom mirrors
 COPY *.repo Dockerfile /etc/yum.repos.d/
 
@@ -12,7 +13,7 @@ COPY *.repo Dockerfile /etc/yum.repos.d/
 COPY *requirements*.txt entrypoint.sh /
 
 # install most packages from pypi and only then python-Fabric
-RUN yum install -y yum-plugin-priorities && \
+RUN \
     yum repolist | grep epel || yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
     curl --retry 3 --retry-delay 10 https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==20.1' && \
     yum install -y unzip vim tcpdump ant git ipmitool gcc python-devel \
