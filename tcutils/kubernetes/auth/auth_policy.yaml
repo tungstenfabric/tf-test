@@ -6,18 +6,42 @@ metadata:
   labels:
     k8s-app: k8s-keystone-auth
 data:
-  policies:
-  - resource:
-      resources:
-      - '*'
-      verbs:
-      - '*'
-      version: '*'
-      namespace: '*'
-    match:
-    - type: role
-      values:
-      - '*'
-    - type: project
-      values:
-      - new_project
+  policies: |
+    [
+      {
+        "resource": {
+          "verbs": ["*"],
+          "resources": ["*"],
+          "version": "*",
+          "namespace": "*"
+        },
+        "match": [
+          {
+            "type": "role",
+            "values": ["*"]
+          },
+          {
+            "type": "project",
+            "values": ["admin"]
+          }
+        ]
+      },
+      {
+        "resource": {
+          "verbs": ["*"],
+          "resources": ["*"],
+          "version": "*",
+          "namespace": "*"
+        },
+        "match": [
+          {
+            "type": "role",
+            "values": ["*"]
+          },
+          {
+            "type": "project",
+            "values": ["new_project"]
+          }
+        ]
+      }
+    ]

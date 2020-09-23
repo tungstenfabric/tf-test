@@ -21,8 +21,13 @@ class Util:
 
     @staticmethod
     def exec_kubectl_cmd_on_file(verb, template_file):
-        kubectl = 'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443'
-        return check_output(f'{kubectl} {verb} -f {template_file}', shell=True, universal_newlines=True)
+        try:
+            kubectl = 'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443'
+            # MSG USE Popen instead of check_output
+            output = check_output(f'{kubectl} {verb} -f {template_file}', shell=True, universal_newlines=True)
+            return output
+        except Exception as e:
+            return(e.output)
 
     @staticmethod
     def source_stackrc(user_name='admin', password='password', project_name='admin', domain_name='admin_domain', auth_url=None):
@@ -37,10 +42,21 @@ class Util:
 
     @staticmethod
     def create_resource(resource):
-        try:
-            output = Util.exec_kubectl_cmd_on_file(
-                verb='create', template_file=Util.templates[resource])
-            if 'created' in output:
-                logging.info(f'{resource} created')
-        except Exception as e:
-            logging.error(e)
+        output = Util.exec_kubectl_cmd_on_file(
+            verb='create', template_file=Util.templates[resource])
+        if 'created' in output:
+            logging.info(f'{resource} created')
+        else:
+            logging.error(f'{resource} creation failed')
+            logging.error(output)
+
+
+    @staticmethod
+    def delete_resource(resource):
+        output = Util.exec_kubectl_cmd_on_file(
+            verb='delete', template_file=Util.templates[resource])
+        if 'deleted' in output:
+            logging.info(f'{resource} deleted')
+        else:
+            logging.error(f'{resource} deletion failed')
+            logging.error(output)

@@ -84,10 +84,11 @@ def apply_policies(filename):
     print(f"Filename:{filename}")
     os.system(
         f'juju config kubernetes-master keystone-policy="$(cat {filename})"')
-    print("Applying Config. Sleeping 20s")
-    time.sleep(20)
-    os.system('juju config kubernetes-master keystone-policy')
-    #MSG Need to reduce sleep time and add check_policy_in_config_map
+    print("Applying Config. Sleeping 30s")
+    time.sleep(30)
+    os.system(
+        'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443 describe configmap -n kube-system k8s-auth-policy')
+    #MSG Need to reduce sleep time and add check_policy_in_config_map, can get -o yaml and then convert data policies to string and then compare
 
 
 
