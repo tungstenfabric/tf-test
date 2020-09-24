@@ -29,7 +29,7 @@ data:
       {
         "resource": {
           "verbs": ["*"],
-          "resources": ["*"],
+          "resources": ["pods"],
           "version": "*",
           "namespace": "*"
         },

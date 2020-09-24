@@ -2,6 +2,9 @@ from ruamel.yaml import YAML
 import pprint
 import os
 import time
+from example_user import ExampleUser
+from util import Util
+
 
 
 def construct_config_map_dict(policies=None):
@@ -84,6 +87,9 @@ def apply_policies(filename):
     print(f"Filename:{filename}")
     os.system(
         f'juju config kubernetes-master keystone-policy="$(cat {filename})"')
+    admin = ExampleUser.admin()
+    Util.source_stackrc(user_name='admin', password='password',
+                        project_name='admin', domain_name='admin_domain', auth_url=admin.auth_url)
     print("Applying Config. Sleeping 30s")
     time.sleep(30)
     os.system(
