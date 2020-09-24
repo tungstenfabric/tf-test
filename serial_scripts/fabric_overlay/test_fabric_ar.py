@@ -15,6 +15,14 @@ from netaddr import IPNetwork, IPAddress
 from vnc_api.vnc_api import *
 
 class Test_assisted_replication(BaseFabricTest):
+    def setUp(self):
+        for device, device_dict in self.inputs.physical_routers_data.items():
+            if device_dict['role'] == 'leaf':
+                self.rb_roles[device] = ['CRB-Access', 'AR-Client']
+            elif device_dict['role'] == 'spine':
+                self.rb_roles[device] = ['CRB-Gateway', 'Route-Reflector', 'AR-Replicator']
+        super(Test_assisted_replication, self).setUp()
+
     @classmethod
     def setUpClass(cls):
         super(Test_assisted_replication, cls).setUpClass()
