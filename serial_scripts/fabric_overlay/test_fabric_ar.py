@@ -15,6 +15,15 @@ from netaddr import IPNetwork, IPAddress
 from vnc_api.vnc_api import *
 
 class Test_assisted_replication(BaseFabricTest):
+    erb = False
+    def setUp(self):
+        for device, device_dict in self.inputs.physical_routers_data.items():
+            if device_dict['role'] == 'leaf':
+                self.rb_roles[device] = ['CRB-Access', 'AR-Client']
+            elif device_dict['role'] == 'spine':
+                self.rb_roles[device] = ['CRB-Gateway', 'Route-Reflector', 'AR-Replicator']
+        super(Test_assisted_replication, self).setUp()
+
     @classmethod
     def setUpClass(cls):
         super(Test_assisted_replication, cls).setUpClass()
@@ -33,7 +42,8 @@ class Test_assisted_replication(BaseFabricTest):
         bms_nodes = self.get_bms_nodes()
         bms_fixtures = list()
         vn1 = self.create_vn()
-        for bms in self.get_bms_nodes(rb_role='erb_ucast_gw'):
+        kwargs = {'rb_role': 'erb_ucast_gw'} if self.erb else {}
+        for bms in self.get_bms_nodes(**kwargs):
             bms_fixtures.append(self.create_bms(bms_name=bms,vn_fixture=vn1, vlan_id=10, static_ip=True))
         bms1 = bms_fixtures[0]
         bms2 = bms_fixtures[1]
@@ -47,6 +57,7 @@ class Test_assisted_replication(BaseFabricTest):
         leafs = []
         for spine in self.spines:
             spines.append(str(spine.tunnel_ip))
+
         for leaf in self.leafs:
             leafs.append(str(leaf.tunnel_ip))
 
@@ -61,6 +72,7 @@ class Test_assisted_replication(BaseFabricTest):
         bms1.stop_broadcast_traffic(pid)
 
 class Test_assisted_replication_ERB(Test_assisted_replication):
+    erb = True
     def setUp(self):
         for device, device_dict in self.inputs.physical_routers_data.items():
             if device_dict['role'] == 'leaf':
