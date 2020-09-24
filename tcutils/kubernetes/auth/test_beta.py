@@ -13,6 +13,7 @@ def all_operations_for_admin_project_domain():
     admin = ExampleUser.admin()
 
     filename = get_absolute_file_path('admin_all_policy.yaml')
+#MSG Try to come up with the string format of data policies
     create_policy.apply_policies(filename)
 
     Util.source_stackrc(user_name='admin', password='password',
@@ -39,3 +40,4 @@ def pod_with_all_operations_for_custom_user_project_domain():
 
 all_operations_for_admin_project_domain()
 pod_with_all_operations_for_custom_user_project_domain()
+#MSG add more tests related to different verbs, resources and namespaces
