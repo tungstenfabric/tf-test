@@ -105,8 +105,53 @@ def create_and_apply_policies(resource={}, match=[], filename=None):
     apply_policies(filename)
 
 
-# pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['Pod']}))
-# policies = create_policies(resource={'verbs': ['get'], 'resources': ['Pod']})
+# pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['pods']}))
+# policies = create_policies(resource={'verbs': ['get'], 'resources': ['pods']})
 # policy_dict = construct_config_map_dict(policies)
 # create_config_map_file(policy_dict)
-# create_and_apply_policies(resource={'verbs': ['get', 'create'], 'resources': ['Pod']}, filename='policy.yaml')
+# create_and_apply_policies(resource={'verbs': ['get', 'create'], 'resources': ['pods']}, filename='policy.yaml')
+def new_create_policies_cm(policies=None):
+    policy_dict = {}
+    policy_dict['apiVersion'] = 'v1'
+    policy_dict['kind'] = 'ConfigMap'
+    policy_dict['metadata'] = {
+        'name': 'k8s-auth-policy',
+        'namespace': 'kube-system',
+        'labels': {
+            'k8s-app': 'k8s-keystone-auth'
+        }
+    }
+    if policies is None:
+        policies = [
+            {
+                'resource': {
+                    'verbs': ['*'],
+                    'resources': ['*'],
+                    'version': '*',
+                    'namespace': '*'
+                },
+                'match': [
+                    {
+                        'type': 'role',
+                        'values': ['*']
+                    },
+                    {
+                        'type': 'project',
+                        'values': ['admin']
+                    }
+                ]
+            }
+        ]
+
+    policy_dict['data'] = {
+        'policies': policies
+    }
+    print(policy_dict)
+    print()
+    import sys
+    y = YAML()
+    y.default_flow_style = None
+    y.dump(policy_dict, sys.stdout)
+
+
+new_create_policies_cm()
