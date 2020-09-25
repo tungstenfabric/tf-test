@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "734d75bc_f2f29c32",
+        "filename": "serial_scripts/fabric_overlay/test_evpn_multicast.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-25T05:16:23Z",
+      "side": 1,
+      "message": "Just curious, if we could use the workaround suggested by patrik in place of manual config \nhttps://contrail-jws.atlassian.net/browse/CEM-15484?focusedCommentId\u003d1055349\nI dont know much about PIM, so ignore if irrelevant.",
+      "revId": "160e24a1de546876eb8ead421437b74ff9e50881",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
