@@ -218,12 +218,11 @@ class FabricUtils(object):
         time.sleep(30)
 
     #routine to fetch the gdo info from the nodes
-    def get_chassis_gdo_info(self, fabric_dict, wait_for_finish=True,
-                                cleanup=False,
-                                gdo_type="chassis hardware"):
+    def get_chassis_gdo_info(self, fabric_dict, fq_name, payload, gdo_type,
+                                wait_for_finish=True, cleanup=False):
         fq_name = ['default-global-system-config',
-                   'show_chassis_info_template']
-        payload = {'chassis_detail': gdo_type
+                   fq_name]
+        payload = {payload: gdo_type
                    }
         self.logger.info('Fetching info from the fabric nodes')
         execution_id = self.vnc_h.execute_job(fq_name, payload)
@@ -249,6 +248,18 @@ class FabricUtils(object):
             return True
         else:
             return False
+
+    #routine to fetch the gdo info from the nodes
+    def get_chassis_gdo_info_multiple(self, fabric_dict, fq_name, payload1, value1, payload2, value2,
+                                wait_for_finish=True, cleanup=False):
+        fq_name = ['default-global-system-config',
+                   fq_name]
+        payload = {payload1: value1, payload2: value2
+                   }
+        self.logger.info('Fetching info from the fabric nodes')
+        execution_id = self.vnc_h.execute_job(fq_name, payload)
+        status = self.check_gdo_details(value2)
+        assert status, 'Mismatch between the fabric info and the details fetched from the nodes'
 
     def cleanup_fabric(self, fabric, devices=None, interfaces=None,
                        verify=True, wait_for_finish=True, retry=True):
