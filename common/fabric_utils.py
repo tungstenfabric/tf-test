@@ -70,10 +70,10 @@ class FabricUtils(object):
         return (True, fabric)
 
     def onboard_fabric(self, fabric_dict, wait_for_finish=True,
-                       name=None, cleanup=False, enterprise_style=True, dc_asn=None ,serList=None):
+                       name=None, cleanup=False, enterprise_style=True, dc_asn=None):
         interfaces = {'physical': [], 'logical': []}
         devices = list()
-        name = name if name else get_random_name('fabric')
+        name = get_random_name(name) if name else get_random_name('fabric')
 
         fq_name = ['default-global-system-config',
                    'fabric_onboard_template']
@@ -89,14 +89,12 @@ class FabricUtils(object):
                    "supplemental_day_0_cfg":[{"name": dct["supplemental_day_0_cfg"]["name"],\
                                               "cfg": dct["supplemental_day_0_cfg"]["cfg"]}
                         for dct in list(self.inputs.physical_routers_data.values()) \
-                           if dct.get('supplemental_day_0_cfg') \
-                               if serList is None or dct["serial_number"] in serList],
+                           if dct.get('supplemental_day_0_cfg')],
                    'device_to_ztp': [{"serial_number": dct['serial_number'], \
                                       "hostname": dct['name'], \
                                       "supplemental_day_0_cfg": dct.get("supplemental_day_0_cfg",{}).get('name','')} \
                        for dct in list(self.inputs.physical_routers_data.values()) \
-                           if dct.get('serial_number') \
-                               if serList is None or dct["serial_number"] in serList],
+                           if dct.get('serial_number')],
                    'node_profiles': [{"node_profile_name": profile}
                        for profile in fabric_dict.get('node_profiles')\
                                       or NODE_PROFILES],
@@ -107,7 +105,7 @@ class FabricUtils(object):
                    'overlay_ibgp_asn': dc_asn or fabric_dict['namespaces']['overlay_ibgp_asn'],
                    'fabric_asn_pool': [{"asn_max": fabric_dict['namespaces']['asn'][0]['max'],
                                        "asn_min": fabric_dict['namespaces']['asn'][0]['min']}]
-                   }
+                   } 
         if os_version:
             payload['os_version'] = os_version
         self.logger.info('Onboarding new fabric %s %s'%(name, payload))
@@ -218,12 +216,11 @@ class FabricUtils(object):
         time.sleep(30)
 
     #routine to fetch the gdo info from the nodes
-    def get_chassis_gdo_info(self, fabric_dict, wait_for_finish=True,
-                                cleanup=False,
-                                gdo_type="chassis hardware"):
+    def get_chassis_gdo_info(self, fabric_dict, fq_name, payload, gdo_type,
+                                wait_for_finish=True, cleanup=False):
         fq_name = ['default-global-system-config',
-                   'show_chassis_info_template']
-        payload = {'chassis_detail': gdo_type
+                   fq_name]
+        payload = {payload: gdo_type
                    }
         self.logger.info('Fetching info from the fabric nodes')
         execution_id = self.vnc_h.execute_job(fq_name, payload)
@@ -249,6 +246,18 @@ class FabricUtils(object):
             return True
         else:
             return False
+
+    #routine to fetch the gdo info from the nodes
+    def get_chassis_gdo_info_multiple(self, fabric_dict, fq_name, payload1, value1, payload2, value2,
+                                wait_for_finish=True, cleanup=False):
+        fq_name = ['default-global-system-config',
+                   fq_name]
+        payload = {payload1: value1, payload2: value2
+                   }
+        self.logger.info('Fetching info from the fabric nodes')
+        execution_id = self.vnc_h.execute_job(fq_name, payload)
+        status = self.check_gdo_details(value2)
+        assert status, 'Mismatch between the fabric info and the details fetched from the nodes'
 
     def cleanup_fabric(self, fabric, devices=None, interfaces=None,
                        verify=True, wait_for_finish=True, retry=True):
