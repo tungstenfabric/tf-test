@@ -153,7 +153,7 @@ class BaseIntrospectSsl(GenericTestBase):
             self.inputs.copy_file_to_server(node_ip, cert, self.cert_location,
                 cert.split('/')[-1], container=container, force=True)
             self.addCleanup(self.delete_cert_file, node_ip,
-                dstdir+cert.split('/')[-1], container)
+                self.cert_location+cert.split('/')[-1], container)
 
     def create_agent_certs_and_update_on_compute(self, host_ip, subject,
             ssl_enable='false', subjectAltName=None, verify_in_cleanup=True):
