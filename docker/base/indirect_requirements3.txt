@@ -17,7 +17,7 @@ google-auth==1.11.2
 greenlet==0.4.15 ; platform_python_implementation == 'CPython'
 idna==2.8
 ipaddress==1.0.23
-kubernetes==7.0.0
+kubernetes==11.0.0
 markupsafe==1.1.1
 monotonic==1.5
 oauthlib==3.1.0

@@ -447,7 +447,7 @@ class Client(object):
         return self.v1_h.read_namespaced_pod_status(name, namespace)
 
     def exec_cmd_on_pod(self, name, cmd, namespace='default', stderr=True,
-                        stdin=True, stdout=True, tty=True,
+                        stdin=False, stdout=True, tty=False,
                         shell='/bin/bash -l -c', container=None):
         cmd_prefix = shell.split()
         cmd_prefix.append(cmd)
