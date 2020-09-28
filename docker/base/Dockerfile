@@ -11,6 +11,7 @@ COPY *.repo Dockerfile /etc/yum.repos.d/
 
 # pip install python packages
 COPY *requirements*.txt entrypoint.sh /
+COPY pip.conf /etc/
 
 # install most packages from pypi and only then python-Fabric
 RUN \
