@@ -13,7 +13,7 @@ def all_operations_for_admin_project_domain():
     admin = ExampleUser.admin()
 
     filename = get_absolute_file_path('admin_all_policy.yaml')
-#MSG Now:-- Use jinja template for yaml
+# MSG Now:-- Use jinja template for yaml
     create_policy.apply_policies(filename)
 
     Util.source_stackrc(user_name='admin', password='password',
@@ -40,4 +40,4 @@ def pod_with_all_operations_for_custom_user_project_domain():
 
 all_operations_for_admin_project_domain()
 pod_with_all_operations_for_custom_user_project_domain()
-#MSG add more tests related to different verbs, resources and namespaces
+# MSG add more tests related to different verbs, resources and namespaces
