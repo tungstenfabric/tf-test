@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fd9dab43_5cc927c2",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_ar.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T01:42:57Z",
+      "side": 1,
+      "message": "erb \u003d False",
+      "revId": "833911d7cb8dcbb3f6e395000f31bf3bbd375732",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adc97a49_2e0c50ee",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_ar.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T01:42:57Z",
+      "side": 1,
+      "message": "kwargs \u003d {\u0027rb_role\u0027: \u0027erb_ucast_gw\u0027} if self.erb else {}",
+      "revId": "833911d7cb8dcbb3f6e395000f31bf3bbd375732",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee430908_116d4a9b",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_ar.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T01:42:57Z",
+      "side": 1,
+      "message": "for bms in self.get_bms_nodes(**kwargs):",
+      "revId": "833911d7cb8dcbb3f6e395000f31bf3bbd375732",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09a16642_cbb23e1a",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_ar.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T01:42:57Z",
+      "side": 1,
+      "message": "erb \u003d True",
+      "revId": "833911d7cb8dcbb3f6e395000f31bf3bbd375732",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
