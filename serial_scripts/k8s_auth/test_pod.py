@@ -6,7 +6,7 @@ import os
 
 def pod_with_all_operations_for_admin_project_domain():
     resource = {}
-    resource['resources'] = ['Pod']
+    resource['resources'] = ['pod']
     create_policy.create_and_apply_policies(resource=resource)
 
 
@@ -26,13 +26,19 @@ def pod_with_all_operations_for_custom_user_project_domain():
         'type': 'project',
         'values': ['new_project']
     }
-    match = [role_dict, project_dict]
+    user_dict = {
+        "type": 'user',
+        "values": ['john']
+    }
+    match = [role_dict, project_dict, user_dict]
     create_policy.create_and_apply_policies(resource=resource, match=match)
 
     # Test required operation
     # Need to be able to create, delete, get Pod
-    Util.create_resource('pod')
-
+    Util.resource(verb='create', resource_list=['pod', 'deployment', 'service', 'namespace',
+                                                'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
+    Util.resource(verb='delete', resource_list=[
+                  'pod', 'deployment', 'service', 'namespace', 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
     # Shouldn't be able to create Deployment, Service, Ingress, NAD, Namespace, DaemonSet and NetworkPolicy
 
 
@@ -55,5 +61,5 @@ def test():
     create_policy.create_config_map_file(policy_dict)
 
 
-# pod_with_all_operations_for_custom_user_project_domain()
-test()
+pod_with_all_operations_for_custom_user_project_domain()
+# test()
