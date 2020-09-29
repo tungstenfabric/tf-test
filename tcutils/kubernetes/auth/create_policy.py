@@ -82,6 +82,12 @@ def apply_policies(filename):
     os.system(
         'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443 describe configmap -n kube-system k8s-auth-policy')
     # MSG Need to reduce sleep time and add check_policy_in_config_map, can get -o yaml and then convert data policies to string and then compare
+    # out = check_output("kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443 describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+    # out.split("policies")[1].split("\n")[2]
+    # Next compare with auth_policy data policies
+    # import yaml
+    # with open('/root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml') as f:
+    # data = yaml.load(f, Loader=yaml.FullLoader)
 
 
 def create_and_apply_policies(resource={}, match=[], filename=None):
@@ -89,6 +95,39 @@ def create_and_apply_policies(resource={}, match=[], filename=None):
     filename = insert_policies_in_template_file(policies)
     apply_policies(filename)
 
+def check_policy_in_config_map():
+    admin = ExampleUser.admin()
+    Util.source_stackrc(user_name='admin', password='password',
+                        project_name='admin', domain_name='admin_domain', auth_url=admin.auth_url)
+    from subprocess import check_output
+    out = check_output("kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443 describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+    cmd_policy_string = out.split("policies")[1].split("\n")[2]
+
+    resource = {}
+    resource['resources'] = ['pods']
+    role_dict = {
+        'type': 'role',
+        'values': ['Member']
+    }
+    project_dict = {
+        'type': 'project',
+        'values': ['new_project']
+    }
+    user_dict = {
+        "type": 'user',
+        "values": ['john']
+    }
+    match = [role_dict, project_dict, user_dict]
+    policies = create_policies(resource=resource, match=match)
+    policies_json = json.dumps(policies)
+    policies_string = str(policies_json)
+    print(f"Policy_string: {policies_string}")
+    print()
+    print(f"cmd_policy_string: {cmd_policy_string}")
+    print(cmd_policy_string == policies_string)
+
+
+check_policy_in_config_map()
 
 # pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['pods']}))
 # policies = create_policies(resource={'verbs': ['get'], 'resources': ['pods']})
