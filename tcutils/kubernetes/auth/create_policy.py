@@ -21,7 +21,7 @@ def insert_policies_in_template_file(policies, filename=None):
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     template = env.get_template("policy.yaml.j2")
     with open(filename, 'w') as f:
-        f.write(template.render(policies=policies))
+        f.write(template.render(policies=policies_json))
     return filename
 
 

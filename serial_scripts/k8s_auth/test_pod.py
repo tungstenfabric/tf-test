@@ -14,13 +14,11 @@ def pod_with_all_operations_for_custom_user_project_domain():
     admin = ExampleUser.admin()
     admin.create_all(user_name='john', password='c0ntrail123', role='Member',
                      project_name='new_project', domain_name='new_domain')
-    Util.source_stackrc(user_name='john', password='c0ntrail123',
-                        project_name='new_project', domain_name='new_domain', auth_url=admin.auth_url)
     resource = {}
-    resource['resources'] = ['pod']
+    resource['resources'] = ['services']
     role_dict = {
         'type': 'role',
-        'values': ['*']
+        'values': ['Member']
     }
     project_dict = {
         'type': 'project',
@@ -35,6 +33,8 @@ def pod_with_all_operations_for_custom_user_project_domain():
 
     # Test required operation
     # Need to be able to create, delete, get Pod
+    Util.source_stackrc(user_name='john', password='c0ntrail123',
+                        project_name='new_project', domain_name='new_domain', auth_url=admin.auth_url)
     Util.resource(verb='create', resource_list=['pod', 'deployment', 'service', 'namespace',
                                                 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
     Util.resource(verb='delete', resource_list=[
