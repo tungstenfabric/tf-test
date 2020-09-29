@@ -25,6 +25,7 @@ class Util:
         kubectl = 'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443'
         cmd = shlex.split(f'{kubectl} {verb} -f {template_file}')
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+        # p = Popen(f'{kubectl} {verb} -f {template_file}', stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)
         output, error = p.communicate()
         return output, error
 
@@ -39,7 +40,7 @@ class Util:
         os.environ['OS_PASSWORD'] = password
         os.environ['OS_AUTH_URL'] = auth_url
         os.environ['OS_DOMAIN_NAME'] = domain_name
-
+        
 
     @staticmethod
     def resource(verb, resource_list):

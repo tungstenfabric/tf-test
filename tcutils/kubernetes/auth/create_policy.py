@@ -7,7 +7,9 @@ from jinja2 import Environment, FileSystemLoader
 
 from tcutils.kubernetes.auth.example_user import ExampleUser
 from tcutils.kubernetes.auth.util import Util
+from common import log_orig as contrail_logging
 
+logger = contrail_logging.getLogger(__name__)
 
 def insert_policies_in_template_file(policies, filename=None):
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -79,21 +81,20 @@ def check_policy_in_config_map(policies):
     cmd_policy_string = out.split("policies")[1].split("\n")[2]
     policies_json = json.dumps(policies)
     policies_string = str(policies_json)
-    print(f"Policy_string: {policies_string}")
-    print()
-    print(f"cmd_policy_string: {cmd_policy_string}")
-    print(cmd_policy_string == policies_string)
-    while cmd_policy_string == policies_string:
+    logger.info("Waiting for policy to update in ConfigMap")
+    while cmd_policy_string != policies_string:
         out = check_output("kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443 describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
         cmd_policy_string = out.split("policies")[1].split("\n")[2]
+        time.sleep(2)
+    time.sleep(5) # For master to stabilize, give additional 5 seconds
 
 
 def apply_policies_and_check_in_config_map(policies, filename):
-    print(f"Applying policy file:{filename}")
+    # print(f"Applying policy file:{filename}")
+    logger.info(f"Applying policy file: {filename}")
     os.system(
         f'juju config kubernetes-master keystone-policy="$(cat {filename})"')
     check_policy_in_config_map(policies)
-    # MSG Need to reduce sleep time and add check_policy_in_config_map, can get -o yaml and then convert data policies to string and then compare
 
 
 def create_and_apply_policies(resource={}, match=[], filename=None):
