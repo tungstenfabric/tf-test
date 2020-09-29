@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f03316ce_08648bc6",
+        "filename": "common/fabric_utils.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T05:24:29Z",
+      "side": 1,
+      "message": "why are we skipping verify?",
+      "revId": "2a4a11eab8466dc955ffd8a7056fef8cc090454a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c76a7451_70bc8861",
+        "filename": "common/fabric_utils.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T05:24:29Z",
+      "side": 1,
+      "message": "Can we not use create_bms itself? Compared the same with create_vmi inside bms_fixture and i dont see much difference except for MAC address. Is bms_mac the reason or is it something else?",
+      "revId": "2a4a11eab8466dc955ffd8a7056fef8cc090454a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9a4ed015_32e916ea",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_collapsed_spine.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T05:24:29Z",
+      "side": 1,
+      "message": "We dont have explicitly check for collapsed spine in rb_roles since any device that can act as spine in CRB can act as spine in collapsed spine topology too.",
+      "revId": "2a4a11eab8466dc955ffd8a7056fef8cc090454a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e27c32d4_f62e594c",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_collapsed_spine.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T05:24:29Z",
+      "side": 1,
+      "message": "Why not use the existing leaf role itself?",
+      "revId": "2a4a11eab8466dc955ffd8a7056fef8cc090454a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff39bd59_7e2fb95d",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_collapsed_spine.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T05:24:29Z",
+      "side": 1,
+      "message": "The VPG should be created with links from both spines.In this case the VPG is created with just one link.\n\nIdeally we should pick the BMS and from the BMS we should decipher the Leaf and then their connections to spines and specify those links in the VPG.",
+      "revId": "2a4a11eab8466dc955ffd8a7056fef8cc090454a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0b7966c_cfd9c8cc",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_collapsed_spine.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T05:24:29Z",
+      "side": 1,
+      "message": "For intra VN there is no need for LR",
+      "revId": "2a4a11eab8466dc955ffd8a7056fef8cc090454a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7b899d5b_fa24b2ef",
+        "filename": "serial_scripts/fabric_overlay/test_fabric_collapsed_spine.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 126
+      },
+      "writtenOn": "2020-09-29T05:24:29Z",
+      "side": 1,
+      "message": "Can you also add a test for DC-Gw and Unmanaged PNF scenarios, if possible.",
+      "revId": "2a4a11eab8466dc955ffd8a7056fef8cc090454a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
