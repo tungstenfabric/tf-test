@@ -231,7 +231,7 @@ class VNFixture(fixtures.Fixture):
                     vrf_id_dict.update({ip:vrf_id})
             self._vrf_ids = vrf_id_dict
         return self._vrf_ids
-    # end get_vrf_ids
+	# end get_vrf_ids
 
     @property
     def vrf_ids(self):
@@ -1564,7 +1564,7 @@ class VNFixture(fixtures.Fixture):
         return self.quantum_h.get_subnets_of_vn(self.uuid)
 
     def get_subnet_id_for_af(self, af):
-        return [subnet['id'] for subnet in self.vn_subnet_objs
+        return [subnet['id'] for subnet in self.vn_subnet_objs 
                 if get_af_type(subnet['cidr']) == af]
 
     def add_to_router(self, physical_router_id):
@@ -1783,6 +1783,26 @@ class VNFixture(fixtures.Fixture):
         return True
     # end set_igmp_config
 
+    def set_mac_ip_learning(self, mac_ip_learning_enable=True, verify=True):
+        ''' Configure mac_ip_learning flag on virtual network
+        '''
+        self.logger.debug('Updating mac_ip_learning flag on VN %s to %s' % (
+            self.vn_fq_name, mac_ip_learning_enable))
+        vn_obj = self.vnc_lib_h.virtual_network_read(id = self.uuid)
+        vn_obj.set_mac_ip_learning_enable(mac_ip_learning_enable)
+        self.vnc_lib_h.virtual_network_update(vn_obj)
+
+        if verify:
+            vn_in_api = self.api_s_inspect.get_cs_vn_by_id(vn_id=self.uuid, refresh=True)
+            if vn_in_api['virtual-network']['mac_ip_learning_enable'] != mac_ip_learning_enable:
+                self.logger.error("mac_ip_learning flag in API is not what"
+                    " was set, actual: %s, expected: %s" % (
+                    vn_in_api['virtual-network']['mac_ip_learning_enable'],
+                    mac_ip_learning_enable))
+                return False
+
+        return True
+    # end set_mac_ip_learning
 
     def get_pbb_evpn_enable(self):
         ''' Get PBB EVPN on virtual network '''
