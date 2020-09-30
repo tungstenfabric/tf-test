@@ -18,7 +18,7 @@ ipaddress==1.0.23 ; python_version == '2.7'
 jinja2==2.11.1
 junos-eznc==1.2.2
 jxmlease==1.0.1
-kubernetes==7.0.0
+kubernetes==11.0.0
 lxml==4.5.0
 markupsafe==1.1.1
 ncclient==0.6.3
