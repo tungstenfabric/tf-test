@@ -76,6 +76,7 @@ class TestFabricSecurityGroup(BaseFabricTest):
         workloads.append(workload3)
 
         self.do_ping_mesh(workloads)
+        
         # Apply SG to BMS
         bms1.add_security_groups([sg1.uuid, sg2.uuid])
         sleep(60)
@@ -133,6 +134,12 @@ class TestFabricSecurityGroup(BaseFabricTest):
             sport=1111, dport=8000, expectation=False)
         self.verify_traffic(bms1, vm1, 'tcp', sport=1111, dport=8006)
         self.verify_traffic(bms2, vm1, 'tcp', sport=1111, dport=8004)
+        
+        #Remove the rule from SG
+        sg1.replace_rules(rules=[sg_rule_1, sg_rule_2])
+        self.verify_traffic(bms1, vm2, 'tcp', sport=1111, dport=8006, expectation=False)
+        assert vm1.ping_with_certainty(ip=bms1.bms_ip)
+        self.verify_traffic(bms1, vm1, 'tcp', sport=1111, dport=8006)
 
         #Remove all SGs attached to BMS
         bms1.delete_security_groups([sg1.uuid, sg2.uuid])
