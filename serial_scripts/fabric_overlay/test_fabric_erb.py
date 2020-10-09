@@ -36,6 +36,7 @@ class TestFabricERB(BaseFabricTest):
         super(TestFabricERB, self).setUp()
 
     @skip_because(function='filter_bms_nodes', rb_role='erb_ucast_gw')
+    @test.attr(type=['fabric_sanity'])
     @preposttest_wrapper
     def test_fabric_erb_intravn_basic(self):
         '''
