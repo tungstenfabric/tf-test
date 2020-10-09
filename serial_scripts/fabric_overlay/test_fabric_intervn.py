@@ -33,6 +33,7 @@ class TestFabricEvpnType5(BaseFabricTest):
                     return (True, None)
         return False, msg
 
+    @test.attr(type=['fabric_sanity'])
     @preposttest_wrapper
     def test_fabric_intervn_basic(self):
         '''
@@ -63,6 +64,7 @@ class TestFabricEvpnType5(BaseFabricTest):
         vm1.wait_till_vm_is_up()
         self.do_ping_mesh(bms_fixtures+[vm1, vm2])
 
+    @test.attr(type=['fabric_sanity'])
     @preposttest_wrapper
     def test_fabric_intervn_tagged(self):
         '''
