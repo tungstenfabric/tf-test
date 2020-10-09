@@ -56,13 +56,17 @@ class GlanceHelper(object):
 
     def get_image(self, image_id=None, image_name=None, check_active=True):
         if not image_id:
+            self.logger.debug('image_name is %s (in fixtures.glance_test.get_image)' % image_name)
             for image in self.obj.images.list():
+                self.logger.debug('%s is once in all images' % image)
                 if image.name == image_name:
+                    self.logger.debug('image %s in self.obj.images.list() is TRUE' % image_name)
                     image_id = image.id
                     break
             else:
                 self.logger.debug('Image by name %s not found'%image_name)
                 return False
+        self.logger.debug('image_id is %s (in fixtures.glance_test.get_image)' % image_id)
         if not image_id:
             self.logger.debug('image_id cant be empty')
             return False

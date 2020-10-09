@@ -203,6 +203,7 @@ class NovaHelper(object):
     # end get_image_by_id
 
     def get_image(self, image_name='ubuntu'):
+        self.logger.debug('image_name is %s (in fixtures.nova_test.get_image)' % image_name)
         f = '/tmp/%s'%image_name
         lock = Lock(f)
         try:
@@ -349,6 +350,9 @@ class NovaHelper(object):
 
         username = self.inputs.host_data[self.openstack_ip]['username']
         password = self.inputs.host_data[self.openstack_ip]['password']
+
+        self.logger.debug('build_path is %s (in fixtures.nova_test._install_image)' % build_path)
+        self.logger.debug('image_name is %s (in fixtures.nova_test._install_image)' % image_name)
 
         with settings(
             host_string='%s@%s' % (username, self.openstack_ip),
