@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "43f67c64_b125b11b",
+        "filename": "configs/images.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 428
+      },
+      "writtenOn": "2020-10-14T12:19:53Z",
+      "side": 1,
+      "message": "please leave the default settings as is , and if you wanted any image with required params ..please add as another image and provide your prams.",
+      "revId": "b6f351d8e24299ec918e0b5aa77bc270b26d8f31",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad06284f_29c20e08",
+        "filename": "scripts/maciplearning/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 428
+      },
+      "writtenOn": "2020-10-14T12:19:53Z",
+      "side": 1,
+      "message": "What if there is no bfd session gets created  for any reason ? return the output also along with status",
+      "revId": "b6f351d8e24299ec918e0b5aa77bc270b26d8f31",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
