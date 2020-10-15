@@ -19,13 +19,16 @@ class BaseHC(GenericTestBase):
 
     def create_hc(self, hc_type='link-local', probe_type='PING',
                   delay=3, timeout=5, max_retries=2,
-                  http_url='local-ip', verify=True):
+                  http_url='local-ip', target_ip_all=False,
+                  target_ip_list=None, verify=True):
         hc_fixture = self.useFixture(HealthCheckFixture(
                      connections=self.connections,
                      name=get_random_name(self.project_name),
                      hc_type=hc_type, delay=delay,
                      probe_type=probe_type, timeout=timeout,
-                     max_retries=max_retries, http_url=http_url))
+                     max_retries=max_retries, http_url=http_url,
+                     target_ip_all=target_ip_all,
+                     target_ip_list=target_ip_list))
         if verify:
             hc_fixture.verify_on_setup()
         return hc_fixture
