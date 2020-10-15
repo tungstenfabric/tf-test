@@ -21,6 +21,8 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
     :param http_method : One of GET/PUT/PUSH default:GET
     :param http_url : HTTP URL Path (local-ip or ip-addr or http://ip:port/v1)
     :param http_codes : HTTP reply codes
+    :param target_ip_all : indicate all learnt IP addresses when True (for MAC-IP Learning)
+    :param target_ip_list : indicate target_ip when target_ip_all is False (for MAC-IP Learning)
 
     Inherited optional parameters:
     :param domain   : default is default-domain
@@ -47,6 +49,8 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
         self.http_method = kwargs.get('http_method', None)
         self.http_url = kwargs.get('http_url', 'local-ip')
         self.http_codes = kwargs.get('http_codes', None)
+        self.target_ip_all = kwargs.get('target_ip_all', False)
+        self.target_ip_list = kwargs.get('target_ip_list', None)
         self.created = False
         if self.inputs.verify_thru_gui():
             self.browser = self.connections.browser
@@ -87,6 +91,8 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
         self.http_method = prop.http_method
         self.http_url = prop.url_path
         self.http_codes = prop.expected_codes
+        self.target_ip_all = prop.target_ip_all
+        self.target_ip_list = prop.target_ip_list
 
     def create(self):
         if not self.uuid:
@@ -111,7 +117,9 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
                                   max_retries=self.max_retries,
                                   http_method=self.http_method,
                                   url_path=self.http_url,
-                                  expected_codes=self.http_codes)
+                                  expected_codes=self.http_codes,
+                                  target_ip_all=self.target_ip_all,
+                                  target_ip_list=self.target_ip_list)
             self.created = True
         self.logger.info('Health Check: %s(%s), type %s'
                          %(self.name, self.uuid, self.probe_type))
@@ -125,7 +133,8 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
     def update_properties(self, enabled=None, hc_type=None,
                           probe_type=None, delay=None,
                           timeout=None, max_retries=None, http_method=None,
-                          http_url=None, http_codes=None):
+                          http_url=None, http_codes=None,
+                          target_ip_all=False, target_ip_list=None):
         self.status = enabled or self.status
         self.hc_type = hc_type or self.hc_type
         self.probe_type = probe_type or self.probe_type
@@ -135,6 +144,8 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
         self.http_url = http_url or self.http_url
         self.http_method = http_method or self.http_method
         self.http_codes = http_codes or self.http_codes
+        self.target_ip_all= target_ip_all or self.target_ip_all
+        self.target_ip_list= target_ip_list or self.target_ip_list
         self.vnc_h.update_health_check_properties(self.uuid,
                                       enabled=self.status,
                                       health_check_type=self.hc_type,
@@ -144,8 +155,9 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
                                       max_retries=self.max_retries,
                                       http_method=self.http_method,
                                       url_path=self.http_url,
-                                      expected_codes=self.http_codes)
-
+                                      expected_codes=self.http_codes,
+                                      target_ip_all=self.target_ip_all,
+                                      target_ip_list=self.target_ip_list)
     def verify_on_setup(self):
         self.verify_is_run = True
         ret = self.verify_in_api_server()
@@ -198,6 +210,14 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
         if self.http_codes and self.http_codes != api_obj.http_codes:
             self.logger.warn('HC http-codes didnt match. Exp: %s Act: %s'%(
                               self.http_codes, api_obj.http_codes))
+            return False
+        if self.target_ip_all and self.target_ip_all != api_obj.target_ip_all:
+            self.logger.warn('HC target-ip-all didnt match. Exp: %s Act: %s'%(
+                              self.target_ip_all, api_obj.target_ip_all))
+            return False
+        if self.target_ip_list and self.target_ip_list != api_obj.target_ip_list:
+            self.logger.warn('HC target-ip-list didnt match. Exp: %s Act: %s'%(
+                              self.target_ip_list, api_obj.target_ip_list))
             return False
         self.logger.info('verify_in_api_server passed for HC obj %s'%self.uuid)
         return True
@@ -260,6 +280,14 @@ class HealthCheckFixture(vnc_api_test.VncLibFixture):
                               self.http_codes, agent_obj.http_codes))
             return False
         '''
+        if self.target_ip_all and self.target_ip_all != agent_obj.target_ip_all:
+            self.logger.warn('HC target-ip-all didnt match. Exp: %s Act: %s'%(
+                              self.target_ip_all, agent_obj.target_ip_all))
+            return False
+        if self.target_ip_list and self.target_ip_list != agent_obj.target_ip_list:
+            self.logger.warn('HC target-ip-list didnt match. Exp: %s Act: %s'%(
+                              self.target_ip_list, agent_obj.target_ip_list))
+            return False
         self.logger.info('verify_in_agent passed for HC obj %s'%self.uuid)
         return True
 

@@ -938,6 +938,14 @@ class CsHealthCheckResult(Result):
     def http_codes(self):
         return self.properties('expected_codes')
 
+    @property
+    def target_ip_all(self):
+        return self.properties('target_ip_all')
+
+    @property
+    def target_ip_list(self):
+        return self.properties('target_ip_list')
+
 class CsApiAccessList(Result):
     def fq_name(self):
         return ':'.join(self.xpath('api-access-list', 'fq_name'))
