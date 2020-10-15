@@ -802,9 +802,12 @@ class AnalyticsVerification(fixtures.Fixture):
 # end vrouter uve functions
 # virtual-network uve functions
 # ------------------------#
-    def get_vn_uve(self, vn_fq_name):
+    def get_vn_uve(self, vn_fq_name, skip_opservers=None):
         '''This function returns entire vn uve.Need this to verify that vn uve does not exists if the vn is deleted'''
+        skip_opservers = skip_opservers or []
         for ip in self.inputs.collector_ips:
+            if ip in skip_opservers:
+                continue
             self.opsobj = self.ops_inspect[ip]
             ops_vn = self.opsobj.get_ops_vn(vn_fq_name=vn_fq_name)
             if ops_vn:
@@ -2204,7 +2207,7 @@ class AnalyticsVerification(fixtures.Fixture):
 
     # Verifiation of contrail Alarms generation
 
-    def verify_alarms(self, role, alarm_type='process-status', service=None, verify_alarm_cleared=False):
+    def verify_alarms(self, role, alarm_type='process-status', service=None, verify_alarm_cleared=False, skip_opservers=None):
         result = True
         analytics = self.inputs.collector_ips[0]
         underlay = self.inputs.run_cmd_on_server(analytics, 'contrail-status | grep contrail-snmp-collector',
@@ -2335,7 +2338,7 @@ class AnalyticsVerification(fixtures.Fixture):
             if alarm_type == 'process-status':
                 assert self.inputs.verify_state(),'contrail-status is not good,some processess are already down'
                 for process in vrouter_processes:
-                    if not self._verify_contrail_alarms(process, 'vrouter','service_stop', multi_instances=multi_instances):
+                    if not self._verify_contrail_alarms(process, 'vrouter','service_stop', multi_instances=multi_instances, skip_opservers=skip_opservers):
                         result = result and False
                     else:
                         self.logger.info("Vrouter alarms were generated after stopping the process  %s " % (role))
@@ -2778,7 +2781,7 @@ class AnalyticsVerification(fixtures.Fixture):
                      verify_alarm_cleared=verify_alarm_cleared, built_in=False, alarm_name=alarm_name, skip_nodes=skip_nodes)
     # end  verify_configured_alarm
 
-    def _verify_alarms_stop_svc(self, service, service_ip, role, alarm_type, multi_instances=False, soak_timer=15,container='controller'):
+    def _verify_alarms_stop_svc(self, service, service_ip, role, alarm_type, multi_instances=False, soak_timer=15,container='controller', skip_opservers=None):
         result = True
         self.logger.info("Verify alarms generated after stopping the service %s:" % (service))
         dist = self.inputs.get_os_version(service_ip)
@@ -2798,7 +2801,7 @@ class AnalyticsVerification(fixtures.Fixture):
                 self.inputs.stop_service(service, host_ips=[service_ip],
                                          container=container)
             self.logger.info("Process %s stopped" % (service))
-            if not self._verify_alarms_by_type(service, service_ip, role, alarm_type, multi_instances, soak_timer):
+            if not self._verify_alarms_by_type(service, service_ip, role, alarm_type, multi_instances, soak_timer, skip_nodes=skip_opservers):
                 result = result and False
         except Exception as e:
             self.logger.exception('Exception occured while verifying alarms %s' % (alarm_type))
@@ -2949,7 +2952,7 @@ class AnalyticsVerification(fixtures.Fixture):
     # end _verify_alarms_by_type
 
     def _verify_contrail_alarms(self, service, role, trigger='service_stop',
-            multi_instances=False, verify_alarm_cleared=False):
+            multi_instances=False, verify_alarm_cleared=False, skip_opservers=None):
         ''' Verify whether contrail alarms is raised
         multi_instances = True for multi node setup based on the role
         '''
@@ -3016,7 +3019,7 @@ class AnalyticsVerification(fixtures.Fixture):
             alarm_type = ['process-status']
 
         if trigger == 'service_stop':
-            if not self._verify_alarms_stop_svc(service, service_ip, role, alarm_type, multi_instances,container=container):
+            if not self._verify_alarms_stop_svc(service, service_ip, role, alarm_type, multi_instances,container=container, skip_opservers=skip_opservers):
                 result = result and False
         elif trigger == 'bgp_peer_mismatch':
             alarm_type = ['bgp-connectivity']
