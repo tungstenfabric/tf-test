@@ -535,6 +535,24 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
                 return routes
     # end get_vna_layer2_route
 
+    def get_vna_evpn_route(self, vrf_id='', vxlanid=None, mac=None, ip=None):
+        mac1 = str(vxlanid)+"-"+mac+"-"+ip
+        routes = {'mac': mac1}
+        path = 'Snh_EvpnRouteReq?x=%s' % str(vrf_id)
+        xpath = 'route_list/list/RouteEvpnSandeshData'
+        p = self.dict_get(path)
+        routelist = EtreeToDict('./EvpnRouteResp/%s' %(xpath)).get_all_entry(p) or \
+            EtreeToDict('./%s' % (xpath)).get_all_entry(p)
+        if type(routelist) is dict:
+            routelist1 = [routelist]
+        else:
+            routelist1 = routelist
+        for route in routelist1:
+            if (route['mac'] == mac1):
+                routes.update({'routes': [route]})
+                return routes
+    # end get_vna_evpn_route
+
     def get_vna_mcast_route(self, vrf_id='', grp_ip=None, src_ip=None):
         '''
         Get Multicast route table details
