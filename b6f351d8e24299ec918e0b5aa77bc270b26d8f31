@@ -33,6 +33,40 @@
       "revId": "b6f351d8e24299ec918e0b5aa77bc270b26d8f31",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "311b3def_ca9a6c80",
+        "filename": "scripts/maciplearning/test_maciplearning_v4.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 428
+      },
+      "writtenOn": "2020-10-15T08:33:45Z",
+      "side": 1,
+      "message": "please take out these attribute for all the testcases ...which is not needed instead just include the \"sanity\" for few tests ..so that they will run in  the regular sanity",
+      "revId": "b6f351d8e24299ec918e0b5aa77bc270b26d8f31",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "633d8e0f_031ed18e",
+        "filename": "scripts/maciplearning/test_maciplearning_v4.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 3491,
+      "author": {
+        "id": 428
+      },
+      "writtenOn": "2020-10-15T08:33:45Z",
+      "side": 1,
+      "message": "as we discussed just take care of the deletion of the vn first  which has the health check reference before the deletion of the bfd health check template",
+      "revId": "b6f351d8e24299ec918e0b5aa77bc270b26d8f31",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
     }
   ]
 }
