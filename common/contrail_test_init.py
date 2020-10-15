@@ -296,6 +296,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.collector_ips = []
         self.collector_control_ips = []
         self.collector_names = []
+        self.alarmgen_nrs = 0
         self.database_ips = []
         self.database_names = []
         self.database_control_ips = []
@@ -466,6 +467,8 @@ class TestInputs(with_metaclass(Singleton, object)):
                 self.k8s_slave_ips.append(host_data['host_ip'])
             if 'contrail_command' in roles:
                 self.command_server_ip = host_data['host_ip']
+            if 'analytics_alarm' in roles:
+                self.alarmgen_nrs += 1
             host_data['data-ip'] = host_data['host_data_ip'] = host_data_ip
             host_data['control-ip'] = host_data['host_control_ip'] = host_control_ip
             self.host_data[host_data_ip] = self.host_data[host_control_ip] = host_data
