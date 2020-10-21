@@ -17,7 +17,8 @@ NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
                  'juniper-qfx5k', 'juniper-qfx5k-lean', 'juniper-srx']
 VALID_OVERLAY_ROLES = ['dc-gateway', 'crb-access', 'dci-gateway',
                        'ar-client', 'crb-gateway', 'erb-ucast-gateway',
-                       'crb-mcast-gateway', 'ar-replicator','route-reflector', 'collapsed-spine']
+                       'crb-mcast-gateway', 'ar-replicator', 'route-reflector',
+                       'collapsed-spine', 'pnf-servicechain']
 DEFAULT_UPGRADE_PARAMS = {
     'bulk_device_upgrade_count': 4,
     'health_check_abort': True,
@@ -494,8 +495,6 @@ class FabricUtils(object):
                              'routing_bridging_roles': routing_bridging_role}
             payload['role_assignments'].append(dev_role_dict)
         for device_roles in payload['role_assignments']:
-            if device_roles['physical_role'].lower() == 'pnf':
-                continue
             device = device_roles['device_fq_name']
             self.vnc_h.associate_physical_role(device,
                 device_roles['physical_role'])
