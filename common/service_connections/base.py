@@ -278,16 +278,22 @@ class BaseServiceConnectionsTest(GenericTestBase):
         Values to argument "client_role" can be:
                 "agent", "control", "config", "analytics" and "database"
         '''
-        config_file = 'entrypoint.sh'
-        client_conf_file = client_process + ".conf"
-        cmd_set = "openstack-config --get /etc/contrail/" + client_conf_file
-        cmd = cmd_set + " " + section + " " + option
+        if client_role == "agent":
+            config_file = 'actions.sh'
+            cmd = "openstack-config --get /parameters.sh DEFAULT " + option
+            section = None
+        else:
+            config_file = 'entrypoint.sh'
+            client_conf_file = client_process + ".conf"
+            cmd_set = "openstack-config --get /etc/contrail/" + client_conf_file
+            cmd = cmd_set + " " + section + " " + option
 
         if client_role == "agent":
             for ip in self.inputs.compute_ips:
                 server_list = self.get_new_server_list(operation, ip,
                                                        cmd, server_ip, index,
                                                        container = "agent")
+                server_list = ['"{}"'.format(' '.join(server_list))]
                 self.configure_server_list(ip, client_process,
                         section, option, server_list, config_file, container_name, container = "agent")
         elif client_role in ["control", "dns"]:
@@ -335,7 +341,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
         '''
         output = self.inputs.run_cmd_on_server(client_ip, cmd,
                             container = container)
-        output = output.split(" ")
+        output = output.replace('"', '').split(" ")
         server_list= [elem for elem in output if elem != " "]
         server_port = server_list[0].split(":")[1]
         server = server_ip + ":" + server_port

@@ -24,10 +24,10 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         in_use_servers, status, ports = self.get_all_in_use_servers("xmpp" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
-        self.add_remove_server("remove", in_use_servers[0], "CONTROL-NODE",
-                                "servers", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
+        self.add_remove_server("remove", in_use_servers[0], None,
+                                "XMPP_SERVERS_LIST", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
         self.addCleanup(self.add_remove_server, "add", in_use_servers[0],
-                "CONTROL-NODE", "servers", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
+                None, "XMPP_SERVERS_LIST", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
         for node in self.inputs.compute_control_ips:
             new_in_use_servers, status, ports = self.get_all_in_use_servers("xmpp",
                                             "agent", "contrail-vrouter-agent",
@@ -59,10 +59,10 @@ class TestServiceConnectionsSerial(BaseServiceConnectionsTest):
         in_use_servers, status, ports = self.get_all_in_use_servers("dns" ,"agent",
                                             "contrail-vrouter-agent",
                                             self.inputs.compute_control_ips[0])
-        self.add_remove_server("remove", in_use_servers[0], "DNS",
-                                "servers", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
-        self.addCleanup(self.add_remove_server, "add", in_use_servers[0], "DNS",
-                                "servers", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
+        self.add_remove_server("remove", in_use_servers[0], None,
+                                "DNS_SERVERS_LIST", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
+        self.addCleanup(self.add_remove_server, "add", in_use_servers[0], None,
+                                "DNS_SERVERS_LIST", "agent", "contrail-vrouter-agent", "vrouter_vrouter-agent_1")
         for node in self.inputs.compute_control_ips:
             new_in_use_servers, status, ports = self.get_all_in_use_servers("dns",
                                             "agent", "contrail-vrouter-agent",
