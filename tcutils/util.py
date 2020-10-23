@@ -779,6 +779,17 @@ def run_cmd_on_server(issue_cmd, server_ip, username,
                     updated_cmd = 'docker exec %s %s \'%s\'' % (container_args,
                                                         shell_prefix,
                                                         issue_cmd)
+                if container == 'vrouter_vrouter-agent_1':
+                    agent_cmd_arr = ["flow", "nh"]
+                    res = issue_cmd.split()
+                    for word in res:
+                        for arr_word in agent_cmd_arr:
+                            if word == arr_word:
+                                break_me = True
+                                updated_cmd = "contrail-tools " + issue_cmd    
+                                break
+                        if break_me:
+                            break
                 else:
                     updated_cmd = 'docker exec %s %s' % (container_args,issue_cmd)
             logger.debug('[%s]: Running cmd : %s' % (server_ip, updated_cmd))
