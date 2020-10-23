@@ -3506,7 +3506,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         state = self.check_bfd_state(test_vm, vm1_fixture, gw_ip)
         assert state == "Up", "BFD state is not up."
 
-        target_mac = self.return_inft_mac_addr(test_vm, vm1_fixture)
+        target_mac = self.get_intf_mac_addr(test_vm, vm1_fixture)
         vsrx_vm_node_ip = vm1_fixture.vm_node_ip
         vsrx_vm_vrf_id = self.get_vrf_id(vn1_fixture, vm1_fixture)
         vn1_vxlan_id = vn1_fixture.get_vxlan_id()
@@ -3641,7 +3641,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         state = self.check_bfd_state(test_vm, vm1_fixture, gw_ip)
         assert state == "Up", "BFD state is not up."
 
-        target_mac = self.return_inft_mac_addr(test_vm, vm1_fixture)
+        target_mac = self.get_intf_mac_addr(test_vm, vm1_fixture)
         vsrx_vm_node_ip = vm1_fixture.vm_node_ip
         vsrx_vm_vrf_id = self.get_vrf_id(vn1_fixture, vm1_fixture)
         vn1_vxlan_id = vn1_fixture.get_vxlan_id()

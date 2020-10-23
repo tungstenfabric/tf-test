@@ -50,7 +50,7 @@ class BaseMacIpLearningTest(GenericTestBase):
         ip = self.inputs.host_data[vm.vm_node_ip]['host_ip']
         (session, pcap) = start_tcpdump_for_intf(
             ip, username, password, interface)
-        time.sleep(10)
+        time.sleep(120)
         stop_tcpdump_for_intf(session, pcap)
         result = search_in_pcap(session, pcap, 'BFD')
         return result
@@ -92,7 +92,7 @@ class BaseMacIpLearningTest(GenericTestBase):
                                            device='junos', hostkey_verify="False"), 'Could not delete target ip on ge-0/0/1 intf thru Netconf'
     # end remove_target_ip_on_vsrx
 
-    def return_inft_mac_addr(
+    def get_intf_mac_addr(
             self,
             src_vm=None,
             dst_vm=None,
@@ -106,7 +106,7 @@ class BaseMacIpLearningTest(GenericTestBase):
         split_output = re.split("Current address: ", output, 1)
         mac = split_output[1].split(",")[0]
         return mac
-    # end return_inft_mac_addr
+    # end get_intf_mac_addr
 
     def check_bfd_state(
             self,
