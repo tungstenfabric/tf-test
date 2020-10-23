@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "637f20f6_74bdd8a2",
+        "filename": "tcutils/util.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 216
+      },
+      "writtenOn": "2020-10-23T09:48:44Z",
+      "side": 1,
+      "message": "its better to have check like if \u0027agent\u0027 in container:\nfor other deployments u wont\u0027t find exact \u0027vrouter_vrouter-agent_1\u0027\nlook at common/contrail_services.py",
+      "revId": "36d19de194e61a856796d283b7e6c10588622173",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8b32f91a_56e3120c",
+        "filename": "tcutils/util.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 216
+      },
+      "writtenOn": "2020-10-23T09:48:44Z",
+      "side": 1,
+      "message": "we are going to have other cmd like rt and vif why only this two",
+      "revId": "36d19de194e61a856796d283b7e6c10588622173",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
