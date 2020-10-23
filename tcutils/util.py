@@ -779,6 +779,8 @@ def run_cmd_on_server(issue_cmd, server_ip, username,
                     updated_cmd = 'docker exec %s %s \'%s\'' % (container_args,
                                                         shell_prefix,
                                                         issue_cmd)
+                if 'agent' in container:
+                    updated_cmd = "contrail-tools " + issue_cmd    
                 else:
                     updated_cmd = 'docker exec %s %s' % (container_args,issue_cmd)
             logger.debug('[%s]: Running cmd : %s' % (server_ip, updated_cmd))
