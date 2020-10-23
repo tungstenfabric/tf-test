@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9e4efd66_0d854fb3",
+        "filename": "tcutils/util.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 823
+      },
+      "writtenOn": "2020-10-23T11:12:28Z",
+      "side": 1,
+      "message": "i took all possible names from common/contrail_services.py\n\nagent \u003d [‘contrail-agent’, ‘vrouter-agent’, ‘contrail-vrouter-agent’, ‘contrail-vrouter-agent_1’, ‘agent-dpdk’, ‘k8s_contrail-vrouter-agent’, ‘vrouter_vrouter-agent_1’, ‘contrail_vrouter_agent_dpdk’, ‘agent’, ‘vrouter_agent’]\n\ndeclaring something like this and comparing with container variable passed from the TC should right ?",
+      "parentUuid": "637f20f6_74bdd8a2",
+      "revId": "36d19de194e61a856796d283b7e6c10588622173",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8b32f91a_56e3120c",
         "filename": "tcutils/util.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2020-10-23T09:48:44Z",
       "side": 1,
       "message": "we are going to have other cmd like rt and vif why only this two",
+      "revId": "36d19de194e61a856796d283b7e6c10588622173",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5206d274_d19ae4f1",
+        "filename": "tcutils/util.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 823
+      },
+      "writtenOn": "2020-10-23T11:12:28Z",
+      "side": 1,
+      "message": "i will be removing this array as well... whenever the container is agent, i will update the command to be executed as below\n\nupdated_cmd \u003d \"contrail-tools \" + issue_cmd",
+      "parentUuid": "8b32f91a_56e3120c",
       "revId": "36d19de194e61a856796d283b7e6c10588622173",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
