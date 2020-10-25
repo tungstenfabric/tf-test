@@ -3495,7 +3495,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             target_ip_list={
                 'ip_address': [
                     target_ip.split('/')[0]]})
-        vn1_fixture.attach_shc(shc_fixture.uuid)
+        self.attach_shc_to_vn(shc_fixture, vn1_fixture)
+        self.addCleanup(self.detach_shc_from_vn, shc_fixture, vn1_fixture)
         self.config_bfd_on_vsrx(src_vm=test_vm,
                                 dst_vm=vm1_fixture,
                                 target_ip=target_ip,
@@ -3559,7 +3560,6 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             ip=target_ip.split("/")[0])
         assert not route, ('Route seen in inet table for %s' %
                            (target_ip.split("/")[0]))
-        vn1_fixture.detach_shc(shc_fixture.uuid)
         return True
     # end test_bfd_on_targetip_vsrx
 
@@ -3631,6 +3631,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             probe_type='BFD',
             target_ip_all=True)
         vn1_fixture.attach_shc(shc_fixture.uuid)
+        self.addCleanup(self.detach_shc_from_vn, shc_fixture, vn1_fixture)
         self.config_bfd_on_vsrx(src_vm=test_vm,
                                 dst_vm=vm1_fixture,
                                 target_ip=target_ip,
@@ -3665,7 +3666,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (target_ip.split("/")[0]))
 
         # detach hc
-        vn1_fixture.detach_shc(shc_fixture.uuid)
+        self.detach_shc_from_vn(shc_fixture, vn1_fixture)
 
         # Checking if BFD failed
         result = self.check_bfd_packets(vm1_fixture, vn1_fixture)

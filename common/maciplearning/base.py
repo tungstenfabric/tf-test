@@ -8,9 +8,7 @@ from vm_test import VMFixture
 from vn_test import VNFixture
 from tcutils.util import retry
 from string import Template
-from tcutils.tcpdump_utils import search_in_pcap, start_tcpdump_for_intf, stop_tcpdump_for_intf
 from tcutils.commands import ssh, execute_cmd, execute_cmd_out
-
 
 class BaseMacIpLearningTest(GenericTestBase):
 
@@ -42,18 +40,36 @@ class BaseMacIpLearningTest(GenericTestBase):
             output['ifconfig eth0 | grep inet'])
         ip_addr = ip.group(1)
         return ip_addr
+    # end get_intf_address
+
+    def attach_shc_to_vn(self, shc, vn_fixture):
+        '''
+        Attach the Health Check to VN
+        '''
+        result = vn_fixture.attach_shc(shc.uuid)
+        return result
+    # end attach_shc_to_vn
+
+    def detach_shc_from_vn(self, shc, vn_fixture):
+        '''
+        Detach the Health Check from VN
+        '''
+        result = vn_fixture.detach_shc(shc.uuid)
+        return result
+    # end detach_shc_from_vn
 
     def check_bfd_packets(self, vm, vn):
         interface = vm.tap_intf[vn.vn_fq_name]['name']
-        username = self.inputs.host_data[vm.vm_node_ip]['username']
-        password = self.inputs.host_data[vm.vm_node_ip]['password']
         ip = self.inputs.host_data[vm.vm_node_ip]['host_ip']
-        (session, pcap) = start_tcpdump_for_intf(
-            ip, username, password, interface)
-        time.sleep(120)
-        stop_tcpdump_for_intf(session, pcap)
-        result = search_in_pcap(session, pcap, 'BFD')
+        session = ssh(ip,self.inputs.host_data[ip]['username'],self.inputs.host_data[ip]['password'])
+        cmd = "sudo timeout 30 tcpdump -nei %s ip | grep BFD" % (interface)
+        self.logger.info("Starting tcpdump to capture the BFD packets on %s in server %s" % (interface, ip))
+        out, err = execute_cmd_out(session, cmd, self.logger)
+        result = False
+        if out:
+            result = True
         return result
+    # end check_bfd_packets
 
     def config_bfd_on_vsrx(
             self,
