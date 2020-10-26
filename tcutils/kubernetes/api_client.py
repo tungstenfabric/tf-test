@@ -1,8 +1,7 @@
-from __future__ import print_function
-from builtins import object
 import time
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+import functools
 
 from common import log_orig as contrail_logging
 from tcutils.util import get_random_name, retry
@@ -10,32 +9,51 @@ from kubernetes.stream import stream
 from pprint import pprint
 
 
+def retry_on_api_exception(*args, **kwargs):
+    """A decorator to retry when kubernetes raises ApiException with ConnectionError."""
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(cls_obj, *func_args, **func_kwargs):
+            try:
+                return f(cls_obj, *func_args, **func_kwargs)
+            except ApiException as e:
+                cls_obj.logger.warning("ApiException is caught %s. Retrying..." % e)
+            # retry
+            time.sleep(5)
+            cls_obj.init_clients()
+            return f(cls_obj, *func_args, **func_kwargs)
+        return wrapper
+    return decorator
+
+
 class Client(object):
 
     def __init__(self, config_file='/etc/kubernetes/admin.conf', logger=None, cluster=None):
         if cluster:
             config_file = cluster['kube_config_file']
-        cfg = client.Configuration()
+        self.cfg = client.Configuration()
         config.load_kube_config(config_file=config_file,
-                                client_configuration=cfg)
-        cfg.assert_hostname = False
+                                client_configuration=self.cfg)
+        self.cfg.assert_hostname = False
         if cluster:
-            (proto, _, port) = cfg.host.split(':')
+            (proto, _, port) = self.cfg.host.split(':')
             host = proto + '://' + cluster['master_public_ip'] + ':' + port
-            cfg.host = host
-            cfg.verify_ssl = False
-        self.api_client = client.ApiClient(cfg)
-        #self.res_v1_beta1_h = client.ApiextensionsV1beta1Api(self.api_client)
-        self.res_v1_obj_h = client.CustomObjectsApi(self.api_client)
-        self.v1_h = client.CoreV1Api(self.api_client)
-        self.v1_h.read_namespace('default')
-        self.v1_beta_h = client.ExtensionsV1beta1Api(self.api_client)
-        self.v1_networking = client.NetworkingV1Api(self.api_client)
-        self.apps_v1_beta1_h = client.AppsV1beta1Api(self.api_client)
-        self.apps_v1_h = client.AppsV1Api(self.api_client)
+            self.cfg.host = host
+            self.cfg.verify_ssl = False
 
+        self.init_clients()
         self.logger = logger or contrail_logging.getLogger(__name__)
     # end __init__
+
+    def init_clients(self):
+        api_client = client.ApiClient(self.cfg)
+        self.res_v1_obj_h = client.CustomObjectsApi(api_client)
+        self.v1_h = client.CoreV1Api(api_client)
+        self.v1_h.read_namespace('default')
+        self.v1_beta_h = client.ExtensionsV1beta1Api(api_client)
+        self.v1_networking = client.NetworkingV1Api(api_client)
+        self.apps_v1_beta1_h = client.AppsV1beta1Api(api_client)
+        self.apps_v1_h = client.AppsV1Api(api_client)
 
     def create_namespace(self, name, isolation=False, ip_fabric_forwarding=False,
                          ip_fabric_snat=False, network_fqname=None):
@@ -47,7 +65,7 @@ class Client(object):
         # initialize to allow different combinations
         body.metadata.annotations = {}
         if isolation:
-            body.metadata.annotations = {"opencontrail.org/isolation" : "true"}
+            body.metadata.annotations = {"opencontrail.org/isolation": "true"}
         if ip_fabric_forwarding:
             body.metadata.annotations["opencontrail.org/ip_fabric_forwarding"] = "true"
         if ip_fabric_snat:
@@ -70,8 +88,9 @@ class Client(object):
             return client.V1ObjectMeta(**mdata_dict)
 
     def _get_ingress_backend(self, backend_dict={}):
-        return client.V1beta1IngressBackend(backend_dict.get('service_name'),
-                backend_dict.get('service_port', 80))
+        return client.V1beta1IngressBackend(
+            backend_dict.get('service_name'),
+            backend_dict.get('service_port', 80))
 
     def _get_ingress_path(self, http):
         paths = http.get('paths', [])
@@ -91,7 +110,7 @@ class Client(object):
             rule_obj = client.V1beta1IngressRule(
                 host=rule.get('host'),
                 http=client.V1beta1HTTPIngressRuleValue(
-                     paths=self._get_ingress_path(rule.get('http'))))
+                    paths=self._get_ingress_path(rule.get('http'))))
 
             ing_rules.append(rule_obj)
         return ing_rules
@@ -108,11 +127,16 @@ class Client(object):
         '''
         Returns V1beta1Ingress object
         '''
-        if metadata is None: metadata = {}
-        if default_backend is None: default_backend = {}
-        if rules is None: rules = []
-        if tls is None: tls = []
-        if spec is None: spec = {}
+        if metadata is None:
+            metadata = {}
+        if default_backend is None:
+            default_backend = {}
+        if rules is None:
+            rules = []
+        if tls is None:
+            tls = []
+        if spec is None:
+            spec = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
@@ -148,12 +172,10 @@ class Client(object):
 
     def _get_label_selector(self, match_labels={}, match_expressions=[]):
         # TODO match_expressions
-        #return client.UnversionedLabelSelector(match_labels=match_labels)
         return client.V1LabelSelector(match_labels=match_labels)
 
     def _get_ip_block_selector(self, cidr="", _except=[]):
         # TODO match_expressions
-        #return client.UnversionedLabelSelector(match_labels=match_labels)
         return client.V1IPBlock(cidr=cidr, _except=_except)
 
     def _get_network_policy_peer_list(self, rule_list):
@@ -177,8 +199,7 @@ class Client(object):
             peer = client.V1NetworkPolicyPeer(
                 namespace_selector=namespace_selector_obj,
                 pod_selector=pod_selector_obj,
-                ip_block=ip_block_obj
-                )
+                ip_block=ip_block_obj)
             peer_list.append(peer)
         return peer_list
     # end _get_network_policy_peer_list
@@ -215,10 +236,11 @@ class Client(object):
             egress_rules_obj.append(
                 client.V1NetworkPolicyEgressRule(
                     to=to, ports=ports))
-        return client.V1NetworkPolicySpec(ingress=ingress_rules_obj,
-                                               egress=egress_rules_obj,
-                                               pod_selector=pod_selector,
-                                               policy_types=policy_types)
+        return client.V1NetworkPolicySpec(
+            ingress=ingress_rules_obj,
+            egress=egress_rules_obj,
+            pod_selector=pod_selector,
+            policy_types=policy_types)
     # end _get_network_policy_spec
 
     def update_network_policy(self,
@@ -229,10 +251,11 @@ class Client(object):
         '''
         Returns V1NetworkPolicy object
         '''
-        if metadata is None: metadata = {}
-        if spec is None: spec = {}
-        policy_obj = self.v1_networking.read_namespaced_network_policy(
-            policy_name, namespace)
+        if metadata is None:
+            metadata = {}
+        if spec is None:
+            spec = {}
+        _ = self.v1_networking.read_namespaced_network_policy(policy_name, namespace)
         metadata_obj = self._get_metadata(metadata)
 
         spec_obj = self._get_network_policy_spec(spec)
@@ -241,8 +264,8 @@ class Client(object):
             metadata=metadata_obj,
             spec=spec_obj)
         self.logger.info('Updating Network Policy %s' % (policy_name))
-        resp = self.v1_networking.patch_namespaced_network_policy(policy_name,
-                                                              namespace, body)
+        resp = self.v1_networking.patch_namespaced_network_policy(
+            policy_name, namespace, body)
         return resp
     # end update_network_policy
 
@@ -272,8 +295,10 @@ class Client(object):
 
         Returns V1NetworkPolicy object
         '''
-        if metadata is None: metadata = {}
-        if spec is None: spec = {}
+        if metadata is None:
+            metadata = {}
+        if spec is None:
+            spec = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
@@ -292,8 +317,8 @@ class Client(object):
                               name):
         self.logger.info('Deleting Network Policy : %s' % (name))
         body = client.V1DeleteOptions()
-        return self.v1_networking.delete_namespaced_network_policy(name, namespace,
-                                                               body)
+        return self.v1_networking.delete_namespaced_network_policy(
+            name, namespace, body)
     # end delete_network_policy
 
     def create_service(self,
@@ -317,9 +342,10 @@ class Client(object):
                                 }
                         ]
         '''
-        #kind = 'Service'
-        if metadata is None: metadata = {}
-        if spec is None: spec = {}
+        if metadata is None:
+            metadata = {}
+        if spec is None:
+            spec = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
@@ -362,8 +388,10 @@ class Client(object):
         return V1Pod instance
 
         '''
-        if metadata is None: metadata = {}
-        if spec is None: spec = {}
+        if metadata is None:
+            metadata = {}
+        if spec is None:
+            spec = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
@@ -431,7 +459,6 @@ class Client(object):
             container_objs.append(self._get_container(container_name, item))
         spec['containers'] = container_objs
         spec_obj = client.V1PodSpec(**spec)
-        #return spec
         return spec_obj
     # end create_spec
 
@@ -446,20 +473,22 @@ class Client(object):
         '''
         return self.v1_h.read_namespaced_pod_status(name, namespace)
 
+    @retry_on_api_exception("init_clients")
     def exec_cmd_on_pod(self, name, cmd, namespace='default', stderr=True,
                         stdin=False, stdout=True, tty=False,
                         shell='/bin/bash -l -c', container=None):
         cmd_prefix = shell.split()
         cmd_prefix.append(cmd)
-        kwargs = dict ()
+        kwargs = dict()
         if container:
             kwargs['container'] = container
-        output = stream(self.v1_h.connect_get_namespaced_pod_exec, name, namespace,
-                                                           command=cmd_prefix,
-                                                           stderr=stderr,
-                                                           stdin=stdin,
-                                                           stdout=stdout,
-                                                           tty=tty, **kwargs)
+        output = stream(
+            self.v1_h.connect_get_namespaced_pod_exec, name, namespace,
+            command=cmd_prefix,
+            stderr=stderr,
+            stdin=stdin,
+            stdout=stdout,
+            tty=tty, **kwargs)
         return output
         # end exec_cmd_on_pod
 
@@ -502,8 +531,8 @@ class Client(object):
         ing_obj.spec.tls = self._get_ingress_tls(tls)
         self._wa_client_bug_18_for_ingress(ing_obj)
 
-        return self.v1_beta_h.patch_namespaced_ingress(ing_obj.metadata.name,
-                namespace, ing_obj)
+        return self.v1_beta_h.patch_namespaced_ingress(
+            ing_obj.metadata.name, namespace, ing_obj)
     # end set_ingress_tls
 
     def set_pod_label(self, namespace, pod_name, label_dict):
@@ -524,10 +553,11 @@ class Client(object):
             return True
         except ApiException:
             return False
+
     # end is_namespace_present
     def _get_selector(self, label_selector):
         if label_selector:
-           return client.V1LabelSelector(match_labels=label_selector.get('match_labels'))
+            return client.V1LabelSelector(match_labels=label_selector.get('match_labels'))
 
     def _get_rollback_config(self, rollback_to=None):
         if rollback_to:
@@ -580,7 +610,6 @@ class Client(object):
         return spec_obj
     # end _get_deployment_spec
 
-
     def create_deployment(self,
                           namespace='default',
                           name=None,
@@ -589,8 +618,10 @@ class Client(object):
         '''
         Returns AppsV1beta1Deployment object
         '''
-        if metadata is None: metadata = {}
-        if spec is None: spec = {}
+        if metadata is None:
+            metadata = {}
+        if spec is None:
+            spec = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
@@ -604,23 +635,21 @@ class Client(object):
         return resp
     # end create_deployment
 
-    def delete_deployment(self,
-                       namespace,
-                       name):
+    def delete_deployment(self, namespace, name):
         self.logger.info('Deleting Deployment : %s' % (name))
         body = client.V1DeleteOptions()
-        return self.apps_v1_beta1_h.delete_namespaced_deployment(name,
-            namespace, body, orphan_dependents=False)
+        return self.apps_v1_beta1_h.delete_namespaced_deployment(
+            name, namespace, body, orphan_dependents=False)
     # end delete_deployment
 
     def set_deployment_replicas(self, namespace, deployment, count=0):
-        self.logger.info('Setting replicas of deployment %s to %s' %(
+        self.logger.info('Setting replicas of deployment %s to %s' % (
             deployment, count))
         dep_obj = self.v1_beta_h.read_namespaced_deployment(deployment,
                                                             namespace)
         dep_obj.spec.replicas = count
-        return self.v1_beta_h.patch_namespaced_deployment(deployment,
-            namespace, dep_obj)
+        return self.v1_beta_h.patch_namespaced_deployment(
+            deployment, namespace, dep_obj)
         time.sleep(10)
     # end set_deployment_replicas
 
@@ -655,14 +684,13 @@ class Client(object):
         return ret_list
     # end get_pods_list
 
-
     @retry(delay=3, tries=20)
     def wait_till_pod_cleanup(self, namespace, replica_set=None):
         if self.get_pods_list(namespace, replica_set):
             self.logger.debug('One or more pods still in replica set..waiting')
             return False
         else:
-            self.logger.debug('No pods managed by replica set %s' %(replica_set))
+            self.logger.debug('No pods managed by replica set %s' % (replica_set))
             return True
     # end wait_till_pod_cleanup
 
@@ -673,14 +701,15 @@ class Client(object):
         this set the replica count of deployment to 0, waits for the pods to
         go away and then delete the rs
         '''
-        self.logger.info('Deleting replica set of deployment %s' %(deployment))
+        self.logger.info('Deleting replica set of deployment %s' % (deployment))
         body = client.V1DeleteOptions()
         self.set_deployment_replicas(namespace, deployment, 0)
         rs_objs = self.get_replica_set(namespace, deployment)
         for rs_obj in rs_objs:
             name = rs_obj.metadata.name
             self.wait_till_pod_cleanup(namespace, name)
-            self.v1_beta_h.delete_namespaced_replica_set(name, namespace, body,
+            self.v1_beta_h.delete_namespaced_replica_set(
+                name, namespace, body,
                 orphan_dependents=False)
     # end delete_replica_set
 
@@ -696,12 +725,7 @@ class Client(object):
         self.v1_h.patch_namespace(namespace, ns_obj)
     # end set_service_isolation
 
-
-    def create_secret(self,
-                       namespace='default',
-                       name=None,
-                       metadata=None,
-                       data=None):
+    def create_secret(self, namespace='default', name=None, metadata=None, data=None):
         '''
         Returns V1Secret object
         Ex :
@@ -714,8 +738,10 @@ class Client(object):
         '''
         kind = 'Secret'
         obj_type = 'kubernetes.io/tls'
-        if metadata is None: metadata = {}
-        if data is None: data = {}
+        if metadata is None:
+            metadata = {}
+        if data is None:
+            data = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
@@ -737,71 +763,75 @@ class Client(object):
         return self.v1_h.delete_namespaced_secret(name, namespace, body)
     # end delete_secret
 
-    def create_custom_resource_object(self,
-                   namespace='default',
-                   name=None, metadata=None,
-                   spec=None,
-                   apiVersion='k8s.cni.cncf.io/v1', \
-                   nad='NetworkAttachmentDefinition',
-                   plural="network-attachment-definitions"):
+    def create_custom_resource_object(
+            self,
+            namespace='default',
+            name=None, metadata=None,
+            spec=None,
+            apiVersion='k8s.cni.cncf.io/v1',
+            nad='NetworkAttachmentDefinition',
+            plural="network-attachment-definitions"):
         '''Routine to create the custome resource object in k8s environment in our case
            its NetworkAttachmentDefinition to support multiple interfaces to the POD
         '''
-        if metadata is None: metadata = {}
-        if spec is None: spec = {}
+        if metadata is None:
+            metadata = {}
+        if spec is None:
+            spec = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
         if namespace:
             metadata_obj.namespace = namespace
-        group=apiVersion.split("/")[0]
-        body={
+        group = apiVersion.split("/")[0]
+        body = {
             'apiVersion': apiVersion,
             'kind': nad,
             'metadata': metadata_obj,
-            'spec': spec }
+            'spec': spec}
 
-        version=apiVersion.split("/")[-1]
-        #create a network attachement definition in the given namespace
+        version = apiVersion.split("/")[-1]
+        # create a network attachement definition in the given namespace
         try:
-            api_response = self.res_v1_obj_h.create_namespaced_custom_object(group, version, \
-                                             namespace, plural, body, pretty="true")
+            api_response = self.res_v1_obj_h.create_namespaced_custom_object(
+                group, version, namespace, plural, body, pretty="true")
             self.logger.info('Creating NetworkAttachment %s:%s' % (namespace, name))
             pprint(api_response)
         except ApiException as e:
             print("Exception when calling CustomObjectsApi->create_cluster_custom_object: %s\n" % e)
             return None
         return api_response
-    #end create_custom_resource_object
+    # end create_custom_resource_object
 
-    def delete_custom_resource_object(self, name=None,
-                                     namespace='default',
-                                     metadata=None, Spec=None,
-                                     apiVersion='k8s.cni.cncf.io/v1',
-                                     plural="network-attachment-definitions",
-                                     grace_period_seconds=0):
+    def delete_custom_resource_object(
+            self, name=None,
+            namespace='default',
+            metadata=None, Spec=None,
+            apiVersion='k8s.cni.cncf.io/v1',
+            plural="network-attachment-definitions",
+            grace_period_seconds=0):
         '''Routine deletes the custome resource object created in k8s plaotform
         '''
         body = client.V1DeleteOptions()
         group = apiVersion.split("/")[0]
         version = apiVersion.split("/")[-1]
         try:
-            api_response = self.res_v1_obj_h.delete_namespaced_custom_object(group, version, namespace, plural, \
-                                                                          name, \
-                                                                          body, \
-                                                                          grace_period_seconds=grace_period_seconds)
+            api_response = self.res_v1_obj_h.delete_namespaced_custom_object(
+                group, version, namespace, plural,
+                name, body, grace_period_seconds=grace_period_seconds)
             self.logger.info('Deleted NetworkAttachment %s:%s' % (namespace, name))
             pprint(api_response)
         except ApiException as e:
             print("Exception when calling CustomObjectsApi->delete_namespaced_custom_object: %s\n" % e)
             return None
         return api_response
-    #delete_custom_resource_object
+    # end delete_custom_resource_object
 
-    def read_custom_resource_object(self, name=None,
-                                     namespace='default',
-                                     apiVersion='k8s.cni.cncf.io/v1',
-                                     plural="network-attachment-definitions"):
+    def read_custom_resource_object(
+            self, name=None,
+            namespace='default',
+            apiVersion='k8s.cni.cncf.io/v1',
+            plural="network-attachment-definitions"):
         '''Routine reads the custome resource object created in k8s plaotform
         '''
 
@@ -815,15 +845,18 @@ class Client(object):
             print("Exception when calling CustomObjectsApi->get_namespaced_custom_object: %s\n" % e)
             return None
         return api_response
-    #Create te daemonset
+
+    # Create te daemonset
     def create_daemonset(self, namespace='default',
                          name=None, metadata=None,
                          spec=None):
         '''
         Returns AppsV1beta1DaemonSet object
         '''
-        if metadata is None: metadata = {}
-        if spec is None: spec = {}
+        if metadata is None:
+            metadata = {}
+        if spec is None:
+            spec = {}
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
@@ -833,9 +866,10 @@ class Client(object):
             metadata=metadata_obj,
             spec=spec_obj)
         self.logger.info('Creating DaemonSet %s' % (metadata_obj.name))
-        resp = self.v1_beta_h.create_namespaced_daemon_set(namespace, body , pretty ='true')
+        resp = self.v1_beta_h.create_namespaced_daemon_set(namespace, body, pretty='true')
         return resp
-    #read the spec of te deamonset object
+
+    # read the spec of te deamonset object
     def _get_daemonset_spec(self, spec_dict):
         '''
           build the daemon set spec and return the spec object
@@ -854,20 +888,21 @@ class Client(object):
                          namespace="default"):
         '''Delete the  daemonset '''
         try:
-           api_response = self.apps_v1_h.read_namespaced_daemon_set(name, namespace)
-           pprint(api_response)
-           self.logger.info('Deleting Daemonset : %s' % (name))
-           body = client.V1DeleteOptions()
-           return self.apps_v1_h.delete_namespaced_daemon_set(name,
-                  namespace,body,orphan_dependents=False)
-        except ApiException as e:
-           self.logger.info('Deamonset %s not found' % (name))
-           return None
+            api_response = self.apps_v1_h.read_namespaced_daemon_set(name, namespace)
+            pprint(api_response)
+            self.logger.info('Deleting Daemonset : %s' % (name))
+            body = client.V1DeleteOptions()
+            return self.apps_v1_h.delete_namespaced_daemon_set(
+                name, namespace, body, orphan_dependents=False)
+        except ApiException:
+            self.logger.info('Deamonset %s not found' % (name))
+            return None
+
     def get_kubernetes_compute_labels(self):
         '''
            Get list of all nodes with label computenode, and no of computes
         '''
-        compute_count=0;
+        compute_count = 0
         compute_label_list = []
         nodes = self.v1_h.list_node()
 
@@ -875,11 +910,11 @@ class Client(object):
             label = node.metadata.labels.get('computenode', None)
             if label:
                 compute_label_list.append(label)
-                compute_count+=1
+                compute_count += 1
 
         return compute_label_list, compute_count
 
-    def set_label_for_hbf_nodes(self,nodes_list_spec=None,
+    def set_label_for_hbf_nodes(self, nodes_list_spec=None,
                                 labels=None,
                                 node_selector=None):
         '''
@@ -890,16 +925,16 @@ class Client(object):
         if nodes_list_spec is None:
             nodes_list_spec = self.v1_h.list_node()
         if labels is None:
-            labels = {"labels":{ "type": "hbf"}}
+            labels = {"labels": {"type": "hbf"}}
         else:
-            labels = {"labels":labels}
-        body = { "metadata": labels}
+            labels = {"labels": labels}
+        body = {"metadata": labels}
         master_label = 'node-role.kubernetes.io/master'
 
         for node in nodes_list_spec.items:
-            if not master_label in node.metadata.labels:
+            if master_label not in node.metadata.labels:
                 nodename = node.metadata.labels.get('kubernetes.io/hostname')
-                self.logger.info('compute node name : %s' %(nodename))
+                self.logger.info('compute node name : %s' % (nodename))
                 if node_selector:
                     body['metadata']['labels'][node_selector] = nodename
                 try:
@@ -909,6 +944,7 @@ class Client(object):
                     self.logger.error("Exception in  CoreV1Api->patch_node:%s\n" % e)
                     return False
         return True
+
 
 if __name__ == '__main__':
     c1 = Client()
@@ -930,7 +966,7 @@ if __name__ == '__main__':
                 },
                 'spec': {
                     'containers': [
-                        { 'image': 'nginx:1.7.9' }
+                        {'image': 'nginx:1.7.9'}
                     ]
                 }
             }
