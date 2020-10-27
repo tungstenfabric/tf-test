@@ -34,6 +34,7 @@ def pod_with_all_operations_for_custom_user_project_domain():
                                                 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
     #MSG USE resource_with_expectation method after it is found to be working
 
+
 # Untested
 def pod_with_all_operations_for_admin_project_domain():
     resource = {}
@@ -46,7 +47,8 @@ def pod_with_all_operations_for_admin_project_domain():
                                                 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
     Util.resource_with_expectation(verb='create', resource_expectation_list=['pod-expected', 'deployment', 'service', 'namespace',
                                                                      'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
-
+    Util.resource_with_expectation(verb='delete', resource_expectation_list=['pod-expected', 'deployment', 'service', 'namespace',
+                                                                 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
 
 pod_with_all_operations_for_custom_user_project_domain()
-pod_with_all_operations_for_admin_project_domain()
+# pod_with_all_operations_for_admin_project_domain()
