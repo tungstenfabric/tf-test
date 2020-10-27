@@ -26,19 +26,15 @@ def pod_with_all_operations_for_custom_user_project_domain():
     create_policy.create_and_apply_policies(resource=resource, match=match)
 
     # Test required operation
-    # Need to be able to create, delete, get Pod
     Util.source_stackrc(user_name='john', password='c0ntrail123',
                         project_name='new_project', domain_name='new_domain', auth_url=admin.auth_url)
     Util.resource(verb='create', resource_list=['pod', 'deployment', 'service', 'namespace',
                                                 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
     Util.resource(verb='delete', resource_list=['pod', 'deployment', 'service', 'namespace',
                                                 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset'])
-    # Shouldn't be able to create Deployment, Service, Ingress, NAD, Namespace, DaemonSet and NetworkPolicy
+    #MSG USE resource_with_expectation method after it is found to be working
 
-
-# pod_with_all_operations_for_admin_project_domain()
-# pod_with_all_operations_for_custom_user_project_domain()
-
+# Untested
 def pod_with_all_operations_for_admin_project_domain():
     resource = {}
     resource['resources'] = ['pods']
