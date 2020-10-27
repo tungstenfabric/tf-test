@@ -14,7 +14,7 @@ def all_operations_for_admin_project_domain():
 
     filename = get_absolute_file_path('admin_all_policy.yaml')
 
-    create_policy.apply_policies(filename)
+    create_policy.create_and_apply_policies(filename=filename)
 
     Util.source_stackrc(user_name='admin', password='password',
                         project_name='admin', domain_name='admin_domain', auth_url=admin.auth_url)
@@ -28,7 +28,9 @@ def pod_with_all_operations_for_custom_user_project_domain():
     admin = ExampleUser.admin()
 
     filename = get_absolute_file_path('john_pod_policy.yaml')
-    create_policy.apply_policies(filename)
+    resource = {}
+    resource['resources'] = ['pods']
+    create_policy.create_and_apply_policies(resource=resource, filename=filename)
 
     Util.source_stackrc(user_name='john', password='c0ntrail123',
                         project_name='new_project', domain_name='new_domain', auth_url=admin.auth_url)

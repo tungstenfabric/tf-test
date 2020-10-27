@@ -56,3 +56,28 @@ class Util:
                 import json
                 errorMessage = json.loads(errorObject)['message']
                 logging.error(errorMessage)
+
+    
+    @staticmethod
+    def resource_with_expectation(verb, resource_expectation_list):
+        expectation = False
+        for resource_exp in resource_expectation_list:
+            if "-expected" in resource_exp:
+                resource = resource_exp.split("-")[0]
+                expectation = True
+            else:
+                resource = resource_exp
+            output, error = Util.exec_kubectl_cmd_on_file(
+                verb=verb, template_file=Util.templates[resource])
+            if verb in output:
+                if expectation == True:
+                    logging.info(f'{verb} {resource} successful')
+                else:
+                    logging.warning(f'{verb} {resource} successful even when expectation is False')
+            elif 'forbidden' in error:
+                logging.info(f'{verb} {resource} forbidden')
+            else:
+                errorObject = error.split("[")[1].split("]")[0]
+                import json
+                errorMessage = json.loads(errorObject)['message']
+                logging.error(errorMessage)
