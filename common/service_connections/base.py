@@ -285,6 +285,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
 
         if client_role == "agent":
             for ip in self.inputs.compute_ips:
+                config_file = 'actions.sh'
                 server_list = self.get_new_server_list(operation, ip,
                                                        cmd, server_ip, index,
                                                        container = "agent")
