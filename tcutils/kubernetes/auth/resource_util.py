@@ -38,9 +38,9 @@ class ResourceUtil(Util):
     def create_policy_and_perform_operation(resource={}, match=[], resource_expectation_list=[], stackrc_dict={}):
         create_policy.create_and_apply_policies(resource=resource, match=match)
         Util.source_stackrc(**stackrc_dict)
-        Util.resource_with_expectation(
+        ResourceUtil.resource_with_expectation(
             verb='create', resource_expectation_list=resource_expectation_list)
-        Util.resource_with_expectation(
+        ResourceUtil.resource_with_expectation(
             verb='delete', resource_expectation_list=resource_expectation_list)
 
 
