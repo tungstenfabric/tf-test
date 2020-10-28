@@ -358,8 +358,10 @@ class VerifySvcMirror(ConfigSvcMirror, ECMPVerify):
             cmds = "/sbin/ifconfig " + sub_intf + " | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'"
             if self.inputs.get_af() == 'v6':
                cmds = "/sbin/ifconfig " + sub_intf + " | grep 'inet6 addr:'"
-            src_ip = src_vm.run_cmd_on_vm(cmds=[cmds]).values()[0]
-            dst_ip = dst_vm.run_cmd_on_vm(cmds=[cmds]).values()[0]
+            src_ip_list = src_vm.run_cmd_on_vm(cmds=[cmds]).values()[0]
+            src_ip = src_ip_list[0]
+            dst_ip_list = dst_vm.run_cmd_on_vm(cmds=[cmds]).values()[0]
+            dst_ip = dst_ip_list[0]
             if self.inputs.get_af() == 'v6':
                 src_list = src_ip.split(' ')
                 dst_list = dst_ip.split(' ')
