@@ -402,6 +402,7 @@ class TestInputs(with_metaclass(Singleton, object)):
                     self.compute_ips.append(host_data['host_ip'])
                     service_name = self.get_service_name(host_data['host_ip'], data_ip)
                     self.compute_names.append(service_name)
+                    #self.compute_names = ['srv1.maas', 'srv4.maas']
                     self.compute_info[service_name] = host_data['host_ip']
                     self.compute_control_ips.append(data_ip)
                     self.host_data[service_name] = host_data
