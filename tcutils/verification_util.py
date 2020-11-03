@@ -369,16 +369,21 @@ class EtreeToDict(object):
         Returns the list of dictionary/didctionary.
         """
         xps = path.xpath(self.xpath)
+        print("[get_all_entry] xps = %s" % str(xps))
         if not xps:
             # sometime ./xpath dosen't work; work around
             # should debug to find the root cause.
+            print("[get_all_entry]  # should debug to find the root cause????")
             xps = path.xpath(self.xpath.strip('.'))
+            print("[get_all_entry]  xps = %s" % str(xps))
         if type(xps) is not list:
+            print("[get_all_entry]  type(xps) == %s, return dict?" % str(type(xps)))
             return self._get_one(xps)
 
         val = []
         for xp in xps:
             val.append(self._get_one(xp))
+        print("[get_all_entry]  return len = %s, type(len(val[0])) == %s" % (str(len(val)), str(type(len(val[0])))))
         if len(val) == 1:
             return val[0]
         return val
