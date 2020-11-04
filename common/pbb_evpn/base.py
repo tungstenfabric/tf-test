@@ -13,7 +13,7 @@ import random
 from netaddr import *
 from tcutils.util import retry, get_random_mac
 from tcutils.tcpdump_utils import *
-
+from time import sleep
 
 USER_DATA = """#!/bin/bash
 
@@ -526,6 +526,7 @@ class PbbEvpnTestBase(BaseVrouterTest):
             'vm_fixtures':vm_fixtures,
             'pbb_compute_node_ips':pbb_compute_node_ips,
         }
+        sleep(120)
         return ret_dict
 
     def send_l2_traffic(self,
