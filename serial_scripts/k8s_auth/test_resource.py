@@ -6,13 +6,15 @@ import os
 # Tested and working
 
 # If nothing is mentioned in the resource verbs, then all operations are permitted for that particular resource
+
+
 def pod_with_all_operations_for_custom_user_project_domain():
     admin = ExampleUser.admin()
     admin.create_all(user_name='test', password='c0ntrail123', role='Member',
                      project_name='test_project', domain_name='test_domain')
     resource = {}
     resource['resources'] = ['pods']
-    # MSG Use create_test_user_openstack_object_and_match_list
+    # MSG Use create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict
     role_dict = {
         'type': 'role',
         'values': ['Member']
@@ -79,9 +81,10 @@ def pod_with_all_operations_for_admin_project_domain():
     resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
                                  'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
     create_policy_and_perform_operation(resource=resource,
-                             resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
+                                        resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
 
-def create_test_user_openstack_object_and_match_list():
+
+def create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict():
     admin = ExampleUser.admin()
     admin.create_all(user_name='test', password='c0ntrail123', role='Member',
                      project_name='test_project', domain_name='test_domain')
@@ -114,9 +117,9 @@ def deployment_with_all_operations_for_custom_user_project_domain():
     resource = {'resources': 'deployments'}
     resource_expectation_list = ['pod', 'deployment-expected', 'service', 'namespace',
                                  'network_attachment_definit= ion', 'network_policy', 'ingress', 'daemonset']
-    match, stackrc_dict = create_test_user_openstack_object_and_match_list()
+    match, stackrc_dict = create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
     create_policy_and_perform_operation(resource=resource, match=match,
-                             resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
+                                        resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
 
 
 # Untested

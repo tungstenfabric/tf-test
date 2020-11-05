@@ -1,3 +1,4 @@
+import os
 from tcutils.kubernetes.auth import create_policy
 from tcutils.kubernetes.auth.util import Util
 from tcutils.kubernetes.auth.example_user import ExampleUser
@@ -45,10 +46,10 @@ class ResourceUtil(Util):
 
 
     @staticmethod
-    def create_test_user_openstack_object_and_match_list():
+    def create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict():
         admin = ExampleUser.admin()
         admin.create_all(user_name='test', password='c0ntrail123', role='Member',
-                        project_name='test_project', domain_name='test_domain')
+                         project_name='test_project', domain_name='test_domain')
         role_dict = {
             'type': 'role',
             'values': ['Member']
@@ -70,3 +71,16 @@ class ResourceUtil(Util):
             'auth_url': admin.auth_url
         }
         return match, stackrc_dict
+
+
+    @staticmethod
+    def admin_stackrc():
+        admin = ExampleUser.admin()
+        return {
+            'user_name': 'admin',
+            'password': 'password',
+            'project_name': 'admin',
+            'domain_name': 'admin_domain',
+            'auth_url': admin.auth_url
+        }
+

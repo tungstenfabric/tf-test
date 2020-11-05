@@ -50,6 +50,9 @@ def get_admin_policy():
 
 
 def create_policies(resource={}, match=[]):
+    '''
+    If no match is provided, then admin_policy is returned with everything enabled in resource
+    '''
     admin_policy = get_admin_policy()
     if len(match) == 0:
         policies = [admin_policy]
