@@ -35,7 +35,7 @@ class ResourceUtil(Util):
 
 
     @staticmethod
-    def create_policy_and_perform_operation(resource={}, match=[], resource_expectation_list=[], stackrc_dict={}):
+    def create_policy_and_perform_operations(resource={}, match=[], resource_expectation_list=[], stackrc_dict={}):
         create_policy.create_and_apply_policies(resource=resource, match=match)
         Util.source_stackrc(**stackrc_dict)
         ResourceUtil.resource_with_expectation(

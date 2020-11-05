@@ -28,29 +28,8 @@ def insert_policies_in_template_file(policies, filename=None):
     return filename
 
 
-def create_policies(resource={}, match=[]):
-    if resource.get('verbs') is None:
-        resource['verbs'] = ['*']
-    if resource.get('resources') is None:
-        resource['resources'] = ['*']
-    if resource.get('version') is None:
-        resource['version'] = '*'
-    if resource.get('namespace') is None:
-        resource['namespace'] = '*'
-
-    if len(match) == 0:
-        role_dict = {
-            'type': 'role',
-            'values': ['*']
-        }
-        project_dict = {
-            'type': 'project',
-            'values': ['admin']
-        }
-        match.append(role_dict)
-        match.append(project_dict)
-
-    admin_policy = {
+def get_admin_policy():
+    return {
         'resource': {
             'verbs': ['*'],
             'resources': ['*'],
@@ -69,6 +48,22 @@ def create_policies(resource={}, match=[]):
         ]
     }
 
+
+def create_policies(resource={}, match=[]):
+    admin_policy = get_admin_policy()
+    if len(match) == 0:
+        policies = [admin_policy]
+        return policies
+
+    if resource.get('verbs') is None:
+        resource['verbs'] = ['*']
+    if resource.get('resources') is None:
+        resource['resources'] = ['*']
+    if resource.get('version') is None:
+        resource['version'] = '*'
+    if resource.get('namespace') is None:
+        resource['namespace'] = '*'
+
     policies = [admin_policy, {'resource': resource, 'match': match}]
     return policies
 
@@ -77,13 +72,15 @@ def check_policy_in_config_map(policies):
     admin = ExampleUser.admin()
     Util.source_stackrc(user_name='admin', password='password',
                         project_name='admin', domain_name='admin_domain', auth_url=admin.auth_url)
-    out = check_output("kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443 describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+    # out = check_output("kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.7.29:6443 describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+    out = check_output("kubectl describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
     cmd_policy_string = out.split("policies")[1].split("\n")[2]
     policies_json = json.dumps(policies)
     policies_string = str(policies_json)
     logger.info("Waiting for policy to update in ConfigMap")
     while cmd_policy_string != policies_string:
-        out = check_output("kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443 describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+        # out = check_output("kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.7.29:6443 describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+        out = check_output("kubectl describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
         cmd_policy_string = out.split("policies")[1].split("\n")[2]
         time.sleep(2)
     time.sleep(5) # For master to stabilize, give additional 5 seconds
