@@ -7,4 +7,4 @@ metadata:
     k8s-app: k8s-keystone-auth
 data:
   policies: |
-    [{"resource": {"verbs": ["*"], "resources": ["*"], "version": "*", "namespace": "*"}, "match": [{"type": "role", "values": ["*"]}, {"type": "project", "values": ["admin"]}]}, {"resource": {"resources": ["deployments"], "verbs": ["*"], "version": "*", "namespace": "*"}, "match": [{"type": "role", "values": ["Member"]}, {"type": "project", "values": ["test_project"]}, {"type": "user", "values": ["test"]}]}]
+    [{"resource": {"verbs": ["*"], "resources": ["*"], "version": "*", "namespace": "*"}, "match": [{"type": "role", "values": ["*"]}, {"type": "project", "values": ["admin"]}]}, {"resource": {"resources": ["pods"], "verbs": ["*"], "version": "*", "namespace": "*"}, "match": [{"type": "role", "values": ["Member"]}, {"type": "project", "values": ["test_project"]}, {"type": "user", "values": ["test"]}]}]

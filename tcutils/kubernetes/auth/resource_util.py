@@ -11,14 +11,14 @@ logging.basicConfig(
 class ResourceUtil(Util):
     @staticmethod
     def resource_with_expectation(verb, resource_expectation_list):
-        expectation = False
         for resource_exp in resource_expectation_list:
+            expectation = False
             if "-expected" in resource_exp:
                 resource = resource_exp.split("-")[0]
                 expectation = True
             else:
                 resource = resource_exp
-                
+
             output, error = Util.exec_kubectl_cmd_on_file(
                 verb=verb, template_file=Util.templates[resource])
             if verb in output:
