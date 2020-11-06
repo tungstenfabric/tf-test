@@ -42,4 +42,3 @@ def pod_with_all_operations_for_custom_user_project_domain():
 
 all_operations_for_admin_project_domain()
 pod_with_all_operations_for_custom_user_project_domain()
-# MSG add more tests related to different verbs, resources and namespaces

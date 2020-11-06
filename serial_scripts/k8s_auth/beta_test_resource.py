@@ -93,4 +93,4 @@ def deployment_with_all_operations_for_admin_project_domain():
     ResourceUtil.create_policy_and_perform_operations(
         resource=resource, resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
 
-# MSG Add the above 2 methods for other resources
+# MSG Add methods for other verbs, resources and namespaces

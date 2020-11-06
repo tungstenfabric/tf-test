@@ -95,7 +95,7 @@ class O7kLib:
             self.keystone.projects.create(name=project_name, domain=domain)
             logging.info(f"Project '{project_name}' created")
         except http.Conflict:
-            logging.warning("Duplicate Project, not creating")
+            logging.info("Duplicate Project, not creating")
         except Exception as e:
             logging.error(e)
 
@@ -104,7 +104,7 @@ class O7kLib:
             self.keystone.domains.create(domain_name)
             logging.info(f"Domain '{domain_name}' created")
         except http.Conflict:
-            logging.warning("Duplicate Domain, not creating")
+            logging.info("Duplicate Domain, not creating")
         except Exception as e:
             logging.error(e)
 
@@ -117,7 +117,7 @@ class O7kLib:
                 user, domain_id, project_id, password, email, enabled=enabled)
             logging.info(f"User '{user}' created")
         except http.Conflict:
-            logging.warning("Duplicate User, not creating")
+            logging.info("Duplicate User, not creating")
         except Exception as e:
             print(e)
 
