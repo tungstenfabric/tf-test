@@ -11,6 +11,7 @@ from common import log_orig as contrail_logging
 
 logger = contrail_logging.getLogger(__name__)
 
+
 def insert_policies_in_template_file(policies, filename=None):
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
     TEMPLATE_DIR = os.path.join(THIS_DIR, 'templates')
@@ -75,37 +76,32 @@ def check_policy_in_config_map(policies):
     admin = ExampleUser.admin()
     Util.source_stackrc(user_name='admin', password='password',
                         project_name='admin', domain_name='admin_domain', auth_url=admin.auth_url)
-    out = check_output("kubectl describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+    out = check_output("kubectl describe configmap -n kube-system k8s-auth-policy",
+                       shell=True, universal_newlines=True)
     cmd_policy_string = out.split("policies")[1].split("\n")[2]
     policies_json = json.dumps(policies)
     policies_string = str(policies_json)
-    if cmd_policy_string == policies_string:
-        return True
 
     logger.info("Waiting for policy to update in ConfigMap")
     while cmd_policy_string != policies_string:
-        out = check_output("kubectl describe configmap -n kube-system k8s-auth-policy", shell=True, universal_newlines=True)
+        out = check_output("kubectl describe configmap -n kube-system k8s-auth-policy",
+                           shell=True, universal_newlines=True)
         cmd_policy_string = out.split("policies")[1].split("\n")[2]
         time.sleep(2)
-    time.sleep(5) # For master to stabilize, give additional 5 seconds
-    return True
+    time.sleep(5)  # For master to stabilize, give additional 5 seconds
 
 
 def apply_policies_and_check_in_config_map(policies, filename):
-    if not check_policy_in_config_map:
-        logger.info(f"Applying policy file: {filename}")
-        os.system(
-            f'juju config kubernetes-master keystone-policy="$(cat {filename})"')
-        check_policy_in_config_map(policies)
+    logger.info(f"Applying policy file: {filename}")
+    os.system(
+        f'juju config kubernetes-master keystone-policy="$(cat {filename})"')
+    check_policy_in_config_map(policies)
 
 
 def create_and_apply_policies(resource={}, match=[], filename=None):
     policies = create_policies(resource=resource, match=match)
     filename = insert_policies_in_template_file(policies)
     apply_policies_and_check_in_config_map(policies, filename)
-
-
-
 
 
 # pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['pods']}))

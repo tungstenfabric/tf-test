@@ -18,6 +18,7 @@ class ResourceUtil(Util):
                 expectation = True
             else:
                 resource = resource_exp
+                
             output, error = Util.exec_kubectl_cmd_on_file(
                 verb=verb, template_file=Util.templates[resource])
             if verb in output:
