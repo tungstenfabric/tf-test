@@ -252,3 +252,193 @@ class TestFabricEvpnType5(BaseFabricTest):
         self.sleep(60)
         self.do_ping_mesh([vm1, vm2, bms1])
         # end test_evpn_type_5_vm_to_bms_add_rt_to_lr
+
+    @preposttest_wrapper
+    def test_logical_router_static_route_update_in_lr_type5_vrf_on_qfx(self):
+        '''
+         1) Configure Encapsulation order as VxLAN, MPLSoverGRE, MPLSoverUDP
+         2) Enable VxLAN Routing under that project settings
+         3) Add vn1 and vn2.
+         4) Launch a vm and bms in each of vn1 and vn2
+         5) Create a logical router and attach it to vn1, vn2 and extend it to crb-gateway
+         6) ping from vm to vm and bms to bms from vn1 to vn2
+         7) Add static route in lr vrf on crb-gateway verify it gets copied to vn1 and vn2
+         8) Verify vm to vm and bms to bms traffic
+         9) Delete static route in lr vrf on crb gateway verify it gets removed from vn1 and vn2 vrf
+         10) verify vm to vm and bms to bms traffic
+         11) Verify path preference for route added by bgp peer has higher prefrence for same route updated in lr vrf
+         12) Verify l2 traffic tests
+        '''
+        vn1 = self.create_vn();
+        vn2 = self.create_vn()
+        lr1 = self.create_logical_router([vn1, vn2], vni=70001)
+        vm11 = self.create_vm(vn_fixture=vn1)
+        vm21 = self.create_vm(vn_fixture=vn2)
+        bms1 = self.create_bms(
+                bms_name=random.choice(self.get_bms_nodes()),
+                tor_port_vlan_tag=10,
+                vn_fixture=vn1)
+        bms2 = self.create_bms(
+                bms_name=random.choice(self.get_bms_nodes()),
+                tor_port_vlan_tag=20,
+                vn_fixture=vn2)
+        lr1.verify_on_setup()
+        self.check_vms_booted([vm11, vm21])
+
+        self.logger.info(
+            "Verify Traffic between VN-1 and VN-2 on Logical Router: lr1")
+        self.verify_traffic(vm11, vm21, 'udp', sport=10000, dport=20000)
+        
+        self.do_ping_mesh([vm11, vm21, bms1, bms2])
+
+        vn_l2_vm1_name = 'VM1'
+        vn_l2_vm2_name = 'VM2'
+
+        vn_l2_vm1_fixture = self.create_vm(vn_fixture=vn1, image_name='ubuntu')
+        vn_l2_vm2_fixture = self.create_vm(vn_fixture=vn1, image_name='ubuntu')
+
+        assert vn_l2_vm1_fixture.verify_on_setup()
+        assert vn_l2_vm2_fixture.verify_on_setup()
+
+        #l2 traffic verification
+        self.mac1=vn_l2_vm1_fixture.mac_addr[vn1.vn_fq_name]
+        self.mac2=vn_l2_vm2_fixture.mac_addr[vn1.vn_fq_name]
+        filters = 'ether src %s' %(self.mac1)
+        tap_intf = vn_l2_vm2_fixture.tap_intf[vn1.vn_fq_name]['name']
+        session,pcap = vn_l2_vm2_fixture.start_tcpdump(filters=filters,interface=tap_intf)
+        sleep(20)
+        self.send_l2_traffic(vn_l2_vm1_fixture,iface='eth1')
+        result = verify_tcpdump_count(self, session, pcap, exp_count=10,mac=self.mac2)
+        assert result, "L2 traffic verification failed"
+
+        for device in self.inputs.physical_routers_data.keys():
+            mgmt_ip = ''
+            if self.get_role_from_inputs(device) == 'spine':
+               mgmt_ip = device['mgmt_ip']
+        self.logger.info(
+            "Add static route on spine with mgmt ip %s " %mgmt_ip)
+        if len(mgmt_ip) == 0:
+            assert(False)
+        rt_cmd = "set groups __contrail_overlay_evpn_type5__ routing-instances _contrail_%s_%s routing-options static route 0.0.0.0/0 next-table inet.0" %(name, id)
+        static_rt_cmd="cli;edit;%s;commit;exit" % (rt_cmd)
+
+        # Add default route on spine device in type5 lr vrf
+        self.inputs.run_cmd_on_server(mgmt_ip, static_rt_cmd, username=self.inputs.fabrics[0]['username'], password=self.inputs.fabrics[0]['password'])
+        time.sleep(1)
+        # Verify route gets updated in bridge network vn1 conneted to lr1
+        vm1_node_ip = vm11.vm_node_ip
+        vm1_vrf_id = self.get_vrf_id(vn1, vm11)
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm1_vrf_id,
+            ip="0.0.0.0")
+        assert route, "Route is not present in bridge vn inet table."
+
+        # Verify route gets updated in internal vn for lr1 on compute node of vm1
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=lr1.vrf_id,
+            ip="0.0.0.0")
+        assert route, "Route is not present in agent inet table."
+
+        # Verify route gets updated in bridge network vn2 conneted to lr1
+        vm2_node_ip = vm21.vm_node_ip
+        vm2_vrf_id = self.get_vrf_id(vn2, vm21)
+        inspect_h = self.agent_inspect[vm2_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm2_vrf_id,
+            ip="0.0.0.0")
+        assert route, "Route is not present in bridge vn inet table."
+
+        # Verify route gets updated in internal vn for lr1 on compute node of vm2
+        inspect_h = self.agent_inspect[vm2_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=lr1.vrf_id,
+            ip="0.0.0.0")
+        assert route, "Route is not present in agent inet table."
+
+        # Verify traffic after static route add
+        self.do_ping_mesh([vm11, vm21, bms1, bms2])
+
+        # create a snat router with gateway set to external vn, attach vn11 and a private network
+        vm1_name = get_random_name('vm_private')
+        vn1_name = get_random_name('vn_private')
+        vn1_subnets = [get_random_cidr()]
+        self.allow_default_sg_to_allow_all_on_project(self.inputs.project_name)
+        ext_vn_fixture = self.create_external_network(self.connections, self.inputs)
+        ext_vn_fixture.verify_on_setup()
+        vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
+        vn1_fixture.verify_on_setup()
+        vm1_fixture = self.create_vm(vn1_fixture, vm1_name,
+                                         image_name='ubuntu')
+        vm1_fixture.wait_till_vm_is_up()
+
+        router_name = get_random_name('router1')
+        router_dict = self.create_router(router_name)
+        router_rsp = self.quantum_h.router_gateway_set(
+                router_dict['id'],
+                ext_vn_fixture.vn_id)
+        self.add_vn_to_router(router_dict['id'], vn1_fixture)
+        self.add_vn_to_router(router_dict['id'], vn11)
+
+        assert self.verify_snat(vm1_fixture)
+
+        # vn11 is attached to both vxlan lr and snat lr , verify path for default route
+        # added by snat lr has higher preference a than path added for static route update
+        # from spine device in type5 lr vrf
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm1_vrf_id,
+            ip="0.0.0.0")
+        assert route, "Route is not present in bridge vn inet table."
+        assert ['routes'][0]['path_list'][1]['peer'] == "EVPN-ROUTING"
+        assert ['routes'][0]['path_list'][0]['peer'] != "EVPN-ROUTING"
+
+        self.delete_vn_from_router(router_dict['id'], vn11)
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm1_vrf_id,
+            ip="0.0.0.0")
+        assert route, "Route is not present in bridge vn inet table."
+        assert ['routes'][0]['path_list'][0]['peer'] == "EVPN-ROUTING"
+        # Delete static route on spine device in type5 lr vrf
+        rt_cmd = "set groups __contrail_overlay_evpn_type5__ routing-instances _contrail_%s_%s routing-options static route 0.0.0.0/0 discard" %(name, id)
+        static_rt_cmd="cli;edit;%s;commit;exit" % (rt_cmd)
+        # Add default route on spine device in type5 lr vrf
+        self.inputs.run_cmd_on_server(mgmt_ip, static_rt_cmd, username=self.inputs.fabrics[0]['username'], password=self.inputs.fabrics[0]['password'])
+        time.sleep(1)
+
+        # Verify route gets deleted in bridge network vn1 conneted to lr1
+        vm1_node_ip = vm11.vm_node_ip
+        vm1_vrf_id = self.get_vrf_id(vn1, vm11)
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm1_vrf_id,
+            ip="0.0.0.0")
+        assert not route, "Route is present in bridge vn inet table."
+
+        # Verify route gets deleted in internal vn for lr1 on compute node of vm1
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=lr1.vrf_id,
+            ip="0.0.0.0")
+        assert not route, "Route is present in agent inet table."
+
+        # Verify route gets deleted in bridge network vn2 conneted to lr1
+        vm2_node_ip = vm21.vm_node_ip
+        vm2_vrf_id = self.get_vrf_id(vn2, vm21)
+        inspect_h = self.agent_inspect[vm2_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm2_vrf_id,
+            ip="0.0.0.0")
+        assert not route, "Route is present in bridge vn inet table."
+
+        # Verify route gets deleted in internal vn for lr1 on compute node of vm2
+        inspect_h = self.agent_inspect[vm2_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=lr1.vrf_id,
+            ip="0.0.0.0")
+        assert not route, "Route is present in agent inet table."
+
+        # Verify traffic after static route add
+        self.do_ping_mesh([vm11, vm21, bms1, bms2])
