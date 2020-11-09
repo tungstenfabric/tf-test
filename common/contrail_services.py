@@ -12,7 +12,7 @@ _CONTRAIL_SERVICES_OPENSHIFT_CONTAINER_MAP = {
     'dns': ['k8s_contrail-controller-control-dns_'],
     'named': ['k8s_contrail-controller-control-named_'],
     # Analytics
-    'analytics-api':['k8s_contrail-analytics-api'],
+    'analytics-api': ['k8s_contrail-analytics-api'],
     'query-engine': ['k8s_contrail-analytics-query-engine'],
     'collector': ['k8s_contrail-analytics-collector'],
     'analytics-zookeeper': [],
@@ -33,7 +33,7 @@ _CONTRAIL_SERVICES_OPENSHIFT_CONTAINER_MAP = {
     'analyticsdb-nodemgr': ['k8s_contrail-analyticsdb-nodemgr'],
     # Openshift master
     'contrail-kube-manager': ['k8s_contrail-kube-manager'],
-    'kube-apiserver':  ['kube-apiserver'],
+    'kube-apiserver': ['kube-apiserver'],
     # Web UI
     'redis': ['k8s_redis_redis'],
     'webui': ['k8s_contrail-controller-webui-web'],
@@ -77,7 +77,7 @@ _CONTRAIL_SERVICES_CONTAINER_MAP = {
     'keystone': ['keystone-api', 'keystone'],
     'neutron': ['neutron', 'neutron-server'],
     'mysql': ['mariadb'],
-    'redis': ['webui_redis', 'webui-redis','redis'],
+    'redis': ['webui_redis', 'webui-redis', 'redis'],
     'stunnel': ['stunnel'],
     'vrouter-nodemgr': ['vrouter_nodemgr', 'vrouter-nodemgr', 'vrouter_agent_nodemgr'],
     'config-nodemgr': ['config_nodemgr', 'config-nodemgr'],
@@ -86,8 +86,8 @@ _CONTRAIL_SERVICES_CONTAINER_MAP = {
     'analyticsdb-nodemgr': ['analyticsdatabase_nodemgr',
                             'analyticsdb-nodemgr', 'analytics_database_nodemgr'],
     'contrail-kube-manager': ['contrail-kube-manager', 'kubemanager'],
-    'kube-apiserver':  ['kube-apiserver'],
-    'strongswan':  ['strongswan_strongswan']
+    'kube-apiserver': ['kube-apiserver'],
+    'strongswan': ['strongswan_strongswan']
 }
 
 # Container names for Helm deployer
@@ -131,8 +131,8 @@ _CONTRAIL_SERVICES_HELM_CONTAINER_MAP = {
     'control-nodemgr': ['control-nodemgr'],
     'analyticsdb-nodemgr': ['analyticsdb-nodemgr'],
     'contrail-kube-manager': ['contrail-kube-manager', 'kubemanager'],
-    'kube-apiserver':  ['kube-apiserver'],
-    'strongswan':  ['strongswan_strongswan']
+    'kube-apiserver': ['kube-apiserver'],
+    'strongswan': ['strongswan_strongswan']
 }
 
 # Separate container names for JuJu deployer
@@ -170,6 +170,7 @@ _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP = {
     'alarmgen': ['analyticsalarm_alarm-gen_1', 'analytics_alarm_alarm-gen_1'],
 #    'alarmgen-nodemgr': ['analyticsalarm_nodemgr_1', 'analytics_alarm_nodemgr_1'],
 #    'kafka': ['analyticsalarm_kafka_1', 'analytics_alarm_kafka_1'],
+    'contrail-kube-manager': ['contrailkubernetesmaster_kubemanager_1'],
     # WebUI
     'webui': ['webui_web_1'],
     'webui-middleware': ['webui_job_1'],
@@ -179,29 +180,29 @@ _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP = {
 # Separate container names for RHOSP deployer
 _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP = {
     # Vrouter
-    'vrouter-nodemgr' : ['contrail_vrouter_agent_nodemgr'],
+    'vrouter-nodemgr': ['contrail_vrouter_agent_nodemgr'],
     'agent': ['contrail_vrouter_agent'],
     # Control
-    'control' : ['contrail_control_control'],
+    'control': ['contrail_control_control'],
     'named': ['contrail_control_named'],
     'dns': ['contrail_control_dns'],
-    'control-nodemgr' : ['contrail_control_nodemgr'],
+    'control-nodemgr': ['contrail_control_nodemgr'],
     # Config
     'api-server': ['contrail_config_api'],
     'schema': ['contrail_config_schema'],
     'svc-monitor': ['contrail_config_svc_monitor'],
     'device-manager': ['contrail_config_device_manager'],
-    'config-nodemgr' : ['contrail_config_nodemgr'],
+    'config-nodemgr': ['contrail_config_nodemgr'],
     # Config Database
     'config-cassandra': ['contrail_config_database'],
     'config-rabbitmq': ['contrail_config_rabbitmq'],
     'config-zookeeper': ['contrail_config_zookeeper'],
-    'configdb-nodemgr' : ['contrail_config_database_nodemgr'],
+    'configdb-nodemgr': ['contrail_config_database_nodemgr'],
     # Analytics Database
     'analytics-cassandra': ['contrail_analytics_database'],
     'analyticsdb-nodemgr': ['contrail_analytics_database_nodemgr'],
     # Analytics
-    'analytics-api' : ['contrail_analytics_api'],
+    'analytics-api': ['contrail_analytics_api'],
     'query-engine': ['contrail_analytics_queryengine'],
     'collector': ['contrail_analytics_collector'],
     'snmp-collector': ['contrail_analytics_snmp_collector'],
@@ -212,7 +213,7 @@ _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP = {
 #    'kafka': ['contrail_analytics_kafka'],
     'analytics-nodemgr': ['contrail_analytics_nodemgr'],
     # WebUI
-    'webui' : ['contrail_webui_web'],
+    'webui': ['contrail_webui_web'],
     'webui-middleware': ['contrail_webui_job'],
     #missing-entries
     'agent-dpdk': ['contrail_vrouter_agent_dpdk'],
