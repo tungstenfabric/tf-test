@@ -441,7 +441,8 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
         for bgp_ip in self.inputs.bgp_ips:
             dnsinspect_h = self.dnsagent_inspect[dns_server_ip]
             dns_data_list.append(dnsinspect_h.get_dnsa_config())
-
+        self.logger.info("[!]  vm_dns_exp_data (expected data): %s" % str(vm_dns_exp_data))
+        self.logger.info("[!]  dns_data_list (actual data): %s" % str(dns_data_list))
         # Traverse over expected record data
         for expected in vm_dns_exp_data:
             # Get te actual record data from introspect

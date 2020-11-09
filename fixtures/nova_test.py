@@ -733,7 +733,13 @@ class NovaHelper(object):
                 if vm_obj.__dict__['OS-EXT-SRV-ATTR:hypervisor_hostname']\
                     == hypervisor.hypervisor_hostname:
                     if hypervisor.hypervisor_type == 'QEMU':
-                        host_name = vm_obj.__dict__['OS-EXT-SRV-ATTR:host']
+                        #host_name = vm_obj.__dict__['OS-EXT-SRV-ATTR:host']
+                        host_name = vm_obj.__dict__['OS-EXT-SRV-ATTR:hypervisor_hostname']
+                        self.logger.info("[!]  get_nova_host_of_vm")
+                        self.logger.info("         [x] OS-EXT-SRV-ATTR:hypervisor_hostname == %s" % str(vm_obj.__dict__['OS-EXT-SRV-ATTR:hypervisor_hostname']))
+                        self.logger.info("         [ ] OS-EXT-SRV-ATTR:host == %s" % str(vm_obj.__dict__['OS-EXT-SRV-ATTR:host']))
+                        self.logger.info("             compute_names = %s" % str(self.inputs.compute_names))
+                        self.logger.info("             return %s" % str(self.get_host_name(host_name)))
                         return host_name and self.get_host_name(host_name)
                     if 'VMware' in hypervisor.hypervisor_type:
                         host_name = vcenter_libs.get_contrail_vm_by_vm_uuid(self.inputs,vm_obj.id)
