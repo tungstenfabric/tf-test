@@ -89,6 +89,7 @@ def check_policy_in_config_map(policies):
         cmd_policy_string = out.split("policies")[1].split("\n")[2]
         time.sleep(2)
     time.sleep(5)  # For master to stabilize, give additional 5 seconds
+    logger.info("Policy updated in ConfigMap")
 
 
 def apply_policies_and_check_in_config_map(policies, filename):

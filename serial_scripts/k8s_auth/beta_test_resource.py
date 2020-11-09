@@ -28,7 +28,7 @@ def test_individual_resource_with_all_operations_for_custom_user_project_domain(
     for resource in resource_list:
         resource_with_all_operations_for_custom_user_project_domain(resource, match, stackrc_dict)
 
-test_individual_resource_with_all_operations_for_custom_user_project_domain()
+# test_individual_resource_with_all_operations_for_custom_user_project_domain()
 
 
 # Untested
@@ -77,3 +77,24 @@ def deployment_with_all_operations_for_admin_project_domain():
         resource=resource, resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
 
 # MSG Add methods for other verbs, resources and namespaces
+
+
+# For manual test
+def operations_for_custom_user_project_domain():
+    resource = {'resources': ['deployments'], 'verbs': ['delete']}
+    match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
+    resource_expectation_list = ['pod', 'deployment-expected', 'service', 'namespace',
+                                 'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
+    ResourceUtil.create_policy_and_perform_operations(
+        resource=resource, match=match, stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
+
+
+# operations_for_custom_user_project_domain()
+
+#For manual test
+def manual_test2():
+    resource = {'resources': ['pods'], 'verbs': ['create','get','list','delete'], 'namespace': 'easy'}
+    match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
+    create_policy.create_and_apply_policies(resource=resource, match=match)
+
+manual_test2()

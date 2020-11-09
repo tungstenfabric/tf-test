@@ -2,6 +2,7 @@ import os
 from tcutils.kubernetes.auth import create_policy
 from tcutils.kubernetes.auth.util import Util
 from tcutils.kubernetes.auth.example_user import ExampleUser
+import time
 
 import logging
 logging.basicConfig(
@@ -30,10 +31,17 @@ class ResourceUtil(Util):
             elif 'forbidden' in error:
                 logging.info(f'{verb} {resource} forbidden')
             else:
-                errorObject = error.split("[")[1].split("]")[0]
-                import json
-                errorMessage = json.loads(errorObject)['message']
-                logging.error(errorMessage)
+                if 'already' in error:
+                    Util.exec_kubectl_cmd_on_file(
+                        verb='delete', template_file=Util.templates[resource])
+                    time.sleep(10)
+                    Util.exec_kubectl_cmd_on_file(
+                        verb='create', template_file=Util.templates[resource])
+                else:
+                    errorObject = error.split("[")[1].split("]")[0]
+                    import json
+                    errorMessage = json.loads(errorObject)['message']
+                    logging.error(errorMessage)
 
 
     @staticmethod

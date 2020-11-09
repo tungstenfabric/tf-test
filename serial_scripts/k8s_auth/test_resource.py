@@ -16,7 +16,7 @@ def all_operations_for_admin_project_domain():
     ResourceUtil.create_policy_and_perform_operations(
         resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
 
-# all_operations_for_admin_project_domain()
+all_operations_for_admin_project_domain()
 
 
 def all_operations_for_custom_user_project_domain():
@@ -49,7 +49,7 @@ def deployment_with_all_operations_for_custom_user_project_domain():
     ResourceUtil.create_policy_and_perform_operations(
         resource=resource, match=match, stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
-deployment_with_all_operations_for_custom_user_project_domain()
+# deployment_with_all_operations_for_custom_user_project_domain()
 
 
 
