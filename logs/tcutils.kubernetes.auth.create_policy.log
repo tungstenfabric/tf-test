@@ -33,3 +33,9 @@
 2020-11-06 06:28:28,290 - INFO - Waiting for policy to update in ConfigMap
 2020-11-08 20:55:08,641 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
 2020-11-08 20:55:14,029 - INFO - Waiting for policy to update in ConfigMap
+2020-11-08 20:58:13,006 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-08 20:58:15,240 - INFO - Waiting for policy to update in ConfigMap
+2020-11-08 20:59:24,727 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-08 20:59:27,209 - INFO - Waiting for policy to update in ConfigMap
+2020-11-08 21:01:02,744 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-08 21:01:04,969 - INFO - Waiting for policy to update in ConfigMap

@@ -8,14 +8,6 @@ import os
 # If no match is provided, then it is admin_policy with everything enabled in resource
 
 # Untested
-def all_operations_for_admin_project_domain():
-    stackrc_dict = ResourceUtil.admin_stackrc()
-    resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
-                                 'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
-    ResourceUtil.create_policy_and_perform_operations(
-        resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
-
-
 # MSG Next to test
 def resource_with_all_operations_for_custom_user_project_domain(res):
     resource = {'resources': [res]}
