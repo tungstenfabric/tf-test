@@ -9,6 +9,26 @@ import os
 # If nothing is mentioned in the resource verbs, then all operations are permitted for that particular resource
 
 
+def all_operations_for_admin_project_domain():
+    stackrc_dict = ResourceUtil.admin_stackrc()
+    resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
+                                 'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
+    ResourceUtil.create_policy_and_perform_operations(
+        resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
+
+# all_operations_for_admin_project_domain()
+
+
+def all_operations_for_custom_user_project_domain():
+    match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
+    resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
+                                 'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
+    ResourceUtil.create_policy_and_perform_operations(
+        match=match, resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
+
+# all_operations_for_custom_user_project_domain()
+
+
 def pod_with_all_operations_for_custom_user_project_domain():
     resource = {'resources': ['pods']}
     match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
@@ -20,6 +40,7 @@ def pod_with_all_operations_for_custom_user_project_domain():
 # MSG Fix Error of create deployment successful even when expectation is False
 # pod_with_all_operations_for_custom_user_project_domain()
 
+
 def deployment_with_all_operations_for_custom_user_project_domain():
     resource = {'resources': ['deployments']}
     match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
@@ -28,26 +49,9 @@ def deployment_with_all_operations_for_custom_user_project_domain():
     ResourceUtil.create_policy_and_perform_operations(
         resource=resource, match=match, stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
-
 deployment_with_all_operations_for_custom_user_project_domain()
 
-def all_operations_for_custom_user_project_domain():
-    match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
-    resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
-                                 'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
-    ResourceUtil.create_policy_and_perform_operations(
-        match=match, resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
 
 
-# all_operations_for_custom_user_project_domain()
 
 
-def all_operations_for_admin_project_domain():
-    stackrc_dict = ResourceUtil.admin_stackrc()
-    resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
-                                 'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
-    ResourceUtil.create_policy_and_perform_operations(
-        resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
-
-
-# all_operations_for_admin_project_domain()
