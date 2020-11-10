@@ -231,12 +231,10 @@ class TestHbsTraffic(BaseK8sTest):
                 pod2_vif_id = int(self.apod2_dict['tap_intfs'][0]['index'])
                 fflow = self.inputs.run_cmd_on_server(
                                     self.apod1.compute_ip,
-                                    "flow --match %s:0" % (self.apod2.pod_ip),
-                                    container='agent')
+                                    "contrail-tools flow --match %s:0" % (self.apod2.pod_ip))
                 rflow = self.inputs.run_cmd_on_server(
                                     self.apod1.compute_ip,
-                                    "flow --match %s:0" % (self.apod1.pod_ip),
-                                    container='agent')
+                                    "contrail-tools flow --match %s:0" % (self.apod1.pod_ip))
                 if pod1_vif_id < pod2_vif_id:
                     assert 'HbsLeft' in fflow
                     assert 'HbsRight' in rflow
@@ -246,12 +244,10 @@ class TestHbsTraffic(BaseK8sTest):
             else:
                 fflow = self.inputs.run_cmd_on_server(
                                     self.apod1.compute_ip,
-                                    "flow --match %s" % (self.apod1.pod_ip),
-                                    container='agent')
+                                    "contrail-tools flow --match %s" % (self.apod1.pod_ip))
                 rflow = self.inputs.run_cmd_on_server(
                                     self.apod2.compute_ip,
-                                    "flow --match %s" % (self.apod2.pod_ip),
-                                    container='agent')
+                                    "contrail-tools flow --match %s" % (self.apod2.pod_ip))
 
                 assert 'HbsRight' in fflow
                 assert 'HbsLeft' in rflow

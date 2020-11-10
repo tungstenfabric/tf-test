@@ -134,13 +134,12 @@ def get_flow_data(
 
 
 def vm_vrouter_flow_count(self):
-    cmd = 'flow -l | grep Action | grep -E "F|N" | wc -l '
+    cmd = 'contrail-tools flow -l | grep Action | grep -E "F|N" | wc -l '
     result = ''
     output = self.inputs.run_cmd_on_server(
         self.vm_node_ip, cmd, self.inputs.host_data[
             self.vm_node_ip]['username'], self.inputs.host_data[
-            self.vm_node_ip]['password'],
-            container='agent')
+            self.vm_node_ip]['password'])
     for s in output:
         if s.isdigit():
             result = result + s

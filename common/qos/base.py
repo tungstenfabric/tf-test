@@ -1036,10 +1036,9 @@ class QosTestBase(BaseNeutronTest):
         else:
             interface_list = [interface]
         for intf in interface_list:
-            cmd = "qosmap --set-queue %s --dcbx ieee --bw 0,60,0,40,0,0,0,0 "\
+            cmd = "contrail-tools qosmap --set-queue %s --dcbx ieee --bw 0,60,0,40,0,0,0,0 "\
                 "--strict 10101010 --tc 0,1,2,3,4,5,6,7" % intf
-            cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd,
-                                         container = 'agent')
+            cls.inputs.run_cmd_on_server(cls.qos_node_ip, cmd)
 
     def setup_control_dscp_values(self, control_dscp, dns_dscp, analytics_dscp):
         '''

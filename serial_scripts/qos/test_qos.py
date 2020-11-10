@@ -763,19 +763,17 @@ class TestQosQueueQosmap(TestQosQueueProperties):
                                         get_all_interfaces = True)
             for intf in interface_list:
                 # Getting priority group Bandwidth configurations
-                cmd = "qosmap --get-queue %s| grep 'Priority Group Bandwidth:'"\
+                cmd = "contrail-tools qosmap --get-queue %s| grep 'Priority Group Bandwidth:'"\
                                                                          % intf
-                output = self.inputs.run_cmd_on_server(server , cmd,
-                                                       container = 'agent')
+                output = self.inputs.run_cmd_on_server(server , cmd)
                 output = output.split()[3:11]
                 if output == ['0','60','0','40','0','0','0','0']:
                     self.logger.debug("Bandwidth configured correctly on physical"
                                       "interface %s of bond interface" % intf)
                 else:
                     assert False, "BW values not configured correctly"
-                cmd = "qosmap --get-queue %s| grep 'Strictness:'" % intf
-                output = self.inputs.run_cmd_on_server(server , cmd,
-                                                       container = 'agent')
+                cmd = "contrail-tools qosmap --get-queue %s| grep 'Strictness:'" % intf
+                output = self.inputs.run_cmd_on_server(server , cmd)
                 output = output.split()[1:9]
                 if output == ['1','0','1','0','1','0','1','0']:
                     self.logger.debug("Stritness configured correctly on physical"
