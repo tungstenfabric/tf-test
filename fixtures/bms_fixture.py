@@ -34,7 +34,7 @@ class BMSFixture(fixtures.Fixture):
         self.mgmt_ip = kwargs.get('mgmt_ip') or bms_dict['mgmt_ip'] # Host IP, optional
         self.username = kwargs.get('username') or bms_dict['username']
         self.password = kwargs.get('password') or bms_dict['password']
-        self.namespace = get_random_name('ns')
+        self.namespace = kwargs.get('namespace') or get_random_name('ns')
         self.bms_ip = kwargs.get('bms_ip')   # BMS VMI IP
         self.bms_ip6 = kwargs.get('bms_ip6')   # BMS VMI IPv6
         self.bms_ip_netmask = kwargs.get('bms_ip_netmask', None)
@@ -140,6 +140,7 @@ class BMSFixture(fixtures.Fixture):
             bms_info.append(intf_dict)
         binding_profile = {'local_link_information': bms_info}
         security_groups = None if self.ep_style else self.security_groups
+        create_iip = not self.external_dhcp_server and not self.static_ip
         self.port_fixture = PortFixture(
                                  connections=self.connections,
                                  vn_id=self.vn_fixture.uuid,
@@ -151,8 +152,7 @@ class BMSFixture(fixtures.Fixture):
                                  binding_profile=binding_profile,
                                  port_group_name=self._port_group_name,
                                  tor_port_vlan_tag=self.tor_port_vlan_tag,
-                                 create_iip=not self.external_dhcp_server,
-                             )
+                                 create_iip=create_iip)
         self.port_fixture.setUp()
         self.add_port_profiles(self.port_profiles)
         if self.ep_style:

@@ -11,6 +11,7 @@ from common.neutron.base import BaseNeutronTest
 from common.fabric_utils import FabricUtils
 from bms_fixture import BMSFixture
 from vm_test import VMFixture
+from interface_route_table_fixture import InterfaceRouteTableFixture
 from tcutils.util import Singleton, skip_because, get_random_vxlan_id, get_an_ip
 from tcutils.util import create_netns, delete_netns, get_intf_name_from_mac, run_dhcp_server
 from future.utils import with_metaclass
@@ -339,6 +340,17 @@ class BaseFabricTest(BaseNeutronTest, FabricUtils):
                     continue
             lr.add_physical_router(spine.uuid)
         return lr
+
+    def create_interface_route_table(self, rvn_uuid, prefixes,
+                                      community_action=None):
+        name = 'irt' + rvn_uuid
+        irt_fixture = self.useFixture(InterfaceRouteTableFixture(
+            connections=self.connections, name=name,
+            prefixes=prefixes, community_action=community_action))
+        irt_fixture.setUp()
+
+        return irt_fixture
+    # end create_irt
 
     def start_dhcp_server(self, vn_fixtures, dhcp_server=None,
                           bms_node=None, namespace=None):

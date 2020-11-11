@@ -867,3 +867,62 @@ class GenericTestBase(test_v1.BaseTestCase_v1, _GenericTestBaseMethods):
         ''' Refer LogicalInterfaceFixture for params info '''
         connections = connections or self.connections
         return self.useFixture(LogicalInterfaceFixture(connections=connections, **kwargs))
+
+    @staticmethod
+    def generate_bird_conf(router_id, local_ip1, local_asn1, neighbour_ip1,
+                           neighbour_asn1, local_ip2=None, local_asn2=None, neighbour_ip2=None,
+                           neighbour_asn2=None):
+        common_bird_config = """log syslog all;
+
+    router id $ROUTER_ID;
+
+    protocol direct {
+             interface "bond0*";
+    }
+
+    protocol device {
+             scan time 10;
+    }
+
+    # Export routes to kernel
+    protocol kernel {
+             scan time 15;
+             export all;
+             import all;
+             learn;
+    }"""
+        left_bgp = """
+    protocol bgp public_left_1 {
+        description "My BGP uplink";
+            export all;
+        local $LOCAL_IP1 as $LOCAL_ASN1;
+        neighbor $NEIGHBOUR_IP1 as $NEIGHBOUR_ASN1;
+        graceful restart;
+    }"""
+        right_bgp = """
+    protocol bgp public_right_1 {
+            export all;
+        description "My BGP uplink";
+        local $LOCAL_IP2 as $LOCAL_ASN2;
+        neighbor $NEIGHBOUR_IP2 as $NEIGHBOUR_ASN2;
+        graceful restart;
+    }"""
+
+        final_config = common_bird_config.replace('$ROUTER_ID', router_id)
+
+        left_bgp = left_bgp.replace('$LOCAL_IP1', local_ip1)
+        left_bgp = left_bgp.replace('$LOCAL_ASN1', local_asn1)
+        left_bgp = left_bgp.replace('$NEIGHBOUR_IP1', neighbour_ip1)
+        left_bgp = left_bgp.replace('$NEIGHBOUR_ASN1', neighbour_asn1)
+
+        final_config = final_config + left_bgp
+
+        if neighbour_ip2 and neighbour_asn2:
+            right_bgp = right_bgp.replace('$LOCAL_IP2', local_ip2)
+            right_bgp = right_bgp.replace('$LOCAL_ASN2', local_asn2)
+            right_bgp = right_bgp.replace('$NEIGHBOUR_IP2', neighbour_ip2)
+            right_bgp = right_bgp.replace('$NEIGHBOUR_ASN2', neighbour_asn2)
+
+            final_config = final_config + right_bgp
+
+        return final_config
