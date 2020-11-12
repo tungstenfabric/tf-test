@@ -15,6 +15,7 @@ from tcutils.util import Singleton, skip_because, get_random_vxlan_id, get_an_ip
 from tcutils.util import create_netns, delete_netns, get_intf_name_from_mac, run_dhcp_server
 from future.utils import with_metaclass
 from netaddr import *
+from string import Template
 
 class FabricSingleton(with_metaclass(Singleton, type('NewBase', (FabricUtils, GenericTestBase), {}))):
     def __init__(self, connections):
@@ -408,3 +409,15 @@ class BaseFabricTest(BaseNeutronTest, FabricUtils):
             self.addCleanup(self.vnc_h.delete_device_image, name)
             device_images[device] = name
         return device_images
+
+    def send_l2_traffic(self,vm1_fixture,iface):
+
+        python_code = Template('''
+from scapy.all import *
+payload = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
+a=Ether(src='$mac1',dst='$mac2')/payload
+sendp(a, count=10, inter=0, iface='$iface')
+            ''')
+        python_code = python_code.substitute(mac1=self.mac1,mac2=self.mac2,iface=iface)
+        return vm1_fixture.run_python_code(python_code)
+    #end send_l2_traffic
