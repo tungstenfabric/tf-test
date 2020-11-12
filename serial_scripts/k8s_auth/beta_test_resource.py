@@ -81,7 +81,7 @@ def deployment_with_all_operations_for_admin_project_domain():
 
 # For manual test
 def operations_for_custom_user_project_domain():
-    resource = {'resources': ['deployments'], 'verbs': ['delete']}
+    resource = {'resources': ['deployments'], 'verbs': ['create']}
     match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
     resource_expectation_list = ['pod', 'deployment-expected', 'service', 'namespace',
                                  'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
@@ -91,9 +91,20 @@ def operations_for_custom_user_project_domain():
 
 # operations_for_custom_user_project_domain()
 
+def delete_all():
+    admin = ExampleUser.admin()
+    ResourceUtil.source_stackrc(auth_url=admin.auth_url)
+    resource_list = ['pod', 'deployment', 'service', 'namespace',
+                     'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
+    ResourceUtil.resource('delete', resource_list)
+
+# delete_all()
+
+
 #For manual test
 def manual_test2():
-    resource = {'resources': ['pods'], 'verbs': ['create','get','list','delete'], 'namespace': 'easy'}
+    # resource = {'resources': ['pods'], 'verbs': ['create','get','list'], 'namespace': 'easy'}
+    resource = {'resources': ['pods'], 'verbs': ['create','get','list']}
     match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
     create_policy.create_and_apply_policies(resource=resource, match=match)
 
