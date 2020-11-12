@@ -369,12 +369,12 @@ class VerifySvcMirror(ConfigSvcMirror, ECMPVerify):
                     if line.find('/') != -1 and line.find('fe80') == -1:
                         src_ip = line
                         break
-                src_ip = line.split('/')[0].strip()
+                src_ip = line.split('/').strip()
                 for line in dst_list:
                     if line.find('/') != -1 and line.find('fe80') == -1:
                         dst_ip = line
                         break
-                dst_ip = line.split('/')[0].strip()
+                dst_ip = line.split('/').strip()
         assert src_vm.ping_with_certainty(dst_ip, count=5, size='1200')
         #lets wait 10 sec for tcpdump to capture all the packets
         sleep(10)
