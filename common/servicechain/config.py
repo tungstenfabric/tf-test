@@ -340,7 +340,7 @@ class ConfigSvcChain(object):
     def create_service_vms(self, vns, service_mode='transparent', max_inst=1,
             svc_img_name=None, service_type='firewall',
             hosts=[]):
-        non_docker_zones = [x for x in self.orch.get_zones() if x != 'nova/docker']
+        valid_zones = [x for x in self.orch.get_zones() if x not in ['nova/docker', 'nova-baremetal']]
         svm_fixtures = []
         svc_img_name = svc_img_name or SVC_TYPE_PROPS[service_type][service_mode]
         for i in range(max_inst):
@@ -350,7 +350,7 @@ class ConfigSvcChain(object):
                 image_name=svc_img_name,
                 vns=vns,
                 node_name=hosts[i%len(hosts)] if hosts else None,
-                zone=random.choice(non_docker_zones))
+                zone=random.choice(valid_zones))
             svm_fixtures.append(svm_fixture)
             if service_type == 'analyzer':
                 svm_fixture.disable_interface_policy()
