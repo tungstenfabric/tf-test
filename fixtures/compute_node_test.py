@@ -300,8 +300,8 @@ class ComputeNodeFixture(fixtures.Fixture):
             self.logger.debug(
                 'Get count of flows in node %s with action %s' %
                 (self.ip, action))
-            cmd = 'flow -l | grep Action | grep %s | wc -l ' % (action)
-            flow_count[action] = self.execute_cmd(cmd, container='agent')
+            cmd = 'contrail-tools flow -l | grep Action | grep %s | wc -l ' % (action)
+            flow_count[action] = self.execute_cmd(cmd, container=None)
         now = datetime.now()
         self.logger.info(
             "Flow count @ time %s in node %s is %s" %
@@ -318,7 +318,7 @@ class ComputeNodeFixture(fixtures.Fixture):
                                    'src_port':<src port>, 'dst_port':<dst port>,
                                    'proto':<protocol-integer>, 'vrf':<vrf-id>}
         '''
-        cmd = 'flow -l | grep \"%s\|%s\" -A1 | grep \"%s\|%s\" -A1' % (
+        cmd = 'contrail-tools flow -l | grep \"%s\|%s\" -A1 | grep \"%s\|%s\" -A1' % (
                            flow_data['src_ip'], flow_data['dst_ip'],
                            flow_data['src_port'], flow_data['dst_port']) + \
                             '| grep \"%s (%s)\" -A2' % (
@@ -328,8 +328,8 @@ class ComputeNodeFixture(fixtures.Fixture):
             cmd = cmd + '| grep %s' %  filters
 
         now = datetime.now()
-        flow = self.execute_cmd(cmd, container='agent')
-        flow_count = self.execute_cmd(cmd + '| wc -l', container='agent')
+        flow = self.execute_cmd(cmd, container=None)
+        flow_count = self.execute_cmd(cmd + '| wc -l', container=None)
         self.logger.info(
             "Flow count @ time %s in node %s is %s" %
             (now, self.ip, flow_count))
@@ -353,17 +353,17 @@ class ComputeNodeFixture(fixtures.Fixture):
             proto = flow_data['proto']
             vrf = flow_data['vrf']
             self.logger.info('Get count of flows in node %s' % (self.ip))
-            cmd_1 = 'flow -l | grep %s -A1 | grep %s -A1 | grep \"%s (%s\" -A1 | grep Action | wc -l' % (
+            cmd_1 = 'contrail-tools flow -l | grep %s -A1 | grep %s -A1 | grep \"%s (%s\" -A1 | grep Action | wc -l' % (
                 src_ip, dst_ip, proto, vrf)
-            cmd_2 = 'flow -l |grep %s -A1| grep %s -A1 |grep \"%s (%s\" -A1 |grep Action |grep -v FlowLim| wc -l' % (
+            cmd_2 = 'contrail-tools flow -l |grep %s -A1| grep %s -A1 |grep \"%s (%s\" -A1 |grep Action |grep -v FlowLim| wc -l' % (
                 src_ip, dst_ip, proto, vrf)
-            cmd_3 = 'flow -l |grep %s -A1| grep %s -A1 |grep \"%s (%s\" -A1 |grep Action |grep FlowLim| wc -l' % (
+            cmd_3 = 'contrail-tools flow -l |grep %s -A1| grep %s -A1 |grep \"%s (%s\" -A1 |grep Action |grep FlowLim| wc -l' % (
                 src_ip, dst_ip, proto, vrf)
-            flow_count['all'] += int(self.execute_cmd(cmd_1, container='agent'))
+            flow_count['all'] += int(self.execute_cmd(cmd_1, container=None))
             self.logger.debug('Command issued: %s, all flows: %s' %(cmd_1, flow_count['all']))
-            flow_count['allowed'] += int(self.execute_cmd(cmd_2, container='agent'))
+            flow_count['allowed'] += int(self.execute_cmd(cmd_2, container=None))
             self.logger.debug('Command issued: %s, allowed flows: %s' %(cmd_2, flow_count['allowed']))
-            flow_count['dropped_by_limit'] += int(self.execute_cmd(cmd_3, container='agent'))
+            flow_count['dropped_by_limit'] += int(self.execute_cmd(cmd_3, container=None))
             self.logger.debug('Command issued: %s, Limit dropped flows: %s' %(cmd_3, flow_count['dropped_by_limit']))
         self.logger.info(
             "Flow count in node %s is %s" %
