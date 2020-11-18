@@ -2690,7 +2690,7 @@ class VMFixture(fixtures.Fixture):
 
     @retry(delay=2, tries=15)
     def verify_vm_flows_removed(self):
-        cmd = 'flow -l '
+        cmd = 'contrail-tools flow -l '
         result = True
         # TODO Change the logic so that check is not global(causes problems
         # when run in parallel if same IP is across Vns or projects)
@@ -2700,8 +2700,7 @@ class VMFixture(fixtures.Fixture):
         output = self.inputs.run_cmd_on_server(self.vm_node_ip, cmd,
                                                self.inputs.host_data[
                                                    self.vm_node_ip]['username'],
-                                               self.inputs.host_data[self.vm_node_ip]['password'],
-                                               container='agent')
+                                               self.inputs.host_data[self.vm_node_ip]['password'])
         matches = [x for x in self.vm_ips if '%s:' % x in output]
         if matches:
             self.logger.warn(
@@ -3218,14 +3217,14 @@ class VMFixture(fixtures.Fixture):
         nh_dict ={}
         rt_keys = ['prefix','prefix_len','label','label_flags','nh_id']
         nh_keys = ['oif', 'flags', 'dip','type']
-        cmd = "rt --dump %s | grep %s " %(vrf_id, prefix)
-        output = self.inputs.run_cmd_on_server(compute_ip, cmd, container='agent')
+        cmd = "contrail-tools rt --dump %s | grep %s " %(vrf_id, prefix)
+        output = self.inputs.run_cmd_on_server(compute_ip, cmd)
         if output:
             rt_values = output.split()[:-1]
             rt_dict = dict(zip(rt_keys,rt_values)) 
             if int(rt_dict['nh_id']) > 0:
-                nh_cmd = 'nh --get %s'%rt_dict['nh_id']
-                output = self.inputs.run_cmd_on_server(compute_ip, nh_cmd, container='agent')
+                nh_cmd = 'contrail-tools nh --get %s'%rt_dict['nh_id']
+                output = self.inputs.run_cmd_on_server(compute_ip, nh_cmd)
                 if output:
                     output = output.split()
                     for out in output:

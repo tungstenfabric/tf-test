@@ -1687,7 +1687,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vm11_drop_new_flow_before = int(vm11_dropstats['ds_drop_new_flow'])
         self.logger.info("Dropstats value before executing clear command: %d " % (vm11_drop_new_flow_before))
 
-        self.inputs.run_cmd_on_server(vm11_fix.vm_node_ip, "dropstats --clear", container='agent')
+        self.inputs.run_cmd_on_server(vm11_fix.vm_node_ip, "contrail-tools dropstats --clear")
         for i in range(1,12):
             time.sleep(5)
             vm11_dropstats = vm11_inspect.get_agent_vrouter_drop_stats()
