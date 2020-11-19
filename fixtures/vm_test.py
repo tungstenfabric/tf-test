@@ -3210,18 +3210,18 @@ class VMFixture(fixtures.Fixture):
     def setup_subintf(self, device=None, vlan=None):
         cmd = 'vconfig add %s %s; dhclient %s.%s'%(device, vlan, device, vlan)
         self.run_cmd_on_vm([cmd], timeout=60, as_sudo=True)
-    
+
     def get_route_nh_from_host(self, compute_ip, vrf_id, prefix):
         #cmd = "rt --dump %s | grep %s | awk \'{print $5}\'" %(vrf_id, prefix)
         rt_dict = {}
         nh_dict ={}
         rt_keys = ['prefix','prefix_len','label','label_flags','nh_id']
         nh_keys = ['oif', 'flags', 'dip','type']
-        cmd = "contrail-tools rt --dump %s | grep %s " %(vrf_id, prefix)
+        cmd = "contrail-tools rt --dump %s 2>/dev/null | grep %s " %(vrf_id, prefix)
         output = self.inputs.run_cmd_on_server(compute_ip, cmd)
         if output:
             rt_values = output.split()[:-1]
-            rt_dict = dict(zip(rt_keys,rt_values)) 
+            rt_dict = dict(zip(rt_keys,rt_values))
             if int(rt_dict['nh_id']) > 0:
                 nh_cmd = 'contrail-tools nh --get %s'%rt_dict['nh_id']
                 output = self.inputs.run_cmd_on_server(compute_ip, nh_cmd)
@@ -3241,12 +3241,12 @@ class VMFixture(fixtures.Fixture):
                             nh_dict['flags'] = 'TUNNEL'
                 rt_dict['nh'] = nh_dict
             return [rt_dict]
-                    
+
         return []
-                
-                
-            
-        
+
+
+
+
 
     def __repr__(self):
         return '<VMFixture: %s>' % (self.vm_name)
