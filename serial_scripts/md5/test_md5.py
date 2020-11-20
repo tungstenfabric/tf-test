@@ -48,10 +48,11 @@ class TestMd5tests(Md5Base, VerifySecGroup, ConfigPolicy):
         if result[0]:
             self.is_mx_present=False
             self.check_dm = True
-            self.config_basic(self.check_dm)
+            self.add_mx_group_config(self.check_dm)
+            self.config_basic()
             uuid = self.vnc_lib.bgp_routers_list()
             self.uuid = str(uuid)
-            self.list_uuid = re.findall('u\'uuid\': u\'([a-zA-Z0-9-]+)\'', self.uuid)
+            self.list_uuid = re.findall('\'uuid\': \'([a-zA-Z0-9-]+)\'', self.uuid)
             bgp_fq_name = ['default-domain', 'default-project','ip-fabric', '__default__', self.inputs.bgp_names[0]]
             self.only_control_host = self.vnc_lib.bgp_router_read(fq_name=bgp_fq_name).uuid
         else:
@@ -141,7 +142,6 @@ class TestMd5testsOnControl(Md5Base, VerifySecGroup, ConfigPolicy):
     @classmethod
     def tearDownClass(cls):
         super(TestMd5testsOnControl, cls).tearDownClass()
-        cls.remove_mx_group_config()
 
     def is_test_applicable(self):
         if (len(self.inputs.bgp_control_ips) == 1 and len(self.inputs.ext_routers) < 1):
@@ -154,10 +154,10 @@ class TestMd5testsOnControl(Md5Base, VerifySecGroup, ConfigPolicy):
         if result[0]:
             self.is_mx_present=False
             self.check_dm = False
-            self.config_basic(self.check_dm)
+            self.config_basic()
             uuid = self.vnc_lib.bgp_routers_list()
             self.uuid = str(uuid)
-            self.list_uuid = re.findall('u\'uuid\': u\'([a-zA-Z0-9-]+)\'', self.uuid)
+            self.list_uuid = re.findall('\'uuid\': \'([a-zA-Z0-9-]+)\'', self.uuid)
             bgp_fq_name = ['default-domain', 'default-project','ip-fabric', '__default__', self.inputs.bgp_names[0]]
             self.only_control_host = self.vnc_lib.bgp_router_read(fq_name=bgp_fq_name).uuid
         else:
