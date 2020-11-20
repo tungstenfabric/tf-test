@@ -50,6 +50,13 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                                                   logger=cls.logger,
                                                   fip_pool_name=cls.inputs.fip_pool_name,
                                                   api_option='contrail')
+        if cls.inputs.additional_orchestrator == 'kubernetes':
+            if 'KUBERNETES_PUBLIC_FIP_POOL' in cls.inputs.contrail_configs:
+                cls.connections.project_name = cls.inputs.contrail_configs['KUBERNETES_PUBLIC_FIP_POOL']['project']
+                cls.connections.domain_name = cls.inputs.contrail_configs['KUBERNETES_PUBLIC_FIP_POOL']['domain']
+            else:
+                cls.connections.project_name = cls.inputs.k8s_cluster_name + '-default'
+                cls.connections.domain_name = cls.inputs.stack_domain
         cls.cluster_connections = []
         if cls.inputs.slave_orchestrator == 'kubernetes':
             for cluster in cls.inputs.k8s_clusters:
