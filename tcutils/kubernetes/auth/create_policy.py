@@ -90,6 +90,9 @@ def check_policy_in_config_map(policies):
         time.sleep(2)
     time.sleep(5)  # For master to stabilize, give additional 5 seconds
     logger.info("Policy updated in ConfigMap")
+    logger.info(check_output(
+        "kubectl config use-context keystone", shell=True, universal_newlines=True))
+
 
 
 def apply_policies_and_check_in_config_map(policies, filename):
