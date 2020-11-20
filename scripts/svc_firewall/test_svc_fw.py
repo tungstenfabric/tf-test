@@ -89,6 +89,155 @@ class TestSvcRegr(BaseSvc_FwTest, VerifySvcFirewall, ECMPVerify):
         return True
 
 
+    @test.attr(type=['ci_sanity', 'vcenter'])
+    @preposttest_wrapper
+    def test_svc_v2_transparent_datapath_move_svm_to_new_svc(self):
+        """
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (transparent mode) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc 
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. Verify route entry and end to end ping works 
+        """
+        Maintainer : kpatel@juniper.net
+        ret_dict=self.verify_svc_chain(service_mode='transparent',
+                                                    create_svms=True)
+
+        si_fixture=ret_dict.get('si_fixture')
+        pt_props=si_fixture.port_tuples_props[0]
+        pt_name=pt_props.get('name')
+        pt_uuid=si_fixture.port_tuples_uuids
+        si_obj = self.vnc_lib.service_instance_read(fq_name=si_fixture.si_fq_name)
+        pt_props['si_obj']=si_obj
+        pt_props['name']=pt_name
+        pt_props['pt_uuid']=pt_uuid[0]
+        si_fixture.delete_port_tuple(pt_props)
+
+        kwargs={}
+        kwargs['service_mode']='transparent'
+        kwargs['left_vn_fixture']=ret_dict.get('left_vn_fixture')
+        kwargs['right_vn_fixture']=ret_dict.get('right_vn_fixture')
+        kwargs['mgmt_vn_fixture']=ret_dict.get('mgmt_vn_fixture')
+        kwargs['trans_left_vn_fixture']=ret_dict.get('si_left_vn_fixture')
+        kwargs['trans_right_vn_fixture']=ret_dict.get('si_right_vn_fixture')
+        kwargs['left_lr_child_vn_fixture']=ret_dict.get('left_lr_child_vn_fixture')
+        kwargs['right_lr_child_vn_fixture']=ret_dict.get('right_lr_child_vn_fixture')
+
+        kwargs['svm_fixtures']=ret_dict.get('svm_fixtures')
+        kwargs['policy_fixture']=ret_dict.get('policy_fixture')
+        kwargs['modify_rules']=True
+        kwargs['right_vm_fixture']=ret_dict.get('right_vm_fixture')
+        kwargs['left_vm_fixture']=ret_dict.get('left_vm_fixture')
+
+        return self.verify_svc_chain(**kwargs)
+
+    @test.attr(type=['ci_sanity', 'vcenter'])
+    @preposttest_wrapper
+    def test_svc_in_network_datapath_move_svm_to_new_svc(self):
+        """
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (in-network) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc 
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. Verify route entry and end to end ping works 
+        """
+        Maintainer : kpatel@juniper.net
+        ret_dict=self.verify_svc_chain(svc_img_name='tiny_in_net', service_mode='in-network',
+                                     create_svms=True)
+ 
+        si_fixture=ret_dict.get('si_fixture')
+        pt_props=si_fixture.port_tuples_props[0]
+        pt_name=pt_props.get('name')
+        pt_uuid=si_fixture.port_tuples_uuids
+        si_obj = self.vnc_lib.service_instance_read(fq_name=si_fixture.si_fq_name)
+        pt_props['si_obj']=si_obj
+        pt_props['name']=pt_name
+        pt_props['pt_uuid']=pt_uuid[0]
+        si_fixture.delete_port_tuple(pt_props)
+
+        kwargs={}
+        kwargs['service_mode']='in-network'
+        kwargs['left_vn_fixture']=ret_dict.get('left_vn_fixture')
+        kwargs['right_vn_fixture']=ret_dict.get('right_vn_fixture')
+        kwargs['mgmt_vn_fixture']=ret_dict.get('mgmt_vn_fixture')
+
+        kwargs['left_lr_child_vn_fixture']=ret_dict.get('left_lr_child_vn_fixture')
+        kwargs['right_lr_child_vn_fixture']=ret_dict.get('right_lr_child_vn_fixture')
+
+        kwargs['svm_fixtures']=ret_dict.get('svm_fixtures')
+        kwargs['modify_rules']=True
+        kwargs['policy_fixture']=ret_dict.get('policy_fixture')
+
+        kwargs['right_vm_fixture']=ret_dict.get('right_vm_fixture')
+        kwargs['left_vm_fixture']=ret_dict.get('left_vm_fixture')
+
+        return self.verify_svc_chain(**kwargs)
+
+    @test.attr(type=['ci_sanity', 'vcenter'])
+    @preposttest_wrapper
+    def test_svc_in_network_nat_private_to_public_move_svm_to_new_svc(self):
+        """ 
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (in-network-nat) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc 
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. Verify route entry and end to end ping works 
+        """
+        Maintainer : kpatel@juniper.net
+        if  os.environ.get('MX_GW_TEST', 0) != '1':
+            self.logger.info("Skipping Test. Env variable MX_GW_TEST is not set. Skipping this test")
+            raise self.skipTest("Skipping Test. Env variable MX_GW_TEST is not set. Skipping this test")
+
+        public_vn_fixture = self.public_vn_obj.public_vn_fixture
+        public_vn_subnet = self.public_vn_obj.public_vn_fixture.vn_subnets[
+            0]['cidr']
+        # Since the ping is across projects, enabling allow_all in the SG
+        self.project.set_sec_group_for_allow_all(
+            self.inputs.project_name, 'default')
+        ret_dict = self.verify_svc_chain(service_mode='in-network-nat',
+                                         right_vn_fixture=public_vn_fixture,
+                                         right_vn_subnets=[public_vn_subnet],
+                                         create_svms=True)
+        self.logger.info('Ping to outside world from left VM')
+        si_fixture = ret_dict['si_fixture']
+        left_vm_fixture = ret_dict['left_vm_fixture']
+        assert left_vm_fixture.ping_with_certainty('8.8.8.8', count='10')
+
+        pt_props=si_fixture.port_tuples_props[0]
+        pt_name=pt_props.get('name')
+        pt_uuid=si_fixture.port_tuples_uuids
+        si_obj = self.vnc_lib.service_instance_read(fq_name=si_fixture.si_fq_name)
+        pt_props['si_obj']=si_obj
+        pt_props['name']=pt_name
+        pt_props['pt_uuid']=pt_uuid[0]
+        si_fixture.delete_port_tuple(pt_props)
+        kwargs={}
+        kwargs['service_mode']='in-network-nat'
+        kwargs['left_vn_fixture']=ret_dict.get('left_vn_fixture')
+        kwargs['mgmt_vn_fixture']=ret_dict.get('mgmt_vn_fixture')
+
+        kwargs['left_lr_child_vn_fixture']=ret_dict.get('left_lr_child_vn_fixture')
+        kwargs['right_lr_child_vn_fixture']=ret_dict.get('right_lr_child_vn_fixture')
+
+        kwargs['svm_fixtures']=ret_dict.get('svm_fixtures')
+        kwargs['modify_rules']=True
+        kwargs['policy_fixture']=ret_dict.get('policy_fixture')
+
+        kwargs['right_vm_fixture']=ret_dict.get('right_vm_fixture')
+        kwargs['left_vm_fixture']=ret_dict.get('left_vm_fixture')
+        kwargs['right_vn_fixture']=public_vn_fixture
+        kwargs['right_vn_subnets']=public_vn_subnet
+        ret_dict = self.verify_svc_chain(**kwargs)
+        self.logger.info('Ping to outside world from left VM')
+        si_fixture = ret_dict['si_fixture']
+        left_vm_fixture = ret_dict['left_vm_fixture']
+        assert left_vm_fixture.ping_with_certainty('8.8.8.8', count='10')
+
+        return True
+
 class TestSvcRegrFeature(BaseSvc_FwTest, VerifySvcFirewall):
 
     @classmethod
@@ -166,6 +315,50 @@ class TestSvcRegrIPv6(TestSvcRegr):
     @skip_because(address_family='v6')
     def test_svc_in_network_nat_private_to_public(self):
         super(TestSvcRegrIPv6,self).test_svc_in_network_nat_private_to_public()
+
+    @preposttest_wrapper
+    def test_svc_in_network_datapath_move_svm_to_new_svc(self):
+        """
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (in-network) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. While updating policy with new service instance change the rule mode to deny
+        4. Verify route entry and end to end should fail
+        """
+        Maintainer : kpatel@juniper.net
+        ret_dict=self.verify_svc_chain(svc_img_name='tiny_in_net', service_mode='in-network',
+                                     create_svms=True)
+
+        si_fixture=ret_dict.get('si_fixture')
+        pt_props=si_fixture.port_tuples_props[0]
+        pt_name=pt_props.get('name')
+        pt_uuid=si_fixture.port_tuples_uuids
+        si_obj = self.vnc_lib.service_instance_read(fq_name=si_fixture.si_fq_name)
+        pt_props['si_obj']=si_obj
+        pt_props['name']=pt_name
+        pt_props['pt_uuid']=pt_uuid[0]
+        si_fixture.delete_port_tuple(pt_props)
+
+        kwargs={}
+        kwargs['service_mode']='in-network'
+        kwargs['left_vn_fixture']=ret_dict.get('left_vn_fixture')
+        kwargs['right_vn_fixture']=ret_dict.get('right_vn_fixture')
+        kwargs['mgmt_vn_fixture']=ret_dict.get('mgmt_vn_fixture')
+
+        kwargs['left_lr_child_vn_fixture']=ret_dict.get('left_lr_child_vn_fixture')
+        kwargs['right_lr_child_vn_fixture']=ret_dict.get('right_lr_child_vn_fixture')
+
+        kwargs['svm_fixtures']=ret_dict.get('svm_fixtures')
+        kwargs['modify_rules']=True
+        kwargs['policy_action']='deny'
+        kwargs['policy_fixture']=ret_dict.get('policy_fixture')
+
+        kwargs['right_vm_fixture']=ret_dict.get('right_vm_fixture')
+        kwargs['left_vm_fixture']=ret_dict.get('left_vm_fixture')
+
+        return self.verify_svc_chain(**kwargs)
 
 class TestSvcRegrFeatureIPv6(TestSvcRegrFeature):
 
