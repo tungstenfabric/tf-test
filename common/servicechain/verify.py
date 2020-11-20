@@ -367,10 +367,17 @@ class VerifySvcChain(ConfigSvcChain):
         if proto not in ['any', 'icmp']:
             self.logger.info('Will skip Ping test')
         else:
-            # Ping from left VM to right VM
-            errmsg = "Ping to Right VM %s from Left VM failed" % right_vm_fixture.vm_ip
-            assert left_vm_fixture.ping_with_certainty(
-                right_vm_fixture.vm_ip, count='3'), errmsg
+            if kwargs.get('policy_action'):
+                if kwargs.get('policy_action') == 'deny':
+                    errmsg = "Ping to Right VM %s from Left VM passed" % right_vm_fixture.vm_ip
+                    assert left_vm_fixture.ping_with_certainty(
+                        right_vm_fixture.vm_ip, count='3', expectation=False), errmsg
+            else:
+                # Ping from left VM to right VM
+                errmsg = "Ping to Right VM %s from Left VM failed" % right_vm_fixture.vm_ip
+                assert left_vm_fixture.ping_with_certainty(
+                    right_vm_fixture.vm_ip, count='3'), errmsg
+
         return ret_dict
     # end verify_svc_chain
 
