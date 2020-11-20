@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "692764a2_b82f0883",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 163
+      },
+      "writtenOn": "2020-11-20T11:22:50Z",
+      "side": 1,
+      "message": "The previous code was to remove any previous config. There are 4 possibilities since there are 4 options - global md5, peer md5, md5 present and md5 absent options. This is so that any other testcase fail does not affect current testcase, since the other tc might have failed after configuring per peer md5. The above code configures md5, does not remove it. Or the log message has to change, because it says, BGP failed before md5 was configured.",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "685acf96_b33d5aa5",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 163
+      },
+      "writtenOn": "2020-11-20T11:22:50Z",
+      "side": 1,
+      "message": "Same comment as above testcase. Auth has to be removed before tc can begin or log message has to change.",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "301d217f_a3f79f0e",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 163
+      },
+      "writtenOn": "2020-11-20T11:22:50Z",
+      "side": 1,
+      "message": "Same comment as above testcase. Auth has to be removed before tc can begin or log message has to change.",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bae40819_6cc3e63c",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 163
+      },
+      "writtenOn": "2020-11-20T11:22:50Z",
+      "side": 1,
+      "message": "Same comment as above testcase. Auth has to be removed before tc can begin or log message has to change.",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cbcba226_ff856213",
+        "filename": "serial_scripts/md5/test_md5.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 163
+      },
+      "writtenOn": "2020-11-20T11:22:50Z",
+      "side": 1,
+      "message": "check_dm knob was there so that if there is future support from DM for md5, we can have a knob that can control the run. I think it would be better to have the knob, but set it to False by default",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
