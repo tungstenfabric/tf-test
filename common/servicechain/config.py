@@ -439,6 +439,8 @@ class ConfigSvcChain(object):
                         svm_fixtures=[],
                         create_svms=False,
                         evpn=False,
+                        modify_rules=False,
+                        policy_action='pass',
                         hosts=[],
                         **kwargs):
         '''
@@ -606,6 +608,26 @@ class ConfigSvcChain(object):
             self.verify_vm(left_vm_fixture)
         if created_right_vm:
             self.verify_vm(right_vm_fixture)
+
+        if policy_fixture and modify_rules:
+            si_fq_name_list = [si_fixture.fq_name_str]
+            if policy_action == 'deny':
+                action_list = {'simple_action' : 'deny',
+                        'apply_service': si_fq_name_list}
+            else:
+                action_list = {'simple_action' : 'pass',
+                        'apply_service': si_fq_name_list}
+            rules = []
+            rules.append({
+                    'direction': '<>',
+                    'protocol': proto,
+                    'source_network': left_vn_fq_name,
+                    'src_ports': src_ports,
+                    'dest_network': right_vn_fq_name,
+                    'dst_ports': dst_ports,
+                    'action_list': action_list,
+                    })
+            policy_fixture.update_policy_api(rules)
 
         if not policy_fixture:
             policy_name = get_random_name('policy')
