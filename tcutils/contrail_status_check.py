@@ -70,7 +70,7 @@ class ContrailStatusChecker(object):
                 keyfile=keyfile, certfile=certfile, cacert=cacert, refresh=refresh)
             failed_services = self._get_failed_services(status_dict)
             if (failed_services and expectation) or (not expectation and not failed_services):
-                self.inputs.logger.debug('%s'%failed_services)
+                self.inputs.logger.debug('%s' %failed_services)
                 if i+1 < tries:
                     self.inputs.logger.debug('Not all services up. '
                         'Sleeping for %s seconds. iteration: %s' %(delay, i))

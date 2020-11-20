@@ -44,7 +44,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
     def tearDown(self):
         super(Md5Base, self).tearDown()
 
-    def config_basic(self, check_dm):
+    def add_mx_group_config(self, check_dm):
         #mx config using device manager
         #both dm_mx and use_device_manager knobs are required for DM
         #this check is present in is_test_applicable
@@ -95,6 +95,8 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
                         mx_handle.connect()
                         cli_output = mx_handle.config(stmts = cmd, timeout = 120)
 
+
+    def config_basic(self):
         #ipv6 not supported for vcenter so skipping config
         if self.inputs.orchestrator != 'vcenter':
             vn61_name = "test_vnv6sr"
@@ -188,6 +190,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
             policy_fix, self.vn2_fix)
 
     def config_md5(self, host, auth_data):
+        self.logger.info("configure MD5 on host %s", host)
         rparam = self.vnc_lib.bgp_router_read(id=host).bgp_router_parameters
         list_uuid = self.vnc_lib.bgp_router_read(id=host)
         rparam.set_auth_data(auth_data)
@@ -196,6 +199,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
 
     @retry(delay=10, tries=9)
     def check_bgp_status(self, is_mx_present=False):
+        self.logger.info("Check BGP staus between peers")
         result = True
         self.cn_inspect = self.connections.cn_inspect
                 # Verify the connection between all control nodes and MX(if
@@ -252,16 +256,21 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
                                                        container='control')
             tcp_status=tcp_status.split('\n')
             for one_status in tcp_status:
-                one_status=one_status.split(' ')[-2]
-                if not ('ESTABLISHED' in one_status):
+                res = one_status.find('ESTABLISHED')
+                if res == -1:
                     result = False
                     self.logger.debug("Check the TCP connection on %s", node)
+                if result:
+                    self.logger.info("tcp connection on node is good  %s", node)
+                    
         return result
 
     def config_per_peer(self, auth_data):
+        self.logger.info("config per peer with auth_data %s", auth_data)
         uuid = self.vnc_lib.bgp_routers_list()
         uuid = str(uuid)
-        list_uuid = re.findall('u\'uuid\': u\'([a-zA-Z0-9-]+)\'', uuid)
+        list_uuid = re.findall('\'uuid\': \'([a-zA-Z0-9-]+)\'', uuid)
+        #list_uuid = re.findall('u\'uuid\': u\'([a-zA-Z0-9-]+)\'', uuid)
         #Same routine is used for DM and non DM testcases. Check if DM knob is enabled.
         if self.check_dm:
             list_uuid.append(self.phy_router_fixture.bgp_router.uuid)
@@ -290,153 +299,154 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
 
     def remove_configured_md5(self):
         auth_data=None
+
         for host in self.list_uuid:
+            self.logger.info("remove md5 configured on host %s", host)
             self.config_per_peer(auth_data=auth_data)
             self.config_md5( host=host, auth_data=auth_data )
 
     def create_md5_config(self):
         auth_data=None
+        self.logger.info("config md5 on each host with auth_data %s", auth_data)
+
         for host in self.list_uuid:
             self.config_per_peer(auth_data=auth_data)
             self.config_md5( host=host, auth_data=auth_data )
         #Same routine is used for DM and non DM testcases. Check if DM knob is enabled.
         if self.check_dm:
             self.config_md5( host = self.phy_router_fixture.bgp_router.uuid, auth_data=auth_data )
-        sleep(95)
+
+        self.logger.info("check if BGP between peers are up before setting md5")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
         for host in self.list_uuid:
             auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
+            self.logger.info("setting MD5 config on host %s", host)
             self.config_md5( host=host, auth_data=auth_data )
         #Same routine is used for DM and non DM testcases. Check if DM knob is enabled.
         if self.check_dm:
             self.config_md5( host = self.phy_router_fixture.bgp_router.uuid, auth_data=auth_data )
+        self.logger.info("check if BGP peering is up after md5 config")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes after basic md5 config not up"
         return True
 
     def add_delete_md5_config(self):
-        auth_data=None
-        for host in self.list_uuid:
-            self.config_per_peer(auth_data=auth_data)
-            self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
-        assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
         auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
+        for host in self.list_uuid:
+            self.config_per_peer(auth_data=None)
+            self.config_md5( host=host, auth_data=None )
+
+        self.logger.info("check if BGP peering between hosts are up before setting the MD5 config")
+        assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
+
         self.config_md5(host=self.only_control_host, auth_data=auth_data)
-        sleep(95)
+        self.logger.info("check that BGP peering is down as md5 is set only on one side")
         assert not (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should not be up as only one side has md5"
 
         for host in self.list_uuid:
-            auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
             self.config_md5( host=host, auth_data=auth_data )
 
-        sleep(95)
+        self.logger.info("check that BGP peering is up after md5 is set on both sides")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after both sides have md5"
 
-        auth_data=None
-        self.config_md5(host=self.only_control_host, auth_data=auth_data)
-        sleep(95)
+        self.config_md5(host=self.only_control_host, auth_data=None)
+        self.logger.info("check that BGP peering is down as md5 config is removed on one of the host")
         assert not (self.check_bgp_status(self.is_mx_present)), "BGP between nodes 2 should not be up as others have md5"
 
         for host in self.list_uuid:
-            auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+
+        self.logger.info("check that BGP peering is up after setting back MD5 on all hosts")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after 2 both sides have md5"
 
         for host in self.list_uuid:
-            auth_data=None
-            self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+            self.config_md5( host=host, auth_data=None )
+
+        self.logger.info("check that BGP peering is up after removing MD5 config on all hosts")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up"
         return True
 
     def different_keys_md5_config(self):
-        auth_data=None
+        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
         for host in self.list_uuid:
-            self.config_per_peer(auth_data=auth_data)
-            self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+            self.config_per_peer(auth_data=None)
+            self.config_md5( host=host, auth_data=None )
+
+        self.logger.info("Check BGP peering between hosts are up before md5 config")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
+
         for host in self.list_uuid:
-            auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+
+        self.logger.info("Check BGP peering between hosts are up after md5 config")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after md5 config"
         i=1
         for host in self.list_uuid:
             key = "juniper" + i.__str__()
-            auth_data={'key_items': [ { 'key':key,"key_id":0 } ], "key_type":"md5"}
-            self.config_md5( host=host, auth_data=auth_data )
+            diff_auth_data={'key_items': [ { 'key':key,"key_id":0 } ], "key_type":"md5"}
+            self.logger.info("set different keys for every host")
+            self.config_md5( host=host, auth_data=diff_auth_data )
             i += 1
-        sleep(95)
+
+        self.logger.info("check BGP peering is down as keys are different for each host")
         assert not (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should not be up as keys are different"
 
+        self.logger.info("set same key for all hosts")
         for host in self.list_uuid:
-            auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+
+        self.logger.info("check BGP peering is up as keys are same for each host")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after md5 config on all sides"
 
         for host in self.list_uuid:
-            auth_data=None
-            self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+            self.config_md5( host=host, auth_data=None )
+
+        self.logger.info("check BGP peering is up after removing md5 config on all nodes")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up"
         return True
 
     def check_per_peer_md5_config(self):
-        auth_data=None
+        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
         for host in self.list_uuid:
-            self.config_per_peer(auth_data=auth_data)
-            self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+            self.config_per_peer(auth_data=None)
+            self.config_md5( host=host, auth_data=None )
+
+        self.logger.info("check BGP peering is up before setting md5 config")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
 
-        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer(auth_data=auth_data )
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after per peer config"
         return True
 
     def add_delete_per_peer_md5_config(self):
-        auth_data=None
+        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
         for host in self.list_uuid:
-            self.config_per_peer(auth_data=auth_data)
-            self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+            self.config_per_peer(auth_data=None)
+            self.config_md5( host=host, auth_data=None )
+
+        self.logger.info("check BGP peering is up before setting md5 config")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
 
-        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer(auth_data=auth_data)
-        sleep(95)
+
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after per peer with mx"
         auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after different per peer value"
 
-        auth_data=None
-
-        self.config_per_peer(auth_data=auth_data)
-        sleep(95)
+        self.config_per_peer(auth_data=None)
+        self.logger.info("check BGP peering is up after removing md5 config")
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up"
 
-        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
-
         self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after reconfig per peer with mx"
-        auth_data=None
 
-        self.config_per_peer(auth_data=auth_data )
-        sleep(95)
+        self.config_per_peer(auth_data=None )
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after removing md5 with control"
-        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after reconfiguring md5 with control"
         return True
 
@@ -445,24 +455,17 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
         for host in self.list_uuid:
             self.config_per_peer(auth_data=auth_data)
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
 
         auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after per peer with mx"
 
-        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
-
         self.config_per_peer( auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up"
-        auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after reconfiguring key with mx"
         return True
 
@@ -472,18 +475,15 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
         self.config_per_peer(auth_data=auth_data)
         for host in self.list_uuid:
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
         auth_data={'key_items': [ { 'key':"simple","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer( auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after per peer with mx"
 
         auth_data=None
 
         self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after removing md5 with control"
 
         i=1
@@ -492,12 +492,10 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
             auth_data={'key_items': [ { 'key':key,"key_id":0 } ], "key_type":"md5"}
             self.config_md5( host=host, auth_data=auth_data )
             i += 1
-        sleep(95)
         assert not (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should not be up after global md5 key mismatch"
         auth_data={'key_items': [ { 'key':"juniper","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer( auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after global mismatch, but per peer match"
 
 
@@ -505,18 +503,15 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
 
         self.config_per_peer( auth_data=auth_data )
 
-        sleep(95)
         assert not (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should not be up as global mismatch still exists"
         for host in self.list_uuid:
             auth_data={'key_items': [ { 'key':"trialbyerror","key_id":0 } ], "key_type":"md5"}
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after reconfiguring global match"
 
         for host in self.list_uuid:
             auth_data=None
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after having no md5 between control"
 
         return True
@@ -526,12 +521,10 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
         for host in self.list_uuid:
             self.config_per_peer(auth_data=auth_data)
             self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up before md5"
         auth_data={'key_items': [ { 'key':"iter","key_id":0 } ], "key_type":"md5"}
 
         self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after per peer with mx"
 
         for i in range(1, 11):
@@ -539,14 +532,10 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
                 key = "juniper" + i.__str__()
                 auth_data={'key_items': [ { 'key':key,"key_id":0 } ], "key_type":"md5"}
                 self.config_md5( host=host, auth_data=auth_data )
-            sleep(95)
             assert (self.check_tcp_status()), "TCP connection should be up after key change"
             assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up 1 as keys are the same everywhere"
-            with settings(
-                host_string='%s@%s' % (
-                    self.inputs.username, self.inputs.cfgm_ips[0]),
-                    password=self.inputs.password, warn_only=True, abort_on_prompts=False, debug=True):
-                conrt = run('service contrail-control restart')
+
+            self.inputs.restart_service('contrail-control', [self.inputs.cfgm_ips[0]], container='control')
             cluster_status, error_nodes = ContrailStatusChecker().wait_till_contrail_cluster_stable()
             assert cluster_status, 'Hash of error nodes and services : %s' % (error_nodes)
             assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up 2 as keys are the same everywhere"
@@ -556,7 +545,7 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
                 key = "juniper" + i.__str__()
                 auth_data={'key_items': [ { 'key':key,"key_id":0 } ], "key_type":"md5"}
                 self.config_md5( host=host, auth_data=auth_data )
-        sleep(95)
+
         assert (self.check_tcp_status()), "TCP connection should be up after key change"
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes should be up 3 as keys are the same everywhere"
         with settings(
@@ -575,7 +564,6 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
             self.config_per_peer( auth_data=auth_data )
             #with repetitive config/unconfig, tcp takes a little longer to come up.
             #does not seem contrail issue, still needs a debug. Increasing the timeout as a temp measure.
-            sleep(120)
             assert (self.check_tcp_status()), "TCP connection should be up after key change"
             assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after per peer match"
 
@@ -585,7 +573,6 @@ class Md5Base(VerifySecGroup, ConfigPolicy):
 
             notmx=1
             self.config_per_peer(auth_data=auth_data )
-        sleep(95)
         assert (self.check_tcp_status()), "TCP connection should be up after key change"
         assert (self.check_bgp_status(self.is_mx_present)), "BGP between nodes not up after per peer match"
 
