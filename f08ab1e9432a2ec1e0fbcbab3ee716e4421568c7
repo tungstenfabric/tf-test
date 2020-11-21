@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff57f025_d12ddf58",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-21T13:44:15Z",
+      "side": 1,
+      "message": "auth_data is passed as None to per_peer and config_md5 function. The condition is taken care of.",
+      "parentUuid": "692764a2_b82f0883",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "685acf96_b33d5aa5",
         "filename": "serial_scripts/md5/base.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2020-11-20T11:22:50Z",
       "side": 1,
       "message": "Same comment as above testcase. Auth has to be removed before tc can begin or log message has to change.",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3d13356_fd0f2a37",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-21T13:44:15Z",
+      "side": 1,
+      "message": "comment same as above.",
+      "parentUuid": "685acf96_b33d5aa5",
       "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "46bd81f1_561520fa",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-21T13:44:15Z",
+      "side": 1,
+      "message": "comment same as above.",
+      "parentUuid": "301d217f_a3f79f0e",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bae40819_6cc3e63c",
         "filename": "serial_scripts/md5/base.py",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "0eea66c6_8472aecc",
+        "filename": "serial_scripts/md5/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-21T13:44:15Z",
+      "side": 1,
+      "message": "comment same as above.",
+      "parentUuid": "bae40819_6cc3e63c",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "cbcba226_ff856213",
         "filename": "serial_scripts/md5/test_md5.py",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2020-11-20T11:22:50Z",
       "side": 1,
       "message": "check_dm knob was there so that if there is future support from DM for md5, we can have a knob that can control the run. I think it would be better to have the knob, but set it to False by default",
+      "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad8c41b5_068e2ee3",
+        "filename": "serial_scripts/md5/test_md5.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-21T13:44:15Z",
+      "side": 1,
+      "message": "config_basic will only to create VN, launch VMs and attach policies, there is no DM specific code in that function. To accommodate your comment, add_mx_group_config need to be called for now with check_dm set to False, which is as good as no calling that function. So it\u0027s not required as of now.",
+      "parentUuid": "cbcba226_ff856213",
       "revId": "f08ab1e9432a2ec1e0fbcbab3ee716e4421568c7",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
