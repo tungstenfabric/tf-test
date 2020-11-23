@@ -334,7 +334,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         provider_configs = (self.config.get('provider_config') or {}).get('bms') or {}
         username = provider_configs.get('ssh_user') or 'root'
         password = provider_configs.get('ssh_pwd') or 'c0ntrail123'
-        domainsuffix = provider_configs.get('domainsuffix') or 'englab.juniper.net'
+        self.domainsuffix = provider_configs.get('domainsuffix') or 'englab.juniper.net'
         for host, values  in (self.config.get('instances') or {}).items():
             roles = values.get('roles') or {}
             host_data = dict()
@@ -395,7 +395,7 @@ class TestInputs(with_metaclass(Singleton, object)):
                     if self.deployer == 'rhosp' and len(hostname.split('.')) > 1:
                         host_data['name'] = hostname
                     else:
-                        host_data['name'] = '.'.join([hostname,domainsuffix])
+                        host_data['name'] = '.'.join([hostname,self.domainsuffix])
                 #
                 if roles['vrouter'] and roles['vrouter'].get('TSN_EVPN_MODE'):
                     self.contrail_service_nodes.append(hostname)
