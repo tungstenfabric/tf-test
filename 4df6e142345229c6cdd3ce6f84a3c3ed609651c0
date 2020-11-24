@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9dd7e029_f264d5ac",
+        "filename": "scripts/svc_firewall/test_svc_fw.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-24T16:46:34Z",
+      "side": 1,
+      "message": "remove these tags",
+      "range": {
+        "startLine": 92,
+        "startChar": 21,
+        "endLine": 92,
+        "endChar": 44
+      },
+      "revId": "4df6e142345229c6cdd3ce6f84a3c3ed609651c0",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d1beadc_629db39d",
+        "filename": "scripts/svc_firewall/test_svc_fw.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-24T16:46:34Z",
+      "side": 1,
+      "message": "this is a common code for all TCs, why can\u0027t this be a separate function and call with required parameters?",
+      "range": {
+        "startLine": 107,
+        "startChar": 8,
+        "endLine": 131,
+        "endChar": 65
+      },
+      "revId": "4df6e142345229c6cdd3ce6f84a3c3ed609651c0",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29af388a_96072268",
+        "filename": "scripts/svc_firewall/test_svc_fw.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-24T16:46:34Z",
+      "side": 1,
+      "message": "remove these tags",
+      "range": {
+        "startLine": 135,
+        "startChar": 5,
+        "endLine": 135,
+        "endChar": 45
+      },
+      "revId": "4df6e142345229c6cdd3ce6f84a3c3ed609651c0",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0420e552_3b80a2c1",
+        "filename": "scripts/svc_firewall/test_svc_fw.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-11-24T16:46:34Z",
+      "side": 1,
+      "message": "remove these tags",
+      "range": {
+        "startLine": 178,
+        "startChar": 3,
+        "endLine": 178,
+        "endChar": 45
+      },
+      "revId": "4df6e142345229c6cdd3ce6f84a3c3ed609651c0",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
