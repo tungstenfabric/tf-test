@@ -1,3 +1,4 @@
+
 import os
 from tcutils.kubernetes.auth import create_policy
 from tcutils.kubernetes.auth.util import Util
@@ -43,16 +44,19 @@ class ResourceUtil(Util):
                     errorMessage = json.loads(errorObject)['message']
                     logging.error(errorMessage)
 
-
     @staticmethod
     def create_policy_and_perform_operations(resource={}, match=[], resource_expectation_list=[], stackrc_dict={}):
         create_policy.create_and_apply_policies(resource=resource, match=match)
+        ResourceUtil.perform_operations(
+            stackrc_dict, resource_expectation_list)
+
+    @staticmethod
+    def perform_operations(stackrc_dict={}, resource_expectation_list=[]):
         Util.source_stackrc(**stackrc_dict)
         ResourceUtil.resource_with_expectation(
             verb='create', resource_expectation_list=resource_expectation_list)
         ResourceUtil.resource_with_expectation(
             verb='delete', resource_expectation_list=resource_expectation_list)
-
 
     @staticmethod
     def create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict():
@@ -81,7 +85,6 @@ class ResourceUtil(Util):
         }
         return match, stackrc_dict
 
-
     @staticmethod
     def admin_stackrc():
         admin = ExampleUser.admin()
@@ -93,3 +96,30 @@ class ResourceUtil(Util):
             'auth_url': admin.auth_url
         }
 
+    # Temp method
+    @staticmethod
+    def create_custom_user_openstack_objects_and_return_match_list_and_stackrc_dict():
+        admin = ExampleUser.admin()
+        admin.create_all(user_name='test', password='c0ntrail123', role='Member',
+                         project_name='test_project', domain_name='test_domain')
+        role_dict = {
+            'type': 'role',
+            'values': ['Member']
+        }
+        project_dict = {
+            'type': 'project',
+            'values': ['test_project']
+        }
+        user_dict = {
+            "type": 'user',
+            "values": ['test']
+        }
+        match = [role_dict, project_dict, user_dict]
+        stackrc_dict = {
+            'user_name': 'test',
+            'password': 'c0ntrail123',
+            'project_name': 'test_project',
+            'domain_name': 'test_domain',
+            'auth_url': admin.auth_url
+        }
+        return match, stackrc_dict

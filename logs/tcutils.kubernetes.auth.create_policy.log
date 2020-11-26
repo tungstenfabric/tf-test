@@ -142,3 +142,157 @@
 2020-11-20 06:43:42,905 - INFO - Policy updated in ConfigMap
 2020-11-20 06:43:43,029 - INFO - Switched to context "keystone".
 
+<<<<<<< HEAD
+=======
+2020-11-23 22:05:52,390 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-23 22:05:53,014 - INFO - Switched to context "juju-context".
+
+2020-11-23 22:05:53,377 - INFO - Waiting for policy to update in ConfigMap
+2020-11-23 22:06:20,002 - INFO - Policy updated in ConfigMap
+2020-11-23 22:06:20,132 - INFO - Switched to context "keystone".
+
+2020-11-23 22:07:00,102 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-23 22:07:00,494 - INFO - Switched to context "juju-context".
+
+2020-11-23 22:07:00,655 - INFO - Waiting for policy to update in ConfigMap
+2020-11-23 22:07:05,661 - INFO - Policy updated in ConfigMap
+2020-11-23 22:07:05,789 - INFO - Switched to context "keystone".
+
+2020-11-23 22:09:17,698 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-23 22:09:18,204 - INFO - Switched to context "juju-context".
+
+2020-11-23 22:09:18,363 - INFO - Waiting for policy to update in ConfigMap
+2020-11-23 22:09:45,082 - INFO - Policy updated in ConfigMap
+2020-11-23 22:09:45,213 - INFO - Switched to context "keystone".
+
+2020-11-23 22:13:58,247 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-23 22:13:58,635 - INFO - Switched to context "juju-context".
+
+2020-11-23 22:13:58,791 - INFO - Waiting for policy to update in ConfigMap
+2020-11-23 22:14:03,796 - INFO - Policy updated in ConfigMap
+2020-11-23 22:14:03,932 - INFO - Switched to context "keystone".
+
+2020-11-23 22:14:52,968 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-23 22:14:53,454 - INFO - Switched to context "juju-context".
+
+2020-11-23 22:14:53,610 - INFO - Waiting for policy to update in ConfigMap
+2020-11-23 22:15:22,866 - INFO - Policy updated in ConfigMap
+2020-11-23 22:15:22,997 - INFO - Switched to context "keystone".
+
+2020-11-23 22:16:38,711 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-23 22:16:39,214 - INFO - Switched to context "juju-context".
+
+2020-11-23 22:16:39,378 - INFO - Waiting for policy to update in ConfigMap
+2020-11-23 22:17:06,081 - INFO - Policy updated in ConfigMap
+2020-11-23 22:17:06,222 - INFO - Switched to context "keystone".
+
+2020-11-23 23:29:28,277 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-23 23:29:28,681 - INFO - Switched to context "juju-context".
+
+2020-11-23 23:29:31,836 - INFO - Waiting for policy to update in ConfigMap
+2020-11-23 23:29:36,841 - INFO - Policy updated in ConfigMap
+2020-11-23 23:29:36,974 - INFO - Switched to context "keystone".
+
+2020-11-24 05:18:41,988 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:18:42,646 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:18:46,419 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:19:11,030 - INFO - Policy updated in ConfigMap
+2020-11-24 05:19:11,165 - INFO - Switched to context "keystone".
+
+2020-11-24 05:20:06,068 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:20:06,456 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:20:06,614 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:20:18,294 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:20:18,853 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:20:19,016 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:20:45,673 - INFO - Policy updated in ConfigMap
+2020-11-24 05:20:45,810 - INFO - Switched to context "keystone".
+
+2020-11-24 05:25:31,636 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:25:32,014 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:25:32,172 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:25:37,177 - INFO - Policy updated in ConfigMap
+2020-11-24 05:25:37,306 - INFO - Switched to context "keystone".
+
+2020-11-24 05:26:57,189 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:26:57,816 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:26:57,980 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:27:24,618 - INFO - Policy updated in ConfigMap
+2020-11-24 05:27:24,760 - INFO - Switched to context "keystone".
+
+2020-11-24 05:28:06,526 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:28:07,156 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:28:07,308 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:28:34,080 - INFO - Policy updated in ConfigMap
+2020-11-24 05:28:34,216 - INFO - Switched to context "keystone".
+
+2020-11-24 05:30:20,025 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:30:20,439 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:30:20,594 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:30:25,599 - INFO - Policy updated in ConfigMap
+2020-11-24 05:30:25,735 - INFO - Switched to context "keystone".
+
+2020-11-24 05:36:34,079 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:36:34,446 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:36:34,599 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:36:39,605 - INFO - Policy updated in ConfigMap
+2020-11-24 05:36:39,743 - INFO - Switched to context "keystone".
+
+2020-11-24 05:38:12,570 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:38:12,960 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:38:13,114 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:38:18,119 - INFO - Policy updated in ConfigMap
+2020-11-24 05:38:18,255 - INFO - Switched to context "keystone".
+
+2020-11-24 05:39:05,506 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:39:06,069 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:39:09,353 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:39:31,716 - INFO - Policy updated in ConfigMap
+2020-11-24 05:39:31,854 - INFO - Switched to context "keystone".
+
+2020-11-24 05:46:57,406 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 05:46:57,972 - INFO - Switched to context "juju-context".
+
+2020-11-24 05:46:58,122 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 05:47:44,303 - INFO - Policy updated in ConfigMap
+2020-11-24 05:47:44,437 - INFO - Switched to context "keystone".
+
+2020-11-24 06:35:01,988 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 06:35:02,377 - INFO - Switched to context "juju-context".
+
+2020-11-24 06:35:05,267 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 06:35:10,273 - INFO - Policy updated in ConfigMap
+2020-11-24 06:35:10,405 - INFO - Switched to context "keystone".
+
+2020-11-24 06:49:23,331 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 06:49:23,834 - INFO - Switched to context "juju-context".
+
+2020-11-24 06:49:27,162 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 06:54:46,748 - INFO - Policy updated in ConfigMap
+2020-11-24 06:54:46,888 - INFO - Switched to context "keystone".
+
+2020-11-24 06:55:47,953 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-24 06:55:48,504 - INFO - Switched to context "juju-context".
+
+2020-11-24 06:55:48,661 - INFO - Waiting for policy to update in ConfigMap
+2020-11-24 07:01:10,316 - INFO - Policy updated in ConfigMap
+2020-11-24 07:01:10,458 - INFO - Switched to context "keystone".
+
+2020-11-25 23:26:57,157 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/auth_policy.yaml
+2020-11-25 23:26:57,539 - INFO - Switched to context "juju-context".
+
+2020-11-25 23:27:00,693 - INFO - Waiting for policy to update in ConfigMap
+2020-11-25 23:32:00,793 - INFO - Policy updated in ConfigMap
+2020-11-25 23:32:00,930 - INFO - Switched to context "keystone".
+
+>>>>>>> 8915b98... Working manual_test and all_in_one_policy

@@ -1,0 +1,110 @@
+provider_config:
+  bms:
+    ssh_user: 'root'
+    ssh_pwd:
+    domainsuffix: 'maas'
+
+instances:
+  192.168.7_20:
+    ip: 192.168.7.20
+    provider: bms
+    roles:
+      analytics:
+      analytics_snmp:
+      analytics_alarm:
+      analytics_database:
+      config:
+      config_database:
+      control:
+      webui:
+      openstack:
+  192.168.7_29:
+    ip: 192.168.7.29
+    provider: bms
+    roles:
+      analytics:
+      analytics_snmp:
+      analytics_alarm:
+      analytics_database:
+      config:
+      config_database:
+      control:
+      webui:
+      # vrouter:
+      k8s_master:
+      kubemanager:
+  192.168.7_34:
+    ip: 192.168.7.34
+    provider: bms
+    roles:
+      analytics:
+      analytics_snmp:
+      analytics_alarm:
+      analytics_database:
+      config:
+      config_database:
+      control:
+      webui:
+      openstack:
+  192.168.7_19:
+    ip: 192.168.7.19
+    provider: bms
+    roles:
+      vrouter:
+      k8s_node:
+  192.168.7_9:
+    ip: 192.168.7.9
+    provider: bms
+    roles:
+      vrouter:
+      openstack_compute:
+
+global_configuration:
+  CONTAINER_REGISTRY: bng-artifactory.juniper.net/contrail-nightly
+  REGISTRY_PRIVATE_INSECURE: True
+
+contrail_configuration:
+  LOG_LEVEL: SYS_DEBUG
+  CONTRAIL_CONTAINER_TAG: '2011.61'
+  CLOUD_ORCHESTRATOR: kubernetes
+  OPENSTACK_VERSION: queens
+  AUTH_MODE: keystone
+  KEYSTONE_AUTH_URL_VERSION: /v3
+  SSL_ENABLE: 'true'
+  RABBITMQ_USE_SSL: 'true'
+  CASSANDRA_SSL_ENABLE: 'true'
+  KUBERNETES_PUBLIC_FIP_POOL:
+    domain: default-domain
+    name: __fip_pool_public__
+    network: __public__
+    project: k8s-default
+
+orchestrator_configuration:
+  keystone:
+    version: v3
+    password: password
+    domain: admin_domain
+    region: RegionOne
+
+deployment:
+  orchestrator: openstack
+  deployer: juju
+  additional_orchestrator: kubernetes
+
+test_configuration:
+  image_web_server: 10.204.217.158
+  auth_port: 35357
+  auth_url: http://192.168.7.31:35357/v3
+  web_server:
+    server: 10.204.216.50
+    username: bhushana
+    password: c0ntrail!23
+    report_path: /home/bhushana/Documents/technical/sanity/juju-k8s
+    log_path: /home/bhushana/Documents/technical/logs
+    web_root: Docs/logs
+  mail_server:
+    server: 10.47.226.20
+    port: 25
+    to: nuthanc@juniper.net
+    sender: contrailbuild@juniper.net
+  use_project_scoped_token: True
