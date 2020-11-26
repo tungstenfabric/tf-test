@@ -1012,6 +1012,16 @@ class TestInputs(with_metaclass(Singleton, object)):
                 self.logger.debug('Container %s not in host %s, running on '
                     ' host itself' % (container, server_ip))
             container = cntr
+
+        # Workaround as part of CEM-20626
+        if "contrail-tools" in issue_cmd:
+            cmd = "contrail-tools exit"
+            dummy = run_cmd_on_server(cmd,
+                          server_ip,
+                          username,
+                          password,
+                          as_sudo=as_sudo)
+        
         output = run_cmd_on_server(issue_cmd,
                           server_ip,
                           username,
