@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e05b3336_71068901",
+        "filename": "common/contrail_test_init.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1015,
+      "author": {
+        "id": 216
+      },
+      "writtenOn": "2020-11-26T15:55:58Z",
+      "side": 1,
+      "message": "please mention single line comment or give bug_id and point to that",
+      "revId": "03c19049112717ee81b576c8e233249c88db219d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6550a90b_c1199214",
+        "filename": "common/contrail_test_init.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1026,
+      "author": {
+        "id": 216
+      },
+      "writtenOn": "2020-11-26T15:55:58Z",
+      "side": 1,
+      "message": "add as_sudo parameter , it might be required for rhosp where we will not have root permissions",
+      "revId": "03c19049112717ee81b576c8e233249c88db219d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
