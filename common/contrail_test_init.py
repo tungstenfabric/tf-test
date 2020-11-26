@@ -1012,6 +1012,46 @@ class TestInputs(with_metaclass(Singleton, object)):
                 self.logger.debug('Container %s not in host %s, running on '
                     ' host itself' % (container, server_ip))
             container = cntr
+        ###########################################
+        # When Contrail-tools command is executed on the vRouter for the first time
+        # Then it first download the container image and then execute the contrail-tool CLI on the container
+        # In that case the out put of image download also gets returned as output and then the parsing of the 
+        # output fails in the testcase, Thats why adding a dummy command just to makesure it does not return those 
+        # unnecessary Image download output to the testcase.
+        #
+        # Example :
+
+        # CMD is :  
+        # contrail-tools flow -l | grep 120.15.159.124 -A3 | grep 190.223.205.252 -A3 | grep "Action:D(Policy)" | wc -l
+
+        # OUTPUT is :  
+        # Unable to find image 'bng-artifactory.juniper.net/contrail-nightly/contrail-tools:2011.102' locally
+        # 2011.102: Pulling from contrail-nightly/contrail-tools
+        # 9b4ebb48de8d: Already exists
+        # cfc385f074b7: Already exists
+        # b32fdf677262: Already exists
+        # c51c979fdd72: Already exists
+        # 5cd4ea5a3452: Already exists
+        # b073baafcff7: Already exists
+        # 5f9b01b6c7ec: Already exists
+        # 2b38aeb08793: Already exists
+        # 9e5b7b9d2837: Already exists
+        # 6367ab09e144: Pulling fs layer
+        # 6367ab09e144: Verifying Checksum
+        # 6367ab09e144: Download complete
+        # 6367ab09e144: Pull complete
+        # Digest: sha256:5de2204dbd492068d6e2dc4b3c013dd3bf389749689722705831afc80dcf2788
+        # Status: Downloaded newer image for bng-artifactory.juniper.net/contrail-nightly/contrail-tools:2011.102
+        # 2  <=========== This is actually Expected
+
+        # ########################################## 
+        if "contrail-tools" in issue_cmd:
+            cmd = "contrail-tools exit"
+            dummy = run_cmd_on_server(cmd,
+                          server_ip,
+                          username,
+                          password)
+        
         output = run_cmd_on_server(issue_cmd,
                           server_ip,
                           username,
