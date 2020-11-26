@@ -1012,6 +1012,20 @@ class TestInputs(with_metaclass(Singleton, object)):
                 self.logger.debug('Container %s not in host %s, running on '
                     ' host itself' % (container, server_ip))
             container = cntr
+        ###########################################
+        # When Contrail-tools command is executed on the vRouter for the first time
+        # Then it first download the container image and then execute the contrail-tool CLI on the container
+        # In that case the out put of image download also gets returned as output and then the parsing of the 
+        # output fails in the testcase, Thats why adding a dummy command just to makesure it does not return those 
+        # unnecessary Image download output to the testcase.
+        # ########################################## 
+        if "contrail-tools" in issue_cmd:
+            cmd = "contrail-tools exit"
+            dummy = run_cmd_on_server(cmd,
+                          server_ip,
+                          username,
+                          password)
+        
         output = run_cmd_on_server(issue_cmd,
                           server_ip,
                           username,
