@@ -175,7 +175,8 @@ def manual_test():
                                  'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
     ResourceUtil.perform_operations(
         stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
-    import pdb;pdb.set_trace()
+    ResourceUtil.perform_operations(
+        stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list, namespace='zomsrc')
 
     # For zoro user, any operation on pods, deployments and services but only in easy namespace
     print("\nFor zoro user, any operation on pods, deployments and services but only in easy namespace")
@@ -190,7 +191,8 @@ def manual_test():
                                  'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
     ResourceUtil.perform_operations(
         resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
-    import pdb;pdb.set_trace()
+    ResourceUtil.perform_operations(
+        stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list, namespace='easy')
     
 manual_test()
 
