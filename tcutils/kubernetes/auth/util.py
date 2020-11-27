@@ -79,3 +79,15 @@ class Util:
         if err:
             print(err)
         client.close()
+
+    # MSG Need to get the kubemanager ip from contrail_test_input
+    @staticmethod
+    def restart_kube_manager():
+        Util.execute_cmds_on_remote(
+            '192.168.7.29', ['sudo docker restart contrailkubernetesmaster_kubemanager_1'])
+
+    # MSG Need to get vrouter agent ip from contrail_test_input
+    @staticmethod
+    def restart_vrouter_agent():
+        Util.execute_cmds_on_remote(
+            '192.168.7.19', ['sudo docker restart vrouter_vrouter-agent_1'])
