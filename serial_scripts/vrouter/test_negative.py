@@ -45,7 +45,7 @@ class KernelCrashTest(BaseVrouterTest):
                 msg = ('/etc/kdump.conf not found! No kernel core file can get '
                     'created')
                 assert exists('/etc/kdump.conf'), msg
-                cmd = 'grep -o "^#path .*" kdump.conf | awk \'{print $2}\''
+                cmd = 'grep -o "^path .*" /etc/kdump.conf | awk \'{print $2}\''
                 crash_file = run(cmd) or default_crash_file
 
             files = str(run('ls %s' % (crash_file))).split()
