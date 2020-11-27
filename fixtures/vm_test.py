@@ -3210,6 +3210,23 @@ class VMFixture(fixtures.Fixture):
     def setup_subintf(self, device=None, vlan=None):
         cmd = 'vconfig add %s %s; dhclient %s.%s'%(device, vlan, device, vlan)
         self.run_cmd_on_vm([cmd], timeout=60, as_sudo=True)
+
+    @retry(delay=10, tries=20)
+    def check_subintf(self, ip, family='v4'):
+        result = False
+        cmd = 'ifconfig | grep %s' %ip 
+        cmd_output = self.run_cmd_on_vm([cmd], timeout=60, as_sudo=True)
+        if (family == 'v4'):
+            sub_str = 'inet addr:%s' %ip
+        else:
+            sub_str = 'inet6 addr: %s' %ip
+
+        if cmd_output and sub_str in str(cmd_output):
+            self.logger.info("sub-interface is up")
+            result = True
+        else:
+            self.logger.info("sub-interface is still not up")
+        return result
     
     def get_route_nh_from_host(self, compute_ip, vrf_id, prefix):
         #cmd = "rt --dump %s | grep %s | awk \'{print $5}\'" %(vrf_id, prefix)
