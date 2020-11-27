@@ -116,24 +116,25 @@ def manual_test():
     admin = ExampleUser.admin()
     
 
-    admin.create_all(user_name='zoro', password='c0ntrail123', role='Member',
-                     project_name='zoro_project', domain_name='zoro_domain')
-    admin.create_all(user_name='ola', password='c0ntrail123', role='Member',
-                     project_name='ola_project', domain_name='ola_domain')
-    admin.create_all(user_name='uber', password='c0ntrail123', role='Member',
-                     project_name='uber_project', domain_name='uber_domain')
-    admin.create_all(user_name='zomato', password='c0ntrail123', role='Member',
-                     project_name='zomato_project', domain_name='zomato_domain')
+    # admin.create_all(user_name='zoro', password='c0ntrail123', role='Member',
+    #                  project_name='zoro_project', domain_name='zoro_domain')
+    # admin.create_all(user_name='ola', password='c0ntrail123', role='Member',
+    #                  project_name='ola_project', domain_name='ola_domain')
+    # admin.create_all(user_name='uber', password='c0ntrail123', role='Member',
+    #                  project_name='uber_project', domain_name='uber_domain')
+    # admin.create_all(user_name='zomato', password='c0ntrail123', role='Member',
+    #                  project_name='zomato_project', domain_name='zomato_domain')
 
-    ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
-    os.system('kubectl create ns zomsrc')
-    os.system('kubectl create ns easy')
-    os.system('juju config kubernetes-master keystone-policy="$(cat /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml)"')
-    import pdb;pdb.set_trace()
+    # ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
+    # os.system('kubectl create ns zomsrc')
+    # os.system('kubectl create ns easy')
+    # os.system('juju config kubernetes-master keystone-policy="$(cat /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml)"')
+    # import pdb;pdb.set_trace()
     # kubectl describe configmap -n kube-system k8s-auth-policy
     # Stackrcs in o7k
 
     # For ola user, only create pods and deployments and nothing else
+    print("For ola user, only create pods and deployments and nothing else")
     stackrc_dict = {
         'user_name': 'ola',
         'password': 'c0ntrail123',
@@ -148,6 +149,7 @@ def manual_test():
 
 
     # For uber user, only delete pods and deployments and nothing else
+    print("\nFor uber user, only delete pods and deployments and nothing else")
     stackrc_dict = {
         'user_name': 'uber',
         'password': 'c0ntrail123',
@@ -161,6 +163,7 @@ def manual_test():
         stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
     # For zomato user, create service in zomsrc namespace and nothing else should work
+    print("\nFor zomato user, create service in zomsrc namespace and nothing else should work")
     stackrc_dict = {
         'user_name': 'zomato',
         'password': 'c0ntrail123',
@@ -172,8 +175,10 @@ def manual_test():
                                  'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
     ResourceUtil.perform_operations(
         stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
+    import pdb;pdb.set_trace()
 
     # For zoro user, any operation on pods, deployments and services but only in easy namespace
+    print("\nFor zoro user, any operation on pods, deployments and services but only in easy namespace")
     stackrc_dict = {
         'user_name': 'zoro',
         'password': 'c0ntrail123',
@@ -185,6 +190,7 @@ def manual_test():
                                  'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
     ResourceUtil.perform_operations(
         resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
+    import pdb;pdb.set_trace()
     
 manual_test()
 

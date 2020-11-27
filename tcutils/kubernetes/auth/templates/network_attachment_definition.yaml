@@ -6,6 +6,5 @@ metadata:
     opencontrail.org/ip_fabric_forwarding: "false" 
     opencontrail.org/ip_fabric_snat: "false"
   name: vn-right
-  namespace: default 
 spec:
   config: '{ "cniVersion": "0.3.0", "type": "contrail-k8s-cni" }'
