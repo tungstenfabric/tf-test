@@ -89,6 +89,88 @@ class TestSvcRegr(BaseSvc_FwTest, VerifySvcFirewall, ECMPVerify):
         return True
 
 
+    @preposttest_wrapper
+    def test_svc_v2_transparent_datapath_move_svm_to_new_svc(self):
+        """
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (transparent mode) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. Verify route entry and end to end ping works
+        Maintainer : kpatel@juniper.net
+        """
+
+        ret_dict=self.verify_svc_chain(service_mode='transparent',
+                                                    create_svms=True)
+        ret_dict['service_mode']='transparent'
+        # remove old svm create and add new svm to same SI
+        kwargs = self.replace_svm_on_si(**ret_dict)
+        return self.verify_svc_chain(**kwargs)
+
+    @preposttest_wrapper
+    def test_svc_in_network_datapath_move_svm_to_new_svc(self):
+        """
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (in-network) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. Verify route entry and end to end ping works
+        Maintainer : kpatel@juniper.net
+        """
+ 
+        ret_dict=self.verify_svc_chain(svc_img_name='tiny_in_net', service_mode='in-network',
+                                     create_svms=True)
+
+        ret_dict['service_mode']='in-network'
+        # remove old svm create and add new svm to same SI
+        kwargs = self.replace_svm_on_si(**ret_dict)
+        return self.verify_svc_chain(**kwargs)
+
+    @preposttest_wrapper
+    def test_svc_in_network_nat_private_to_public_move_svm_to_new_svc(self):
+        """
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (in-network-nat) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. Verify route entry and end to end ping works
+        Maintainer : kpatel@juniper.net
+        """
+
+        if  os.environ.get('MX_GW_TEST', 0) != '1':
+            self.logger.info("Skipping Test. Env variable MX_GW_TEST is not set. Skipping this test")
+            raise self.skipTest("Skipping Test. Env variable MX_GW_TEST is not set. Skipping this test")
+
+        public_vn_fixture = self.public_vn_obj.public_vn_fixture
+        public_vn_subnet = self.public_vn_obj.public_vn_fixture.vn_subnets[
+            0]['cidr']
+        # Since the ping is across projects, enabling allow_all in the SG
+        self.project.set_sec_group_for_allow_all(
+            self.inputs.project_name, 'default')
+        ret_dict = self.verify_svc_chain(service_mode='in-network-nat',
+                                         right_vn_fixture=public_vn_fixture,
+                                         right_vn_subnets=[public_vn_subnet],
+                                         create_svms=True)
+        self.logger.info('Ping to outside world from left VM')
+        si_fixture = ret_dict['si_fixture']
+        left_vm_fixture = ret_dict['left_vm_fixture']
+        assert left_vm_fixture.ping_with_certainty('8.8.8.8', count='10')
+
+        ret_dict['service_mode']='in-network-nat'
+        # remove old svm create and add new svm to same SI
+        kwargs = self.replace_svm_on_si(**ret_dict)
+        ret_dict = self.verify_svc_chain(**kwargs)
+
+        self.logger.info('Ping to outside world from left VM')
+        si_fixture = ret_dict['si_fixture']
+        left_vm_fixture = ret_dict['left_vm_fixture']
+        assert left_vm_fixture.ping_with_certainty('8.8.8.8', count='10')
+
+        return True        
+
 class TestSvcRegrFeature(BaseSvc_FwTest, VerifySvcFirewall):
 
     @classmethod
@@ -166,6 +248,30 @@ class TestSvcRegrIPv6(TestSvcRegr):
     @skip_because(address_family='v6')
     def test_svc_in_network_nat_private_to_public(self):
         super(TestSvcRegrIPv6,self).test_svc_in_network_nat_private_to_public()
+
+    @preposttest_wrapper
+    def test_svc_in_network_datapath_move_svm_to_new_svc(self):
+        """
+        Description: Verify svm can be moved to new service instance
+        Test steps:
+        1. Configure svc instance (in-network) and verify route entry and end to end ping works
+        2. Delete port tuple(svm) from old svc
+        3. Create new svc intance and move port tuple (svm) to this instance
+        4. While updating policy with new service instance change the rule mode to deny
+        5. Verify route entry and end to end should fail
+        Maintainer : kpatel@juniper.net
+        """
+ 
+        ret_dict=self.verify_svc_chain(svc_img_name='tiny_in_net', service_mode='in-network',
+                                     create_svms=True)
+
+        ret_dict['service_mode']='in-network'
+        # remove old svm create and add new svm to same SI
+        kwargs = self.replace_svm_on_si(**ret_dict)
+
+        # verify deny policy
+        kwargs['policy_action']='deny'
+        return self.verify_svc_chain(**kwargs)
 
 class TestSvcRegrFeatureIPv6(TestSvcRegrFeature):
 
