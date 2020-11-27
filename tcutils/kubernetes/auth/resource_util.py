@@ -30,7 +30,7 @@ class ResourceUtil(Util):
                     logging.warning(
                         f'{verb} {resource} successful even when expectation is False')
             elif 'forbidden' in error:
-                logging.info(f'{verb} {resource} forbidden')
+                logging.warn(f'{verb} {resource} forbidden')
             else:
                 if 'already' in error:
                     Util.exec_kubectl_cmd_on_file(
