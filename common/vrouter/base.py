@@ -1090,6 +1090,7 @@ class BaseVrouterTest(BaseNeutronTest, VerifySvcMirror):
             nc_options=nc_options)
 
         #Verify tcpdump count, any one destination should receive the packet
+        dst_vrf_on_src=None
         for vm in dest_vm_fix_list:
             if not self.inputs.pcap_on_vm:
                 ret = verify_tcpdump_count(self, session[vm], pcap[vm])
