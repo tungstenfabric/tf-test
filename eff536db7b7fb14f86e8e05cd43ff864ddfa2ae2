@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e5ba0a45_f5076329",
+        "filename": "common/vrouter/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1096,
+      "author": {
+        "id": 128
+      },
+      "writtenOn": "2020-12-01T10:40:38Z",
+      "side": 1,
+      "message": "The root cause seems to be that failure in verify_tcpdump_count is ignored.\nWhen verify_tcpdump_count fails, lines 1100-1114, where dst_vrf_on_src is assigned to, is not executed, hence when line 1121 is executed, dst_vrf_on_src is not initialized\nWe should assert that verify_tcpdump_count passes.",
+      "revId": "eff536db7b7fb14f86e8e05cd43ff864ddfa2ae2",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
