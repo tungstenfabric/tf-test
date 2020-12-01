@@ -3210,7 +3210,7 @@ class VMFixture(fixtures.Fixture):
     def setup_subintf(self, device=None, vlan=None):
         cmd = 'vconfig add %s %s; dhclient %s.%s'%(device, vlan, device, vlan)
         self.run_cmd_on_vm([cmd], timeout=60, as_sudo=True)
-    
+
     def get_route_nh_from_host(self, compute_ip, vrf_id, prefix):
         #cmd = "rt --dump %s | grep %s | awk \'{print $5}\'" %(vrf_id, prefix)
         rt_dict = {}
