@@ -43,9 +43,11 @@ class TestFabricDcGw(BaseFabricTest):
         for spine in self.spines:
             prouter_details = self.inputs.physical_routers_data[spine.name]
             if prouter_details.get('model', '').startswith('mx'):
-                spine.add_service_interface(prouter_details['si_port'])
-                spine.add_virtual_network(public_vn.uuid)
-                self.addCleanup(spine.delete_virtual_network, public_vn.uuid)
+                if prouter_details.get('si_port'):
+                    spine.add_service_interface(prouter_details['si_port'])
+                    spine.add_virtual_network(public_vn.uuid)
+                    self.addCleanup(spine.delete_virtual_network, public_vn.uuid)
+
         vm = self.create_vm(vn_fixture=private_vn, image_name='cirros')
 
         for bms in list(self.inputs.bms_data.keys()):
