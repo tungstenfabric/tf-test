@@ -79,7 +79,7 @@ class VerifySriovCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sriov',
                 vm_name=sriov_vm1_name,
                 node_name=compute_1,
                 port_ids = [ports1['subnet1']['id'],ports1['subnet2']['id']]))
@@ -90,7 +90,7 @@ class VerifySriovCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sriov',
                 vm_name=sriov_vm2_name,
                 node_name=compute_2,
                 port_ids = [ports2['subnet1']['id'],ports2['subnet2']['id']]))
@@ -105,13 +105,13 @@ class VerifySriovCases(object):
         self.bringup_interface_forcefully(vm2_fixture)
 
         # Configure IP address
-        cmd_to_pass1 = ['ifconfig eth1 %s' % (vm1_sriov_ip)]
+        cmd_to_pass1 = ['ifconfig ens6 %s' % (vm1_sriov_ip)]
         vm1_fixture.run_cmd_on_vm(cmds=cmd_to_pass1, as_sudo=True, timeout=60)
-        cmd_to_pass2 = ['ifconfig eth1 %s' % (vm2_sriov_ip)]
+        cmd_to_pass2 = ['ifconfig ens6 %s' % (vm2_sriov_ip)]
         vm2_fixture.run_cmd_on_vm(cmds=cmd_to_pass2, as_sudo=True, timeout=60)
 
         assert vm2_fixture.ping_to_ip(vm1_sriov_ip, count='15',
-                                              other_opt='-I eth1')
+                                              other_opt='-I ens6')
     # End communication_between_two_sriov_vm
 
     def virtual_function_exhaustion_and_resue (self):
@@ -177,7 +177,7 @@ class VerifySriovCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sriov',
                 vm_name=sriov_vm1_name,
                 node_name=compute_1,
                 port_ids = [ports1['id'],ports2['id']])))
@@ -200,7 +200,7 @@ class VerifySriovCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sriov',
                 vm_name='VM-Error',
                 node_name=compute_1,
                 port_ids = [ports1['id'],ports2['id']]))
@@ -231,7 +231,7 @@ class VerifySriovCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sriov',
                 vm_name='VM-New',
                 node_name=compute_1,
                 port_ids = [ports1['id'],ports2['id']]))
@@ -317,7 +317,7 @@ class VerifySriovCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sriov',
                 vm_name=sriov_vm1_name,
                 node_name=compute_1,
                 port_ids = [ports1['subnet1']['id'],ports1['subnet2']['id']]))
@@ -328,7 +328,7 @@ class VerifySriovCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sriov',
                 vm_name=sriov_vm2_name,
                 node_name=compute_2,
                 port_ids = [ports2['subnet1']['id'],ports2['subnet2']['id']]))
@@ -343,20 +343,20 @@ class VerifySriovCases(object):
         self.bringup_interface_forcefully(vm2_fixture)
 
         # Configure IP address
-        cmd_to_pass1 = ['ifconfig eth1 %s' % (vm1_sriov_ip)]
+        cmd_to_pass1 = ['ifconfig ens6 %s' % (vm1_sriov_ip)]
         vm1_fixture.run_cmd_on_vm(cmds=cmd_to_pass1, as_sudo=True, timeout=60)
-        cmd_to_pass2 = ['ifconfig eth1 %s' % (vm2_sriov_ip)]
+        cmd_to_pass2 = ['ifconfig ens6 %s' % (vm2_sriov_ip)]
         vm2_fixture.run_cmd_on_vm(cmds=cmd_to_pass2, as_sudo=True, timeout=60)
 
         # Configure Higher MTU value
-        cmd_to_increase_mtu = ['ifconfig eth1 mtu 5000']
+        cmd_to_increase_mtu = ['ifconfig ens6 mtu 5000']
         vm1_fixture.run_cmd_on_vm(cmds=cmd_to_increase_mtu, as_sudo=True, timeout=60)
         vm2_fixture.run_cmd_on_vm(cmds=cmd_to_increase_mtu, as_sudo=True, timeout=60)
-        vf_in_vm1=self.get_vf_in_use(vm1_fixture,self.get_sriov_pf(compute_1),self.get_sriov_mac(vm1_fixture,'eth1'))
-        vf_in_vm2=self.get_vf_in_use(vm2_fixture,self.get_sriov_pf(compute_2),self.get_sriov_mac(vm2_fixture,'eth1'))
+        vf_in_vm1=self.get_vf_in_use(vm1_fixture,self.get_sriov_pf(compute_1),self.get_sriov_mac(vm1_fixture,'ens6'))
+        vf_in_vm2=self.get_vf_in_use(vm2_fixture,self.get_sriov_pf(compute_2),self.get_sriov_mac(vm2_fixture,'ens6'))
         self.set_mtu_on_vf(vm1_fixture,self.get_sriov_pf(compute_1),vf_in_vm1,'200','5000')
         self.set_mtu_on_vf(vm2_fixture,self.get_sriov_pf(compute_2),vf_in_vm2,'200','5000')
 
         assert vm2_fixture.ping_to_ip(vm1_sriov_ip, count='15',
-                                              other_opt='-I eth1',return_output=True,size='5000')
+                                              other_opt='-I ens6',return_output=True,size='5000')
     # End communication_between_two_sriov_vm_with_large_mtu
