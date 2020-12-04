@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Set the env variable PARAMS_FILE to point to your ini file. Else it will try to pick params.ini in PWD
 from . import base
 from tcutils.wrappers import preposttest_wrapper
+from tcutils.util import *
 from .verify import VerifySriovCases
 import test
 
@@ -19,7 +20,8 @@ class TestSriov(base.BaseSriovTest, VerifySriovCases):
     def runTest(self):
         pass
     #end runTest
-
+    @test.attr(type=['ci_sanity'])
+    @skip_because(sriov_cluster=False)
     @preposttest_wrapper
     def test_communication_between_two_sriov_vm(self):
         '''
@@ -29,12 +31,16 @@ class TestSriov(base.BaseSriovTest, VerifySriovCases):
         '''
         return self.communication_between_two_sriov_vm()
 
+    @test.attr(type=['ci_sanity'])
+    @skip_because(sriov_cluster=False)
     @preposttest_wrapper
     def test_communication_between_two_sriov_vm_with_large_mtu(self):
         '''
         '''
         return self.communication_between_two_sriov_vm_with_large_mtu()
 
+    @test.attr(type=['ci_sanity'])
+    @skip_because(sriov_cluster=False)
     @preposttest_wrapper
     def test_virtual_function_exhaustion_and_resue(self):
         '''
