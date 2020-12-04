@@ -1099,6 +1099,13 @@ def skip_because(*args, **kwargs):
                     msg = "Skipped as test is not supported if dpdk_cluster=%s " % val
                     raise testtools.TestCase.skipException(msg)
 
+            if 'sriov_cluster' in kwargs:
+                val = kwargs['sriov_cluster']
+                if self.inputs.is_sriov_cluster == val:
+                    skip = True
+                    msg = "Skipped as test is not supported if sriov_cluster=%s " % val
+                    raise testtools.TestCase.skipException(msg)
+
             if 'ssl_enabled' in kwargs:
                 val = self.inputs.contrail_configs.get('SSL_ENABLE', False)
                 if kwargs['ssl_enabled'] == val:

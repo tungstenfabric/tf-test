@@ -40,6 +40,7 @@ from vnc_api import utils
 import argparse
 import yaml
 from future.utils import with_metaclass
+import pdb
 
 ORCH_DEFAULT_DOMAIN = {
     'openstack' : 'Default',
@@ -97,7 +98,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.logger = logger or contrail_logging.getLogger(__name__)
 
         self.tor_agent_data = {}
-        self.sriov_data = {}
+        self.sriov_data = []
         self.dpdk_data = {}
         self.mysql_token = None
         self.pcap_on_vm = False
@@ -472,6 +473,8 @@ class TestInputs(with_metaclass(Singleton, object)):
             host_data['data-ip'] = host_data['host_data_ip'] = host_data_ip
             host_data['control-ip'] = host_data['host_control_ip'] = host_control_ip
             self.host_data[host_data_ip] = self.host_data[host_control_ip] = host_data
+            if len(self.sriov_data) > 0:
+                self.is_sriov_cluster = True
         # end for
 
     def get_roles(self, host):
@@ -536,6 +539,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.deployer = deployment_configs.get('deployer', 'contrail-ansible-deployer')
         self.contrail_configs = contrail_configs = \
             self.config.get('contrail_configuration') or {}
+        self.sriov_data.append (self.config.get('sriov_configuration'))
         self.orchestrator_configs = orchestrator_configs = \
             self.config.get('orchestrator_configuration') or {}
         test_configs = self.config.get('test_configuration') or {}
