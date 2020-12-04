@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1dca3ada_0aad0709",
+        "filename": "scripts/svc_firewall/test_svc_fw.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-12-04T14:29:13Z",
+      "side": 1,
+      "message": "i don\u0027t see the change with previous patch. All the above code can be put into one function?",
+      "range": {
+        "startLine": 107,
+        "startChar": 7,
+        "endLine": 131,
+        "endChar": 65
+      },
+      "revId": "703e8329c012125be23d7497ae3c4e933be371c5",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
