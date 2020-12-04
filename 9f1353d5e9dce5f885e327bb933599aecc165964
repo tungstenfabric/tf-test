@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da849be5_617af8a4",
+        "filename": "scripts/svc_firewall/test_svc_fw.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 147
+      },
+      "writtenOn": "2020-12-04T14:34:44Z",
+      "side": 1,
+      "message": "no need to pass the dict, just pass the service_mode and return whole dict as you are already doing it.",
+      "range": {
+        "startLine": 108,
+        "startChar": 42,
+        "endLine": 108,
+        "endChar": 50
+      },
+      "revId": "9f1353d5e9dce5f885e327bb933599aecc165964",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
