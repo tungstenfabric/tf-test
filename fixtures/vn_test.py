@@ -539,12 +539,12 @@ class VNFixture(fixtures.Fixture):
             virtio = True
         port_rsp = self.quantum_h.create_port(
             net_id,
-            fixed_ips,
-            mac_address,
-            no_security_group,
-            security_groups,
-            extra_dhcp_opts,
-            sriov, virtio)
+            fixed_ips=fixed_ips,
+            mac_address=mac_address,
+            no_security_group=no_security_group,
+            security_groups=security_groups,
+            extra_dhcp_opts=extra_dhcp_opts,
+            sriov=sriov, virtio=virtio)
         self.vn_port_list.append(port_rsp['id'])
         return port_rsp
 
