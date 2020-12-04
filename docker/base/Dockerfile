@@ -13,7 +13,7 @@ COPY *.repo Dockerfile /etc/yum.repos.d/
 COPY *requirements*.txt entrypoint.sh /
 COPY pip.conf /etc/
 
-# 1. install most packages from pypi and only then python-Fabric
+# 1. install most packages from pypi and only then python-Fabric 
 # 2. google-chrome-stable is located is in very unstable repo and yum may fail on it
 #    do manual download with retries and install it locally
 RUN \
