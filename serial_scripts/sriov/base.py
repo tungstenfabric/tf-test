@@ -1,35 +1,27 @@
 from builtins import range
-import test
+import test_v1
 import time
 import struct
 import socket
 import fixtures
-from common import isolated_creds
 
-class BaseSriovTest(test.BaseTestCase):
+class BaseSriovTest(test_v1.BaseTestCase_v1):
 
     @classmethod
     def setUpClass(cls):
         super(BaseSriovTest, cls).setUpClass()
-        cls.isolated_creds = isolated_creds.IsolatedCreds(cls.__name__, \
-                cls.inputs, input_file = cls.input_file, \
-                logger = cls.logger)
-        cls.isolated_creds.setUp()
-        cls.project = cls.isolated_creds.create_tenant()
-        cls.isolated_creds.create_and_attach_user_to_tenant()
-        cls.inputs = cls.isolated_creds.get_inputs()
-        cls.connections = cls.isolated_creds.get_conections()
+
+        cls.orch = cls.connections.orch
         cls.quantum_h= cls.connections.quantum_h
         cls.nova_h = cls.connections.nova_h
         cls.vnc_lib= cls.connections.vnc_lib
         cls.agent_inspect= cls.connections.agent_inspect
         cls.cn_inspect= cls.connections.cn_inspect
         cls.analytics_obj=cls.connections.analytics_obj
-    #end setUpClass
+        #end setUpClass
 
     @classmethod
     def tearDownClass(cls):
-        cls.isolated_creds.delete_tenant()
         super(BaseSriovTest, cls).tearDownClass()
     #end tearDownClass
 
@@ -44,12 +36,14 @@ class BaseSriovTest(test.BaseTestCase):
               break
           else:
               time.sleep(3)
+
     def get_sriov_enabled_compute_list(self):
         sriov_host_name_list=[]
         sriov_host_list=list(self.inputs.sriov_data[0].keys())
         for item in sriov_host_list:
             sriov_host_name_list.append(self.inputs.host_data[item.split('@')[1]]['name'])
         return sriov_host_name_list
+
 
     def get_sriov_physnets(self,compute_name):
         host_key=self.inputs.host_data[compute_name]['username'] + '@' + self.inputs.host_data[compute_name]['host_ip']

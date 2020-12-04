@@ -8,7 +8,6 @@ from __future__ import absolute_import
 from . import base
 from tcutils.wrappers import preposttest_wrapper
 from .verify import VerifySriovCases
-import test
 
 class TestSriov(base.BaseSriovTest, VerifySriovCases):
 

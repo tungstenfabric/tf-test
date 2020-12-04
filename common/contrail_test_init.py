@@ -97,7 +97,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.logger = logger or contrail_logging.getLogger(__name__)
 
         self.tor_agent_data = {}
-        self.sriov_data = {}
+        self.sriov_data = []
         self.dpdk_data = {}
         self.mysql_token = None
         self.pcap_on_vm = False
@@ -413,6 +413,8 @@ class TestInputs(with_metaclass(Singleton, object)):
                         host_data['is_dpdk'] = True
                         self.is_dpdk_cluster = True
                         self.dpdk_ips.append(host_data['host_ip'])
+                    if roles['vrouter'].get('sriov_data'):
+                        self.sriov_data.append ( roles['vrouter']['sriov_data'])
                 host_data_ip = host_control_ip = data_ip
             if 'control' in roles:
                 service_ip = self.get_service_ip(host_data['host_ip'], 'control')
