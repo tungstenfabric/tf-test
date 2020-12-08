@@ -4,6 +4,7 @@ from tcutils.kubernetes.auth import create_policy
 from tcutils.kubernetes.auth.util import Util
 from tcutils.kubernetes.auth.example_user import ExampleUser
 import time
+import random
 
 import logging
 logging.basicConfig(
@@ -30,7 +31,7 @@ class ResourceUtil(Util):
                     logging.warning(
                         f'{verb} {resource} successful even when expectation is False')
             elif 'forbidden' in error:
-                logging.warn(f'{verb} {resource} forbidden')
+                logging.warning(f'{verb} {resource} forbidden')
             else:
                 if 'already' in error:
                     Util.exec_kubectl_cmd_on_file(
@@ -59,9 +60,10 @@ class ResourceUtil(Util):
             verb='delete', resource_expectation_list=resource_expectation_list, namespace=namespace)
 
     @staticmethod
-    def create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict():
+    def create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict(rand=False):
         admin = ExampleUser.admin()
-        admin.create_all(user_name='test', password='c0ntrail123', role='Member',
+        user_name = Util.get_random_string() if rand else 'test'
+        admin.create_all(user_name=user_name, password='c0ntrail123', role='Member',
                          project_name='test_project', domain_name='test_domain')
         role_dict = {
             'type': 'role',
@@ -73,11 +75,11 @@ class ResourceUtil(Util):
         }
         user_dict = {
             "type": 'user',
-            "values": ['test']
+            "values": [user_name]
         }
         match = [role_dict, project_dict, user_dict]
         stackrc_dict = {
-            'user_name': 'test',
+            'user_name': user_name,
             'password': 'c0ntrail123',
             'project_name': 'test_project',
             'domain_name': 'test_domain',

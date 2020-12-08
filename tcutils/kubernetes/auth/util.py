@@ -2,6 +2,8 @@ import os
 import paramiko
 from subprocess import Popen, PIPE
 import shlex
+import string
+import random
 import logging
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
@@ -58,6 +60,11 @@ class Util:
                 import json
                 errorMessage = json.loads(errorObject)['message']
                 logging.error(errorMessage)
+
+    @staticmethod
+    def get_random_string(size=8):
+        return ''.join(random.choices(string.ascii_lowercase +
+                                      string.digits, k=size))
 
 
     @staticmethod

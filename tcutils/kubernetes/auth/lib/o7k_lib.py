@@ -58,7 +58,7 @@ class O7kLib:
     def user_list(self, project_name=None, domain_name=None):
         project = self.find_project(project_name)
         domain = self.find_domain(domain_name)
-        return self.keystone.users.list(project=project, domain=domain)
+        return self.keystone.users.list(default_project=project, domain=domain)
         # self.keystone.users.list(project=self.keystone.projects.find(
         # name='nuthan-project'), domain=self.keystone.domains.find(name='nuthan'))
 
