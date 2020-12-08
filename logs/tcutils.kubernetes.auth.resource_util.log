@@ -1,0 +1,64 @@
+2020-12-08 04:28:29,243 - INFO - create pod successful in default namespace
+2020-12-08 04:28:30,340 - INFO - create deployment successful in default namespace
+2020-12-08 04:28:31,554 - INFO - create service successful in default namespace
+2020-12-08 04:28:32,539 - INFO - create namespace successful in default namespace
+2020-12-08 04:28:33,518 - INFO - create network_attachment_definition successful in default namespace
+2020-12-08 04:28:34,582 - INFO - create network_policy successful in default namespace
+2020-12-08 04:28:35,625 - INFO - create ingress successful in default namespace
+2020-12-08 04:28:36,684 - INFO - create daemonset successful in default namespace
+2020-12-08 04:28:41,539 - INFO - delete pod successful in default namespace
+2020-12-08 04:28:42,437 - INFO - delete deployment successful in default namespace
+2020-12-08 04:28:43,554 - INFO - delete service successful in default namespace
+2020-12-08 04:28:50,092 - INFO - delete namespace successful in default namespace
+2020-12-08 04:28:50,983 - INFO - delete network_attachment_definition successful in default namespace
+2020-12-08 04:28:52,269 - INFO - delete network_policy successful in default namespace
+2020-12-08 04:28:53,343 - INFO - delete ingress successful in default namespace
+2020-12-08 04:28:54,279 - INFO - delete daemonset successful in default namespace
+2020-12-08 04:29:23,792 - INFO - create pod successful in default namespace
+2020-12-08 04:29:24,856 - INFO - create deployment successful in default namespace
+2020-12-08 04:29:26,008 - INFO - create service successful in default namespace
+2020-12-08 04:29:27,466 - INFO - create namespace successful in default namespace
+2020-12-08 04:29:28,586 - INFO - create network_attachment_definition successful in default namespace
+2020-12-08 04:29:29,671 - INFO - create network_policy successful in default namespace
+2020-12-08 04:29:30,751 - INFO - create ingress successful in default namespace
+2020-12-08 04:29:31,852 - INFO - create daemonset successful in default namespace
+2020-12-08 04:29:36,857 - INFO - delete pod successful in default namespace
+2020-12-08 04:29:37,958 - INFO - delete deployment successful in default namespace
+2020-12-08 04:29:39,069 - INFO - delete service successful in default namespace
+2020-12-08 04:29:45,272 - INFO - delete namespace successful in default namespace
+2020-12-08 04:29:46,326 - INFO - delete network_attachment_definition successful in default namespace
+2020-12-08 04:29:47,169 - INFO - delete network_policy successful in default namespace
+2020-12-08 04:29:48,270 - INFO - delete ingress successful in default namespace
+2020-12-08 04:29:49,162 - INFO - delete daemonset successful in default namespace
+2020-12-08 04:30:30,334 - WARNING - create pod forbidden
+2020-12-08 04:30:31,379 - INFO - create deployment successful in default namespace
+2020-12-08 04:30:32,420 - WARNING - create service forbidden
+2020-12-08 04:30:33,529 - WARNING - create namespace forbidden
+2020-12-08 04:30:35,303 - WARNING - create network_attachment_definition forbidden
+2020-12-08 04:30:36,388 - WARNING - create network_policy forbidden
+2020-12-08 04:30:37,592 - WARNING - create ingress forbidden
+2020-12-08 04:30:38,679 - WARNING - create daemonset forbidden
+2020-12-08 04:30:39,908 - WARNING - delete pod forbidden
+2020-12-08 04:30:40,736 - INFO - delete deployment successful in default namespace
+2020-12-08 04:30:41,496 - WARNING - delete service forbidden
+2020-12-08 04:30:42,300 - WARNING - delete namespace forbidden
+2020-12-08 04:30:43,165 - WARNING - delete network_attachment_definition forbidden
+2020-12-08 04:30:44,098 - WARNING - delete network_policy forbidden
+2020-12-08 04:30:45,314 - WARNING - delete ingress forbidden
+2020-12-08 04:30:46,290 - WARNING - delete daemonset forbidden
+2020-12-08 04:31:18,055 - INFO - create pod successful in default namespace
+2020-12-08 04:31:19,622 - WARNING - create deployment forbidden
+2020-12-08 04:31:20,667 - WARNING - create service forbidden
+2020-12-08 04:31:21,746 - WARNING - create namespace forbidden
+2020-12-08 04:31:22,847 - WARNING - create network_attachment_definition forbidden
+2020-12-08 04:31:23,969 - WARNING - create network_policy forbidden
+2020-12-08 04:31:25,120 - WARNING - create ingress forbidden
+2020-12-08 04:31:26,412 - WARNING - create daemonset forbidden
+2020-12-08 04:31:35,731 - INFO - delete pod successful in default namespace
+2020-12-08 04:31:36,584 - WARNING - delete deployment forbidden
+2020-12-08 04:31:37,390 - WARNING - delete service forbidden
+2020-12-08 04:31:38,155 - WARNING - delete namespace forbidden
+2020-12-08 04:31:39,032 - WARNING - delete network_attachment_definition forbidden
+2020-12-08 04:31:39,966 - WARNING - delete network_policy forbidden
+2020-12-08 04:31:40,824 - WARNING - delete ingress forbidden
+2020-12-08 04:31:41,685 - WARNING - delete daemonset forbidden
