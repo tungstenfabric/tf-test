@@ -110,24 +110,23 @@ def manual_test2():
 
 # manual_test2()
 
-# MSG Check the comments in all_in_one
-def manual_test():
+def test_all_in_one():
     # Create the required users, projects and domains
     admin = ExampleUser.admin()
     
 
-    # admin.create_all(user_name='zoro', password='c0ntrail123', role='Member',
-    #                  project_name='zoro_project', domain_name='zoro_domain')
-    # admin.create_all(user_name='ola', password='c0ntrail123', role='Member',
-    #                  project_name='ola_project', domain_name='ola_domain')
-    # admin.create_all(user_name='uber', password='c0ntrail123', role='Member',
-    #                  project_name='uber_project', domain_name='uber_domain')
-    # admin.create_all(user_name='zomato', password='c0ntrail123', role='Member',
-    #                  project_name='zomato_project', domain_name='zomato_domain')
+    admin.create_all(user_name='zoro', password='c0ntrail123', role='Member',
+                     project_name='zoro_project', domain_name='zoro_domain')
+    admin.create_all(user_name='ola', password='c0ntrail123', role='Member',
+                     project_name='ola_project', domain_name='ola_domain')
+    admin.create_all(user_name='uber', password='c0ntrail123', role='Member',
+                     project_name='uber_project', domain_name='uber_domain')
+    admin.create_all(user_name='zomato', password='c0ntrail123', role='Member',
+                     project_name='zomato_project', domain_name='zomato_domain')
 
-    # ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
-    # os.system('kubectl create ns zomsrc')
-    # os.system('kubectl create ns easy')
+    ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
+    os.system('kubectl create ns zomsrc')
+    os.system('kubectl create ns easy')
     # os.system('juju config kubernetes-master keystone-policy="$(cat /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml)"')
     # import pdb;pdb.set_trace()
     # kubectl describe configmap -n kube-system k8s-auth-policy
@@ -194,7 +193,7 @@ def manual_test():
     ResourceUtil.perform_operations(
         stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list, namespace='easy')
     
-manual_test()
+test_all_in_one()
 
 
 
