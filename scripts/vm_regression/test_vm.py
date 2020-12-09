@@ -373,6 +373,8 @@ class TestBasicVMVN0(BaseVnVmTest):
          Maintainer : sandipd@juniper.net
         '''
         result = False
+        quota_dict={'cores': 30, 'instances': 30}
+        self.nova_h.update_quota(self.connections.project_id, **quota_dict)
         vn_fixture= self.create_vn()
         vm1_fixture = self.create_vm(vn_fixture= vn_fixture)
 
@@ -396,7 +398,8 @@ echo "Hello World.  The time is now $(date -R)!" | tee /tmp/output.txt
                          vm_name=vm1_name, inputs=self.inputs,
                          vn_count=vn_count_for_test, vm_count=1, af='v4',
                          subnet_count=1, userdata='/tmp/metadata_script.txt'))
-        time.sleep(5)
+        sleep(20)
+        assert vm_fixture.wait_till_vms_are_up()
         assert vm_fixture.verify_vms_on_setup()
         assert vm_fixture.verify_vns_on_setup()
 
@@ -408,8 +411,8 @@ echo "Hello World.  The time is now $(date -R)!" | tee /tmp/output.txt
                 if 'output.txt' in elem:
                     result = True
                     break
-            else:
-                self.logger.info('%s' %vmobj.get_console_output())
+                else:
+                    self.logger.info('%s' %vmobj.get_console_output())
             assert result, "metadata_script.txt did not get executed in the vm"
             self.logger.debug("Printing the output.txt :")
             cmd = 'cat /tmp/output.txt'
@@ -859,7 +862,7 @@ class TestBasicVMVN2(BaseVnVmTest):
         vn1_vm2_name = get_random_name('vn1_vm2')
         vn1_vm3_name = get_random_name('vn1_vm3')
         vn1_vm4_name = get_random_name('vn1_vm4')
-        vn1_fixture = self.create_vn(vn_subnets=vn1_subnets[0])
+        vn1_fixture = self.create_vn(vn_subnets=vn1_subnets)
         vm1_fixture = self.create_vm(vn1_fixture, vm_name=vn1_vm1_name)
         vm2_fixture = self.create_vm(vn1_fixture, vm_name=vn1_vm2_name)
         vm3_fixture = self.create_vm(vn1_fixture, vm_name=vn1_vm3_name)
@@ -1684,7 +1687,8 @@ class TestBasicVMVN5(BaseVnVmTest):
         cmd = 'ifdown %s --force'%other_interface
 
         vm1_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=True, local_ip=vm1_intf_local_ip, timeout=250)
-
+        vm1_fixture.clear_local_ips()
+        vm1_fixture.get_local_ip()
         if vm1_fixture.ping_to_vn(intf_vm_dct[other_interface]):
             result = False
             assert result, "Ping to %s should have failed"%intf_vm_dct[other_interface].vm_name
@@ -1954,7 +1958,7 @@ class TestBasicVMVN5(BaseVnVmTest):
         if 'v6' in af or 'dual' in af:
             subnets.append(get_random_cidr(af='v6',
                            mask=SUBNET_MASK['v6']['max']))
-        vn_fixture = self.create_vn(vn_subnets=subnets[0].replace(':', '.'))
+        vn_fixture = self.create_vn(vn_subnets=subnets)
         assert vn_fixture.verify_on_setup()
         self.logger.info(
             'out of /29 block, we can have 5 usable addresses. Only 5 VMs should get launched properly.')
@@ -1967,13 +1971,14 @@ class TestBasicVMVN5(BaseVnVmTest):
         self.logger.info(
             'The 5th VM should go into ERROR state as it is unable to get any ip. The ip-block is exhausted')
         sleep(5)
-        vm5_fixture = self.create_vm(vn_fixture=vn_fixture, vm_name='vm5')
+        vm5_fixture = self.create_only_vm(vn_fixture=vn_fixture, vm_name='vm5')
         assert vm1_fixture.verify_on_setup()
         assert vm2_fixture.verify_on_setup()
         assert vm3_fixture.verify_on_setup()
         assert vm4_fixture.verify_on_setup()
         assert not vm5_fixture.verify_on_setup()
-
+        vm5_obj=vm5_fixture.vm_obj
+        vm5_obj.force_delete()
         return True
     # end test_vm_vn_block_exhaustion
 
