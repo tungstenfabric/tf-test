@@ -12,14 +12,13 @@ import unittest
 
 class TestResource(unittest.TestCase):
     resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
-                                'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
+                                 'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
 
     def test_all_operations_for_admin_project_domain(self):
         print("\n"+self.id())
         stackrc_dict = ResourceUtil.admin_stackrc()
         ResourceUtil.create_policy_and_perform_operations(
             resource_expectation_list=TestResource.resource_expectation_list, stackrc_dict=stackrc_dict)
-
 
     def test_all_operations_for_custom_user_project_domain(self):
         print("\n"+self.id())
@@ -34,8 +33,9 @@ class TestResourceCustom(unittest.TestCase):
             rand=True)
 
     def tearDown(self):
-        # MSG Delete User after it is done
-        pass
+        user = ExampleUser.admin()
+        user.delete_user(user_name=self.stackrc_dict['user_name'],
+                         project_name=self.stackrc_dict['project_name'], domain_name=self.stackrc_dict['domain_name'])
 
     def test_pod_with_all_operations_for_custom_user_project_domain(self):
         print("\n"+self.id())
@@ -44,7 +44,6 @@ class TestResourceCustom(unittest.TestCase):
                                      'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
         ResourceUtil.create_policy_and_perform_operations(
             resource=resource, match=self.match, stackrc_dict=self.stackrc_dict, resource_expectation_list=resource_expectation_list)
-
 
     def test_deployment_with_all_operations_for_custom_user_project_domain(self):
         print("\n"+self.id())

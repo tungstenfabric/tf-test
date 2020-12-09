@@ -4,10 +4,9 @@ from subprocess import Popen, PIPE
 import shlex
 import string
 import random
-import logging
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
-# MSG Create a Logger class
+from common import log_orig as contrail_logging
+
+logger = contrail_logging.getLogger(__name__)
 
 
 class Util:
@@ -50,16 +49,16 @@ class Util:
     def resource(verb, resource_list):
         for resource in resource_list:
             output, error = Util.exec_kubectl_cmd_on_file(
-                verb=verb, template_file=Util.templates[resource])
+                verb=verb, template_file=Util.templates[resource], namespace='default')
             if verb in output:
-                logging.info(f'{verb} {resource} successful')
+                logger.info(f'{verb} {resource} successful')
             elif 'forbidden' in error:
-                logging.info(f'{verb} {resource} forbidden')
+                logger.info(f'{verb} {resource} forbidden')
             else:
                 errorObject = error.split("[")[1].split("]")[0]
                 import json
                 errorMessage = json.loads(errorObject)['message']
-                logging.error(errorMessage)
+                logger.error(errorMessage)
 
     @staticmethod
     def get_random_string(size=8):
