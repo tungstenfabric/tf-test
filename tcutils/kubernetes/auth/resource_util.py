@@ -6,6 +6,7 @@ from tcutils.kubernetes.auth.example_user import ExampleUser
 import time
 import random
 from common import log_orig as contrail_logging
+import json
 
 logger = contrail_logging.getLogger(__name__)
 
@@ -27,8 +28,7 @@ class ResourceUtil(Util):
                 if expectation == True:
                     logger.info(f'{verb} {resource} successful in {namespace} namespace')
                 else:
-                    logger.warning(
-                        f'{verb} {resource} successful even when expectation is False')
+                    assert False, f'{verb} {resource} successful even when expectation is False'
             elif 'forbidden' in error:
                 logger.warning(f'{verb} {resource} forbidden')
             else:
@@ -39,10 +39,11 @@ class ResourceUtil(Util):
                     Util.exec_kubectl_cmd_on_file(
                         verb='create', template_file=Util.templates[resource], namespace=namespace)
                 else:
-                    errorObject = error.split("[")[1].split("]")[0]
-                    import json
-                    errorMessage = json.loads(errorObject)['message']
-                    logger.error(errorMessage)
+                    if '[' in error:
+                        errorObject = error.split("[")[1].split("]")[0]
+                        errorMessage = json.loads(errorObject)['message']
+                        logger.error(errorMessage)
+                    logger.error(f'Error while {resource} {verb}')
 
     @staticmethod
     def create_policy_and_perform_operations(resource={}, match=[], resource_expectation_list=[], stackrc_dict={}):
