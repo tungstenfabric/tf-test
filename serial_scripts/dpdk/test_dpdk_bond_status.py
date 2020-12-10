@@ -51,7 +51,7 @@ class TestDpdkBondStatus(GenericTestBase):
 
         dpdk_compute = self.inputs.dpdk_ips[0]
 
-        self.inputs.restart_service('contrail-vrouter-agent-dpdk', [dpdk_compute], container='agent-dpdk')
+        self.inputs.restart_service('contrail-vrouter-agent-dpdk', [dpdk_compute], container='contrail-vrouter-agent-dpdk')
 
         cip = self.inputs.collector_ips[0]
         self.inputs.restart_service('analytics_collector_1', [cip], container='collector')
@@ -60,7 +60,7 @@ class TestDpdkBondStatus(GenericTestBase):
 
         state, state1 = self.inputs.verify_service_state(cip, service='collector')
         assert state,'contrail collector is inactive'
-        state, state1 = self.inputs.verify_service_state(dpdk_compute, service='agent-dpdk')
+        state, state1 = self.inputs.verify_service_state(dpdk_compute, service='contrail-vrouter-agent-dpdk')
         assert state,'contrail agent is inactive'
         self.logger.info('contrail agent is active')
 
@@ -115,9 +115,9 @@ class TestDpdkBondStatus(GenericTestBase):
 
         self.logger.info('Validate bond/slave interface status.')
         self.logger.info('Ensure slave members are present in vif --list output.')
-        assert self.agent_inspect[dpdk_compute].validate_bondVifListStatus(bondStatus="DOWN",slaveStatus="DOWN")
+        assert not self.agent_inspect[dpdk_compute].validate_bondVifListStatus(bondStatus="UP",slaveStatus="DOWN")
         self.logger.info('Ensure slave members status is present in agent introspect.')
-        assert self.agent_inspect[dpdk_compute].validate_bondStatus(bondStatus="Inactive",slaveStatus="DOWN")
+        assert not self.agent_inspect[dpdk_compute].validate_bondStatus(bondStatus="Active",slaveStatus="DOWN")
 
         self.logger.info('Ensure alarms are present since interface is down.')
 

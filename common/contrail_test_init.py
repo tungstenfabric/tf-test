@@ -644,6 +644,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         #    name,type,mgmt_ip,model,vendor,asn,ssh_username,ssh_password,tunnel_ip,ports
 
         self.data_sw_ip = test_configs.get('data_sw_ip')
+        self.data_sw_password = test_configs.get('data_sw_password')
         self.data_sw_compute_bond_interface = test_configs.get('data_sw_compute_bond_interface')
 
         self.physical_routers_data = test_configs.get('physical_routers',{})
@@ -1287,7 +1288,7 @@ class ContrailTestInit(object):
                'contrail-database': 'analytics-cassandra',
                'contrail-database-nodemgr': 'analyticsdb-nodemgr',
                'contrail-vrouter-agent': 'agent',
-               'contrail-vrouter-agent-dpdk': 'agent-dpdk',
+               'contrail-vrouter-agent-dpdk': 'contrail-vrouter-agent-dpdk',
                'contrail-vrouter-nodemgr': 'vrouter-nodemgr',
                'contrail-control': 'control',
                'contrail-control-nodemgr': 'control-nodemgr',
