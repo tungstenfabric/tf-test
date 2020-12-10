@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d98bf3e_c24edc51",
+        "filename": "common/k8s/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1449,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-12-10T06:07:32Z",
+      "side": 1,
+      "message": "please don\u0027t use tabs!\npython3 allows only space delimiter",
+      "revId": "bff05ca6dd20ba29ac9f332d2d7bf83e58ce1c7e",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
