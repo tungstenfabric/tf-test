@@ -29,6 +29,69 @@ def insert_policies_in_template_file(policies, filename=None):
     return filename
 
 
+def get_custom_user_policy(verbs, resources, project, user, namespace='*', role='Member'):
+    return {
+        'resource': {
+            'verbs': verbs,
+            'resources': resources,
+            'version': '*',
+            'namespace': namespace
+        },
+        "match": [
+            {
+                "type": "role",
+                "values": [
+                    role
+                ]
+            },
+            {
+                "type": "project",
+                "values": [
+                    project
+                ]
+            },
+            {
+                "type": "user",
+                "values": [
+                    user
+                ]
+            }
+        ]
+    }
+
+
+def get_userA_policy():
+    verbs = ['create']
+    resources = ['pods', 'deployments']
+    project = 'userA_project'
+    user = 'userA'
+    return get_custom_user_policy(verbs, resources, project, user)
+
+
+def get_userB_policy():
+    verbs = ['delete']
+    resources = ['pods', 'deployments']
+    project = 'userB_project'
+    user = 'userB'
+    return get_custom_user_policy(verbs, resources, project, user)
+
+
+def get_userC_policy():
+    verbs = ['*']
+    resources = ['services']
+    project = 'userC_project'
+    user = 'userC'
+    return get_custom_user_policy(verbs, resources, project, user, namespace='zomsrc')
+
+
+def get_userD_policy():
+    verbs = ['*']
+    resources = ['pods', 'deployments', 'services']
+    project = 'userD_project'
+    user = 'userD'
+    return get_custom_user_policy(verbs, resources, project, user, namespace='easy')
+
+
 def get_admin_policy():
     return {
         'resource': {
@@ -72,6 +135,8 @@ def create_policies(resource={}, match=[]):
     return policies
 
 # MSG need to add condition when the same policy is applied again
+
+
 def check_policy_in_config_map(policies):
     admin = ExampleUser.admin()
     Util.source_stackrc(user_name='admin', password='password',
@@ -94,7 +159,6 @@ def check_policy_in_config_map(policies):
         "kubectl config use-context keystone", shell=True, universal_newlines=True)
 
 
-
 def apply_policies_and_check_in_config_map(policies, filename):
     logger.info(f"Applying policy file: {filename}")
     os.system(
@@ -106,10 +170,3 @@ def create_and_apply_policies(resource={}, match=[], filename=None):
     policies = create_policies(resource=resource, match=match)
     filename = insert_policies_in_template_file(policies)
     apply_policies_and_check_in_config_map(policies, filename)
-
-
-# pprint.pprint(create_policies(resource={'verbs': ['get'], 'resources': ['pods']}))
-# policies = create_policies(resource={'verbs': ['get'], 'resources': ['pods']})
-# policy_dict = construct_config_map_dict(policies)
-# create_config_map_file(policy_dict)
-# create_and_apply_policies(resource={'verbs': ['get', 'create'], 'resources': ['pods']}, filename='policy.yaml')

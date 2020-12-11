@@ -4,101 +4,110 @@ from tcutils.kubernetes.auth import create_policy
 import unittest
 import os
 
+
 class TestPolicyCombo(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Create the required users, projects and domains
         admin = ExampleUser.admin()
-        admin.create_all(user_name='zoro', password='c0ntrail123', role='Member',
-                        project_name='zoro_project', domain_name='zoro_domain')
-        admin.create_all(user_name='ola', password='c0ntrail123', role='Member',
-                        project_name='ola_project', domain_name='ola_domain')
-        admin.create_all(user_name='uber', password='c0ntrail123', role='Member',
-                        project_name='uber_project', domain_name='uber_domain')
-        admin.create_all(user_name='zomato', password='c0ntrail123', role='Member',
-                        project_name='zomato_project', domain_name='zomato_domain')
+        admin.create_all(user_name='userD', password='c0ntrail123', role='Member',
+                         project_name='userD_project', domain_name='userD_domain')
+        admin.create_all(user_name='userA', password='c0ntrail123', role='Member',
+                         project_name='userA_project', domain_name='userA_domain')
+        admin.create_all(user_name='userB', password='c0ntrail123', role='Member',
+                         project_name='userB_project', domain_name='userB_domain')
+        admin.create_all(user_name='userC', password='c0ntrail123', role='Member',
+                         project_name='userC_project', domain_name='userC_domain')
         ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
         os.system('kubectl create ns zomsrc')
         os.system('kubectl create ns easy')
-        # MSG Add code in create_policy for the below
-        policies = [admin_policy, ola_policy, uber_policy, zomato_policy, zoro_policy]
-        filename = create_policy.insert_policies_in_template_file(policies, 'all_in_one_policy.yaml')
-        create_policy.apply_policies_and_check_in_config_map(policies, filename)
-
+        admin_policy = create_policy.get_admin_policy()
+        userA_policy = create_policy.get_userA_policy()
+        userB_policy = create_policy.get_userB_policy()
+        userC_policy = create_policy.get_userC_policy()
+        userD_policy = create_policy.get_userD_policy()
+        policies = [admin_policy, userA_policy,
+                    userB_policy, userC_policy, userD_policy]
+        filename = create_policy.insert_policies_in_template_file(
+            policies, 'all_in_one_policy.yaml')
+        create_policy.apply_policies_and_check_in_config_map(
+            policies, filename)
 
     def test_only_pods_and_deployments_create(self):
         '''
-        For ola user, only create pods and deployments and nothing else
+        For userA user, only create pods and deployments and nothing else
         '''
-        print("For ola user, only create pods and deployments and nothing else")
+        print("\n"+self.id())
+        print("For userA user, only create pods and deployments and nothing else")
         admin = ExampleUser.admin()
         stackrc_dict = {
-            'user_name': 'ola',
+            'user_name': 'userA',
             'password': 'c0ntrail123',
-            'project_name': 'ola_project',
-            'domain_name': 'ola_domain',
+            'project_name': 'userA_project',
+            'domain_name': 'userA_domain',
             'auth_url': admin.auth_url
         }
         resource_expectation_list = ['pod-expected', 'deployment-expected', 'service', 'namespace',
-                                    'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
+                                     'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
-
     def test_only_pods_and_deployments_delete(self):
         '''
-        For uber user, only delete pods and deployments and nothing else
+        For userB user, only delete pods and deployments and nothing else
         '''
-        print("\nFor uber user, only delete pods and deployments and nothing else")
+        print("\n"+self.id())
+        print("\nFor userB user, only delete pods and deployments and nothing else")
         admin = ExampleUser.admin()
         stackrc_dict = {
-            'user_name': 'uber',
+            'user_name': 'userB',
             'password': 'c0ntrail123',
-            'project_name': 'uber_project',
-            'domain_name': 'uber_domain',
+            'project_name': 'userB_project',
+            'domain_name': 'userB_domain',
             'auth_url': admin.auth_url
         }
         resource_expectation_list = ['pod-expected', 'deployment-expected', 'service', 'namespace',
-                                    'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
+                                     'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
     def test_only_service_in_zomsrc_ns(self):
         '''
-        For zomato user, create service in zomsrc namespace and nothing else should work
+        For userC user, create service in zomsrc namespace and nothing else should work
         '''
-        print("\nFor zomato user, create service in zomsrc namespace and nothing else should work")
+        print("\n"+self.id())
+        print("\nFor userC user, create service in zomsrc namespace and nothing else should work")
         admin = ExampleUser.admin()
         stackrc_dict = {
-            'user_name': 'zomato',
+            'user_name': 'userC',
             'password': 'c0ntrail123',
-            'project_name': 'zomato_project',
-            'domain_name': 'zomato_domain',
+            'project_name': 'userC_project',
+            'domain_name': 'userC_domain',
             'auth_url': admin.auth_url
         }
         resource_expectation_list = ['pod', 'deployment', 'service-expected', 'namespace',
-                                    'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
+                                     'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list, namespace='zomsrc')
 
-
     def test_only_pods_deployments_services_in_easy_ns(self):
         '''
-        For zoro user, any operation on pods, deployments and services but only in easy namespace
+        For userD user, any operation on pods, deployments and services but only in easy namespace
         '''
-        print("\nFor zoro user, any operation on pods, deployments and services but only in easy namespace")
+        print("\n"+self.id())
+        print("\nFor userD user, any operation on pods, deployments and services but only in easy namespace")
         admin = ExampleUser.admin()
         stackrc_dict = {
-            'user_name': 'zoro',
+            'user_name': 'userD',
             'password': 'c0ntrail123',
-            'project_name': 'zoro_project',
-            'domain_name': 'zoro_domain',
+            'project_name': 'userD_project',
+            'domain_name': 'userD_domain',
             'auth_url': admin.auth_url
         }
         resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
-                                    'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
+                                     'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
         ResourceUtil.perform_operations(
             resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
         ResourceUtil.perform_operations(
