@@ -3,14 +3,15 @@ from tcutils.kubernetes.auth.example_user import ExampleUser
 from tcutils.kubernetes.auth.resource_util import ResourceUtil
 from tcutils.kubernetes.auth.util import Util
 import os
-import unittest
+from tcutils.wrappers import preposttest_wrapper
+from testtools import TestCase
 
 # Tested and working
 
 # If nothing is mentioned in the resource verbs, then all operations are permitted for that particular resource
 
 
-class TestResource(unittest.TestCase):
+class TestResource(TestCase):
     resource_expectation_list = ['pod-expected', 'deployment-expected', 'service-expected', 'namespace-expected',
                                  'network_attachment_definition-expected', 'network_policy-expected', 'ingress-expected', 'daemonset-expected']
 
@@ -27,7 +28,7 @@ class TestResource(unittest.TestCase):
             match=match, resource_expectation_list=TestResource.resource_expectation_list, stackrc_dict=stackrc_dict)
 
 
-class TestResourceCustom(unittest.TestCase):
+class TestResourceCustom(TestCase):
     def setUp(self):
         self.match, self.stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict(
             rand=True)
@@ -52,7 +53,3 @@ class TestResourceCustom(unittest.TestCase):
                                      'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
         ResourceUtil.create_policy_and_perform_operations(
             resource=resource, match=self.match, stackrc_dict=self.stackrc_dict, resource_expectation_list=resource_expectation_list)
-
-
-if __name__ == '__main__':
-    unittest.main()

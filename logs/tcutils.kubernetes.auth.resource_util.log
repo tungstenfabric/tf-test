@@ -158,3 +158,99 @@
 2020-12-10 22:33:33,251 - WARNING - delete network_policy forbidden
 2020-12-10 22:33:34,101 - WARNING - delete ingress forbidden
 2020-12-10 22:33:34,857 - WARNING - delete daemonset forbidden
+2020-12-10 23:34:57,432 - INFO - create pod successful in default namespace
+2020-12-10 23:34:58,482 - INFO - create deployment successful in default namespace
+2020-12-10 23:34:59,536 - WARNING - create service forbidden
+2020-12-10 23:35:00,636 - WARNING - create namespace forbidden
+2020-12-10 23:35:02,048 - WARNING - create network_attachment_definition forbidden
+2020-12-10 23:35:03,114 - WARNING - create network_policy forbidden
+2020-12-10 23:35:04,181 - WARNING - create ingress forbidden
+2020-12-10 23:35:05,235 - WARNING - create daemonset forbidden
+2020-12-10 23:35:06,073 - WARNING - delete pod forbidden
+2020-12-10 23:35:07,093 - WARNING - delete deployment forbidden
+2020-12-10 23:35:08,020 - WARNING - delete service forbidden
+2020-12-10 23:35:08,894 - WARNING - delete namespace forbidden
+2020-12-10 23:35:09,864 - WARNING - delete network_attachment_definition forbidden
+2020-12-10 23:35:10,807 - WARNING - delete network_policy forbidden
+2020-12-10 23:35:11,700 - WARNING - delete ingress forbidden
+2020-12-10 23:35:12,547 - WARNING - delete daemonset forbidden
+2020-12-10 23:35:14,760 - WARNING - create pod forbidden
+2020-12-10 23:35:15,840 - WARNING - create deployment forbidden
+2020-12-10 23:35:16,899 - WARNING - create service forbidden
+2020-12-10 23:35:17,956 - WARNING - create namespace forbidden
+2020-12-10 23:35:19,048 - WARNING - create network_attachment_definition forbidden
+2020-12-10 23:35:20,112 - WARNING - create network_policy forbidden
+2020-12-10 23:35:21,228 - WARNING - create ingress forbidden
+2020-12-10 23:35:22,271 - WARNING - create daemonset forbidden
+2020-12-10 23:35:23,171 - INFO - delete pod successful in default namespace
+2020-12-10 23:35:24,049 - INFO - delete deployment successful in default namespace
+2020-12-10 23:35:24,902 - WARNING - delete service forbidden
+2020-12-10 23:35:25,773 - WARNING - delete namespace forbidden
+2020-12-10 23:35:26,608 - WARNING - delete network_attachment_definition forbidden
+2020-12-10 23:35:27,814 - WARNING - delete network_policy forbidden
+2020-12-10 23:35:28,683 - WARNING - delete ingress forbidden
+2020-12-10 23:35:29,517 - WARNING - delete daemonset forbidden
+2020-12-10 23:35:31,718 - WARNING - create pod forbidden
+2020-12-10 23:35:32,798 - WARNING - create deployment forbidden
+2020-12-10 23:35:33,906 - WARNING - create service forbidden
+2020-12-10 23:35:35,054 - WARNING - create namespace forbidden
+2020-12-10 23:35:36,118 - WARNING - create network_attachment_definition forbidden
+2020-12-10 23:35:37,186 - WARNING - create network_policy forbidden
+2020-12-10 23:35:38,340 - WARNING - create ingress forbidden
+2020-12-10 23:35:39,442 - WARNING - create daemonset forbidden
+2020-12-10 23:35:40,292 - WARNING - delete pod forbidden
+2020-12-10 23:35:41,227 - WARNING - delete deployment forbidden
+2020-12-10 23:35:42,096 - WARNING - delete service forbidden
+2020-12-10 23:35:43,205 - WARNING - delete namespace forbidden
+2020-12-10 23:35:44,052 - WARNING - delete network_attachment_definition forbidden
+2020-12-10 23:35:44,948 - WARNING - delete network_policy forbidden
+2020-12-10 23:35:45,800 - WARNING - delete ingress forbidden
+2020-12-10 23:35:46,653 - WARNING - delete daemonset forbidden
+2020-12-10 23:35:47,862 - INFO - create pod successful in easy namespace
+2020-12-10 23:35:48,938 - INFO - create deployment successful in easy namespace
+2020-12-10 23:35:50,129 - INFO - create service successful in easy namespace
+2020-12-10 23:35:51,241 - WARNING - create namespace forbidden
+2020-12-10 23:35:52,289 - WARNING - create network_attachment_definition forbidden
+2020-12-10 23:35:53,614 - WARNING - create network_policy forbidden
+2020-12-10 23:35:54,660 - WARNING - create ingress forbidden
+2020-12-10 23:35:55,716 - WARNING - create daemonset forbidden
+2020-12-10 23:36:00,419 - INFO - delete pod successful in easy namespace
+2020-12-10 23:36:01,286 - INFO - delete deployment successful in easy namespace
+2020-12-10 23:36:02,284 - INFO - delete service successful in easy namespace
+2020-12-10 23:36:03,482 - WARNING - delete namespace forbidden
+2020-12-10 23:36:04,341 - WARNING - delete network_attachment_definition forbidden
+2020-12-10 23:36:05,124 - WARNING - delete network_policy forbidden
+2020-12-10 23:36:06,095 - WARNING - delete ingress forbidden
+2020-12-10 23:36:06,916 - WARNING - delete daemonset forbidden
+2020-12-10 23:36:09,249 - WARNING - create pod forbidden
+2020-12-10 23:36:10,317 - WARNING - create deployment forbidden
+2020-12-10 23:36:11,397 - WARNING - create service forbidden
+2020-12-10 23:36:12,487 - WARNING - create namespace forbidden
+2020-12-10 23:36:13,565 - WARNING - create network_attachment_definition forbidden
+2020-12-10 23:36:14,823 - WARNING - create network_policy forbidden
+2020-12-10 23:36:15,926 - WARNING - create ingress forbidden
+2020-12-10 23:36:17,030 - WARNING - create daemonset forbidden
+2020-12-10 23:36:17,899 - WARNING - delete pod forbidden
+2020-12-10 23:36:18,783 - WARNING - delete deployment forbidden
+2020-12-10 23:36:19,624 - WARNING - delete service forbidden
+2020-12-10 23:36:20,553 - WARNING - delete namespace forbidden
+2020-12-10 23:36:21,403 - WARNING - delete network_attachment_definition forbidden
+2020-12-10 23:36:22,141 - WARNING - delete network_policy forbidden
+2020-12-10 23:36:22,994 - WARNING - delete ingress forbidden
+2020-12-10 23:36:23,847 - WARNING - delete daemonset forbidden
+2020-12-10 23:36:24,936 - WARNING - create pod forbidden
+2020-12-10 23:36:26,025 - WARNING - create deployment forbidden
+2020-12-10 23:36:27,256 - INFO - create service successful in zomsrc namespace
+2020-12-10 23:36:28,437 - WARNING - create namespace forbidden
+2020-12-10 23:36:30,135 - WARNING - create network_attachment_definition forbidden
+2020-12-10 23:36:31,229 - WARNING - create network_policy forbidden
+2020-12-10 23:36:32,326 - WARNING - create ingress forbidden
+2020-12-10 23:36:33,405 - WARNING - create daemonset forbidden
+2020-12-10 23:36:34,250 - WARNING - delete pod forbidden
+2020-12-10 23:36:35,161 - WARNING - delete deployment forbidden
+2020-12-10 23:36:36,072 - INFO - delete service successful in zomsrc namespace
+2020-12-10 23:36:36,933 - WARNING - delete namespace forbidden
+2020-12-10 23:36:37,793 - WARNING - delete network_attachment_definition forbidden
+2020-12-10 23:36:38,647 - WARNING - delete network_policy forbidden
+2020-12-10 23:36:39,489 - WARNING - delete ingress forbidden
+2020-12-10 23:36:40,318 - WARNING - delete daemonset forbidden

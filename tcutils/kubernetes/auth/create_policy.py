@@ -134,7 +134,6 @@ def create_policies(resource={}, match=[]):
     policies = [admin_policy, {'resource': resource, 'match': match}]
     return policies
 
-# MSG need to add condition when the same policy is applied again
 
 
 def check_policy_in_config_map(policies):
