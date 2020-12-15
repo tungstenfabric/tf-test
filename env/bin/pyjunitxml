@@ -1,7 +1,0 @@
-#!/root/nuthanc-tf-test/env/bin/python3
-
-"""Script to run unit tests under junitxml."""
-
-if __name__ == '__main__':
-    import junitxml.main
-    junitxml.main.main()
