@@ -1,0 +1,22 @@
+Metadata-Version: 1.1
+Name: openshift
+Version: 0.7.2
+Summary: OpenShift python client
+Home-page: https://github.com/openshift/openshift-restclient-python
+Author: OpenShift
+Author-email: UNKNOWN
+License: Apache License Version 2.0
+Description: Python client for OpenShift http://openshift.redhat.com/
+Keywords: Swagger,OpenAPI,Kubernetes,OpenShift
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Topic :: Utilities
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5

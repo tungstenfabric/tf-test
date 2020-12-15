@@ -1,0 +1,186 @@
+Metadata-Version: 2.1
+Name: remote-pdb
+Version: 2.0.0
+Summary: Remote vanilla PDB (over TCP sockets) *done right*: no extras, proper handling around connection failures and CI. Based on `pdbx <https://pypi.python.org/pypi/pdbx>`_.
+Home-page: https://github.com/ionelmc/python-remote-pdb
+Author: Ionel Cristian Mărieș
+Author-email: contact@ionelmc.ro
+License: BSD 2-Clause License
+Project-URL: Documentation, https://python-remote-pdb.readthedocs.io/
+Project-URL: Changelog, https://python-remote-pdb.readthedocs.io/en/latest/changelog.html
+Project-URL: Issue Tracker, https://github.com/ionelmc/python-remote-pdb/issues
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Utilities
+Requires-Python: >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*
+
+========
+Overview
+========
+
+
+
+Remote vanilla PDB (over TCP sockets) *done right*: no extras, proper handling around connection failures and CI. Based
+on `pdbx <https://pypi.python.org/pypi/pdbx>`_.
+
+* Free software: BSD 2-Clause License
+
+Installation
+============
+
+::
+
+    pip install remote-pdb
+
+Usage
+=====
+
+To open a remote PDB on first available port:
+
+.. code:: python
+
+    from remote_pdb import set_trace
+    set_trace() # you'll see the port number in the logs
+
+To use some specific host/port:
+
+.. code:: python
+
+    from remote_pdb import RemotePdb
+    RemotePdb('127.0.0.1', 4444).set_trace()
+
+To connect just run ``telnet 127.0.0.1 4444``.  When you are finished
+debugging, either exit the debugger, or press Control-], then Control-d.
+
+Alternately, one can connect with NetCat: ``nc -C 127.0.0.1 4444`` or Socat: ``socat readline
+tcp:127.0.0.1:4444`` (for line editing and history support).  When finished debugging, either exit
+the debugger, or press Control-c.
+
+Integration with breakpoint() in Python 3.7+
+============================================
+
+If you are using Python 3.7 one can use the new ``breakpoint()`` built in to invoke
+remote PDB. In this case the following environment variable must be set:
+
+.. code:: bash
+
+    PYTHONBREAKPOINT=remote_pdb.set_trace
+
+The debugger can then be invoked as follows, without any imports:
+
+.. code:: python
+
+    breakpoint()
+
+As the ``breakpoint()`` function does not take any arguments, environment variables can be used to
+specify the host and port that the server should listen to. For example, to run ``script.py`` in such a
+way as to make ``telnet 127.0.0.1 4444`` the correct way of connecting, one would run:
+
+.. code:: bash
+
+    PYTHONBREAKPOINT=remote_pdb.set_trace REMOTE_PDB_HOST=127.0.0.1 REMOTE_PDB_PORT=4444 python script.py
+
+If ``REMOTE_PDB_HOST`` is omitted then a default value of 127.0.0.1 will be used. If ``REMOTE_PDB_PORT`` is
+omitted then the first available port will be used. The connection information will be logged to the console,
+as with calls to ``remote_pdb.set_trace()``.
+
+To quiet the output, set ``REMOTE_PDB_QUIET=1``, this will prevent
+``RemotePdb`` from producing any output -- you'll probably want to specify
+``REMOTE_PDB_PORT`` as well since the randomized port won't be printed.
+
+
+Note about OS X
+===============
+
+In certain scenarios (backgrounded processes) OS X will prevent readline to be imported (and readline is a dependency of pdb). 
+A workaround (run this early):
+
+.. code:: python
+
+    import signal
+    signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+
+See `#9 <https://github.com/ionelmc/python-remote-pdb/issues/9>`_ and `cpython#14892 <http://bugs.python.org/issue14892>`_.
+
+Requirements
+============
+
+Python 2.6, 2.7, 3.2, 3.3 and PyPy are supported.
+
+Similar projects
+================
+
+* `qdb <https://pypi.python.org/pypi/qdb>`_
+
+
+Changelog
+=========
+
+2.0.0 (2019-07-31)
+------------------
+
+* Fixed inconsistency with normal use of ``pdb`` - `BdbQuit` will now be raised on quitting.
+  Contributed by Anthony Sottile in `#18 <https://github.com/ionelmc/python-remote-pdb/pull/18>`_.
+  **BACKWARDS INCOMPATIBLE**.
+* Added ``REMOTE_PDB_QUIET=1`` to silence output.
+  Contributed by Anthony Sottile in `#19 <https://github.com/ionelmc/python-remote-pdb/pull/19>`_.
+
+1.3.0 (2019-03-13)
+------------------
+
+* Documented support for Python 3.7's ``breakpoint()``.
+* Added support for setting the socket listening host/port through the ``REMOTE_PDB_HOST``/``REMOTE_PDB_PORT``
+  environment variables. Contributed by Matthew Wilkes in `#14 <https://github.com/ionelmc/python-remote-pdb/pull/14>`_.
+* Removed use of `rw` file wrappers around sockets (turns out socket's ``makefile`` is very buggy in Python 3.6 and
+  later - `output is discarded <https://bugs.python.org/issue35928>`_). Contributed in `#13
+  <https://github.com/ionelmc/python-remote-pdb/pull/13>`_.
+
+1.2.0 (2015-09-26)
+------------------
+
+* Always print/log listening address.
+
+1.1.3 (2015-07-06)
+------------------
+
+* Corrected the default frame tracing starts from.
+
+1.1.2 (2015-07-06)
+------------------
+
+* Small readme update.
+
+1.1.1 (2015-07-06)
+------------------
+
+* Remove bogus ``remote_pdb`` console script.
+
+1.1.0 (2015-06-21)
+------------------
+
+* Fixed buffering issues when running on Python 3 and Windows.
+
+1.0.0 (2015-06-15)
+------------------
+
+* Added support for PDB++.
+
+0.2.1 (2014-03-07)
+------------------
+
+* First release on PyPI.
+
+

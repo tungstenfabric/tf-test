@@ -1,3 +1,5 @@
+from tcutils.wrappers import preposttest_wrapper
+from common.k8s.base import BaseK8sTest
 from tcutils.kubernetes.auth import create_policy
 from tcutils.kubernetes.auth.example_user import ExampleUser
 from tcutils.kubernetes.auth.resource_util import ResourceUtil
@@ -191,8 +193,3 @@ def test_all_in_one():
         resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
     ResourceUtil.perform_operations(
         stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list, namespace='easy')
-    
-test_all_in_one()
-
-
-

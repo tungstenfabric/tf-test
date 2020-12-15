@@ -5,6 +5,7 @@ from tcutils.kubernetes.auth.util import Util
 import os
 from tcutils.wrappers import preposttest_wrapper
 from testtools import TestCase
+from common.k8s.base import BaseK8sTest
 
 # Tested and working
 

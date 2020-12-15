@@ -1,4 +1,5 @@
 from tcutils.kubernetes.auth.lib.o7k_lib import O7kLib
+from common.contrail_test_init import ContrailTestInit
 from subprocess import check_output
 
 
@@ -13,8 +14,11 @@ class ExampleUser(O7kLib):
 
     @staticmethod
     def get_auth_url():
-        auth_ip = check_output(
-            "juju status | grep 5000 | awk '{print $5}'", shell=True, universal_newlines=True).strip()
+        cti_obj = ContrailTestInit()
+        auth_ip = cti_obj.run_cmd_on_server(server_ip='192.168.7.29',issue_cmd="juju status | grep 5000 | awk '{print $5}'")
+        print(auth_ip)
+        # auth_ip = check_output(
+        #     , shell=True, universal_newlines=True).strip()
         auth_url = f'http://{auth_ip}:5000/v3'
         return auth_url
 
