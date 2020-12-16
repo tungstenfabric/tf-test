@@ -1,6 +1,5 @@
 from tcutils.kubernetes.auth.lib.o7k_lib import O7kLib
 from common.contrail_test_init import ContrailTestInit
-from subprocess import check_output
 
 
 class ExampleUser(O7kLib):
@@ -14,11 +13,10 @@ class ExampleUser(O7kLib):
 
     @staticmethod
     def get_auth_url():
-        cti_obj = ContrailTestInit()
-        auth_ip = cti_obj.run_cmd_on_server(server_ip='192.168.7.29',issue_cmd="juju status | grep 5000 | awk '{print $5}'")
-        print(auth_ip)
-        # auth_ip = check_output(
-        #     , shell=True, universal_newlines=True).strip()
+        cti_obj = ContrailTestInit(input_file='contrail_test_input.yaml')
+        # import pdb;pdb.set_trace()
+        cmd = "juju status | grep 5000 | awk '{print $5}'"
+        auth_ip = cti_obj.run_cmd_on_server(server_ip=cti_obj.juju_server, username='root', password='c0ntrail123', issue_cmd=cmd)
         auth_url = f'http://{auth_ip}:5000/v3'
         return auth_url
 
@@ -35,15 +33,3 @@ class ExampleUser(O7kLib):
                          domain_name=domain_name)
         self.delete_project(project_name)
         self.delete_domain(domain_name)
-
-
-# admin = ExampleUser(username='admin', password='password', domain_name='admin_domain',
-#                project_name='admin', auth_url='http://192.168.30.76:5000/v3')
-# Utilizing classmethod to act as factory functions to get similar parameters as above
-# admin = ExampleUser.admin()
-# admin.create_all('john', 'c0ntrail123', 'Member', 'new_project', 'new_domain')
-# admin.delete_all('john', 'new_project', 'new_domain')
-
-# Create and Delete for test_user
-# admin.create_all()
-# admin.delete_all()

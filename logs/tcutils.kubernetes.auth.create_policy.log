@@ -16,3 +16,42 @@
 2020-12-10 23:34:47,966 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
 2020-12-10 23:34:50,013 - INFO - Waiting for policy to update in ConfigMap
 2020-12-10 23:34:55,019 - INFO - Policy updated in ConfigMap
+2020-12-15 11:21:12,195 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 12:44:23,274 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 13:58:44,070 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 13:58:45,709 - INFO - Waiting for policy to update in ConfigMap
+2020-12-15 14:01:54,651 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 14:01:56,182 - INFO - Waiting for policy to update in ConfigMap
+2020-12-15 14:04:24,193 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 14:04:26,069 - INFO - Waiting for policy to update in ConfigMap
+2020-12-15 14:05:58,602 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 14:07:14,120 - INFO - Waiting for policy to update in ConfigMap
+2020-12-15 14:12:02,279 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 14:12:38,882 - INFO - Waiting for policy to update in ConfigMap
+2020-12-15 14:12:53,327 - INFO - Policy updated in ConfigMap
+2020-12-15 14:14:05,455 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 14:15:55,656 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-15 14:15:56,589 - INFO - Waiting for policy to update in ConfigMap
+2020-12-15 14:16:01,595 - INFO - Policy updated in ConfigMap
+2020-12-16 03:35:30,401 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 03:35:34,328 - INFO - Waiting for policy to update in ConfigMap
+2020-12-16 03:35:39,333 - INFO - Policy updated in ConfigMap
+2020-12-16 03:44:17,798 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 03:49:23,157 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 03:50:37,709 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 03:50:41,526 - INFO - Waiting for policy to update in ConfigMap
+2020-12-16 03:50:46,532 - INFO - Policy updated in ConfigMap
+2020-12-16 03:51:56,338 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 03:51:57,273 - INFO - Waiting for policy to update in ConfigMap
+2020-12-16 03:52:02,278 - INFO - Policy updated in ConfigMap
+2020-12-16 04:52:36,919 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 04:52:40,841 - INFO - Waiting for policy to update in ConfigMap
+2020-12-16 04:52:45,846 - INFO - Policy updated in ConfigMap
+2020-12-16 04:57:16,951 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 04:57:17,884 - INFO - Waiting for policy to update in ConfigMap
+2020-12-16 04:57:22,889 - INFO - Policy updated in ConfigMap
+2020-12-16 06:53:58,086 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 06:57:22,824 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 07:00:08,725 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 07:15:45,447 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 07:27:33,457 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml

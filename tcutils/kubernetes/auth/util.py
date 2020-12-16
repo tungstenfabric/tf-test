@@ -1,12 +1,11 @@
 import os
 import paramiko
-from subprocess import Popen, PIPE
-import shlex
 import string
 import random
 from common import log_orig as contrail_logging
+from common.contrail_test_init import ContrailTestInit
 
-logger = contrail_logging.getLogger(__name__)
+logger = contrail_logging.getLogger('auth')
 
 
 class Util:
@@ -23,14 +22,13 @@ class Util:
     }
 
     @staticmethod
-    def exec_kubectl_cmd_on_file(verb, template_file, namespace):
+    def exec_kubectl_cmd_on_file(verb, template_file, namespace, stackrc_dict):
         # kubectl = 'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443'
         kubectl = 'kubectl'
-        cmd = shlex.split(f'{kubectl} {verb} -f {template_file} -n {namespace}')
-        p = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-        # p = Popen(f'{kubectl} {verb} -f {template_file}', stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)
-        output, error = p.communicate()
-        return output, error
+        cmd = [f'{kubectl} {verb} -f {template_file} -n {namespace}']
+        cti_obj = ContrailTestInit(input_file='contrail_test_input.yaml')
+        out, err = Util.execute_cmds_on_remote(ip=cti_obj.juju_server, cmd_list=cmd, env_dict=stackrc_dict)
+        return out, err
 
 
     @staticmethod
@@ -67,24 +65,28 @@ class Util:
 
 
     @staticmethod
-    def execute_cmds_on_remote(ip, cmd_list):
+    def execute_cmds_on_remote(ip, cmd_list, env_dict={}, username='root', password='c0ntrail123'):
+        output = ""
+        error = ""
         client = paramiko.SSHClient()
         try:
-            # k = paramiko.RSAKey.from_private_key_file('~/.ssh/id_rsa')
-            client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(hostname=ip, username='ubuntu')
+            client.connect(ip, username=username, password=password)
         except:
             print("[!] Cannot connect to the SSH Server")
             exit()
 
         for cmd in cmd_list:
-            stdin, stdout, stderr = client.exec_command(cmd)
+            stdin, stdout, stderr = client.exec_command(cmd, environment=env_dict)
+            output = stdout
+            error = stderr
             print(stdout.read().decode())
             err = stderr.read().decode()
-        if err:
+        if error:
             print(err)
         client.close()
+        return output, error
+        
 
     # MSG Need to get the kubemanager ip from contrail_test_input
     @staticmethod

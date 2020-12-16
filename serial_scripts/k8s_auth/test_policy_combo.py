@@ -1,9 +1,9 @@
 from tcutils.kubernetes.auth.example_user import ExampleUser
 from tcutils.kubernetes.auth.resource_util import ResourceUtil
+from common.contrail_test_init import ContrailTestInit
 from tcutils.kubernetes.auth import create_policy
-from tcutils.wrappers import preposttest_wrapper
+from tcutils.kubernetes.auth.wrappers import preposttest_wrapper
 from testtools import TestCase
-import os
 
 
 class TestPolicyCombo(TestCase):
@@ -20,9 +20,12 @@ class TestPolicyCombo(TestCase):
         admin.create_all(user_name='userC', password='c0ntrail123', role='Member',
                          project_name='userC_project', domain_name='userC_domain')
         ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
-        # MSG Use Util's execute_cmds_on_remote cmd
-        os.system('kubectl create ns zomsrc')
-        os.system('kubectl create ns easy')
+
+        cti_obj = ContrailTestInit(input_file='contrail_test_input.yaml')
+        cmd1 = 'kubectl create ns zomsrc'
+        cmd2 = 'kubectl create ns easy'
+        cti_obj.run_cmd_on_server(server_ip=cti_obj.juju_server, username='root', password='c0ntrail123', issue_cmd=cmd1)
+        cti_obj.run_cmd_on_server(server_ip=cti_obj.juju_server, username='root', password='c0ntrail123', issue_cmd=cmd2)
         admin_policy = create_policy.get_admin_policy()
         userA_policy = create_policy.get_userA_policy()
         userB_policy = create_policy.get_userB_policy()
@@ -35,7 +38,8 @@ class TestPolicyCombo(TestCase):
         create_policy.apply_policies_and_check_in_config_map(
             policies, filename)
 
-    # MSG Add @preposttest_wrapper before each test and remove print statements
+
+    @preposttest_wrapper
     def test_only_pods_and_deployments_create(self):
         '''
         For userA user, only create pods and deployments and nothing else
@@ -55,6 +59,8 @@ class TestPolicyCombo(TestCase):
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
+
+    @preposttest_wrapper
     def test_only_pods_and_deployments_delete(self):
         '''
         For userB user, only delete pods and deployments and nothing else
@@ -74,6 +80,8 @@ class TestPolicyCombo(TestCase):
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
+
+    @preposttest_wrapper
     def test_only_service_in_zomsrc_ns(self):
         '''
         For userC user, create service in zomsrc namespace and nothing else should work
@@ -95,6 +103,8 @@ class TestPolicyCombo(TestCase):
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list, namespace='zomsrc')
 
+
+    @preposttest_wrapper
     def test_only_pods_deployments_services_in_easy_ns(self):
         '''
         For userD user, any operation on pods, deployments and services but only in easy namespace

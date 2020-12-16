@@ -1,5 +1,7 @@
-from gevent import monkey
-monkey.patch_all()
+# from gevent import monkey
+# monkey.patch_all()
+# from gevent import monkey as curious_george
+# curious_george.patch_all(thread=False, select=False)
 from builtins import object
 import functools
 import os

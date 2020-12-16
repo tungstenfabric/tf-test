@@ -1,0 +1,24 @@
+2020-12-16 03:52:02,521 - INFO - ================================================================================
+2020-12-16 03:52:02,521 - INFO - STARTING TEST    : test_only_pods_and_deployments_create
+2020-12-16 03:52:02,522 - INFO - TEST DESCRIPTION : 
+        For userA user, only create pods and deployments and nothing else
+        
+2020-12-16 03:52:03,783 - INFO - ================================================================================
+2020-12-16 03:52:03,783 - INFO - STARTING TEST    : test_only_pods_and_deployments_delete
+2020-12-16 03:52:03,783 - INFO - TEST DESCRIPTION : 
+        For userB user, only delete pods and deployments and nothing else
+        
+2020-12-16 03:52:05,024 - INFO - ================================================================================
+2020-12-16 03:52:05,024 - INFO - STARTING TEST    : test_only_pods_deployments_services_in_easy_ns
+2020-12-16 03:52:05,025 - INFO - TEST DESCRIPTION : 
+        For userD user, any operation on pods, deployments and services but only in easy namespace
+        
+2020-12-16 03:52:06,295 - INFO - ================================================================================
+2020-12-16 03:52:06,296 - INFO - STARTING TEST    : test_only_service_in_zomsrc_ns
+2020-12-16 03:52:06,296 - INFO - TEST DESCRIPTION : 
+        For userC user, create service in zomsrc namespace and nothing else should work
+        
+2020-12-16 04:48:55,880 - INFO - Reading existing Domain with UUID 0aef8636-4bb0-4d27-9739-58e46fdd25b6
+2020-12-16 04:48:57,290 - INFO - Using existing domain ['admin_domain'](0aef8636-4bb0-4d27-9739-58e46fdd25b6)
+2020-12-16 04:48:57,518 - INFO - Project ctest-TestPolicyCombo-07110251 not found, creating it
+2020-12-16 04:48:58,111 - INFO - Created Project:ctest-TestPolicyCombo-07110251, ID : e02156d8-fced-423d-b1ac-eccf76eccdca 
