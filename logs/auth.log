@@ -1,40 +1,24 @@
-2020-12-16 04:57:23,029 - INFO - ================================================================================
-2020-12-16 04:57:23,029 - INFO - STARTING TEST: test_only_pods_and_deployments_create
-2020-12-16 04:57:23,032 - INFO - TEST DESCRIPTION : 
+2020-12-16 14:19:47,197 - INFO - Duplicate Domain, not creating
+2020-12-16 14:19:47,393 - INFO - Duplicate Project, not creating
+2020-12-16 14:19:47,896 - INFO - Duplicate User, not creating
+2020-12-16 14:19:48,149 - INFO - User 'userD' assigned 'Member' role
+2020-12-16 14:19:48,215 - INFO - Duplicate Domain, not creating
+2020-12-16 14:19:48,339 - INFO - Duplicate Project, not creating
+2020-12-16 14:19:48,839 - INFO - Duplicate User, not creating
+2020-12-16 14:19:49,081 - INFO - User 'userA' assigned 'Member' role
+2020-12-16 14:19:49,147 - INFO - Duplicate Domain, not creating
+2020-12-16 14:19:49,275 - INFO - Duplicate Project, not creating
+2020-12-16 14:19:49,773 - INFO - Duplicate User, not creating
+2020-12-16 14:19:50,026 - INFO - User 'userB' assigned 'Member' role
+2020-12-16 14:19:50,109 - INFO - Duplicate Domain, not creating
+2020-12-16 14:19:50,243 - INFO - Duplicate Project, not creating
+2020-12-16 14:19:51,462 - INFO - Duplicate User, not creating
+2020-12-16 14:19:51,705 - INFO - User 'userC' assigned 'Member' role
+2020-12-16 14:19:53,710 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-16 14:19:58,710 - INFO - Waiting for policy to update in ConfigMap
+2020-12-16 14:20:03,715 - INFO - Policy updated in ConfigMap
+2020-12-16 14:20:04,169 - INFO - ================================================================================
+2020-12-16 14:20:04,170 - INFO - STARTING TEST: test_only_pods_and_deployments_create
+2020-12-16 14:20:04,171 - INFO - TEST DESCRIPTION : 
         For userA user, only create pods and deployments and nothing else
         
-2020-12-16 04:57:24,125 - ERROR - [Errno 2] No such file or directory: 'kubectl': 'kubectl'
-2020-12-16 04:57:24,126 - INFO - END TEST : test_only_pods_and_deployments_create : FAILED[0:00:01]
-2020-12-16 04:57:24,126 - INFO - --------------------------------------------------------------------------------
-2020-12-16 04:57:24,128 - INFO - END TEST : test_only_pods_and_deployments_create : PASSED[0:00:01]
-2020-12-16 04:57:24,128 - INFO - --------------------------------------------------------------------------------
-2020-12-16 04:57:24,129 - INFO - ================================================================================
-2020-12-16 04:57:24,129 - INFO - STARTING TEST: test_only_pods_and_deployments_delete
-2020-12-16 04:57:24,129 - INFO - TEST DESCRIPTION : 
-        For userB user, only delete pods and deployments and nothing else
-        
-2020-12-16 04:57:25,139 - ERROR - [Errno 2] No such file or directory: 'kubectl': 'kubectl'
-2020-12-16 04:57:25,140 - INFO - END TEST : test_only_pods_and_deployments_delete : FAILED[0:00:01]
-2020-12-16 04:57:25,140 - INFO - --------------------------------------------------------------------------------
-2020-12-16 04:57:25,141 - INFO - END TEST : test_only_pods_and_deployments_delete : PASSED[0:00:01]
-2020-12-16 04:57:25,141 - INFO - --------------------------------------------------------------------------------
-2020-12-16 04:57:25,142 - INFO - ================================================================================
-2020-12-16 04:57:25,142 - INFO - STARTING TEST: test_only_pods_deployments_services_in_easy_ns
-2020-12-16 04:57:25,142 - INFO - TEST DESCRIPTION : 
-        For userD user, any operation on pods, deployments and services but only in easy namespace
-        
-2020-12-16 04:57:26,118 - ERROR - [Errno 2] No such file or directory: 'kubectl': 'kubectl'
-2020-12-16 04:57:26,119 - INFO - END TEST : test_only_pods_deployments_services_in_easy_ns : FAILED[0:00:01]
-2020-12-16 04:57:26,119 - INFO - --------------------------------------------------------------------------------
-2020-12-16 04:57:26,120 - INFO - END TEST : test_only_pods_deployments_services_in_easy_ns : PASSED[0:00:01]
-2020-12-16 04:57:26,120 - INFO - --------------------------------------------------------------------------------
-2020-12-16 04:57:26,121 - INFO - ================================================================================
-2020-12-16 04:57:26,121 - INFO - STARTING TEST: test_only_service_in_zomsrc_ns
-2020-12-16 04:57:26,122 - INFO - TEST DESCRIPTION : 
-        For userC user, create service in zomsrc namespace and nothing else should work
-        
-2020-12-16 04:57:27,220 - ERROR - [Errno 2] No such file or directory: 'kubectl': 'kubectl'
-2020-12-16 04:57:27,221 - INFO - END TEST : test_only_service_in_zomsrc_ns : FAILED[0:00:01]
-2020-12-16 04:57:27,221 - INFO - --------------------------------------------------------------------------------
-2020-12-16 04:57:27,223 - INFO - END TEST : test_only_service_in_zomsrc_ns : PASSED[0:00:01]
-2020-12-16 04:57:27,223 - INFO - --------------------------------------------------------------------------------

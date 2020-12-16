@@ -3,9 +3,8 @@ from keystoneauth1 import identity as ks_identity
 from keystoneauth1 import session as ks_session
 from keystoneauth1.exceptions import http
 from keystoneclient import exceptions as ks_exceptions
-import logging
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
+from common import log_orig as contrail_logging
+logging = contrail_logging.getLogger('auth')
 
 
 class O7kLib:

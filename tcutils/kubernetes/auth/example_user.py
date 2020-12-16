@@ -16,8 +16,8 @@ class ExampleUser(O7kLib):
     def get_auth_url():
         cti_obj = ContrailTestInit(input_file='contrail_test_input.yaml')
         cmd = ["juju status | grep 5000 | awk '{print $5}'"]
-        import pdb;pdb.set_trace()
         auth_ip, err = Util.execute_cmds_on_remote(ip=cti_obj.juju_server, cmd_list=cmd)
+        auth_ip = auth_ip.strip()
         auth_url = f'http://{auth_ip}:5000/v3'
         return auth_url
 

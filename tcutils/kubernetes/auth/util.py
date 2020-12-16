@@ -33,15 +33,17 @@ class Util:
 
     @staticmethod
     def source_stackrc(user_name='admin', password='password', project_name='admin', domain_name='admin_domain', auth_url=None):
-        os.environ['OS_IDENTITY_API_VERSION'] = '3'
-        os.environ['OS_USER_DOMAIN_NAME'] = domain_name
-        os.environ['OS_USERNAME'] = user_name
-        os.environ['OS_PROJECT_DOMAIN_NAME'] = domain_name
-        os.environ['OS_PROJECT_NAME'] = project_name
-        os.environ['OS_PASSWORD'] = password
-        os.environ['OS_AUTH_URL'] = auth_url
-        os.environ['OS_DOMAIN_NAME'] = domain_name
-        
+        return {
+            'OS_IDENTITY_API_VERSION' : '3',
+            'OS_USER_DOMAIN_NAME' : domain_name,
+            'OS_USERNAME' : user_name,
+            'OS_PROJECT_DOMAIN_NAME' : domain_name,
+            'OS_PROJECT_NAME' : project_name,
+            'OS_PASSWORD' : password,
+            'OS_AUTH_URL' : auth_url,
+            'OS_DOMAIN_NAME' : domain_name
+        }
+
 
     @staticmethod
     def resource(verb, resource_list):
@@ -77,10 +79,11 @@ class Util:
             exit()
 
         for cmd in cmd_list:
+            # Checkout https://stackoverflow.com/questions/14834251/setting-session-variable-for-paramiko-session
+            import pdb;pdb.set_trace()
             stdin, stdout, stderr = client.exec_command(cmd, environment=env_dict)
             output = stdout.read().decode()
             error = stderr.read().decode()
-            print(output)
         if error:
             print(error)
         client.close()
@@ -98,7 +101,4 @@ class Util:
     def restart_vrouter_agent():
         Util.execute_cmds_on_remote(
             '192.168.7.19', ['sudo docker restart vrouter_vrouter-agent_1'])
-
-u = Util()
-u.execute_cmds_on_remote('10.204.216.194', ["juju status"])
 

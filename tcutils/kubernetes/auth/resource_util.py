@@ -8,7 +8,7 @@ import random
 from common import log_orig as contrail_logging
 import json
 
-logger = contrail_logging.getLogger(__name__)
+logger = contrail_logging.getLogger('auth')
 
 
 class ResourceUtil(Util):
@@ -26,7 +26,8 @@ class ResourceUtil(Util):
                 verb=verb, template_file=Util.templates[resource], namespace=namespace, stackrc_dict=stackrc_dict)
             if verb in output:
                 if expectation == True:
-                    logger.info(f'{verb} {resource} successful in {namespace} namespace')
+                    logger.info(
+                        f'{verb} {resource} successful in {namespace} namespace')
                 else:
                     assert False, f'{verb} {resource} successful even when expectation is False'
             elif 'forbidden' in error:
@@ -53,7 +54,7 @@ class ResourceUtil(Util):
 
     @staticmethod
     def perform_operations(stackrc_dict={}, resource_expectation_list=[], namespace='default'):
-        # Util.source_stackrc(**stackrc_dict)
+        stackrc_dict = Util.source_stackrc(**stackrc_dict)
         ResourceUtil.resource_with_expectation(
             verb='create', resource_expectation_list=resource_expectation_list, namespace=namespace, stackrc_dict=stackrc_dict)
         ResourceUtil.resource_with_expectation(
