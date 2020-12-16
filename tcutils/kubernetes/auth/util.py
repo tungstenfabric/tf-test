@@ -78,12 +78,11 @@ class Util:
 
         for cmd in cmd_list:
             stdin, stdout, stderr = client.exec_command(cmd, environment=env_dict)
-            output = stdout
-            error = stderr
-            print(stdout.read().decode())
-            err = stderr.read().decode()
+            output = stdout.read().decode()
+            error = stderr.read().decode()
+            print(output)
         if error:
-            print(err)
+            print(error)
         client.close()
         return output, error
         
@@ -99,3 +98,7 @@ class Util:
     def restart_vrouter_agent():
         Util.execute_cmds_on_remote(
             '192.168.7.19', ['sudo docker restart vrouter_vrouter-agent_1'])
+
+u = Util()
+u.execute_cmds_on_remote('10.204.216.194', ["juju status"])
+

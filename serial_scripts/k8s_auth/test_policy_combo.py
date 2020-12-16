@@ -22,10 +22,8 @@ class TestPolicyCombo(TestCase):
         ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
 
         cti_obj = ContrailTestInit(input_file='contrail_test_input.yaml')
-        cmd1 = 'kubectl create ns zomsrc'
-        cmd2 = 'kubectl create ns easy'
-        cti_obj.run_cmd_on_server(server_ip=cti_obj.juju_server, username='root', password='c0ntrail123', issue_cmd=cmd1)
-        cti_obj.run_cmd_on_server(server_ip=cti_obj.juju_server, username='root', password='c0ntrail123', issue_cmd=cmd2)
+        cmds = ['kubectl create ns zomsrc', 'kubectl create ns easy']
+        ResourceUtil.execute_cmds_on_remote(ip=cti_obj.juju_server, cmd_list=cmds)
         admin_policy = create_policy.get_admin_policy()
         userA_policy = create_policy.get_userA_policy()
         userB_policy = create_policy.get_userB_policy()
