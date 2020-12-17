@@ -15,12 +15,13 @@ def retry_on_api_exception(*args, **kwargs):
     def decorator(f):
         @functools.wraps(f)
         def wrapper(cls_obj, *func_args, **func_kwargs):
-            try:
-                return f(cls_obj, *func_args, **func_kwargs)
-            except ApiException as e:
-                cls_obj.logger.warning("ApiException is caught %s. Retrying..." % e)
-            # retry
-            time.sleep(5)
+            for i in range(4):
+                try:
+                    return f(cls_obj, *func_args, **func_kwargs)
+                except ApiException as e:
+                    cls_obj.logger.warning("ApiException is caught %s. Retrying..." % e)
+                # retry
+                time.sleep(5)
             cls_obj.init_clients()
             return f(cls_obj, *func_args, **func_kwargs)
         return wrapper
