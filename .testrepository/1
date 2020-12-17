@@ -1,0 +1,98 @@
+time: 2020-12-17 09:07:32.996890Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_pods_and_deployments_create
+time: 2020-12-17 09:07:53.602594Z
+successful: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_pods_and_deployments_create [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:07:53.603107Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_pods_and_deployments_delete
+time: 2020-12-17 09:08:15.939784Z
+successful: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_pods_and_deployments_delete [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:08:15.940236Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_pods_deployments_services_in_easy_ns
+time: 2020-12-17 09:09:10.775205Z
+successful: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_pods_deployments_services_in_easy_ns [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:09:10.776159Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_service_in_zomsrc_ns
+time: 2020-12-17 09:09:53.533262Z
+successful: serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo.test_only_service_in_zomsrc_ns [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:09:53.534199Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_resource.TestResource.test_all_operations_for_admin_project_domain
+time: 2020-12-17 09:17:34.917737Z
+successful: serial_scripts.k8s_auth.test_resource.TestResource.test_all_operations_for_admin_project_domain [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:17:34.918672Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_resource.TestResource.test_all_operations_for_custom_user_project_domain
+time: 2020-12-17 09:29:31.635323Z
+successful: serial_scripts.k8s_auth.test_resource.TestResource.test_all_operations_for_custom_user_project_domain [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:29:31.636362Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_resource.TestResourceCustom.test_deployment_with_all_operations_for_custom_user_project_domain
+time: 2020-12-17 09:37:16.214633Z
+successful: serial_scripts.k8s_auth.test_resource.TestResourceCustom.test_deployment_with_all_operations_for_custom_user_project_domain [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:37:16.215741Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_resource.TestResourceCustom.test_pod_with_all_operations_for_custom_user_project_domain
+time: 2020-12-17 09:43:51.604001Z
+successful: serial_scripts.k8s_auth.test_resource.TestResourceCustom.test_pod_with_all_operations_for_custom_user_project_domain [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:43:51.605067Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_admin_project_domain_with_agent_restart
+time: 2020-12-17 09:51:00.114990Z
+successful: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_admin_project_domain_with_agent_restart [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:51:00.115898Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_admin_project_domain_with_kube_manager_restart
+time: 2020-12-17 09:51:50.515736Z
+successful: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_admin_project_domain_with_kube_manager_restart [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:51:50.516182Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_custom_user_project_domain_with_agent_restart
+time: 2020-12-17 09:55:05.479310Z
+successful: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_custom_user_project_domain_with_agent_restart [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:55:05.479820Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_custom_user_project_domain_with_kube_manager_restart
+time: 2020-12-17 09:59:34.815528Z
+successful: serial_scripts.k8s_auth.test_restart.TestRestart.test_all_operations_for_custom_user_project_domain_with_kube_manager_restart [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 09:59:34.816018Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_restart.TestRestart.test_pod_with_all_operations_for_custom_user_project_domain_with_agent_restart
+time: 2020-12-17 10:03:33.948145Z
+successful: serial_scripts.k8s_auth.test_restart.TestRestart.test_pod_with_all_operations_for_custom_user_project_domain_with_agent_restart [ multipart
+]
+tags: -worker-0
+time: 2020-12-17 10:03:33.949006Z
+tags: worker-0
+test: serial_scripts.k8s_auth.test_restart.TestRestart.test_pod_with_all_operations_for_custom_user_project_domain_with_kube_manager_restart
+time: 2020-12-17 10:05:44.346399Z
+successful: serial_scripts.k8s_auth.test_restart.TestRestart.test_pod_with_all_operations_for_custom_user_project_domain_with_kube_manager_restart [ multipart
+]
+tags: -worker-0

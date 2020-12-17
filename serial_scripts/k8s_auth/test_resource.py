@@ -1,6 +1,5 @@
 from tcutils.kubernetes.auth.example_user import ExampleUser
 from tcutils.kubernetes.auth.resource_util import ResourceUtil
-from tcutils.kubernetes.auth.util import Util
 from tcutils.kubernetes.auth.wrappers import preposttest_wrapper
 from testtools import TestCase
 

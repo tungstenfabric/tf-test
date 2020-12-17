@@ -1,6 +1,6 @@
 export OS_IDENTITY_API_VERSION=3
 export OS_USER_DOMAIN_NAME=test_domain
-export OS_USERNAME=y12w9g61
+export OS_USERNAME=test
 export OS_PROJECT_DOMAIN_NAME=test_domain
 export OS_PROJECT_NAME=test_project
 export OS_PASSWORD=c0ntrail123

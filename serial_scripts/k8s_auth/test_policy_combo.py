@@ -2,7 +2,7 @@ from tcutils.kubernetes.auth.example_user import ExampleUser
 from tcutils.kubernetes.auth.resource_util import ResourceUtil
 from common.contrail_test_init import ContrailTestInit
 from tcutils.kubernetes.auth import create_policy
-from tcutils.kubernetes.auth.wrappers import preposttest_wrapper
+from tcutils.kubernetes.auth.wrappers import preposttest_wrapper, attr
 from testtools import TestCase
 
 
@@ -36,6 +36,7 @@ class TestPolicyCombo(TestCase):
         create_policy.apply_policies_and_check_in_config_map(
             policies, filename)
 
+    @attr(type=['auth'])
     @preposttest_wrapper
     def test_only_pods_and_deployments_create(self):
         '''

@@ -1,0 +1,16 @@
+<testsuite errors="0" failures="0" name="serial_scripts" skipped="0" tests="14" time="3779.805">
+<testcase classname="serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo" name="TestPolicyCombo.test_only_pods_and_deployments_create" time="20.606"/>
+<testcase classname="serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo" name="TestPolicyCombo.test_only_pods_and_deployments_delete" time="22.337"/>
+<testcase classname="serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo" name="TestPolicyCombo.test_only_pods_deployments_services_in_easy_ns" time="54.835"/>
+<testcase classname="serial_scripts.k8s_auth.test_policy_combo.TestPolicyCombo" name="TestPolicyCombo.test_only_service_in_zomsrc_ns" time="42.757"/>
+<testcase classname="serial_scripts.k8s_auth.test_resource.TestResource" name="TestResource.test_all_operations_for_admin_project_domain" time="461.384"/>
+<testcase classname="serial_scripts.k8s_auth.test_resource.TestResource" name="TestResource.test_all_operations_for_custom_user_project_domain" time="716.717"/>
+<testcase classname="serial_scripts.k8s_auth.test_resource.TestResourceCustom" name="TestResourceCustom.test_deployment_with_all_operations_for_custom_user_project_domain" time="464.578"/>
+<testcase classname="serial_scripts.k8s_auth.test_resource.TestResourceCustom" name="TestResourceCustom.test_pod_with_all_operations_for_custom_user_project_domain" time="395.388"/>
+<testcase classname="serial_scripts.k8s_auth.test_restart.TestRestart" name="TestRestart.test_all_operations_for_admin_project_domain_with_agent_restart" time="428.510"/>
+<testcase classname="serial_scripts.k8s_auth.test_restart.TestRestart" name="TestRestart.test_all_operations_for_admin_project_domain_with_kube_manager_restart" time="50.400"/>
+<testcase classname="serial_scripts.k8s_auth.test_restart.TestRestart" name="TestRestart.test_all_operations_for_custom_user_project_domain_with_agent_restart" time="194.963"/>
+<testcase classname="serial_scripts.k8s_auth.test_restart.TestRestart" name="TestRestart.test_all_operations_for_custom_user_project_domain_with_kube_manager_restart" time="269.336"/>
+<testcase classname="serial_scripts.k8s_auth.test_restart.TestRestart" name="TestRestart.test_pod_with_all_operations_for_custom_user_project_domain_with_agent_restart" time="239.132"/>
+<testcase classname="serial_scripts.k8s_auth.test_restart.TestRestart" name="TestRestart.test_pod_with_all_operations_for_custom_user_project_domain_with_kube_manager_restart" time="130.397"/>
+</testsuite>
