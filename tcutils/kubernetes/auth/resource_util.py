@@ -13,7 +13,7 @@ logger = contrail_logging.getLogger('auth')
 
 class ResourceUtil(Util):
     @staticmethod
-    def resource_with_expectation(verb, resource_expectation_list, namespace, stackrc_dict):
+    def resource_with_expectation(verb, resource_expectation_list, namespace, stackrc_file):
         for resource_exp in resource_expectation_list:
             expectation = False
             if "-expected" in resource_exp:
@@ -23,7 +23,7 @@ class ResourceUtil(Util):
                 resource = resource_exp
 
             output, error = Util.exec_kubectl_cmd_on_file(
-                verb=verb, template_file=Util.templates[resource], namespace=namespace, stackrc_dict=stackrc_dict)
+                verb=verb, template_file=Util.templates[resource], namespace=namespace, stackrc_file=stackrc_file)
             if verb in output:
                 if expectation == True:
                     logger.info(
@@ -54,11 +54,11 @@ class ResourceUtil(Util):
 
     @staticmethod
     def perform_operations(stackrc_dict={}, resource_expectation_list=[], namespace='default'):
-        stackrc_dict = Util.source_stackrc(**stackrc_dict)
+        stackrc_file = Util.source_stackrc_to_file(**stackrc_dict)
         ResourceUtil.resource_with_expectation(
-            verb='create', resource_expectation_list=resource_expectation_list, namespace=namespace, stackrc_dict=stackrc_dict)
+            verb='create', resource_expectation_list=resource_expectation_list, namespace=namespace, stackrc_file=stackrc_file)
         ResourceUtil.resource_with_expectation(
-            verb='delete', resource_expectation_list=resource_expectation_list, namespace=namespace, stackrc_dict=stackrc_dict)
+            verb='delete', resource_expectation_list=resource_expectation_list, namespace=namespace, stackrc_file=stackrc_file)
 
     @staticmethod
     def create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict(rand=False):

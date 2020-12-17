@@ -1,24 +1,143 @@
-2020-12-16 14:19:47,197 - INFO - Duplicate Domain, not creating
-2020-12-16 14:19:47,393 - INFO - Duplicate Project, not creating
-2020-12-16 14:19:47,896 - INFO - Duplicate User, not creating
-2020-12-16 14:19:48,149 - INFO - User 'userD' assigned 'Member' role
-2020-12-16 14:19:48,215 - INFO - Duplicate Domain, not creating
-2020-12-16 14:19:48,339 - INFO - Duplicate Project, not creating
-2020-12-16 14:19:48,839 - INFO - Duplicate User, not creating
-2020-12-16 14:19:49,081 - INFO - User 'userA' assigned 'Member' role
-2020-12-16 14:19:49,147 - INFO - Duplicate Domain, not creating
-2020-12-16 14:19:49,275 - INFO - Duplicate Project, not creating
-2020-12-16 14:19:49,773 - INFO - Duplicate User, not creating
-2020-12-16 14:19:50,026 - INFO - User 'userB' assigned 'Member' role
-2020-12-16 14:19:50,109 - INFO - Duplicate Domain, not creating
-2020-12-16 14:19:50,243 - INFO - Duplicate Project, not creating
-2020-12-16 14:19:51,462 - INFO - Duplicate User, not creating
-2020-12-16 14:19:51,705 - INFO - User 'userC' assigned 'Member' role
-2020-12-16 14:19:53,710 - INFO - Applying policy file: /nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
-2020-12-16 14:19:58,710 - INFO - Waiting for policy to update in ConfigMap
-2020-12-16 14:20:03,715 - INFO - Policy updated in ConfigMap
-2020-12-16 14:20:04,169 - INFO - ================================================================================
-2020-12-16 14:20:04,170 - INFO - STARTING TEST: test_only_pods_and_deployments_create
-2020-12-16 14:20:04,171 - INFO - TEST DESCRIPTION : 
+2020-12-17 07:26:38,173 - INFO - Duplicate Domain, not creating
+2020-12-17 07:26:38,279 - INFO - Duplicate Project, not creating
+2020-12-17 07:26:38,806 - INFO - Duplicate User, not creating
+2020-12-17 07:26:39,575 - INFO - User 'userD' assigned 'Member' role
+2020-12-17 07:26:40,243 - INFO - Duplicate Domain, not creating
+2020-12-17 07:26:40,417 - INFO - Duplicate Project, not creating
+2020-12-17 07:26:40,834 - INFO - Duplicate User, not creating
+2020-12-17 07:26:41,059 - INFO - User 'userA' assigned 'Member' role
+2020-12-17 07:26:41,126 - INFO - Duplicate Domain, not creating
+2020-12-17 07:26:41,235 - INFO - Duplicate Project, not creating
+2020-12-17 07:26:41,753 - INFO - Duplicate User, not creating
+2020-12-17 07:26:41,979 - INFO - User 'userB' assigned 'Member' role
+2020-12-17 07:26:42,063 - INFO - Duplicate Domain, not creating
+2020-12-17 07:26:42,186 - INFO - Duplicate Project, not creating
+2020-12-17 07:26:42,881 - INFO - Duplicate User, not creating
+2020-12-17 07:26:43,123 - INFO - User 'userC' assigned 'Member' role
+2020-12-17 07:26:44,021 - INFO - Applying policy file: /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml
+2020-12-17 07:26:45,264 - INFO - Waiting for policy to update in ConfigMap
+2020-12-17 07:26:50,269 - INFO - Policy updated in ConfigMap
+2020-12-17 07:26:50,726 - INFO - ================================================================================
+2020-12-17 07:26:50,727 - INFO - STARTING TEST: test_only_pods_and_deployments_create
+2020-12-17 07:26:50,728 - INFO - TEST DESCRIPTION : 
         For userA user, only create pods and deployments and nothing else
         
+2020-12-17 07:26:52,221 - INFO - create pod successful in default namespace
+2020-12-17 07:26:53,644 - INFO - create deployment successful in default namespace
+2020-12-17 07:26:55,347 - WARNING - create service forbidden
+2020-12-17 07:26:56,762 - WARNING - create namespace forbidden
+2020-12-17 07:26:58,240 - WARNING - create network_attachment_definition forbidden
+2020-12-17 07:26:59,642 - WARNING - create network_policy forbidden
+2020-12-17 07:27:01,266 - WARNING - create ingress forbidden
+2020-12-17 07:27:02,662 - WARNING - create daemonset forbidden
+2020-12-17 07:27:03,895 - WARNING - delete pod forbidden
+2020-12-17 07:27:05,172 - WARNING - delete deployment forbidden
+2020-12-17 07:27:06,414 - WARNING - delete service forbidden
+2020-12-17 07:27:07,659 - WARNING - delete namespace forbidden
+2020-12-17 07:27:08,779 - WARNING - delete network_attachment_definition forbidden
+2020-12-17 07:27:09,911 - WARNING - delete network_policy forbidden
+2020-12-17 07:27:11,248 - WARNING - delete ingress forbidden
+2020-12-17 07:27:12,390 - WARNING - delete daemonset forbidden
+2020-12-17 07:27:12,390 - INFO - END TEST : test_only_pods_and_deployments_create : PASSED[0:00:22]
+2020-12-17 07:27:12,390 - INFO - --------------------------------------------------------------------------------
+2020-12-17 07:27:12,391 - INFO - ================================================================================
+2020-12-17 07:27:12,391 - INFO - STARTING TEST: test_only_pods_and_deployments_delete
+2020-12-17 07:27:12,391 - INFO - TEST DESCRIPTION : 
+        For userB user, only delete pods and deployments and nothing else
+        
+2020-12-17 07:27:13,959 - WARNING - create pod forbidden
+2020-12-17 07:27:15,370 - WARNING - create deployment forbidden
+2020-12-17 07:27:16,748 - WARNING - create service forbidden
+2020-12-17 07:27:18,085 - WARNING - create namespace forbidden
+2020-12-17 07:27:19,455 - WARNING - create network_attachment_definition forbidden
+2020-12-17 07:27:20,807 - WARNING - create network_policy forbidden
+2020-12-17 07:27:22,274 - WARNING - create ingress forbidden
+2020-12-17 07:27:23,661 - WARNING - create daemonset forbidden
+2020-12-17 07:27:24,823 - INFO - delete pod successful in default namespace
+2020-12-17 07:27:26,033 - INFO - delete deployment successful in default namespace
+2020-12-17 07:27:27,166 - WARNING - delete service forbidden
+2020-12-17 07:27:28,306 - WARNING - delete namespace forbidden
+2020-12-17 07:27:29,416 - WARNING - delete network_attachment_definition forbidden
+2020-12-17 07:27:30,562 - WARNING - delete network_policy forbidden
+2020-12-17 07:27:31,756 - WARNING - delete ingress forbidden
+2020-12-17 07:27:32,937 - WARNING - delete daemonset forbidden
+2020-12-17 07:27:32,937 - INFO - END TEST : test_only_pods_and_deployments_delete : PASSED[0:00:20]
+2020-12-17 07:27:32,938 - INFO - --------------------------------------------------------------------------------
+2020-12-17 07:27:32,938 - INFO - ================================================================================
+2020-12-17 07:27:32,938 - INFO - STARTING TEST: test_only_pods_deployments_services_in_easy_ns
+2020-12-17 07:27:32,938 - INFO - TEST DESCRIPTION : 
+        For userD user, any operation on pods, deployments and services but only in easy namespace
+        
+2020-12-17 07:27:34,486 - WARNING - create pod forbidden
+2020-12-17 07:27:35,924 - WARNING - create deployment forbidden
+2020-12-17 07:27:37,343 - WARNING - create service forbidden
+2020-12-17 07:27:38,712 - WARNING - create namespace forbidden
+2020-12-17 07:27:40,093 - WARNING - create network_attachment_definition forbidden
+2020-12-17 07:27:41,482 - WARNING - create network_policy forbidden
+2020-12-17 07:27:42,881 - WARNING - create ingress forbidden
+2020-12-17 07:27:44,248 - WARNING - create daemonset forbidden
+2020-12-17 07:27:45,383 - WARNING - delete pod forbidden
+2020-12-17 07:27:47,050 - WARNING - delete deployment forbidden
+2020-12-17 07:27:48,322 - WARNING - delete service forbidden
+2020-12-17 07:27:49,692 - WARNING - delete namespace forbidden
+2020-12-17 07:27:50,829 - WARNING - delete network_attachment_definition forbidden
+2020-12-17 07:27:51,996 - WARNING - delete network_policy forbidden
+2020-12-17 07:27:53,141 - WARNING - delete ingress forbidden
+2020-12-17 07:27:54,300 - WARNING - delete daemonset forbidden
+2020-12-17 07:27:55,715 - INFO - create pod successful in easy namespace
+2020-12-17 07:27:57,200 - INFO - create deployment successful in easy namespace
+2020-12-17 07:27:58,727 - INFO - create service successful in easy namespace
+2020-12-17 07:28:00,122 - WARNING - create namespace forbidden
+2020-12-17 07:28:01,548 - WARNING - create network_attachment_definition forbidden
+2020-12-17 07:28:03,286 - WARNING - create network_policy forbidden
+2020-12-17 07:28:04,769 - WARNING - create ingress forbidden
+2020-12-17 07:28:06,122 - WARNING - create daemonset forbidden
+2020-12-17 07:28:20,044 - INFO - delete pod successful in easy namespace
+2020-12-17 07:28:21,213 - INFO - delete deployment successful in easy namespace
+2020-12-17 07:28:22,532 - INFO - delete service successful in easy namespace
+2020-12-17 07:28:23,808 - WARNING - delete namespace forbidden
+2020-12-17 07:28:25,083 - WARNING - delete network_attachment_definition forbidden
+2020-12-17 07:28:26,251 - WARNING - delete network_policy forbidden
+2020-12-17 07:28:27,420 - WARNING - delete ingress forbidden
+2020-12-17 07:28:29,369 - WARNING - delete daemonset forbidden
+2020-12-17 07:28:29,369 - INFO - END TEST : test_only_pods_deployments_services_in_easy_ns : PASSED[0:00:57]
+2020-12-17 07:28:29,369 - INFO - --------------------------------------------------------------------------------
+2020-12-17 07:28:29,370 - INFO - ================================================================================
+2020-12-17 07:28:29,370 - INFO - STARTING TEST: test_only_service_in_zomsrc_ns
+2020-12-17 07:28:29,371 - INFO - TEST DESCRIPTION : 
+        For userC user, create service in zomsrc namespace and nothing else should work
+        
+2020-12-17 07:28:31,167 - WARNING - create pod forbidden
+2020-12-17 07:28:32,575 - WARNING - create deployment forbidden
+2020-12-17 07:28:34,681 - WARNING - create service forbidden
+2020-12-17 07:28:36,152 - WARNING - create namespace forbidden
+2020-12-17 07:28:37,563 - WARNING - create network_attachment_definition forbidden
+2020-12-17 07:28:39,023 - WARNING - create network_policy forbidden
+2020-12-17 07:28:40,461 - WARNING - create ingress forbidden
+2020-12-17 07:28:41,846 - WARNING - create daemonset forbidden
+2020-12-17 07:28:42,980 - WARNING - delete pod forbidden
+2020-12-17 07:28:44,149 - WARNING - delete deployment forbidden
+2020-12-17 07:28:45,280 - WARNING - delete service forbidden
+2020-12-17 07:28:46,448 - WARNING - delete namespace forbidden
+2020-12-17 07:28:47,607 - WARNING - delete network_attachment_definition forbidden
+2020-12-17 07:28:49,182 - WARNING - delete network_policy forbidden
+2020-12-17 07:28:50,341 - WARNING - delete ingress forbidden
+2020-12-17 07:28:51,517 - WARNING - delete daemonset forbidden
+2020-12-17 07:28:52,899 - WARNING - create pod forbidden
+2020-12-17 07:28:54,271 - WARNING - create deployment forbidden
+2020-12-17 07:28:55,946 - INFO - create service successful in zomsrc namespace
+2020-12-17 07:28:57,605 - WARNING - create namespace forbidden
+2020-12-17 07:29:03,841 - WARNING - create network_attachment_definition forbidden
+2020-12-17 07:29:05,184 - WARNING - create network_policy forbidden
+2020-12-17 07:29:06,644 - WARNING - create ingress forbidden
+2020-12-17 07:29:07,975 - WARNING - create daemonset forbidden
+2020-12-17 07:29:09,245 - WARNING - delete pod forbidden
+2020-12-17 07:29:10,433 - WARNING - delete deployment forbidden
+2020-12-17 07:29:11,697 - INFO - delete service successful in zomsrc namespace
+2020-12-17 07:29:12,961 - WARNING - delete namespace forbidden
+2020-12-17 07:29:14,110 - WARNING - delete network_attachment_definition forbidden
+2020-12-17 07:29:15,240 - WARNING - delete network_policy forbidden
+2020-12-17 07:29:16,351 - WARNING - delete ingress forbidden
+2020-12-17 07:29:17,548 - WARNING - delete daemonset forbidden
+2020-12-17 07:29:17,549 - INFO - END TEST : test_only_service_in_zomsrc_ns : PASSED[0:00:48]
+2020-12-17 07:29:17,549 - INFO - --------------------------------------------------------------------------------

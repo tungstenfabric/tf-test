@@ -16,7 +16,7 @@ def resource_with_all_operations_for_custom_user_project_domain(res, match, stac
     resource_expectation_list = ['pod', 'deployment', 'service', 'namespace',
                                  'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
     # MSG Need to add condition properly here as r and res are different
-    for i,r in enumerate(resource_expectation_list):
+    for i, r in enumerate(resource_expectation_list):
         if r in res:
             resource_expectation_list[i] = r + ':expected'
     ResourceUtil.create_policy_and_perform_operations(
@@ -28,7 +28,8 @@ def test_individual_resource_with_all_operations_for_custom_user_project_domain(
     resource_list = ['pods', 'deployments', 'services', 'namespaces',
                      'network-attachment-definitions', 'networkpolicies', 'ingresses', 'daemonsets']
     for resource in resource_list:
-        resource_with_all_operations_for_custom_user_project_domain(resource, match, stackrc_dict)
+        resource_with_all_operations_for_custom_user_project_domain(
+            resource, match, stackrc_dict)
 
 # test_individual_resource_with_all_operations_for_custom_user_project_domain()
 
@@ -79,7 +80,6 @@ def deployment_with_all_operations_for_admin_project_domain():
         resource=resource, resource_expectation_list=resource_expectation_list, stackrc_dict=stackrc_dict)
 
 
-
 # For manual test
 def operations_for_custom_user_project_domain():
     resource = {'resources': ['deployments'], 'verbs': ['create']}
@@ -94,7 +94,7 @@ def operations_for_custom_user_project_domain():
 
 def delete_all():
     admin = ExampleUser.admin()
-    ResourceUtil.source_stackrc(auth_url=admin.auth_url)
+    ResourceUtil.source_stackrc_to_file(auth_url=admin.auth_url)
     resource_list = ['pod', 'deployment', 'service', 'namespace',
                      'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
     ResourceUtil.resource('delete', resource_list)
@@ -102,19 +102,19 @@ def delete_all():
 # delete_all()
 
 
-#For manual test
+# For manual test
 def manual_test2():
     # resource = {'resources': ['pods'], 'verbs': ['create','get','list'], 'namespace': 'easy'}
-    resource = {'resources': ['pods'], 'verbs': ['create','get','list']}
+    resource = {'resources': ['pods'], 'verbs': ['create', 'get', 'list']}
     match, stackrc_dict = ResourceUtil.create_test_user_openstack_objects_and_return_match_list_and_stackrc_dict()
     create_policy.create_and_apply_policies(resource=resource, match=match)
 
 # manual_test2()
 
+
 def test_all_in_one():
     # Create the required users, projects and domains
     admin = ExampleUser.admin()
-    
 
     admin.create_all(user_name='userD', password='c0ntrail123', role='Member',
                      project_name='userD_project', domain_name='userD_domain')
@@ -125,7 +125,7 @@ def test_all_in_one():
     admin.create_all(user_name='userC', password='c0ntrail123', role='Member',
                      project_name='userC_project', domain_name='userC_domain')
 
-    ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
+    ResourceUtil.source_stackrc_to_file(**ResourceUtil.admin_stackrc())
     os.system('kubectl create ns zomsrc')
     os.system('kubectl create ns easy')
     # os.system('juju config kubernetes-master keystone-policy="$(cat /root/nuthanc-tf-test/tcutils/kubernetes/auth/templates/all_in_one_policy.yaml)"')
@@ -146,7 +146,6 @@ def test_all_in_one():
                                  'network_attachment_definition', 'network_policy', 'ingress', 'daemonset']
     ResourceUtil.perform_operations(
         stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
-
 
     # For userB user, only delete pods and deployments and nothing else
     print("\nFor userB user, only delete pods and deployments and nothing else")

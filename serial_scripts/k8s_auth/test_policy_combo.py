@@ -12,18 +12,18 @@ class TestPolicyCombo(TestCase):
         # Create the required users, projects and domains
         cls.admin = ExampleUser.admin()
         cls.admin.create_all(user_name='userD', password='c0ntrail123', role='Member',
-                         project_name='userD_project', domain_name='userD_domain')
+                             project_name='userD_project', domain_name='userD_domain')
         cls.admin.create_all(user_name='userA', password='c0ntrail123', role='Member',
-                         project_name='userA_project', domain_name='userA_domain')
+                             project_name='userA_project', domain_name='userA_domain')
         cls.admin.create_all(user_name='userB', password='c0ntrail123', role='Member',
-                         project_name='userB_project', domain_name='userB_domain')
+                             project_name='userB_project', domain_name='userB_domain')
         cls.admin.create_all(user_name='userC', password='c0ntrail123', role='Member',
-                         project_name='userC_project', domain_name='userC_domain')
-        ResourceUtil.source_stackrc(**ResourceUtil.admin_stackrc())
+                             project_name='userC_project', domain_name='userC_domain')
 
         cti_obj = ContrailTestInit(input_file='contrail_test_input.yaml')
-        cmds = ['kubectl create ns zomsrc', 'kubectl create ns easy']
-        ResourceUtil.execute_cmds_on_remote(ip=cti_obj.juju_server, cmd_list=cmds)
+        cmds = ['kubectl config use-context juju-context','kubectl create ns zomsrc', 'kubectl create ns easy']
+        ResourceUtil.execute_cmds_on_remote(
+            ip=cti_obj.juju_server, cmd_list=cmds)
         admin_policy = create_policy.get_admin_policy()
         userA_policy = create_policy.get_userA_policy()
         userB_policy = create_policy.get_userB_policy()
@@ -36,14 +36,11 @@ class TestPolicyCombo(TestCase):
         create_policy.apply_policies_and_check_in_config_map(
             policies, filename)
 
-
     @preposttest_wrapper
     def test_only_pods_and_deployments_create(self):
         '''
         For userA user, only create pods and deployments and nothing else
         '''
-        import pdb
-        pdb.set_trace()
         stackrc_dict = {
             'user_name': 'userA',
             'password': 'c0ntrail123',
@@ -56,15 +53,11 @@ class TestPolicyCombo(TestCase):
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
-
     @preposttest_wrapper
     def test_only_pods_and_deployments_delete(self):
         '''
         For userB user, only delete pods and deployments and nothing else
         '''
-        print("\n"+self.id())
-        print("\nFor userB user, only delete pods and deployments and nothing else")
-        
         stackrc_dict = {
             'user_name': 'userB',
             'password': 'c0ntrail123',
@@ -77,15 +70,11 @@ class TestPolicyCombo(TestCase):
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list)
 
-
     @preposttest_wrapper
     def test_only_service_in_zomsrc_ns(self):
         '''
         For userC user, create service in zomsrc namespace and nothing else should work
         '''
-        print("\n"+self.id())
-        print("\nFor userC user, create service in zomsrc namespace and nothing else should work")
-        
         stackrc_dict = {
             'user_name': 'userC',
             'password': 'c0ntrail123',
@@ -100,15 +89,11 @@ class TestPolicyCombo(TestCase):
         ResourceUtil.perform_operations(
             stackrc_dict=stackrc_dict, resource_expectation_list=resource_expectation_list, namespace='zomsrc')
 
-
     @preposttest_wrapper
     def test_only_pods_deployments_services_in_easy_ns(self):
         '''
         For userD user, any operation on pods, deployments and services but only in easy namespace
         '''
-        print("\n"+self.id())
-        print("\nFor userD user, any operation on pods, deployments and services but only in easy namespace")
-        
         stackrc_dict = {
             'user_name': 'userD',
             'password': 'c0ntrail123',
