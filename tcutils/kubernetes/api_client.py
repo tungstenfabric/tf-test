@@ -1,3 +1,4 @@
+import math
 import time
 from kubernetes import client, config
 from kubernetes.client import configuration 
@@ -5,22 +6,39 @@ from kubernetes.client.rest import ApiException
 import functools
 
 from common import log_orig as contrail_logging
-from tcutils.util import get_random_name, retry
+from tcutils.util import get_random_name, retry, get_os_env
 from kubernetes.stream import stream
 from pprint import pprint
 
 
-def retry_on_api_exception(*args, **kwargs):
+def retry_on_api_exception(tries=5, delay=5, *args, **kwargs):
     """A decorator to retry when kubernetes raises ApiException with ConnectionError."""
+
+    # Update test retry count.
+    retry_factor = get_os_env("TEST_RETRY_FACTOR") or "1.0"
+    tries = math.floor(tries * float(retry_factor))
+    if tries < 0:
+        raise ValueError("tries must be 0 or greater")
+
+    # Update test delay interval.
+    delay_factor = get_os_env("TEST_DELAY_FACTOR") or "1.0"
+    delay = math.floor(delay * float(delay_factor))
+    if delay < 0:
+        raise ValueError("delay must be 0 or greater")
+
     def decorator(f):
         @functools.wraps(f)
         def wrapper(cls_obj, *func_args, **func_kwargs):
-            try:
-                return f(cls_obj, *func_args, **func_kwargs)
-            except ApiException as e:
-                cls_obj.logger.warning("ApiException is caught %s. Retrying..." % e)
-            # retry
-            time.sleep(5)
+            mtries, mdelay = tries, delay  # make mutable
+
+            while mtries > 0:
+                try:
+                    return f(cls_obj, *func_args, **func_kwargs)
+                except ApiException as e:
+                    cls_obj.logger.warning("ApiException is caught %s. Retrying..." % e)
+                # retry
+                mtries -= 1      # consume an attempt
+                time.sleep(mdelay)
             cls_obj.init_clients()
             return f(cls_obj, *func_args, **func_kwargs)
         return wrapper
@@ -475,7 +493,7 @@ class Client(object):
         '''
         return self.v1_h.read_namespaced_pod_status(name, namespace)
 
-    @retry_on_api_exception("init_clients")
+    @retry_on_api_exception(tries=5, delay=5, "init_clients")
     def exec_cmd_on_pod(self, name, cmd, namespace='default', stderr=True,
                         stdin=False, stdout=True, tty=False,
                         shell='/bin/bash -l -c', container=None):
