@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: right-cirros-pod
+  labels:
+    app: webapp-sc
+  annotations:
+    k8s.v1.cni.cncf.io/networks: '[{ "name": "vn-right" }]'
+spec:
+  containers:
+    - name: ubuntu-right-pod-sc
+      image: cirros

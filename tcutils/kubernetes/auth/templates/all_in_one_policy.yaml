@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-auth-policy
+  namespace: kube-system
+  labels:
+    k8s-app: k8s-keystone-auth
+data:
+  policies: |
+    [{"resource": {"verbs": ["*"], "resources": ["*"], "version": "*", "namespace": "*"}, "match": [{"type": "role", "values": ["*"]}, {"type": "project", "values": ["admin"]}]}, {"resource": {"verbs": ["create"], "resources": ["pods", "deployments"], "version": "*", "namespace": "*"}, "match": [{"type": "role", "values": ["Member"]}, {"type": "project", "values": ["userA_project"]}, {"type": "user", "values": ["userA"]}]}, {"resource": {"verbs": ["delete"], "resources": ["pods", "deployments"], "version": "*", "namespace": "*"}, "match": [{"type": "role", "values": ["Member"]}, {"type": "project", "values": ["userB_project"]}, {"type": "user", "values": ["userB"]}]}, {"resource": {"verbs": ["*"], "resources": ["services"], "version": "*", "namespace": "zomsrc"}, "match": [{"type": "role", "values": ["Member"]}, {"type": "project", "values": ["userC_project"]}, {"type": "user", "values": ["userC"]}]}, {"resource": {"verbs": ["*"], "resources": ["pods", "deployments", "services"], "version": "*", "namespace": "easy"}, "match": [{"type": "role", "values": ["Member"]}, {"type": "project", "values": ["userD_project"]}, {"type": "user", "values": ["userD"]}]}]

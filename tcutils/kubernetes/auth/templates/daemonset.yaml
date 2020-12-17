@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cirros-daemonset
+  labels:
+    app: cirros-ds
+spec:
+  selector:
+    matchLabels:
+      app: cirros-ds
+  template:
+    metadata:
+      labels:
+        app: cirros-ds
+    spec:
+      containers:
+      - name: cirros
+        image: cirros
