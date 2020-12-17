@@ -228,7 +228,7 @@ class TestQuotaUpdate(BaseNeutronTest):
         response_dict['secgrp'] = secgrp_obj
         router_obj = self.create_router(
             get_random_name('router'),
-            connections.project_id)
+            connections)
         response_dict['router'] = router_obj
         sg_rule_obj = connections.quantum_h.create_security_group_rule(
             sg_obj.uuid,
@@ -267,7 +267,7 @@ class TestQuotaUpdate(BaseNeutronTest):
         for i in range(count):
             router_obj = self.create_router(
                 get_random_name('router'),
-                connections.project_id)
+                connections)
             router_objs.append(router_obj)
         return router_objs
 
