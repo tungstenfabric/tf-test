@@ -1,10 +1,8 @@
 
-import os
 from tcutils.kubernetes.auth import create_policy
 from tcutils.kubernetes.auth.util import Util
 from tcutils.kubernetes.auth.example_user import ExampleUser
 import time
-import random
 from common import log_orig as contrail_logging
 import json
 
@@ -35,16 +33,19 @@ class ResourceUtil(Util):
             else:
                 if 'already' in error:
                     Util.exec_kubectl_cmd_on_file(
-                        verb='delete', template_file=Util.templates[resource], namespace=namespace)
+                        verb='delete', template_file=Util.templates[resource], namespace=namespace, stackrc_file=stackrc_file)
                     time.sleep(10)
                     Util.exec_kubectl_cmd_on_file(
-                        verb='create', template_file=Util.templates[resource], namespace=namespace)
+                        verb='create', template_file=Util.templates[resource], namespace=namespace, stackrc_file=stackrc_file)
                 else:
                     if '[' in error:
                         errorObject = error.split("[")[1].split("]")[0]
                         errorMessage = json.loads(errorObject)['message']
                         logger.error(errorMessage)
+                    else:
+                        logger.error(error)
                     logger.error(f'Error while {resource} {verb}')
+                    raise Exception(error)
 
     @staticmethod
     def create_policy_and_perform_operations(resource={}, match=[], resource_expectation_list=[], stackrc_dict={}):

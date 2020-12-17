@@ -1484,3 +1484,1170 @@ vrouter_nodemgr_1
 2020-12-17 07:26:36,579 - DEBUG - Output : 192.168.27.9/24
 2020-12-17 07:26:36,579 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
 2020-12-17 07:26:36,663 - DEBUG - Output : nodec9.maas
+2020-12-17 07:37:33,779 - DEBUG - [192.168.7.20]: Running cmd : hostname
+2020-12-17 07:37:34,880 - DEBUG - Output : noden20
+2020-12-17 07:37:34,880 - DEBUG - [192.168.7.20]: Running cmd : hostname -f
+2020-12-17 07:37:34,996 - DEBUG - Output : noden20.maas
+2020-12-17 07:37:34,997 - DEBUG - [192.168.7.20]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:37:35,219 - DEBUG - Output : NAMES
+webui_web_1
+webui_job_1
+analyticssnmp_topology_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_nodemgr_1
+analyticsalarm_kafka_1
+analytics_nodemgr_1
+analytics_collector_1
+analytics_api_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_nodemgr_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_nodemgr_1
+control_control_1
+control_dns_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_nodemgr_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_api_1
+configapi_schema_1
+2020-12-17 07:37:35,219 - DEBUG - [192.168.7.20]: Running cmd : getent hosts 192.168.7.20 | head -n 1 | awk '{print $2}'
+2020-12-17 07:37:35,329 - DEBUG - Output : noden20.maas
+2020-12-17 07:37:35,330 - DEBUG - [192.168.7.20]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:37:35,451 - DEBUG - Output : 10.204.216.69/24
+192.168.27.20/24
+172.17.0.1/16
+192.168.7.20/24
+2020-12-17 07:37:35,452 - DEBUG - [192.168.7.29]: Running cmd : hostname
+2020-12-17 07:37:36,524 - DEBUG - Output : noden29
+2020-12-17 07:37:36,524 - DEBUG - [192.168.7.29]: Running cmd : hostname -f
+2020-12-17 07:37:36,631 - DEBUG - Output : noden29.maas
+2020-12-17 07:37:36,632 - DEBUG - [192.168.7.29]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:37:36,850 - DEBUG - Output : NAMES
+nuthan_test2
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+webui_web_1
+webui_job_1
+contrailkubernetesmaster_kubemanager_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analyticsalarm_alarm-gen_1
+analytics_api_1
+analytics_nodemgr_1
+analytics_collector_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_control_1
+control_nodemgr_1
+control_dns_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_api_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_nodemgr_1
+configapi_schema_1
+2020-12-17 07:37:36,851 - DEBUG - [192.168.7.29]: Running cmd : getent hosts 192.168.7.29 | head -n 1 | awk '{print $2}'
+2020-12-17 07:37:36,961 - DEBUG - Output : noden29.maas
+2020-12-17 07:37:36,962 - DEBUG - [192.168.7.29]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:37:37,073 - DEBUG - Output : 192.168.7.29/24
+172.17.0.1/16
+192.168.27.29/24
+2020-12-17 07:37:37,261 - DEBUG - [192.168.7.34]: Running cmd : hostname
+2020-12-17 07:37:38,530 - DEBUG - Output : nodei34
+2020-12-17 07:37:38,531 - DEBUG - [192.168.7.34]: Running cmd : hostname -f
+2020-12-17 07:37:38,642 - DEBUG - Output : nodei34.maas
+2020-12-17 07:37:38,643 - DEBUG - [192.168.7.34]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:37:38,869 - DEBUG - Output : NAMES
+webui_job_1
+webui_web_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analytics_nodemgr_1
+analytics_api_1
+analytics_collector_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+redis_redis_1
+redis_stunnel_1
+control_named_1
+control_control_1
+control_dns_1
+control_nodemgr_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_dnsmasq_1
+configapi_nodemgr_1
+configapi_api_1
+configapi_svcmonitor_1
+configapi_schema_1
+2020-12-17 07:37:38,870 - DEBUG - [192.168.7.34]: Running cmd : getent hosts 192.168.7.34 | head -n 1 | awk '{print $2}'
+2020-12-17 07:37:38,986 - DEBUG - Output : nodei34.maas
+2020-12-17 07:37:38,987 - DEBUG - [192.168.7.34]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:37:39,102 - DEBUG - Output : 10.204.217.146/24
+192.168.7.34/24
+192.168.27.34/24
+172.17.0.1/16
+2020-12-17 07:37:39,103 - DEBUG - [192.168.7.19]: Running cmd : hostname
+2020-12-17 07:37:40,132 - DEBUG - Output : noden19
+2020-12-17 07:37:40,133 - DEBUG - [192.168.7.19]: Running cmd : hostname -f
+2020-12-17 07:37:40,233 - DEBUG - Output : noden19.maas
+2020-12-17 07:37:40,233 - DEBUG - [192.168.7.19]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:37:40,408 - DEBUG - Output : NAMES
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_1
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_2
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_0
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_1
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_0
+2020-12-17 07:37:40,409 - DEBUG - [192.168.7.19]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:37:40,513 - DEBUG - Output : 192.168.27.19/24
+2020-12-17 07:37:40,514 - DEBUG - [192.168.7.19]: Running cmd : getent hosts 192.168.27.19 | head -n 1 | awk '{print $2}'
+2020-12-17 07:37:40,617 - DEBUG - Output : noden19.maas
+2020-12-17 07:37:40,618 - DEBUG - [192.168.7.9]: Running cmd : hostname
+2020-12-17 07:37:41,371 - DEBUG - Output : nodec9
+2020-12-17 07:37:41,372 - DEBUG - [192.168.7.9]: Running cmd : hostname -f
+2020-12-17 07:37:41,450 - DEBUG - Output : nodec9.maas
+2020-12-17 07:37:41,450 - DEBUG - [192.168.7.9]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:37:41,571 - DEBUG - Output : NAMES
+vrouter_vrouter-agent_1
+vrouter_nodemgr_1
+2020-12-17 07:37:41,572 - DEBUG - [192.168.7.9]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:37:41,658 - DEBUG - Output : 192.168.27.9/24
+2020-12-17 07:37:41,658 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
+2020-12-17 07:37:41,742 - DEBUG - Output : nodec9.maas
+2020-12-17 07:48:19,111 - DEBUG - [192.168.7.20]: Running cmd : hostname
+2020-12-17 07:48:20,203 - DEBUG - Output : noden20
+2020-12-17 07:48:20,204 - DEBUG - [192.168.7.20]: Running cmd : hostname -f
+2020-12-17 07:48:20,324 - DEBUG - Output : noden20.maas
+2020-12-17 07:48:20,324 - DEBUG - [192.168.7.20]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:48:20,532 - DEBUG - Output : NAMES
+webui_web_1
+webui_job_1
+analyticssnmp_topology_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_nodemgr_1
+analyticsalarm_kafka_1
+analytics_nodemgr_1
+analytics_collector_1
+analytics_api_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_nodemgr_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_nodemgr_1
+control_control_1
+control_dns_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_nodemgr_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_api_1
+configapi_schema_1
+2020-12-17 07:48:20,533 - DEBUG - [192.168.7.20]: Running cmd : getent hosts 192.168.7.20 | head -n 1 | awk '{print $2}'
+2020-12-17 07:48:20,651 - DEBUG - Output : noden20.maas
+2020-12-17 07:48:20,652 - DEBUG - [192.168.7.20]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:48:20,768 - DEBUG - Output : 10.204.216.69/24
+192.168.27.20/24
+172.17.0.1/16
+192.168.7.20/24
+2020-12-17 07:48:20,769 - DEBUG - [192.168.7.29]: Running cmd : hostname
+2020-12-17 07:48:21,843 - DEBUG - Output : noden29
+2020-12-17 07:48:21,844 - DEBUG - [192.168.7.29]: Running cmd : hostname -f
+2020-12-17 07:48:21,952 - DEBUG - Output : noden29.maas
+2020-12-17 07:48:21,952 - DEBUG - [192.168.7.29]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:48:22,184 - DEBUG - Output : NAMES
+nuthan_test2
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+webui_web_1
+webui_job_1
+contrailkubernetesmaster_kubemanager_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analyticsalarm_alarm-gen_1
+analytics_api_1
+analytics_nodemgr_1
+analytics_collector_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_control_1
+control_nodemgr_1
+control_dns_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_api_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_nodemgr_1
+configapi_schema_1
+2020-12-17 07:48:22,185 - DEBUG - [192.168.7.29]: Running cmd : getent hosts 192.168.7.29 | head -n 1 | awk '{print $2}'
+2020-12-17 07:48:22,293 - DEBUG - Output : noden29.maas
+2020-12-17 07:48:22,294 - DEBUG - [192.168.7.29]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:48:22,395 - DEBUG - Output : 192.168.7.29/24
+172.17.0.1/16
+192.168.27.29/24
+2020-12-17 07:48:22,585 - DEBUG - [192.168.7.34]: Running cmd : hostname
+2020-12-17 07:48:23,822 - DEBUG - Output : nodei34
+2020-12-17 07:48:23,822 - DEBUG - [192.168.7.34]: Running cmd : hostname -f
+2020-12-17 07:48:23,921 - DEBUG - Output : nodei34.maas
+2020-12-17 07:48:23,921 - DEBUG - [192.168.7.34]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:48:24,147 - DEBUG - Output : NAMES
+webui_job_1
+webui_web_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analytics_nodemgr_1
+analytics_api_1
+analytics_collector_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+redis_redis_1
+redis_stunnel_1
+control_named_1
+control_control_1
+control_dns_1
+control_nodemgr_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_dnsmasq_1
+configapi_nodemgr_1
+configapi_api_1
+configapi_svcmonitor_1
+configapi_schema_1
+2020-12-17 07:48:24,148 - DEBUG - [192.168.7.34]: Running cmd : getent hosts 192.168.7.34 | head -n 1 | awk '{print $2}'
+2020-12-17 07:48:24,261 - DEBUG - Output : nodei34.maas
+2020-12-17 07:48:24,262 - DEBUG - [192.168.7.34]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:48:24,377 - DEBUG - Output : 10.204.217.146/24
+192.168.7.34/24
+192.168.27.34/24
+172.17.0.1/16
+2020-12-17 07:48:24,377 - DEBUG - [192.168.7.19]: Running cmd : hostname
+2020-12-17 07:48:25,427 - DEBUG - Output : noden19
+2020-12-17 07:48:25,428 - DEBUG - [192.168.7.19]: Running cmd : hostname -f
+2020-12-17 07:48:25,529 - DEBUG - Output : noden19.maas
+2020-12-17 07:48:25,530 - DEBUG - [192.168.7.19]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:48:25,717 - DEBUG - Output : NAMES
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_3
+k8s_nginx_nginx-deployment-6b474476c4-7hjcc_default_bc725379-0c20-43a7-927a-47f8c600dade_0
+k8s_nginx_nginx-deployment-6b474476c4-js5cn_default_2a593978-8d40-465d-9b03-9c9575e750b3_0
+k8s_nginx_nginx-deployment-6b474476c4-7thcq_default_eb16c3fe-7e2d-42ee-ac88-091bd8189227_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_1
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_2
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_0
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_0
+2020-12-17 07:48:25,718 - DEBUG - [192.168.7.19]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:48:25,817 - DEBUG - Output : 192.168.27.19/24
+2020-12-17 07:48:25,817 - DEBUG - [192.168.7.19]: Running cmd : getent hosts 192.168.27.19 | head -n 1 | awk '{print $2}'
+2020-12-17 07:48:25,925 - DEBUG - Output : noden19.maas
+2020-12-17 07:48:25,925 - DEBUG - [192.168.7.9]: Running cmd : hostname
+2020-12-17 07:48:26,613 - DEBUG - Output : nodec9
+2020-12-17 07:48:26,614 - DEBUG - [192.168.7.9]: Running cmd : hostname -f
+2020-12-17 07:48:26,691 - DEBUG - Output : nodec9.maas
+2020-12-17 07:48:26,692 - DEBUG - [192.168.7.9]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:48:26,803 - DEBUG - Output : NAMES
+vrouter_vrouter-agent_1
+vrouter_nodemgr_1
+2020-12-17 07:48:26,804 - DEBUG - [192.168.7.9]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:48:26,886 - DEBUG - Output : 192.168.27.9/24
+2020-12-17 07:48:26,886 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
+2020-12-17 07:48:26,970 - DEBUG - Output : nodec9.maas
+2020-12-17 07:58:54,876 - DEBUG - [192.168.7.20]: Running cmd : hostname
+2020-12-17 07:58:55,971 - DEBUG - Output : noden20
+2020-12-17 07:58:55,971 - DEBUG - [192.168.7.20]: Running cmd : hostname -f
+2020-12-17 07:58:56,086 - DEBUG - Output : noden20.maas
+2020-12-17 07:58:56,086 - DEBUG - [192.168.7.20]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:58:56,315 - DEBUG - Output : NAMES
+webui_web_1
+webui_job_1
+analyticssnmp_topology_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_nodemgr_1
+analyticsalarm_kafka_1
+analytics_nodemgr_1
+analytics_collector_1
+analytics_api_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_nodemgr_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_nodemgr_1
+control_control_1
+control_dns_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_nodemgr_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_api_1
+configapi_schema_1
+2020-12-17 07:58:56,316 - DEBUG - [192.168.7.20]: Running cmd : getent hosts 192.168.7.20 | head -n 1 | awk '{print $2}'
+2020-12-17 07:58:56,440 - DEBUG - Output : noden20.maas
+2020-12-17 07:58:56,440 - DEBUG - [192.168.7.20]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:58:56,564 - DEBUG - Output : 10.204.216.69/24
+192.168.27.20/24
+172.17.0.1/16
+192.168.7.20/24
+2020-12-17 07:58:56,565 - DEBUG - [192.168.7.29]: Running cmd : hostname
+2020-12-17 07:58:57,627 - DEBUG - Output : noden29
+2020-12-17 07:58:57,628 - DEBUG - [192.168.7.29]: Running cmd : hostname -f
+2020-12-17 07:58:57,736 - DEBUG - Output : noden29.maas
+2020-12-17 07:58:57,736 - DEBUG - [192.168.7.29]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:58:57,955 - DEBUG - Output : NAMES
+nuthan_test2
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+webui_web_1
+webui_job_1
+contrailkubernetesmaster_kubemanager_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analyticsalarm_alarm-gen_1
+analytics_api_1
+analytics_nodemgr_1
+analytics_collector_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_control_1
+control_nodemgr_1
+control_dns_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_api_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_nodemgr_1
+configapi_schema_1
+2020-12-17 07:58:57,956 - DEBUG - [192.168.7.29]: Running cmd : getent hosts 192.168.7.29 | head -n 1 | awk '{print $2}'
+2020-12-17 07:58:58,066 - DEBUG - Output : noden29.maas
+2020-12-17 07:58:58,066 - DEBUG - [192.168.7.29]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:58:58,177 - DEBUG - Output : 192.168.7.29/24
+172.17.0.1/16
+192.168.27.29/24
+2020-12-17 07:58:58,376 - DEBUG - [192.168.7.34]: Running cmd : hostname
+2020-12-17 07:58:59,609 - DEBUG - Output : nodei34
+2020-12-17 07:58:59,610 - DEBUG - [192.168.7.34]: Running cmd : hostname -f
+2020-12-17 07:58:59,717 - DEBUG - Output : nodei34.maas
+2020-12-17 07:58:59,717 - DEBUG - [192.168.7.34]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:58:59,949 - DEBUG - Output : NAMES
+webui_job_1
+webui_web_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analytics_nodemgr_1
+analytics_api_1
+analytics_collector_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+redis_redis_1
+redis_stunnel_1
+control_named_1
+control_control_1
+control_dns_1
+control_nodemgr_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_dnsmasq_1
+configapi_nodemgr_1
+configapi_api_1
+configapi_svcmonitor_1
+configapi_schema_1
+2020-12-17 07:58:59,950 - DEBUG - [192.168.7.34]: Running cmd : getent hosts 192.168.7.34 | head -n 1 | awk '{print $2}'
+2020-12-17 07:59:00,059 - DEBUG - Output : nodei34.maas
+2020-12-17 07:59:00,060 - DEBUG - [192.168.7.34]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:59:00,171 - DEBUG - Output : 10.204.217.146/24
+192.168.7.34/24
+192.168.27.34/24
+172.17.0.1/16
+2020-12-17 07:59:00,172 - DEBUG - [192.168.7.19]: Running cmd : hostname
+2020-12-17 07:59:01,220 - DEBUG - Output : noden19
+2020-12-17 07:59:01,220 - DEBUG - [192.168.7.19]: Running cmd : hostname -f
+2020-12-17 07:59:01,320 - DEBUG - Output : noden19.maas
+2020-12-17 07:59:01,320 - DEBUG - [192.168.7.19]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:59:01,505 - DEBUG - Output : NAMES
+k8s_cirros_cirros-pod_default_b3c309f7-e381-4a6a-96dc-614ca52f3dae_0
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_3
+k8s_nginx_nginx-deployment-6b474476c4-7hjcc_default_bc725379-0c20-43a7-927a-47f8c600dade_0
+k8s_nginx_nginx-deployment-6b474476c4-js5cn_default_2a593978-8d40-465d-9b03-9c9575e750b3_0
+k8s_nginx_nginx-deployment-6b474476c4-7thcq_default_eb16c3fe-7e2d-42ee-ac88-091bd8189227_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_1
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_2
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_0
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_0
+2020-12-17 07:59:01,506 - DEBUG - [192.168.7.19]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:59:01,604 - DEBUG - Output : 192.168.27.19/24
+2020-12-17 07:59:01,605 - DEBUG - [192.168.7.19]: Running cmd : getent hosts 192.168.27.19 | head -n 1 | awk '{print $2}'
+2020-12-17 07:59:01,712 - DEBUG - Output : noden19.maas
+2020-12-17 07:59:01,712 - DEBUG - [192.168.7.9]: Running cmd : hostname
+2020-12-17 07:59:02,455 - DEBUG - Output : nodec9
+2020-12-17 07:59:02,456 - DEBUG - [192.168.7.9]: Running cmd : hostname -f
+2020-12-17 07:59:02,533 - DEBUG - Output : nodec9.maas
+2020-12-17 07:59:02,534 - DEBUG - [192.168.7.9]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 07:59:02,654 - DEBUG - Output : NAMES
+vrouter_vrouter-agent_1
+vrouter_nodemgr_1
+2020-12-17 07:59:02,654 - DEBUG - [192.168.7.9]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 07:59:02,733 - DEBUG - Output : 192.168.27.9/24
+2020-12-17 07:59:02,734 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
+2020-12-17 07:59:02,817 - DEBUG - Output : nodec9.maas
+2020-12-17 08:02:51,356 - DEBUG - [192.168.7.20]: Running cmd : hostname
+2020-12-17 08:02:52,475 - DEBUG - Output : noden20
+2020-12-17 08:02:52,475 - DEBUG - [192.168.7.20]: Running cmd : hostname -f
+2020-12-17 08:02:52,594 - DEBUG - Output : noden20.maas
+2020-12-17 08:02:52,595 - DEBUG - [192.168.7.20]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:02:52,816 - DEBUG - Output : NAMES
+webui_web_1
+webui_job_1
+analyticssnmp_topology_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_nodemgr_1
+analyticsalarm_kafka_1
+analytics_nodemgr_1
+analytics_collector_1
+analytics_api_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_nodemgr_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_nodemgr_1
+control_control_1
+control_dns_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_nodemgr_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_api_1
+configapi_schema_1
+2020-12-17 08:02:52,817 - DEBUG - [192.168.7.20]: Running cmd : getent hosts 192.168.7.20 | head -n 1 | awk '{print $2}'
+2020-12-17 08:02:52,941 - DEBUG - Output : noden20.maas
+2020-12-17 08:02:52,941 - DEBUG - [192.168.7.20]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:02:53,050 - DEBUG - Output : 10.204.216.69/24
+192.168.27.20/24
+172.17.0.1/16
+192.168.7.20/24
+2020-12-17 08:02:53,051 - DEBUG - [192.168.7.29]: Running cmd : hostname
+2020-12-17 08:02:54,112 - DEBUG - Output : noden29
+2020-12-17 08:02:54,112 - DEBUG - [192.168.7.29]: Running cmd : hostname -f
+2020-12-17 08:02:54,215 - DEBUG - Output : noden29.maas
+2020-12-17 08:02:54,216 - DEBUG - [192.168.7.29]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:02:54,437 - DEBUG - Output : NAMES
+nuthan_test2
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+webui_web_1
+webui_job_1
+contrailkubernetesmaster_kubemanager_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analyticsalarm_alarm-gen_1
+analytics_api_1
+analytics_nodemgr_1
+analytics_collector_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_control_1
+control_nodemgr_1
+control_dns_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_api_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_nodemgr_1
+configapi_schema_1
+2020-12-17 08:02:54,438 - DEBUG - [192.168.7.29]: Running cmd : getent hosts 192.168.7.29 | head -n 1 | awk '{print $2}'
+2020-12-17 08:02:54,543 - DEBUG - Output : noden29.maas
+2020-12-17 08:02:54,544 - DEBUG - [192.168.7.29]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:02:54,661 - DEBUG - Output : 192.168.7.29/24
+172.17.0.1/16
+192.168.27.29/24
+2020-12-17 08:02:54,846 - DEBUG - [192.168.7.34]: Running cmd : hostname
+2020-12-17 08:02:56,114 - DEBUG - Output : nodei34
+2020-12-17 08:02:56,115 - DEBUG - [192.168.7.34]: Running cmd : hostname -f
+2020-12-17 08:02:56,232 - DEBUG - Output : nodei34.maas
+2020-12-17 08:02:56,232 - DEBUG - [192.168.7.34]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:02:56,457 - DEBUG - Output : NAMES
+webui_job_1
+webui_web_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analytics_nodemgr_1
+analytics_api_1
+analytics_collector_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+redis_redis_1
+redis_stunnel_1
+control_named_1
+control_control_1
+control_dns_1
+control_nodemgr_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_dnsmasq_1
+configapi_nodemgr_1
+configapi_api_1
+configapi_svcmonitor_1
+configapi_schema_1
+2020-12-17 08:02:56,458 - DEBUG - [192.168.7.34]: Running cmd : getent hosts 192.168.7.34 | head -n 1 | awk '{print $2}'
+2020-12-17 08:02:56,568 - DEBUG - Output : nodei34.maas
+2020-12-17 08:02:56,569 - DEBUG - [192.168.7.34]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:02:56,679 - DEBUG - Output : 10.204.217.146/24
+192.168.7.34/24
+192.168.27.34/24
+172.17.0.1/16
+2020-12-17 08:02:56,680 - DEBUG - [192.168.7.19]: Running cmd : hostname
+2020-12-17 08:02:57,672 - DEBUG - Output : noden19
+2020-12-17 08:02:57,672 - DEBUG - [192.168.7.19]: Running cmd : hostname -f
+2020-12-17 08:02:57,780 - DEBUG - Output : noden19.maas
+2020-12-17 08:02:57,780 - DEBUG - [192.168.7.19]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:02:57,970 - DEBUG - Output : NAMES
+k8s_cirros_cirros-pod_default_b3c309f7-e381-4a6a-96dc-614ca52f3dae_0
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_3
+k8s_nginx_nginx-deployment-6b474476c4-7hjcc_default_bc725379-0c20-43a7-927a-47f8c600dade_0
+k8s_nginx_nginx-deployment-6b474476c4-js5cn_default_2a593978-8d40-465d-9b03-9c9575e750b3_0
+k8s_nginx_nginx-deployment-6b474476c4-7thcq_default_eb16c3fe-7e2d-42ee-ac88-091bd8189227_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_1
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_2
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_0
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_0
+2020-12-17 08:02:57,970 - DEBUG - [192.168.7.19]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:02:58,067 - DEBUG - Output : 192.168.27.19/24
+2020-12-17 08:02:58,068 - DEBUG - [192.168.7.19]: Running cmd : getent hosts 192.168.27.19 | head -n 1 | awk '{print $2}'
+2020-12-17 08:02:58,179 - DEBUG - Output : noden19.maas
+2020-12-17 08:02:58,180 - DEBUG - [192.168.7.9]: Running cmd : hostname
+2020-12-17 08:02:58,879 - DEBUG - Output : nodec9
+2020-12-17 08:02:58,880 - DEBUG - [192.168.7.9]: Running cmd : hostname -f
+2020-12-17 08:02:58,958 - DEBUG - Output : nodec9.maas
+2020-12-17 08:02:58,958 - DEBUG - [192.168.7.9]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:02:59,078 - DEBUG - Output : NAMES
+vrouter_vrouter-agent_1
+vrouter_nodemgr_1
+2020-12-17 08:02:59,079 - DEBUG - [192.168.7.9]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:02:59,151 - DEBUG - Output : 192.168.27.9/24
+2020-12-17 08:02:59,152 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
+2020-12-17 08:02:59,213 - DEBUG - Output : nodec9.maas
+2020-12-17 08:05:25,960 - DEBUG - [192.168.7.20]: Running cmd : hostname
+2020-12-17 08:05:27,014 - DEBUG - Output : noden20
+2020-12-17 08:05:27,014 - DEBUG - [192.168.7.20]: Running cmd : hostname -f
+2020-12-17 08:05:27,131 - DEBUG - Output : noden20.maas
+2020-12-17 08:05:27,131 - DEBUG - [192.168.7.20]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:05:27,350 - DEBUG - Output : NAMES
+webui_web_1
+webui_job_1
+analyticssnmp_topology_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_nodemgr_1
+analyticsalarm_kafka_1
+analytics_nodemgr_1
+analytics_collector_1
+analytics_api_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_nodemgr_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_nodemgr_1
+control_control_1
+control_dns_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_nodemgr_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_api_1
+configapi_schema_1
+2020-12-17 08:05:27,351 - DEBUG - [192.168.7.20]: Running cmd : getent hosts 192.168.7.20 | head -n 1 | awk '{print $2}'
+2020-12-17 08:05:27,477 - DEBUG - Output : noden20.maas
+2020-12-17 08:05:27,478 - DEBUG - [192.168.7.20]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:05:27,605 - DEBUG - Output : 10.204.216.69/24
+192.168.27.20/24
+172.17.0.1/16
+192.168.7.20/24
+2020-12-17 08:05:27,606 - DEBUG - [192.168.7.29]: Running cmd : hostname
+2020-12-17 08:05:28,680 - DEBUG - Output : noden29
+2020-12-17 08:05:28,681 - DEBUG - [192.168.7.29]: Running cmd : hostname -f
+2020-12-17 08:05:28,787 - DEBUG - Output : noden29.maas
+2020-12-17 08:05:28,788 - DEBUG - [192.168.7.29]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:05:29,005 - DEBUG - Output : NAMES
+nuthan_test2
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+webui_web_1
+webui_job_1
+contrailkubernetesmaster_kubemanager_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analyticsalarm_alarm-gen_1
+analytics_api_1
+analytics_nodemgr_1
+analytics_collector_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_control_1
+control_nodemgr_1
+control_dns_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_api_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_nodemgr_1
+configapi_schema_1
+2020-12-17 08:05:29,006 - DEBUG - [192.168.7.29]: Running cmd : getent hosts 192.168.7.29 | head -n 1 | awk '{print $2}'
+2020-12-17 08:05:29,104 - DEBUG - Output : noden29.maas
+2020-12-17 08:05:29,104 - DEBUG - [192.168.7.29]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:05:29,225 - DEBUG - Output : 192.168.7.29/24
+172.17.0.1/16
+192.168.27.29/24
+2020-12-17 08:05:29,413 - DEBUG - [192.168.7.34]: Running cmd : hostname
+2020-12-17 08:05:30,662 - DEBUG - Output : nodei34
+2020-12-17 08:05:30,663 - DEBUG - [192.168.7.34]: Running cmd : hostname -f
+2020-12-17 08:05:30,776 - DEBUG - Output : nodei34.maas
+2020-12-17 08:05:30,776 - DEBUG - [192.168.7.34]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:05:31,008 - DEBUG - Output : NAMES
+webui_job_1
+webui_web_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analytics_nodemgr_1
+analytics_api_1
+analytics_collector_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+redis_redis_1
+redis_stunnel_1
+control_named_1
+control_control_1
+control_dns_1
+control_nodemgr_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_dnsmasq_1
+configapi_nodemgr_1
+configapi_api_1
+configapi_svcmonitor_1
+configapi_schema_1
+2020-12-17 08:05:31,009 - DEBUG - [192.168.7.34]: Running cmd : getent hosts 192.168.7.34 | head -n 1 | awk '{print $2}'
+2020-12-17 08:05:31,139 - DEBUG - Output : nodei34.maas
+2020-12-17 08:05:31,140 - DEBUG - [192.168.7.34]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:05:31,252 - DEBUG - Output : 10.204.217.146/24
+192.168.7.34/24
+192.168.27.34/24
+172.17.0.1/16
+2020-12-17 08:05:31,252 - DEBUG - [192.168.7.19]: Running cmd : hostname
+2020-12-17 08:05:32,308 - DEBUG - Output : noden19
+2020-12-17 08:05:32,309 - DEBUG - [192.168.7.19]: Running cmd : hostname -f
+2020-12-17 08:05:32,407 - DEBUG - Output : noden19.maas
+2020-12-17 08:05:32,407 - DEBUG - [192.168.7.19]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:05:32,582 - DEBUG - Output : NAMES
+k8s_cirros_cirros-pod_default_b3c309f7-e381-4a6a-96dc-614ca52f3dae_0
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_3
+k8s_nginx_nginx-deployment-6b474476c4-7hjcc_default_bc725379-0c20-43a7-927a-47f8c600dade_0
+k8s_nginx_nginx-deployment-6b474476c4-js5cn_default_2a593978-8d40-465d-9b03-9c9575e750b3_0
+k8s_nginx_nginx-deployment-6b474476c4-7thcq_default_eb16c3fe-7e2d-42ee-ac88-091bd8189227_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_1
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_2
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_0
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_0
+2020-12-17 08:05:32,583 - DEBUG - [192.168.7.19]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:05:32,691 - DEBUG - Output : 192.168.27.19/24
+2020-12-17 08:05:32,691 - DEBUG - [192.168.7.19]: Running cmd : getent hosts 192.168.27.19 | head -n 1 | awk '{print $2}'
+2020-12-17 08:05:32,799 - DEBUG - Output : noden19.maas
+2020-12-17 08:05:32,799 - DEBUG - [192.168.7.9]: Running cmd : hostname
+2020-12-17 08:05:33,500 - DEBUG - Output : nodec9
+2020-12-17 08:05:33,500 - DEBUG - [192.168.7.9]: Running cmd : hostname -f
+2020-12-17 08:05:33,580 - DEBUG - Output : nodec9.maas
+2020-12-17 08:05:33,580 - DEBUG - [192.168.7.9]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:05:33,705 - DEBUG - Output : NAMES
+vrouter_vrouter-agent_1
+vrouter_nodemgr_1
+2020-12-17 08:05:33,706 - DEBUG - [192.168.7.9]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:05:33,784 - DEBUG - Output : 192.168.27.9/24
+2020-12-17 08:05:33,785 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
+2020-12-17 08:05:33,868 - DEBUG - Output : nodec9.maas
+2020-12-17 08:11:20,663 - DEBUG - [192.168.7.20]: Running cmd : hostname
+2020-12-17 08:11:21,741 - DEBUG - Output : noden20
+2020-12-17 08:11:21,741 - DEBUG - [192.168.7.20]: Running cmd : hostname -f
+2020-12-17 08:11:21,870 - DEBUG - Output : noden20.maas
+2020-12-17 08:11:21,870 - DEBUG - [192.168.7.20]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:11:22,100 - DEBUG - Output : NAMES
+webui_web_1
+webui_job_1
+analyticssnmp_topology_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_nodemgr_1
+analyticsalarm_kafka_1
+analytics_nodemgr_1
+analytics_collector_1
+analytics_api_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_nodemgr_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_nodemgr_1
+control_control_1
+control_dns_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_nodemgr_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_api_1
+configapi_schema_1
+2020-12-17 08:11:22,101 - DEBUG - [192.168.7.20]: Running cmd : getent hosts 192.168.7.20 | head -n 1 | awk '{print $2}'
+2020-12-17 08:11:22,208 - DEBUG - Output : noden20.maas
+2020-12-17 08:11:22,209 - DEBUG - [192.168.7.20]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:11:22,324 - DEBUG - Output : 10.204.216.69/24
+192.168.27.20/24
+172.17.0.1/16
+192.168.7.20/24
+2020-12-17 08:11:22,325 - DEBUG - [192.168.7.29]: Running cmd : hostname
+2020-12-17 08:11:23,391 - DEBUG - Output : noden29
+2020-12-17 08:11:23,392 - DEBUG - [192.168.7.29]: Running cmd : hostname -f
+2020-12-17 08:11:23,499 - DEBUG - Output : noden29.maas
+2020-12-17 08:11:23,499 - DEBUG - [192.168.7.29]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:11:23,731 - DEBUG - Output : NAMES
+nuthan_test2
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+webui_web_1
+webui_job_1
+contrailkubernetesmaster_kubemanager_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analyticsalarm_alarm-gen_1
+analytics_api_1
+analytics_nodemgr_1
+analytics_collector_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_control_1
+control_nodemgr_1
+control_dns_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_api_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_nodemgr_1
+configapi_schema_1
+2020-12-17 08:11:23,732 - DEBUG - [192.168.7.29]: Running cmd : getent hosts 192.168.7.29 | head -n 1 | awk '{print $2}'
+2020-12-17 08:11:23,830 - DEBUG - Output : noden29.maas
+2020-12-17 08:11:23,831 - DEBUG - [192.168.7.29]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:11:23,939 - DEBUG - Output : 192.168.7.29/24
+172.17.0.1/16
+192.168.27.29/24
+2020-12-17 08:11:24,139 - DEBUG - [192.168.7.34]: Running cmd : hostname
+2020-12-17 08:11:25,380 - DEBUG - Output : nodei34
+2020-12-17 08:11:25,380 - DEBUG - [192.168.7.34]: Running cmd : hostname -f
+2020-12-17 08:11:25,497 - DEBUG - Output : nodei34.maas
+2020-12-17 08:11:25,498 - DEBUG - [192.168.7.34]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:11:25,726 - DEBUG - Output : NAMES
+webui_job_1
+webui_web_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analytics_nodemgr_1
+analytics_api_1
+analytics_collector_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+redis_redis_1
+redis_stunnel_1
+control_named_1
+control_control_1
+control_dns_1
+control_nodemgr_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_dnsmasq_1
+configapi_nodemgr_1
+configapi_api_1
+configapi_svcmonitor_1
+configapi_schema_1
+2020-12-17 08:11:25,727 - DEBUG - [192.168.7.34]: Running cmd : getent hosts 192.168.7.34 | head -n 1 | awk '{print $2}'
+2020-12-17 08:11:25,841 - DEBUG - Output : nodei34.maas
+2020-12-17 08:11:25,842 - DEBUG - [192.168.7.34]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:11:25,953 - DEBUG - Output : 10.204.217.146/24
+192.168.7.34/24
+192.168.27.34/24
+172.17.0.1/16
+2020-12-17 08:11:25,954 - DEBUG - [192.168.7.19]: Running cmd : hostname
+2020-12-17 08:11:27,012 - DEBUG - Output : noden19
+2020-12-17 08:11:27,013 - DEBUG - [192.168.7.19]: Running cmd : hostname -f
+2020-12-17 08:11:27,110 - DEBUG - Output : noden19.maas
+2020-12-17 08:11:27,110 - DEBUG - [192.168.7.19]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:11:27,296 - DEBUG - Output : NAMES
+k8s_cirros_cirros-pod_default_b3c309f7-e381-4a6a-96dc-614ca52f3dae_0
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_3
+k8s_nginx_nginx-deployment-6b474476c4-7hjcc_default_bc725379-0c20-43a7-927a-47f8c600dade_0
+k8s_nginx_nginx-deployment-6b474476c4-js5cn_default_2a593978-8d40-465d-9b03-9c9575e750b3_0
+k8s_nginx_nginx-deployment-6b474476c4-7thcq_default_eb16c3fe-7e2d-42ee-ac88-091bd8189227_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_1
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_2
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_0
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_0
+2020-12-17 08:11:27,297 - DEBUG - [192.168.7.19]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:11:27,394 - DEBUG - Output : 192.168.27.19/24
+2020-12-17 08:11:27,394 - DEBUG - [192.168.7.19]: Running cmd : getent hosts 192.168.27.19 | head -n 1 | awk '{print $2}'
+2020-12-17 08:11:27,502 - DEBUG - Output : noden19.maas
+2020-12-17 08:11:27,502 - DEBUG - [192.168.7.9]: Running cmd : hostname
+2020-12-17 08:11:28,195 - DEBUG - Output : nodec9
+2020-12-17 08:11:28,196 - DEBUG - [192.168.7.9]: Running cmd : hostname -f
+2020-12-17 08:11:28,275 - DEBUG - Output : nodec9.maas
+2020-12-17 08:11:28,275 - DEBUG - [192.168.7.9]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:11:28,395 - DEBUG - Output : NAMES
+vrouter_vrouter-agent_1
+vrouter_nodemgr_1
+2020-12-17 08:11:28,396 - DEBUG - [192.168.7.9]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:11:28,474 - DEBUG - Output : 192.168.27.9/24
+2020-12-17 08:11:28,475 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
+2020-12-17 08:11:28,554 - DEBUG - Output : nodec9.maas
+2020-12-17 08:31:14,430 - DEBUG - [192.168.7.20]: Running cmd : hostname
+2020-12-17 08:31:15,538 - DEBUG - Output : noden20
+2020-12-17 08:31:15,538 - DEBUG - [192.168.7.20]: Running cmd : hostname -f
+2020-12-17 08:31:15,654 - DEBUG - Output : noden20.maas
+2020-12-17 08:31:15,655 - DEBUG - [192.168.7.20]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:31:15,883 - DEBUG - Output : NAMES
+webui_web_1
+webui_job_1
+analyticssnmp_topology_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_nodemgr_1
+analyticsalarm_kafka_1
+analytics_nodemgr_1
+analytics_collector_1
+analytics_api_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_nodemgr_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_nodemgr_1
+control_control_1
+control_dns_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_nodemgr_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_api_1
+configapi_schema_1
+2020-12-17 08:31:15,883 - DEBUG - [192.168.7.20]: Running cmd : getent hosts 192.168.7.20 | head -n 1 | awk '{print $2}'
+2020-12-17 08:31:16,005 - DEBUG - Output : noden20.maas
+2020-12-17 08:31:16,006 - DEBUG - [192.168.7.20]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:31:16,120 - DEBUG - Output : 10.204.216.69/24
+192.168.27.20/24
+172.17.0.1/16
+192.168.7.20/24
+2020-12-17 08:31:16,120 - DEBUG - [192.168.7.29]: Running cmd : hostname
+2020-12-17 08:31:17,196 - DEBUG - Output : noden29
+2020-12-17 08:31:17,196 - DEBUG - [192.168.7.29]: Running cmd : hostname -f
+2020-12-17 08:31:17,306 - DEBUG - Output : noden29.maas
+2020-12-17 08:31:17,307 - DEBUG - [192.168.7.29]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:31:17,531 - DEBUG - Output : NAMES
+nuthan_test2
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+webui_web_1
+webui_job_1
+contrailkubernetesmaster_kubemanager_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analyticsalarm_alarm-gen_1
+analytics_api_1
+analytics_nodemgr_1
+analytics_collector_1
+redis_stunnel_1
+redis_redis_1
+control_named_1
+control_control_1
+control_nodemgr_1
+control_dns_1
+configdatabase_cassandra_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_api_1
+configapi_dnsmasq_1
+configapi_svcmonitor_1
+configapi_nodemgr_1
+configapi_schema_1
+2020-12-17 08:31:17,532 - DEBUG - [192.168.7.29]: Running cmd : getent hosts 192.168.7.29 | head -n 1 | awk '{print $2}'
+2020-12-17 08:31:17,640 - DEBUG - Output : noden29.maas
+2020-12-17 08:31:17,641 - DEBUG - [192.168.7.29]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:31:17,762 - DEBUG - Output : 192.168.7.29/24
+172.17.0.1/16
+192.168.27.29/24
+2020-12-17 08:31:17,962 - DEBUG - [192.168.7.34]: Running cmd : hostname
+2020-12-17 08:31:19,226 - DEBUG - Output : nodei34
+2020-12-17 08:31:19,227 - DEBUG - [192.168.7.34]: Running cmd : hostname -f
+2020-12-17 08:31:19,327 - DEBUG - Output : nodei34.maas
+2020-12-17 08:31:19,327 - DEBUG - [192.168.7.34]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:31:19,546 - DEBUG - Output : NAMES
+webui_job_1
+webui_web_1
+analyticssnmp_snmp-collector_1
+analyticssnmp_topology_1
+analyticssnmp_nodemgr_1
+analyticsalarm_alarm-gen_1
+analyticsalarm_kafka_1
+analyticsalarm_nodemgr_1
+analytics_nodemgr_1
+analytics_api_1
+analytics_collector_1
+analyticsdatabase_query-engine_1
+analyticsdatabase_cassandra_1
+analyticsdatabase_nodemgr_1
+redis_redis_1
+redis_stunnel_1
+control_named_1
+control_control_1
+control_dns_1
+control_nodemgr_1
+configdatabase_nodemgr_1
+configdatabase_zookeeper_1
+configdatabase_cassandra_1
+configdatabase_rabbitmq_1
+configapi_devicemgr_1
+configapi_dnsmasq_1
+configapi_nodemgr_1
+configapi_api_1
+configapi_svcmonitor_1
+configapi_schema_1
+2020-12-17 08:31:19,547 - DEBUG - [192.168.7.34]: Running cmd : getent hosts 192.168.7.34 | head -n 1 | awk '{print $2}'
+2020-12-17 08:31:19,665 - DEBUG - Output : nodei34.maas
+2020-12-17 08:31:19,665 - DEBUG - [192.168.7.34]: Running cmd : ip addr show | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:31:19,781 - DEBUG - Output : 10.204.217.146/24
+192.168.7.34/24
+192.168.27.34/24
+172.17.0.1/16
+2020-12-17 08:31:19,781 - DEBUG - [192.168.7.19]: Running cmd : hostname
+2020-12-17 08:31:20,832 - DEBUG - Output : noden19
+2020-12-17 08:31:20,833 - DEBUG - [192.168.7.19]: Running cmd : hostname -f
+2020-12-17 08:31:20,932 - DEBUG - Output : noden19.maas
+2020-12-17 08:31:20,932 - DEBUG - [192.168.7.19]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:31:21,120 - DEBUG - Output : NAMES
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_7
+k8s_coredns_coredns-6b59b8bd9f-qvqhf_kube-system_2fcc6efe-3cd8-4495-9851-4c001eb7db16_6
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_1
+k8s_cirros_cirros_default_563db3f7-b097-4682-b6ad-e421a4d7c66f_0
+vrouter_nodemgr_1
+vrouter_vrouter-agent_1
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-lt7lp_kube-system_bf357374-aa73-4163-91ec-8589f34c94d6_0
+k8s_k8s-keystone-auth_k8s-keystone-auth-bc8999d4b-spqn9_kube-system_b6f3136a-2910-41ef-b7df-19f2abf8833a_0
+2020-12-17 08:31:21,120 - DEBUG - [192.168.7.19]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:31:21,219 - DEBUG - Output : 192.168.27.19/24
+2020-12-17 08:31:21,220 - DEBUG - [192.168.7.19]: Running cmd : getent hosts 192.168.27.19 | head -n 1 | awk '{print $2}'
+2020-12-17 08:31:21,324 - DEBUG - Output : noden19.maas
+2020-12-17 08:31:21,324 - DEBUG - [192.168.7.9]: Running cmd : hostname
+2020-12-17 08:31:22,010 - DEBUG - Output : nodec9
+2020-12-17 08:31:22,011 - DEBUG - [192.168.7.9]: Running cmd : hostname -f
+2020-12-17 08:31:22,098 - DEBUG - Output : nodec9.maas
+2020-12-17 08:31:22,099 - DEBUG - [192.168.7.9]: Running cmd : docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner" | awk '{print $NF}'
+2020-12-17 08:31:22,219 - DEBUG - Output : NAMES
+vrouter_vrouter-agent_1
+vrouter_nodemgr_1
+2020-12-17 08:31:22,220 - DEBUG - [192.168.7.9]: Running cmd : ip addr show dev vhost0 | grep 'inet .*/.* brd ' | awk '{print $2}'
+2020-12-17 08:31:22,302 - DEBUG - Output : 192.168.27.9/24
+2020-12-17 08:31:22,303 - DEBUG - [192.168.7.9]: Running cmd : getent hosts 192.168.27.9 | head -n 1 | awk '{print $2}'
+2020-12-17 08:31:22,386 - DEBUG - Output : nodec9.maas
