@@ -1,0 +1,12 @@
+fabric3
+ruamel.yaml
+python - keystoneclient
+future
+gevent
+testtools
+testresources
+contrail - api - client
+pyvmomi == 6.7.3
+xmltodict == 0.12.0
+junos - eznc == 2.3.0
+tabulate == 0.8.5
