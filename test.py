@@ -1,23 +1,25 @@
 from gevent import monkey
 monkey.patch_all()
-from builtins import object
-import functools
-import os
-import time
-from testtools import content, content_type
-
-import fixtures
-import testresources
-import testtools
-from common.contrail_test_init import ContrailTestInit
-from common import log_orig as contrail_logging
-#from common import config
-import logging as std_logging
 from tcutils.util import get_unique_random_name
+import logging as std_logging
+from common import log_orig as contrail_logging
+from common.contrail_test_init import ContrailTestInit
+import testtools
+import testresources
+import fixtures
+from testtools import content, content_type
+import time
+import os
+import functools
+from builtins import object
+
+#from common import config
 
 # License: Apache-2.0
 # Copyright 2012 OpenStack Foundation
 # https://github.com/openstack/tempest/blob/master/tempest/test.py
+
+
 def attr(*args, **kwargs):
     """A decorator which applies the  testtools attr decorator
 
@@ -35,17 +37,20 @@ def attr(*args, **kwargs):
 
     return decorator
 
+
 #LOG = logging.getLogger(__name__)
 std_logging.getLogger('urllib3.connectionpool').setLevel(std_logging.WARN)
 std_logging.getLogger('paramiko.transport').setLevel(std_logging.WARN)
 std_logging.getLogger('keystoneclient.session').setLevel(std_logging.WARN)
-std_logging.getLogger('keystoneauth.identity.v3.base').setLevel(std_logging.WARN)
+std_logging.getLogger(
+    'keystoneauth.identity.v3.base').setLevel(std_logging.WARN)
 std_logging.getLogger('keystoneauth.session').setLevel(std_logging.WARN)
 std_logging.getLogger('novaclient.v2.client').setLevel(std_logging.WARN)
 std_logging.getLogger('keystoneclient.httpclient').setLevel(std_logging.WARN)
 std_logging.getLogger('neutronclient.client').setLevel(std_logging.WARN)
 #
 #CONF = config.CONF
+
 
 class TagsHack(object):
     def id(self):
@@ -64,6 +69,7 @@ class TagsHack(object):
             # A hack to please testtools to get uniq testcase names
             return get_unique_random_name()
 
+
 class BaseTestCase(TagsHack,
                    testtools.testcase.WithAttributes,
                    testtools.TestCase,
@@ -77,12 +83,12 @@ class BaseTestCase(TagsHack,
             super(BaseTestCase, cls).setUpClass()
         cls.setUpClassCalled = True
 
-        if 'TEST_CONFIG_FILE' in os.environ :
-            cls.input_file= os.environ.get('TEST_CONFIG_FILE')
+        if 'TEST_CONFIG_FILE' in os.environ:
+            cls.input_file = os.environ.get('TEST_CONFIG_FILE')
         else:
-            cls.input_file= 'contrail_test_input.yaml'
+            cls.input_file = 'contrail_test_input.yaml'
         cls.logger = contrail_logging.getLogger(cls.__name__)
-        cls.inputs = ContrailTestInit(cls.input_file,logger = cls.logger)
+        cls.inputs = ContrailTestInit(cls.input_file, logger=cls.logger)
 
     @classmethod
     def tearDownClass(cls):
@@ -90,7 +96,7 @@ class BaseTestCase(TagsHack,
         # Copyright 2012 OpenStack Foundation
         # https://github.com/openstack/tempest/blob/master/tempest/test.py
 
-        #cls.logger.cleanUp()
+        # cls.logger.cleanUp()
         if hasattr(super(BaseTestCase, cls), 'tearDownClass'):
             super(BaseTestCase, cls).tearDownClass()
 
@@ -113,7 +119,7 @@ class BaseTestCase(TagsHack,
             self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
-            os.environ.get('OS_STDOUT_CAPTURE') == '1'):
+                os.environ.get('OS_STDOUT_CAPTURE') == '1'):
             stdout = self.useFixture(fixtures.StringStream('stdout')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stdout', stdout))
         if (os.environ.get('OS_STDERR_CAPTURE') == 'True' or
@@ -121,7 +127,7 @@ class BaseTestCase(TagsHack,
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
         if (os.environ.get('OS_LOG_CAPTURE') != 'False' and
-            os.environ.get('OS_LOG_CAPTURE') != '0'):
+                os.environ.get('OS_LOG_CAPTURE') != '0'):
             log_format = '%(asctime)-15s %(message)s'
             self.useFixture(fixtures.LoggerFixture(nuke_handlers=False,
                                                    format=log_format))
@@ -133,9 +139,9 @@ class BaseTestCase(TagsHack,
         super(BaseTestCase, self).cleanUp()
 
     def addDetail(self, logfile, text):
-        if type(text) is str:
+        if isinstance(text, str):
             super(BaseTestCase, self).addDetail(logfile,
-                  content.text_content(text))
+                                                content.text_content(text))
         else:
             super(BaseTestCase, self).addDetail(logfile, text)
 
