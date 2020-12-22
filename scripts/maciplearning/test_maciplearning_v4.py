@@ -41,6 +41,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         3. Create vm4 in vn1, compute1
         4. Assign policy between vn1 and vn2
         5. Create ips for macvlan intfs with same subnet as eth0 for each vm
+        6. Sets up contrail-tools
         '''
         super(TestMacIpLearning, self).setUp()
         self.vn1_name = get_random_name('vn1')
@@ -139,6 +140,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         self.vm4_macvlan_ip = ".".join(self.vm4_eth0_ip.split(
             ".")[:3]) + "." + str(int(self.vm4_eth0_ip.split(".")[3]) + 5) + "/32"
 
+        try:
+            self.inputs.run_cmd_on_server(self.vm1_fixture.vm_node_ip, "contrail-tools")
+            self.inputs.run_cmd_on_server(self.vm2_fixture.vm_node_ip, "contrail-tools")
+        except CommandTimeout:
+            pass
+
     @preposttest_wrapper
     def test_maciplearning_flag(self):
         '''
@@ -159,362 +166,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         return True
     # end test_maciplearning_flag
 
-    @test.attr(type=['sanity'])
     @preposttest_wrapper
-    def test_intra_vn_intra_compute_l2(self):
+    def test_intra_vn_intra_compute_l2l3_pkt_mode(self):
         '''
-        Description:  Learn MAC_IPv4 bindings on VM interface in the same VN and same compute with forwarding mode L2.
-        Test steps:
-               1. Create macvlan intf on vm1 and vm4.
-        Pass criteria:
-               1. MAC1 + 0 ip route should be present in evpn table
-               2. derived bridge route with peer as EVPN for MAC1
-               3. Inet route in agent is not added.
-               4. On vrouter: Verify POD IP is not added to inet table
-        Maintainer : ybadaya@juniper.net
-        '''
-        cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
-
-        cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
-        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
-
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm1_macvlan_mac_addr = list(
-            self.vm1_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm4_macvlan_mac_addr = list(
-            self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-
-        # checking from vm1 to mac4 intf
-        # checking evpn table
-        vm1_node_ip = self.vm1_fixture.vm_node_ip
-        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-                vm1_vrf_id,
-                vxlanid=self.vn1_vxlan_id,
-                mac=vm4_macvlan_mac_addr,
-                ip=self.vm4_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm4 is present in vm1 EVPN table."
-
-        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-            vm1_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm4_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm4 is absent in vm1 EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm1_node_ip].get_vna_layer2_route(
-            vm1_vrf_id, mac=vm4_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking if vm4_macvlan_ip is present in vm1 inet table
-        inspect_h = self.agent_inspect[vm1_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm1_vrf_id,
-            ip=self.vm4_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
-
-        # checking Vrouter inet table in vm1 for vm4_macvlan_ip
-        route = self.get_vrouter_route(self.vm4_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
-        assert not route, "Route is present in vrouter inet table."
-
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2_l3")
-        cmd = ['ip link delete macvlan1']
-        self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-
-        return True
-    # end test_intra_vn_intra_compute_l2
-
-    @preposttest_wrapper
-    def test_intra_vn_inter_compute_l2(self):
-        '''
-        Description: Learn MAC_IPv4 bindings on VM interface in the same VN and different compute with forwarding mode L2.
-        Test steps:
-               1. Create macvlan intf on vm2 and vm3.
-        Pass criteria:
-               1. MAC1 + 0 ip route should be present in evpn table
-               2. derived bridge route with peer as EVPN for MAC1
-               3. Inet route in agent is not added.
-               4. On vrouter: Verify POD IP is not added to inet table
-        Maintainer : ybadaya@juniper.net
-        '''
-        cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
-
-        cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm3_macvlan_ip.split('/')[0] + "/26")]
-
-        self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
-        self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
-
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm2_macvlan_mac_addr = list(
-            self.vm2_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm3_macvlan_mac_addr = list(
-            self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-
-        # checking from vm2 to mac3 intf
-        # checking evpn table
-        vm2_node_ip = self.vm2_fixture.vm_node_ip
-        vm2_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm2_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-                vm2_vrf_id,
-                vxlanid=self.vn2_vxlan_id,
-                mac=vm3_macvlan_mac_addr,
-                ip=self.vm3_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm3 is present in vm2 EVPN table."
-
-        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-            vm2_vrf_id,
-            vxlanid=self.vn2_vxlan_id,
-            mac=vm3_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm3 is absent in vm2 EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm2_node_ip].get_vna_layer2_route(
-            vm2_vrf_id, mac=vm3_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking if vm3_macvlan_ip is present in vm2 inet table
-        inspect_h = self.agent_inspect[vm2_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm2_vrf_id,
-            ip=self.vm3_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
-
-        # checking Vrouter inet table in vm2 for vm3_macvlan_ip
-        route = self.get_vrouter_route(self.vm3_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
-        assert not route, ('Route seen in vrouter for %s' %
-                           (self.vm3_macvlan_ip))
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
-        cmd = ['ip link delete macvlan1']
-        self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm3_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        return True
-    # end test_intra_vn_inter_compute_l2
-
-    @preposttest_wrapper
-    def test_intra_vn_intra_compute_l2_pkt_mode(self):
-        '''
-        Description:  Learn MAC_IPv4 bindings on VM interface in the same VN and same compute with forwarding mode L2 and disabled policy (in Packet Mode).
+        Description:  Learn MAC_IPv4 bindings on VM interface in the same VN and same compute with forwarding mode L2L3 and disabled policy (in Packet Mode).
         Test steps:
                1. Disable policy on vm1 and vm4
                2. Create macvlan intf on vm1 and vm4.
-        Pass criteria:
-               1. MAC1 + 0 ip route should be present in evpn table
-               2. derived bridge route with peer as EVPN for MAC1
-               3. Inet route in agent is not added.
-               4. On vrouter: Verify POD IP is not added to inet table
-        Maintainer : ybadaya@juniper.net
-        '''
-        self.vm1_fixture.disable_interface_policy()
-        self.vm4_fixture.disable_interface_policy()
-        cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
-
-        cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
-        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
-
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm1_macvlan_mac_addr = list(
-            self.vm1_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm4_macvlan_mac_addr = list(
-            self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-
-        # checking from vm1 to mac4 intf
-        # checking evpn table
-        vm1_node_ip = self.vm1_fixture.vm_node_ip
-        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-                vm1_vrf_id,
-                vxlanid=self.vn1_vxlan_id,
-                mac=vm4_macvlan_mac_addr,
-                ip=self.vm4_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm4 is present in vm1 EVPN table."
-
-        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-            vm1_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm4_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm4 is absent in vm1 EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm1_node_ip].get_vna_layer2_route(
-            vm1_vrf_id, mac=vm4_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking if vm4_macvlan_ip is present in vm1 inet table
-        inspect_h = self.agent_inspect[vm1_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm1_vrf_id,
-            ip=self.vm4_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
-
-        # checking Vrouter inet table in vm1 for vm4_macvlan_ip
-        route = self.get_vrouter_route(self.vm4_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
-        assert not route, "Route is present in vrouter inet table."
-
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2_l3")
-        cmd = ['ip link delete macvlan1']
-        self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-
-        return True
-    # end test_intra_vn_intra_compute_l2_pkt_mode
-
-    @preposttest_wrapper
-    def test_intra_vn_inter_compute_l2_pkt_mode(self):
-        '''
-        Description: Learn MAC_IPv4 bindings on VM interface in the same VN and different compute with forwarding mode L2 and disabled policy (in Packet Mode).
-        Test steps:
-               1. Disable policy on vm2 and vm3
-               2. Create macvlan intf on vm2 and vm3.
-        Pass criteria:
-               1. MAC1 + 0 ip route should be present in evpn table
-               2. derived bridge route with peer as EVPN for MAC1
-               3. Inet route in agent is not added.
-               4. On vrouter: Verify POD IP is not added to inet table
-        Maintainer : ybadaya@juniper.net
-        '''
-        self.vm2_fixture.disable_interface_policy()
-        self.vm3_fixture.disable_interface_policy()
-
-        cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
-
-        cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm3_macvlan_ip.split('/')[0] + "/26")]
-
-        self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
-        self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
-
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm2_macvlan_mac_addr = list(
-            self.vm2_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm3_macvlan_mac_addr = list(
-            self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-
-        # checking from vm2 to mac3 intf
-        # checking evpn table
-        vm2_node_ip = self.vm2_fixture.vm_node_ip
-        vm2_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm2_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-                vm2_vrf_id,
-                vxlanid=self.vn2_vxlan_id,
-                mac=vm3_macvlan_mac_addr,
-                ip=self.vm3_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm3 is present in vm2 EVPN table."
-
-        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-            vm2_vrf_id,
-            vxlanid=self.vn2_vxlan_id,
-            mac=vm3_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm3 is absent in vm2 EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm2_node_ip].get_vna_layer2_route(
-            vm2_vrf_id, mac=vm3_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking if vm3_macvlan_ip is present in vm2 inet table
-        inspect_h = self.agent_inspect[vm2_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm2_vrf_id,
-            ip=self.vm3_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
-
-        # checking Vrouter inet table in vm2 for vm3_macvlan_ip
-        route = self.get_vrouter_route(self.vm3_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
-        assert not route, ('Route seen in vrouter for %s' %
-                           (self.vm3_macvlan_ip))
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
-        cmd = ['ip link delete macvlan1']
-        self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm3_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        return True
-    # end test_intra_vn_inter_compute_l2_pkt_mode
-
-    @preposttest_wrapper
-    def test_intra_vn_intra_compute_l2l3(self):
-        '''
-        Description: Learn MAC_IPv4 bindings on VM interface in the same VN and same compute with forwarding mode L2/L3.
-        Test steps:
-               1. Create macvlan intf on vm1 and vm4.
         Pass criteria:
                1. Ping from vm to macvlan intf should go through fine.
                2. MAC/IP and MAC/0-IP route should be present in evpn table
@@ -524,6 +182,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                6. On vrouter: Verify POD IP is added to inet table, Encap data replaced with MAC2 in nh
         Maintainer : ybadaya@juniper.net
         '''
+        self.vm1_fixture.disable_interface_policy()
+        self.vm4_fixture.disable_interface_policy()
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
                     'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
@@ -548,7 +208,6 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         # ping from macvlan1 intf on vm4 to macvlan intf on vm1
         assert self.vm4_fixture.ping_to_ip(
             self.vm1_macvlan_ip.split('/')[0], intf="macvlan1")
-
         # checking evpn table
         vm1_node_ip = self.vm1_fixture.vm_node_ip
         vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
@@ -590,23 +249,245 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm4_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
              route['prefix'] +
                 "/" +
                 route['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Type | awk {'print $2'}" %
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
             nh_id).split(":")[1]
         assert nh_type == "Encap", "Nh type is not Encap."
         encap_data = self.inputs.run_cmd_on_server(
-            vm1_node_ip, r"docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
+            vm1_node_ip, r"contrail-tools  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
         assert vm4_macvlan_mac_addr.replace(
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+            self.vm4_macvlan_ip, int(vm1_vrf_id))
+        output = self.inputs.run_cmd_on_server(
+            vm1_node_ip, stitched_mac_cmd).split("(")[0]
+        assert EUI(output, dialect=mac_unix_expanded) == EUI(
+            vm4_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
+
+        cmd = ['ip link delete macvlan1']
+        self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
+        self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
+        return True
+    # end test_intra_vn_intra_compute_l2l3_pkt_mode
+
+    @preposttest_wrapper
+    def test_intra_vn_inter_compute_l2l3_pkt_mode(self):
+        '''
+        Description: Learn MAC_IPv4 bindings on VM interface in the same VN and different compute with forwarding mode L2L3 and disabled policy (in Packet Mode).
+        Test steps:
+               1. Disable policy on vm2 and vm3
+               2. Create macvlan intf on vm2 and vm3.
+        Pass criteria:
+               1. Ping from vm to macvlan intf should go through fine.
+               2. MAC/IP and MAC/0-IP route should be present in evpn table
+               3. derived bridge route with peer as EVPN for MAC2
+               4. L3VPN route for IP2 in agent.
+               5. On vrouter: Verify stitched mac addr is available
+               6. On vrouter: Verify POD IP is added to inet table, Encap data replaced with MAC2 in nh, nh type is Tunnel
+        Maintainer : ybadaya@juniper.net
+        '''
+        self.vm2_fixture.disable_interface_policy()
+        self.vm3_fixture.disable_interface_policy()
+
+        cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
+                    'ip link set dev macvlan1 up',
+                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
+
+        cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
+                    'ip link set dev macvlan1 up',
+                    'ip addr add %s dev macvlan1' % (self.vm3_macvlan_ip.split('/')[0] + "/26")]
+
+        self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
+        self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
+
+        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
+        vm2_macvlan_mac_addr = list(
+            self.vm2_fixture.run_cmd_on_vm(mac_cmd).values())[0]
+        vm3_macvlan_mac_addr = list(
+            self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
+
+        # from vm2 to mac3 intf
+        assert self.vm2_fixture.ping_to_ip(self.vm3_macvlan_ip.split('/')[0])
+        # ping from macvlan1 intf on vm2 to macvlan intf on vm3
+        assert self.vm2_fixture.ping_to_ip(
+            self.vm3_macvlan_ip.split('/')[0], intf="macvlan1")
+        # ping from macvlan1 intf on vm3 to macvlan intf on vm2
+        assert self.vm3_fixture.ping_to_ip(
+            self.vm2_macvlan_ip.split('/')[0], intf="macvlan1")
+
+        # checking evpn table
+        vm2_node_ip = self.vm2_fixture.vm_node_ip
+        vm2_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm2_fixture)
+        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
+            vm2_vrf_id,
+            vxlanid=self.vn2_vxlan_id,
+            mac=vm3_macvlan_mac_addr,
+            ip=self.vm3_macvlan_ip)['mac']
+        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + \
+            "-" + self.vm3_macvlan_ip, "Mac route for macvlan1 is absent in EVPN table. "
+
+        # 0 ip should also be present
+        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
+            vm2_vrf_id,
+            vxlanid=self.vn2_vxlan_id,
+            mac=vm3_macvlan_mac_addr,
+            ip="0.0.0.0/32")['mac']
+        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + \
+            "-" + "0.0.0.0/32", "Mac route is absent in EVPN table. "
+
+        # checking bridge table
+        peer = self.agent_inspect[vm2_node_ip].get_vna_layer2_route(
+            vm2_vrf_id, mac=vm3_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
+        assert peer == "EVPN", "Peer is not EVPN."
+
+        # checking if route for macvlan_ip3 is present in vm2 agent inet table
+        inspect_h = self.agent_inspect[vm2_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm2_vrf_id,
+            ip=self.vm3_macvlan_ip.split("/")[0])
+        assert route, ('No route seen in inet table for %s' %
+                       (self.vm3_macvlan_ip.split("/")[0]))
+
+        # checking if route for macvlan_ip3 is present in vm2 vrouter inet
+        # table
+        route = self.get_vrouter_route(self.vm3_macvlan_ip,
+                                       vn_fixture=self.vn2_fixture,
+                                       inspect_h=inspect_h)
+        assert route, ('No route seen in vrouter for %s' %
+                       (self.vm3_macvlan_ip))
+        nh_id = self.inputs.run_cmd_on_server(
+            vm2_node_ip,
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            (vm2_vrf_id,
+             route['prefix'] +
+                "/" +
+                route['prefix_len']))
+        nh_type = self.inputs.run_cmd_on_server(
+            vm2_node_ip,
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
+            nh_id).split(":")[1]
+        assert nh_type == "Tunnel", "Nh type is not Tunnel."
+
+        # checking stitched MAC addr
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+            self.vm3_macvlan_ip, int(vm2_vrf_id))
+        output = self.inputs.run_cmd_on_server(
+            vm2_node_ip, stitched_mac_cmd).split("(")[0]
+        assert EUI(output, dialect=mac_unix_expanded) == EUI(
+            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stictched mac address is invalid."
+
+        cmd = ['ip link delete macvlan1']
+        self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
+        self.vm3_fixture.run_cmd_on_vm(cmd, as_sudo=True)
+        return True
+    # end test_intra_vn_inter_compute_l2l3_pkt_mode
+
+    @test.attr(type=['sanity'])
+    @preposttest_wrapper
+    def test_intra_vn_intra_compute_l2l3(self):
+        '''
+        Description: Learn MAC_IPv4 bindings on VM interface in the same VN and same compute with forwarding mode L2/L3.
+        Test steps:
+               1. Create macvlan intf on vm1 and vm4.
+        Pass criteria:
+               1. Ping from vm to macvlan intf should go through fine.
+               2. MAC/IP and MAC/0-IP route should be present in evpn table
+               3. derived bridge route with peer as EVPN for MAC2
+               4. L3VPN route for IP2 in agent.
+               5. On vrouter: Verify stitched mac addr is available
+               6. On vrouter: Verify POD IP is added to inet table, Encap data replaced with MAC2 in nh
+        Maintainer : ybadaya@juniper.net
+        '''
+        cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
+                    'ip link set dev macvlan1 up',
+                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+
+        cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
+                    'ip link set dev macvlan1 up',
+                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
+        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
+
+        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
+        vm1_macvlan_mac_addr = list(
+            self.vm1_fixture.run_cmd_on_vm(mac_cmd).values())[0]
+        vm4_macvlan_mac_addr = list(
+            self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
+
+        # from vm1 to mac4 intf
+        assert self.vm1_fixture.ping_to_ip(self.vm4_macvlan_ip.split('/')[0])
+        # ping from macvlan1 intf on vm1 to macvlan intf on vm4
+        assert self.vm1_fixture.ping_to_ip(
+            self.vm4_macvlan_ip.split('/')[0], intf="macvlan1")
+        # ping from macvlan1 intf on vm4 to macvlan intf on vm1
+        assert self.vm4_fixture.ping_to_ip(
+            self.vm1_macvlan_ip.split('/')[0], intf="macvlan1")
+        # checking evpn table
+        vm1_node_ip = self.vm1_fixture.vm_node_ip
+        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
+        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
+            vm1_vrf_id,
+            vxlanid=self.vn1_vxlan_id,
+            mac=vm4_macvlan_mac_addr,
+            ip=self.vm4_macvlan_ip)['mac']
+        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_macvlan_mac_addr + \
+            "-" + self.vm4_macvlan_ip, "Mac route is absent in EVPN table. "
+
+        # 0 ip should also be present
+        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
+            vm1_vrf_id,
+            vxlanid=self.vn1_vxlan_id,
+            mac=vm4_macvlan_mac_addr,
+            ip="0.0.0.0/32")['mac']
+        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_macvlan_mac_addr + \
+            "-" + "0.0.0.0/32", "Mac route is absent in EVPN table. "
+
+        # checking bridge table
+        peer = self.agent_inspect[vm1_node_ip].get_vna_layer2_route(
+            vm1_vrf_id, mac=vm4_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
+        assert peer == "EVPN", "Peer is not EVPN."
+
+        # checking if vm4_macvlan_ip is present in vm1 agent inet table
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm1_vrf_id,
+            ip=self.vm4_macvlan_ip.split("/")[0])
+        assert route, ('No route seen in agent inet table for %s' %
+                       (self.vm4_macvlan_ip.split("/")[0]))
+
+        # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
+        route = self.get_vrouter_route(self.vm4_macvlan_ip,
+                                       vn_fixture=self.vn1_fixture,
+                                       inspect_h=inspect_h)
+        assert route, ('No route seen in vrouter for %s' %
+                       (self.vm4_macvlan_ip))
+        nh_id = self.inputs.run_cmd_on_server(
+            vm1_node_ip,
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            (vm1_vrf_id,
+             route['prefix'] +
+                "/" +
+                route['prefix_len']))
+        nh_type = self.inputs.run_cmd_on_server(
+            vm1_node_ip,
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
+            nh_id).split(":")[1]
+        assert nh_type == "Encap", "Nh type is not Encap."
+        encap_data = self.inputs.run_cmd_on_server(
+            vm1_node_ip, r"contrail-tools  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
+        assert vm4_macvlan_mac_addr.replace(
+            ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
+
+        # checking stitched MAC addr
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -702,19 +583,19 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm3_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
             (vm2_vrf_id,
              route['prefix'] +
                 "/" +
                 route['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Type | awk {'print $2'}" %
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
             nh_id).split(":")[1]
         assert nh_type == "Tunnel", "Nh type is not Tunnel."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm3_macvlan_ip, int(vm2_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm2_node_ip, stitched_mac_cmd).split("(")[0]
@@ -728,314 +609,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     # end test_intra_vn_inter_compute_l2l3
 
     @preposttest_wrapper
-    def test_intra_vn_intra_compute_vlan_l2(self):
+    def test_intra_vn_intra_compute_vlan_pkt_mode_l2l3(self):
         '''
-        Description: Learn MAC_IPv4 bindings on VLAN sub intf in same VN and same compute with forwarding mode as L2 only mode
-        Test steps:
-               1. Create macvlan intf on vlan intf on vm1 and vm4. Intf should be of diff subnet.
-               2. Create vlan vmi with parent vmi vm1 and vm4 respectively
-        Pass criteria:
-               1. Ping from vm to macvlan intf should go through fine in l2l3 mode.
-               2. MAC/0-IP route should be present in evpn table
-               3. derived bridge route with peer as EVPN for MAC2
-               4. Inet route in agent not added
-               5. On vrouter: Verify POD IP is not added to inet table
-        Maintainer : ybadaya@juniper.net
-        '''
-        vn2_gw_ip = self.vn2_fixture.get_subnets()[0]['gateway_ip']
-        vm1_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 5) + "/32"
-        vm1_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 6) + "/32"
-        vm4_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 7) + "/32"
-        vm4_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 8) + "/32"
-        cmds_vm1 = ['ip link add link eth0 name eth0.100 type vlan id 100',
-                    'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm1_vlan_ip.split('/')[0] + "/26"),
-                    'ip link add macvlan1 link eth0.100 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm1_vlan_macvlan_ip.split('/')[0] + "/26")]
-
-        cmds_vm4 = ['ip link add link eth0 name eth0.100 type vlan id 100',
-                    'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm4_vlan_ip.split('/')[0] + "/26"),
-                    'ip link add macvlan1 link eth0.100 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm4_vlan_macvlan_ip.split('/')[0] + "/26")]
-        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
-
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm1_macvlan_mac_addr = list(
-            self.vm1_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm4_macvlan_mac_addr = list(
-            self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        mac_cmd = ['ifconfig eth0.100 | grep HWaddr | awk \'{ print $5 }\'']
-        vm1_vlan_mac_addr = list(
-            self.vm1_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm4_vlan_mac_addr = list(
-            self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        parent_vmi_vm1 = self.vnc_lib.virtual_machine_interface_read(
-            id=self.vm1_fixture.get_vmi_id(self.vn1_fixture.vn_fq_name))
-        parent_vmi_vm4 = self.vnc_lib.virtual_machine_interface_read(
-            id=self.vm4_fixture.get_vmi_id(self.vn1_fixture.vn_fq_name))
-        self.setup_vmi(self.vn2_fixture.uuid,
-                       parent_vmi=parent_vmi_vm1,
-                       api_type="contrail",
-                       project_obj=self.project.project_obj,
-                       vlan_id="100",
-                       mac_address=vm1_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm1_vlan_ip.split('/')[1],
-                                   'ip_address':vm1_vlan_ip.split('/')[0]}])
-        self.setup_vmi(self.vn2_fixture.uuid,
-                       parent_vmi=parent_vmi_vm4,
-                       api_type="contrail",
-                       project_obj=self.project.project_obj,
-                       vlan_id="100",
-                       mac_address=vm4_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm4_vlan_ip.split('/')[1],
-                                   'ip_address':vm4_vlan_ip.split('/')[0]}])
-
-        assert self.vm1_fixture.ping_to_ip(vm4_vlan_macvlan_ip.split('/')[0])
-        # ping from macvlan1 intf on vm1 to macvlan intf on vm4
-        assert self.vm1_fixture.ping_to_ip(
-            vm4_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
-        # ping from macvlan1 intf on vm4 to macvlan intf on vm1
-        assert self.vm4_fixture.ping_to_ip(
-            vm1_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
-
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-        # checking from vm1 to mac4 intf
-        # checking evpn table
-        vm1_node_ip = self.vm1_fixture.vm_node_ip
-        vm1_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm1_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-                vm1_vrf_id,
-                vxlanid=self.vn2_vxlan_id,
-                mac=vm4_macvlan_mac_addr,
-                ip=vm4_vlan_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm4 is present in vm1 EVPN table."
-
-        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-            vm1_vrf_id,
-            vxlanid=self.vn2_vxlan_id,
-            mac=vm4_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm4_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm4 is absent in vm1 EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm1_node_ip].get_vna_layer2_route(
-            vm1_vrf_id, mac=vm4_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking if vm4_vlan_macvlan_ip is present in vm1 inet table
-        inspect_h = self.agent_inspect[vm1_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm1_vrf_id,
-            ip=vm4_vlan_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
-
-        # checking Vrouter inet table in vm1 for vm4_vlan_macvlan_ip
-        route = self.get_vrouter_route(vm4_vlan_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
-        assert not route, "Route is present in vrouter inet table."
-
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2_l3")
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
-        cmd = ['ip link delete macvlan1',
-               'ip link delete eth0.100']
-        self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-
-        return True
-    # end test_intra_vn_intra_compute_vlan_l2
-
-    @preposttest_wrapper
-    def test_intra_vn_inter_compute_vlan_l2(self):
-        '''
-        Description:  Learn MAC_IPv4 bindings on VLAN sub intf in same VN and different compute with forwarding mode as L2 only mode
-        Test steps:
-               1. Create macvlan intf on vlan intf on vm2 and vm3. Intf should be of diff subnet.
-               2. Create vlan vmi with parent vmi vm2 and vm3 respectively
-        Pass criteria:
-               1. Ping from vm to macvlan intf should go through fine in l2l3 mode.
-               2. MAC/0-IP route should be present in evpn table
-               3. derived bridge route with peer as EVPN for MAC2
-               4. Inet route in agent not added
-               5. On vrouter: Verify POD IP is not added to inet table
-        Maintainer : ybadaya@juniper.net
-        '''
-        vn1_gw_ip = self.vn1_fixture.get_subnets()[0]['gateway_ip']
-        vm2_vlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 5) + "/32"
-        vm2_vlan_macvlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 6) + "/32"
-        vm3_vlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 7) + "/32"
-        vm3_vlan_macvlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 8) + "/32"
-        cmds_vm2 = ['ip link add link eth0 name eth0.100 type vlan id 100',
-                    'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm2_vlan_ip.split('/')[0] + "/26"),
-                    'ip link add macvlan1 link eth0.100 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm2_vlan_macvlan_ip.split('/')[0] + "/26")]
-
-        cmds_vm3 = ['ip link add link eth0 name eth0.100 type vlan id 100',
-                    'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm3_vlan_ip.split('/')[0] + "/26"),
-                    'ip link add macvlan1 link eth0.100 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm3_vlan_macvlan_ip.split('/')[0] + "/26")]
-
-        self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
-        self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
-
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm2_macvlan_mac_addr = list(
-            self.vm2_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm3_macvlan_mac_addr = list(
-            self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        mac_cmd = ['ifconfig eth0.100 | grep HWaddr | awk \'{ print $5 }\'']
-        vm2_vlan_mac_addr = list(
-            self.vm2_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm3_vlan_mac_addr = list(
-            self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        parent_vmi_vm2 = self.vnc_lib.virtual_machine_interface_read(
-            id=self.vm2_fixture.get_vmi_id(self.vn2_fixture.vn_fq_name))
-        parent_vmi_vm3 = self.vnc_lib.virtual_machine_interface_read(
-            id=self.vm3_fixture.get_vmi_id(self.vn2_fixture.vn_fq_name))
-        self.setup_vmi(self.vn1_fixture.uuid,
-                       parent_vmi=parent_vmi_vm2,
-                       api_type="contrail",
-                       project_obj=self.project.project_obj,
-                       vlan_id="100",
-                       mac_address=vm2_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm2_vlan_ip.split('/')[1],
-                                   'ip_address':vm2_vlan_ip.split('/')[0]}])
-        self.setup_vmi(self.vn1_fixture.uuid,
-                       parent_vmi=parent_vmi_vm3,
-                       api_type="contrail",
-                       project_obj=self.project.project_obj,
-                       vlan_id="100",
-                       mac_address=vm3_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm3_vlan_ip.split('/')[1],
-                                   'ip_address':vm3_vlan_ip.split('/')[0]}])
-
-        assert self.vm2_fixture.ping_to_ip(vm3_vlan_macvlan_ip.split('/')[0])
-        # ping from macvlan1 intf on vm2 to macvlan intf on vm3
-        assert self.vm2_fixture.ping_to_ip(
-            vm3_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
-        # ping from macvlan1 intf on vm3 to macvlan intf on vm2
-        assert self.vm3_fixture.ping_to_ip(
-            vm2_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-        # checking from vm2 to mac3 intf
-        # checking evpn table
-        vm2_node_ip = self.vm2_fixture.vm_node_ip
-        vm2_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm2_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-                vm2_vrf_id,
-                vxlanid=self.vn1_vxlan_id,
-                mac=vm3_macvlan_mac_addr,
-                ip=self.vm3_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm3 is present in vm2 EVPN table."
-
-        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-            vm2_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm3_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm3_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm3 is absent in vm2 EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm2_node_ip].get_vna_layer2_route(
-            vm2_vrf_id, mac=vm3_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking if vm3_macvlan_ip is present in vm2 inet table
-        inspect_h = self.agent_inspect[vm2_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm2_vrf_id,
-            ip=self.vm3_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
-
-        # checking Vrouter inet table in vm2 for vm3_macvlan_ip
-        route = self.get_vrouter_route(self.vm3_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
-        assert not route, ('Route seen in vrouter for %s' %
-                           (self.vm3_macvlan_ip))
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2_l3")
-        cmd = ['ip link delete macvlan1',
-               'ip link delete eth0.100']
-        self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm3_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        return True
-    # end test_intra_vn_inter_compute_vlan_l2
-
-    @preposttest_wrapper
-    def test_intra_vn_intra_compute_vlan_pkt_mode_l2(self):
-        '''
-        Description: Learn MAC_IPv4 bindings on VLAN sub intf in same VN and same compute with forwarding mode as L2 only mode and disabled policy (in Packet mode)
+        Description: Learn MAC_IPv4 bindings on VLAN sub intf in same VN and same compute with forwarding mode as L2L3 only mode and disabled policy (in Packet mode)
         Test steps:
                1. Disable policy on vm1 and vm4
                2. Create macvlan intf on vlan intf on vm1 and vm4. Intf should be on diff subnet
                3. Create vlan vmi with parent vmi vm1 and vm4 respectively
         Pass criteria:
-               1. Ping from vm to macvlan intf should go through fine in l2l3 mode.
-               2. MAC/0-IP route should be present in evpn table
+               1. Ping from vm to macvlan intf should go through fine.
+               2. MAC/IP and MAC/0-IP route should be present in evpn table
                3. derived bridge route with peer as EVPN for MAC2
-               4. Inet route in agent not added
-               5. On vrouter: Verify POD IP is not added to inet table
+               4. L3VPN route for IP2 in agent
+               5. On vrouter: Verify stitched mac addr is available
+               6. On vrouter: Verify POD IP is added to inet table, Encap data replaced with MAC2 in nh
         Maintainer : ybadaya@juniper.net
         '''
         self.vm1_fixture.disable_interface_policy()
@@ -1108,84 +695,92 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert self.vm4_fixture.ping_to_ip(
             vm1_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
 
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-        # checking from vm1 to mac4 intf
         # checking evpn table
         vm1_node_ip = self.vm1_fixture.vm_node_ip
         vm1_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm1_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-                vm1_vrf_id,
-                vxlanid=self.vn2_vxlan_id,
-                mac=vm4_macvlan_mac_addr,
-                ip=vm4_vlan_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm4 is present in vm1 EVPN table."
+        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
+            vm1_vrf_id,
+            vxlanid=self.vn2_vxlan_id,
+            mac=vm4_macvlan_mac_addr,
+            ip=vm4_vlan_macvlan_ip)['mac']
+        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm4_macvlan_mac_addr + \
+            "-" + vm4_vlan_macvlan_ip, "Mac route is absent in EVPN table. "
 
+        # 0 ip should also be present
         evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
             vm1_vrf_id,
             vxlanid=self.vn2_vxlan_id,
             mac=vm4_macvlan_mac_addr,
             ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm4_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm4 is absent in vm1 EVPN table. "
+        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm4_macvlan_mac_addr + \
+            "-" + "0.0.0.0/32", "Mac route is absent in EVPN table. "
 
         # checking bridge table
         peer = self.agent_inspect[vm1_node_ip].get_vna_layer2_route(
             vm1_vrf_id, mac=vm4_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
         assert peer == "EVPN", "Peer is not EVPN."
 
-        # checking if vm4_vlan_macvlan_ip is present in vm1 inet table
+        # checking if vm4_macvlan_ip is present in vm1 agent inet table
         inspect_h = self.agent_inspect[vm1_node_ip]
         route = inspect_h.get_vna_route(
             vrf_id=vm1_vrf_id,
             ip=vm4_vlan_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
+        assert route, ('No route seen in agent inet table for %s' %
+                       (vm4_vlan_macvlan_ip.split("/")[0]))
 
-        # checking Vrouter inet table in vm1 for vm4_vlan_macvlan_ip
+        # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
         route = self.get_vrouter_route(vm4_vlan_macvlan_ip,
                                        vn_fixture=self.vn2_fixture,
                                        inspect_h=inspect_h)
-        assert not route, "Route is present in vrouter inet table."
+        assert route, ('No route seen in vrouter for %s' %
+                       (self.vm4_macvlan_ip))
+        nh_id = self.inputs.run_cmd_on_server(
+            vm1_node_ip,
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            (vm1_vrf_id,
+             route['prefix'] +
+                "/" +
+                route['prefix_len']))
+        nh_type = self.inputs.run_cmd_on_server(
+            vm1_node_ip,
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
+            nh_id).split(":")[1]
+        assert nh_type == "Encap", "Nh type is not Encap."
+        encap_data = self.inputs.run_cmd_on_server(
+            vm1_node_ip, r"contrail-tools  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
+        assert vm4_macvlan_mac_addr.replace(
+            ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2_l3")
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
+        # checking stitched MAC addr
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+            vm4_vlan_macvlan_ip, int(vm1_vrf_id))
+        output = self.inputs.run_cmd_on_server(
+            vm1_node_ip, stitched_mac_cmd).split("(")[0]
+        assert EUI(output, dialect=mac_unix_expanded) == EUI(
+            vm4_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
+
         cmd = ['ip link delete macvlan1',
                'ip link delete eth0.100']
         self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-
         return True
-    # end test_intra_vn_intra_compute_vlan_pkt_mode_l2
+    # end test_intra_vn_intra_compute_vlan_pkt_mode_l2l3
 
     @preposttest_wrapper
-    def test_intra_vn_inter_compute_vlan_pkt_mode_l2(self):
+    def test_intra_vn_inter_compute_vlan_pkt_mode_l2l3(self):
         '''
-        Description:  Learn MAC_IPv4 bindings on VLAN sub intf in same VN and different compute with forwarding mode as L2 only mode and disabled policy (in Packet Mode)
+        Description:  Learn MAC_IPv4 bindings on VLAN sub intf in same VN and different compute with forwarding mode as L2L3 only mode and disabled policy (in Packet Mode)
         Test steps:
                1. Disable policy on vm2 and vm3
                2. Create macvlan intf on vlan intf on vm2 and vm3.
                3. Create vlan vmi with parent vmi vm2 and vm3 respectively
         Pass criteria:
-               1. Ping from vm to macvlan intf should go through fine in l2l3 mode.
-               2. MAC/0-IP route should be present in evpn table
+               1. Ping from vm to macvlan intf should go through fine.
+               2. MAC/IP and MAC/0-IP route should be present in evpn table
                3. derived bridge route with peer as EVPN for MAC2
-               4. Inet route in agent not added
-               5. On vrouter: Verify POD IP is not added to inet table
+               4. L3VPN route for IP2 in agent
+               5. On vrouter: Verify stitched mac addr is available
+               6. On vrouter: Verify POD IP is added to inet table, Encap data replaced with MAC2 in nh, Nh type as Tunnel
         Maintainer : ybadaya@juniper.net
         '''
         self.vm2_fixture.disable_interface_policy()
@@ -1259,69 +854,74 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert self.vm3_fixture.ping_to_ip(
             vm2_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
 
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-        # checking from vm2 to mac3 intf
         # checking evpn table
         vm2_node_ip = self.vm2_fixture.vm_node_ip
         vm2_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm2_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-                vm2_vrf_id,
-                vxlanid=self.vn1_vxlan_id,
-                mac=vm3_macvlan_mac_addr,
-                ip=self.vm3_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm3 is present in vm2 EVPN table."
+        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
+            vm2_vrf_id,
+            vxlanid=self.vn1_vxlan_id,
+            mac=vm3_macvlan_mac_addr,
+            ip=vm3_vlan_macvlan_ip)['mac']
+        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm3_macvlan_mac_addr + \
+            "-" + vm3_vlan_macvlan_ip, "Mac route for macvlan1 is absent in EVPN table. "
 
+        # 0 ip should also be present
         evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
             vm2_vrf_id,
             vxlanid=self.vn1_vxlan_id,
             mac=vm3_macvlan_mac_addr,
             ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm3_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm3 is absent in vm2 EVPN table. "
+        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm3_macvlan_mac_addr + \
+            "-" + "0.0.0.0/32", "Mac route is absent in EVPN table. "
 
         # checking bridge table
         peer = self.agent_inspect[vm2_node_ip].get_vna_layer2_route(
             vm2_vrf_id, mac=vm3_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
         assert peer == "EVPN", "Peer is not EVPN."
 
-        # checking if vm3_macvlan_ip is present in vm2 inet table
+        # checking if route for macvlan_ip3 is present in vm2 agent inet table
         inspect_h = self.agent_inspect[vm2_node_ip]
         route = inspect_h.get_vna_route(
             vrf_id=vm2_vrf_id,
-            ip=self.vm3_macvlan_ip.split("/")[0])
-        assert not route, "Route is present in agent inet table."
+            ip=vm3_vlan_macvlan_ip.split("/")[0])
+        assert route, ('No route seen in inet table for %s' %
+                       (vm3_vlan_macvlan_ip.split("/")[0]))
 
-        # checking Vrouter inet table in vm2 for vm3_macvlan_ip
-        route = self.get_vrouter_route(self.vm3_macvlan_ip,
+        # checking if route for macvlan_ip3 is present in vm2 vrouter inet
+        # table
+        route = self.get_vrouter_route(vm3_vlan_macvlan_ip,
                                        vn_fixture=self.vn1_fixture,
                                        inspect_h=inspect_h)
-        assert not route, ('Route seen in vrouter for %s' %
-                           (self.vm3_macvlan_ip))
+        assert route, ('No route seen in vrouter for %s' %
+                       (vm3_vlan_macvlan_ip))
+        nh_id = self.inputs.run_cmd_on_server(
+            vm2_node_ip,
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            (vm2_vrf_id,
+             route['prefix'] +
+                "/" +
+                route['prefix_len']))
+        nh_type = self.inputs.run_cmd_on_server(
+            vm2_node_ip,
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
+            nh_id).split(":")[1]
+        assert nh_type == "Tunnel", "Nh type is not Tunnel."
 
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2_l3")
+        # checking stitched MAC addr
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+            vm3_vlan_macvlan_ip, int(vm2_vrf_id))
+        output = self.inputs.run_cmd_on_server(
+            vm2_node_ip, stitched_mac_cmd).split("(")[0]
+        assert EUI(output, dialect=mac_unix_expanded) == EUI(
+            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stictched mac address is invalid."
+
         cmd = ['ip link delete macvlan1',
                'ip link delete eth0.100']
         self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmd, as_sudo=True)
+
         return True
-    # end test_intra_vn_inter_compute_vlan_pkt_mode_l2
+    # end test_intra_vn_inter_compute_vlan_pkt_mode_l2l3
 
     @preposttest_wrapper
     def test_intra_vn_intra_compute_vlan_l2l3(self):
@@ -1447,23 +1047,23 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm4_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
              route['prefix'] +
                 "/" +
                 route['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Type | awk {'print $2'}" %
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
             nh_id).split(":")[1]
         assert nh_type == "Encap", "Nh type is not Encap."
         encap_data = self.inputs.run_cmd_on_server(
-            vm1_node_ip, r"docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
+            vm1_node_ip, r"contrail-tools  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
         assert vm4_macvlan_mac_addr.replace(
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             vm4_vlan_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1604,19 +1204,19 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (vm3_vlan_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
             (vm2_vrf_id,
              route['prefix'] +
                 "/" +
                 route['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Type | awk {'print $2'}" %
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
             nh_id).split(":")[1]
         assert nh_type == "Tunnel", "Nh type is not Tunnel."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             vm3_vlan_macvlan_ip, int(vm2_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm2_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1855,7 +1455,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
         assert output != "32", "Route not deleted in vrouter inet table."
@@ -1912,7 +1512,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             evpn_route = None
         assert not evpn_route, "Mac route is present in EVPN table. "
 
-        # 0 ip should also be present
+        # 0 ip should not be present
         try:
             evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
                 vm1_vrf_id,
@@ -1940,13 +1540,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                            (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
         assert output != "32", "Route not deleted in vrouter inet table."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1976,6 +1576,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         shc_fixture = self.create_hc(hc_type="link-local")
         self.attach_shc_to_vmi(shc_fixture, self.vm4_fixture)
+        self.addCleanup(self.detach_shc_from_vmi, shc_fixture, self.vm4_fixture)
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
                     'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
@@ -2031,23 +1632,23 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm4_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
              route['prefix'] +
                 "/" +
                 route['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Type | awk {'print $2'}" %
+            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
             nh_id).split(":")[1]
         assert nh_type == "Encap", "Nh type is not Encap."
         encap_data = self.inputs.run_cmd_on_server(
-            vm1_node_ip, r"docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
+            vm1_node_ip, r"contrail-tools  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
         assert vm4_macvlan_mac_addr.replace(
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2075,6 +1676,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         shc_fixture = self.create_hc(hc_type="link-local")
         self.attach_shc_to_vmi(shc_fixture, self.vm4_fixture)
+        self.addCleanup(self.detach_shc_from_vmi, shc_fixture, self.vm4_fixture)
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
                     'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
@@ -2131,18 +1733,17 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                            (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking if route in vrouter inet table got deleted
-        route_ppl_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
         assert output != "32", "Route not deleted in vrouter inet table."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
         assert not output, "Stitched mac address is present."
-        self.detach_shc_from_vmi(shc_fixture, self.vm4_fixture)
         cmd = ['ip link delete macvlan1']
         self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
     # end test_health_check_failure
@@ -2272,330 +1873,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking Vrouter inet table in vm1 for vm4_vlan_macvlan_ip
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), vm4_vlan_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
         assert output != "32", "Route not deleted in vrouter inet table."
         return True
     # end test_delete_vlan_intf
-
-    @preposttest_wrapper
-    def test_move_ip_locally_l2(self):
-        '''
-        Description: verify that when IP is moved locally, routes get updated correctly. VN forwarding mode is L2
-        Test steps:
-               1. Create a vm - vm5 with same vn and compute as vm1 and vm4
-               2. launch pod1 with MAC1/IP1 in vm1
-               3. bring down pod1 and launch pod2 with MAC2/IP1 in vm4
-        Pass criteria:
-               1. verify routes corresponding to MAC1/IP1 pair when pod1 is launched
-               2. ping from vm5 to pod1 should go through fine when pod1 is launched
-               3. After pod1 is down: MAC1 is deleted from vm5 evpn table
-                                      Derived bridge route is deleted from vm5
-               4. After pod2 is launched: MAC2 is added in vm5 evpn table
-                                          Derived bridge route is added in vm5
-               5. On vrouter: New flow source nh should point to MAC2/IP1
-        Maintainer : ybadaya@juniper.net
-        '''
-        vm5_name = get_random_name('vm5')
-        vm5_fixture = self.create_vm(
-            vn_fixture=self.vn1_fixture,
-            image_name='ubuntu',
-            vm_name=vm5_name,
-            node_name=self.node1)
-        assert vm5_fixture.wait_till_vm_is_up()
-
-        cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
-
-        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm1_macvlan_mac_addr = list(
-            self.vm1_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        # from vm4 to mac1 intf
-        vm5_to_macvlanip_ping = self.start_ping(
-            vm5_fixture, dst_ip=self.vm1_macvlan_ip.split('/')[0])
-        vm5_node_ip = vm5_fixture.vm_node_ip
-        time.sleep(60)
-        flow = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 flow --match %s | grep %s | grep -v \"Listing\"" %
-            (self.vm1_macvlan_ip.split('/')[0],
-             self.vm1_macvlan_ip.split('/')[0]))
-        assert flow, "Flow not created."
-        mac1_nh_id = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            r"docker exec -ti vrouter_vrouter-agent_1 flow --match %s| grep -m 2 S\(nh\)| awk {'print $7'}" %
-            self.vm1_macvlan_ip.split('/')[0]).split(":")[1].split(",")[0]
-        mac1_oif = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Oif | awk {'print $2'}" %
-            mac1_nh_id).split(":")[1]
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-
-        # checking evpn table
-        vm5_vrf_id = self.get_vrf_id(self.vn1_fixture, vm5_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-                vm5_vrf_id,
-                vxlanid=self.vn1_vxlan_id,
-                mac=vm1_macvlan_mac_addr,
-                ip=self.vm1_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm5 is present in vm1 EVPN table."
-
-        evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-            vm5_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm1_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm1_macvlan_mac_addr + "-" + \
-            "0.0.0.0/32", "Mac route for macvlan intf of vm5 is absent in vm1 EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-            vm5_vrf_id, mac=vm1_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2_l3")
-        cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
-
-        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
-
-        # bringing down macvlan1 intf on vm1
-        cmds_vm1 = ['ip link set dev macvlan1 down']
-        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-        time.sleep(90)
-        vm4_macvlan_mac_addr = list(
-            self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        flow = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 flow --match %s | grep %s | grep -v \"Listing\"" %
-            (self.vm1_macvlan_ip.split('/')[0],
-             self.vm1_macvlan_ip.split('/')[0]))
-        assert flow, "Flow not created."
-        mac2_nh_id = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            r"docker exec -ti vrouter_vrouter-agent_1 flow --match %s | grep -m 3 S\(nh\) | tail -n 1 | awk {'print $7'}" %
-            self.vm1_macvlan_ip.split('/')[0]).split(":")[1].split(",")[0]
-        mac2_oif = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Oif | awk {'print $2'}" %
-            mac2_nh_id).split(":")[1]
-        assert mac1_oif != mac2_oif, "Oif has not changed."
-        encap_data = self.inputs.run_cmd_on_server(
-            vm5_node_ip, r"docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Encap\ Data" % mac2_nh_id).split(":")[1][1:18]
-        assert vm4_macvlan_mac_addr.replace(
-            ":", " ") == encap_data, "Mac2 is not updated in encap data."
-
-        self.vn1_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn1_name,
-            forwarding_mode="l2")
-        # checking evpn table if MAC2 is added in vm5
-        try:
-            evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-                vm5_vrf_id,
-                vxlanid=self.vn1_vxlan_id,
-                mac=vm4_macvlan_mac_addr,
-                ip=self.vm1_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan4 is absent in EVPN table. "
-
-        # checking if macvlan4 is added to evpn table
-        evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-            vm5_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm4_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_macvlan_mac_addr + \
-            "-" + "0.0.0.0/32", "Mac route for macvlan4 is absent in EVPN table. "
-
-        # checking MAC1 + 0 ip for mac1 is deleted from vm5
-        try:
-            evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-                vm5_vrf_id,
-                vxlanid=self.vn1_vxlan_id,
-                mac=vm1_macvlan_mac_addr,
-                ip="0.0.0.0/32")['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan1 is present in EVPN table. "
-
-        # checking MAC2 is added in vm5 bridge table
-        peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-            vm5_vrf_id, mac=vm4_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking MAC1 is deleted from vm5 bridge table
-        try:
-            peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-                vm5_vrf_id, mac=vm1_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        except TypeError:
-            peer = None
-        assert not peer, "MAC1 bridge route is present"
-
-        return True
-    # end test_move_ip_locally_l2
-
-    @preposttest_wrapper
-    def test_move_ip_across_computes_l2(self):
-        '''
-        Description: verify that when IP is moved across computes, IP move is detected and old routes are deleted correctly. VN forwarding mode is L2
-        Test steps:
-               1. Create a vm - vm5 with same vn and compute as vm3
-               2. launch pod1 with MAC1/IP1 in vm2
-               3. bring down pod1 and launch pod2 with MAC2/IP1 in vm3
-        Pass criteria:
-               1. verify routes corresponding to MAC1/IP1 pair when pod1 is launched
-               2. ping from vm5 to pod1 should go through fine when pod1 is launched
-               3. After pod1 is down: MAC1 is deleted from vm5 evpn table
-                                      Derived bridge route is deleted from vm5
-               4. After pod2 is launched: MAC2 is added in vm5 evpn table
-                                          Derived bridge route is added in vm5
-               5. On vrouter: flow is updated on vm5
-        Maintainer : ybadaya@juniper.net
-        '''
-        vm5_name = get_random_name('vm5')
-        vm5_fixture = self.create_vm(
-            vn_fixture=self.vn2_fixture,
-            image_name='ubuntu',
-            vm_name=vm5_name,
-            node_name=self.node1)
-        assert vm5_fixture.wait_till_vm_is_up()
-
-        cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
-
-        self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
-        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
-        vm2_macvlan_mac_addr = list(
-            self.vm2_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-
-        # from vm5 to mac2 intf
-        vm5_to_macvlanip_ping = self.start_ping(
-            vm5_fixture, dst_ip=self.vm2_macvlan_ip.split('/')[0])
-        vm5_node_ip = vm5_fixture.vm_node_ip
-        time.sleep(60)
-        flow = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 flow --match %s | grep %s | grep -v \"Listing\"" %
-            (self.vm2_macvlan_ip.split('/')[0],
-             self.vm2_macvlan_ip.split('/')[0]))
-        assert flow, "Flow not created."
-        mac2_nh_id = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            r"docker exec -ti vrouter_vrouter-agent_1 flow --match %s| grep -m 2 S\(nh\)| awk {'print $7'}" %
-            self.vm2_macvlan_ip.split('/')[0]).split(":")[1].split(",")[0]
-        mac2_oif = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Oif | awk {'print $2'}" %
-            mac2_nh_id).split(":")[1]
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-        # checking evpn table
-        vm5_vrf_id = self.get_vrf_id(self.vn2_fixture, vm5_fixture)
-        evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-            vm5_vrf_id,
-            vxlanid=self.vn2_vxlan_id,
-            mac=vm2_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm2_macvlan_mac_addr + \
-            "-" + "0.0.0.0/32", "Mac route for macvlan1 is absent in EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-            vm5_vrf_id, mac=vm2_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
-        cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
-                    'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
-
-        self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
-        vm3_macvlan_mac_addr = list(
-            self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        vm2_cmd = ['ip link set dev macvlan1 down']
-        self.vm2_fixture.run_cmd_on_vm(vm2_cmd, as_sudo=True)
-        time.sleep(90)
-        # checking for flow wrt macvlan1 intf on vm3
-        flow = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1 flow --match %s | grep %s | grep -v \"Listing\"" %
-            (self.vm2_macvlan_ip.split('/')[0],
-             self.vm2_macvlan_ip.split('/')[0]))
-        assert flow, "Flow not created."
-        mac3_nh_id = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            r"docker exec -ti vrouter_vrouter-agent_1 flow --match %s | grep -m 3 S\(nh\) | tail -n 1 | awk {'print $7'}" %
-            self.vm2_macvlan_ip.split('/')[0]).split(":")[1].split(",")[0]
-        mac3_oif = self.inputs.run_cmd_on_server(
-            vm5_node_ip,
-            "docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Oif | awk {'print $2'}" %
-            mac3_nh_id).split(":")[1]
-        assert mac2_oif != mac3_oif, "Oif has not changed."
-        encap_data = self.inputs.run_cmd_on_server(
-            vm5_node_ip, r"docker exec -ti vrouter_vrouter-agent_1  nh --get %s | grep Encap\ Data" % mac3_nh_id).split(":")[1][1:18]
-        assert vm3_macvlan_mac_addr.replace(
-            ":", " ") == encap_data, "Mac2 is not updated in encap data."
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
-        # checking evpn table for macvlan1 intf on vm3
-        evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-            vm5_vrf_id,
-            vxlanid=self.vn2_vxlan_id,
-            mac=vm3_macvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + \
-            "-" + "0.0.0.0/32", "Mac route for macvlan4 is absent in EVPN table. "
-
-        # checking if route in vm3 evpn table is deleted
-        try:
-            evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-                vm5_vrf_id,
-                vxlanid=self.vn2_vxlan_id,
-                mac=vm2_macvlan_mac_addr,
-                ip="0.0.0.0/32")['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac1 route is present in EVPN table. "
-
-        # checking bridge table
-        peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-            vm5_vrf_id, mac=vm3_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-
-        # checking if route in vm3 bridge table is deleted
-        try:
-            peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-                vm5_vrf_id, mac=vm2_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        except TypeError:
-            peer = None
-        assert not peer, "MAC1 bridge route is present"
-        return True
-    # end test_move_ip_across_computes_l2
 
     @preposttest_wrapper
     def test_move_ip_locally_l2l3(self):
@@ -2671,7 +1954,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm1_macvlan_ip))
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm1_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2748,7 +2031,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm1_macvlan_ip))
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm1_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2833,7 +2116,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm2_macvlan_ip))
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2904,7 +2187,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm2_macvlan_ip))
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2994,7 +2277,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm2_macvlan_ip))
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -3067,7 +2350,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm2_macvlan_ip))
         # checking stitched MAC addr
-        stitched_mac_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -3136,7 +2419,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                            (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'docker exec -ti vrouter_vrouter-agent_1 rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
         assert output != "32", "Route not deleted in vrouter inet table."
@@ -3281,7 +2564,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_vrouter_agent_restart(self):
         '''
-        Description: Routes are re-learnt when vrouter_agent container is restarted. Forwarding mode = L2
+        Description: Routes are re-learnt when vrouter_agent container is restarted. Forwarding mode = L2L3
         Test steps:
                1. Create macvlan intf on vm2 and vm3.
         Pass criteria:
@@ -3306,23 +2589,17 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         vm3_macvlan_mac_addr = list(
             self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
 
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2")
         # checking from vm2 to mac3 intf
         # checking evpn table
         vm2_node_ip = self.vm2_fixture.vm_node_ip
         vm2_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm2_fixture)
-        try:
-            evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
-                vm2_vrf_id,
-                vxlanid=self.vn2_vxlan_id,
-                mac=vm3_macvlan_mac_addr,
-                ip=self.vm3_macvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for macvlan intf of vm3 is present in vm2 EVPN table."
+        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
+            vm2_vrf_id,
+            vxlanid=self.vn2_vxlan_id,
+            mac=vm3_macvlan_mac_addr,
+            ip=self.vm3_macvlan_ip)['mac']
+        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + "-" + \
+            self.vm3_macvlan_ip , "Mac route for macvlan intf of vm3 is absent in vm2 EVPN table."
 
         evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
             vm2_vrf_id,
@@ -3344,6 +2621,14 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             vm2_vrf_id,
             vxlanid=self.vn2_vxlan_id,
             mac=vm3_macvlan_mac_addr,
+            ip=self.vm3_macvlan_ip)['mac']
+        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + "-" + \
+            self.vm3_macvlan_ip , "Mac route for macvlan intf of vm3 is absent in vm2 EVPN table."
+
+        evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
+            vm2_vrf_id,
+            vxlanid=self.vn2_vxlan_id,
+            mac=vm3_macvlan_mac_addr,
             ip="0.0.0.0/32")['mac']
         assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_macvlan_mac_addr + "-" + \
             "0.0.0.0/32", "Mac route for macvlan intf of vm3 is absent in vm2 EVPN table. "
@@ -3352,11 +2637,6 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         peer = self.agent_inspect[vm2_node_ip].get_vna_layer2_route(
             vm2_vrf_id, mac=vm3_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
         assert peer == "EVPN", "Peer is not EVPN."
-
-        self.vn2_fixture.add_forwarding_mode(
-            project_fq_name=self.inputs.project_fq_name,
-            vn_name=self.vn2_name,
-            forwarding_mode="l2_l3")
         cmd = ['ip link delete macvlan1']
         self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmd, as_sudo=True)
@@ -3439,6 +2719,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         Pass criteria:
                1. Verify BFD session is up and mac-ip is learnt.
                2. Remove the target ip from vsrx and verify BFD session failed. Target routes are deleted from inet and evpn tables.
+        NOTE: Tcpdump utility must be installed on the computes.
         Maintainer : ybadaya@juniper.net
         '''
         vn1_name = get_random_name('left-vn')
@@ -3491,12 +2772,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         # creating BFD health check
         shc_fixture = self.create_hc(
             hc_type='vn-ip-list',
-            probe_type='BFD',
+           probe_type='BFD',
             target_ip_list={
                 'ip_address': [
                     target_ip.split('/')[0]]})
         self.attach_shc_to_vn(shc_fixture, vn1_fixture)
         self.addCleanup(self.detach_shc_from_vn, shc_fixture, vn1_fixture)
+        target_mac = "00:1b:44:11:3a:b7"
         self.config_bfd_on_vsrx(src_vm=test_vm,
                                 dst_vm=vm1_fixture,
                                 target_ip=target_ip,
@@ -3507,7 +2789,6 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         state = self.check_bfd_state(test_vm, vm1_fixture, gw_ip)
         assert state == "Up", "BFD state is not up."
 
-        target_mac = self.get_intf_mac_addr(test_vm, vm1_fixture)
         vsrx_vm_node_ip = vm1_fixture.vm_node_ip
         vsrx_vm_vrf_id = self.get_vrf_id(vn1_fixture, vm1_fixture)
         vn1_vxlan_id = vn1_fixture.get_vxlan_id()
@@ -3576,6 +2857,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         Pass criteria:
                1. Verify BFD session is up when hc is attached.
                3. Detach hc and verify BFD goes down and target routes are not affected.
+        NOTE: Tcpdump utility must be installed on the computes.
         Maintainer : ybadaya@juniper.net
         '''
         vn1_name = get_random_name('left-vn')
@@ -3632,6 +2914,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             target_ip_all=True)
         vn1_fixture.attach_shc(shc_fixture.uuid)
         self.addCleanup(self.detach_shc_from_vn, shc_fixture, vn1_fixture)
+        target_mac = "00:1b:44:11:3a:b7"
         self.config_bfd_on_vsrx(src_vm=test_vm,
                                 dst_vm=vm1_fixture,
                                 target_ip=target_ip,
@@ -3639,10 +2922,10 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                                 lo_ip=lo_ip)
         result = self.check_bfd_packets(vm1_fixture, vn1_fixture)
         assert result, "BFD packets are not seen"
+        time.sleep(30)
         state = self.check_bfd_state(test_vm, vm1_fixture, gw_ip)
         assert state == "Up", "BFD state is not up."
 
-        target_mac = self.get_intf_mac_addr(test_vm, vm1_fixture)
         vsrx_vm_node_ip = vm1_fixture.vm_node_ip
         vsrx_vm_vrf_id = self.get_vrf_id(vn1_fixture, vm1_fixture)
         vn1_vxlan_id = vn1_fixture.get_vxlan_id()
