@@ -13,6 +13,21 @@ from tcutils.commands import ssh, execute_cmd, execute_cmd_out
 from fabric.operations import get, put
 
 
+SRIOV_VM_IMAGE = 'ubuntu-sriov'
+SRIOV_VM_FLAVOR = 'contrail_flavor_small'
+
+
+class SriovVMFixture(VMFixture):
+    def __init__(self, connections, *args, **kwargs):
+        super(SriovVMFixture, self).__init__(connections, *args, **kwargs)
+        # overwrite image name
+        # as base class use 
+        # self.image_name = self.inputs.get_ci_image(image_name) or self.orch.get_default_image(image_name)
+        # that cannot be easily overwritten
+        self.image_name = SRIOV_VM_IMAGE
+        self.flavor = SRIOV_VM_FLAVOR
+
+
 class VerifySriovCases(object):
 
     def communication_between_two_sriov_vm (self):
@@ -73,24 +88,22 @@ class VerifySriovCases(object):
                     subnet_id=subnet2_objects[0]['id'],ip_address=vm2_mgmt_ip)
 
         vm1_fixture = self.useFixture(
-            VMFixture(
+            SriovVMFixture(
                 project_name=self.inputs.project_name,
                 connections=self.connections,
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu-sriov',
                 vm_name=sriov_vm1_name,
                 node_name=compute_1,
                 port_ids = [ports1['subnet1']['id'],ports1['subnet2']['id']]))
         vm2_fixture = self.useFixture(
-            VMFixture(
+            SriovVMFixture(
                 project_name=self.inputs.project_name,
                 connections=self.connections,
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu-sriov',
                 vm_name=sriov_vm2_name,
                 node_name=compute_2,
                 port_ids = [ports2['subnet1']['id'],ports2['subnet2']['id']]))
@@ -171,13 +184,12 @@ class VerifySriovCases(object):
 
             sriov_vm1_name = 'SRIOV_VM-' + str(x)
             vm_fixture_list.append(self.useFixture(
-            VMFixture(
+            SriovVMFixture(
                 project_name=self.inputs.project_name,
                 connections=self.connections,
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu-sriov',
                 vm_name=sriov_vm1_name,
                 node_name=compute_1,
                 port_ids = [ports1['id'],ports2['id']])))
@@ -194,13 +206,12 @@ class VerifySriovCases(object):
                     subnet_id=subnet2_objects[0]['id'],ip_address=vm1_mgmt_ip)
 
         vm_fixture_error=self.useFixture(
-            VMFixture(
+            SriovVMFixture(
                 project_name=self.inputs.project_name,
                 connections=self.connections,
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu-sriov',
                 vm_name='VM-Error',
                 node_name=compute_1,
                 port_ids = [ports1['id'],ports2['id']]))
@@ -225,13 +236,12 @@ class VerifySriovCases(object):
                     subnet_id=subnet2_objects[0]['id'],ip_address=vm1_mgmt_ip)
 
         vm_fixture_new=self.useFixture(
-            VMFixture(
+            SriovVMFixture(
                 project_name=self.inputs.project_name,
                 connections=self.connections,
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu-sriov',
                 vm_name='VM-New',
                 node_name=compute_1,
                 port_ids = [ports1['id'],ports2['id']]))
@@ -311,24 +321,22 @@ class VerifySriovCases(object):
                     subnet_id=subnet2_objects[0]['id'],ip_address=vm2_mgmt_ip)
 
         vm1_fixture = self.useFixture(
-            VMFixture(
+            SriovVMFixture(
                 project_name=self.inputs.project_name,
                 connections=self.connections,
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu-sriov',
                 vm_name=sriov_vm1_name,
                 node_name=compute_1,
                 port_ids = [ports1['subnet1']['id'],ports1['subnet2']['id']]))
         vm2_fixture = self.useFixture(
-            VMFixture(
+            SriovVMFixture(
                 project_name=self.inputs.project_name,
                 connections=self.connections,
                 vn_objs=[
                     vn3_fixture.obj,
                     vn1_fixture.obj],
-                image_name='ubuntu-sriov',
                 vm_name=sriov_vm2_name,
                 node_name=compute_2,
                 port_ids = [ports2['subnet1']['id'],ports2['subnet2']['id']]))
