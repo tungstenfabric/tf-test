@@ -281,19 +281,6 @@ class VerifySriovCases(object):
         sriov_vm2_name = 'SRIOV_VM2'
 
         (self.vn1_name, self.vn1_subnets) = ("SRIOV-Test-VN1", ["55.1.1.0/24"])
-        vn3_fixture = self.useFixture(
-            VNFixture(
-                project_name=self.inputs.project_name,
-                connections=self.connections,
-                inputs=self.inputs,
-                vn_name=self.vn3_name,
-                subnets=self.vn3_subnets,))
-
-        sriov_vm1_name = 'SRIOV_VM1'
-        sriov_vm2_name = 'SRIOV_VM2'
-
-        (self.vn1_name, self.vn1_subnets) = ("SRIOV-Test-VN1", ["55.1.1.0/24"])
-
         vn1_fixture = self.useFixture(
             VNFixture(
                 project_name=self.inputs.project_name,
