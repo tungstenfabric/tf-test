@@ -175,7 +175,7 @@ class ContrailReportInit(TestInputs):
     def get_build_id(self):
         if self.build_id:
             return self.build_id
-        cmd = "rpm -q --queryformat '%{VERSION}-' contrail-test; rpm -q --queryformat '%{RELEASE}' contrail-test | awk -F'.' '{print $1}'"
+        cmd = "rpm -q --queryformat '%{VERSION}-' python3-contrail; rpm -q --queryformat '%{RELEASE}' python3-contrail | awk -F'.' '{print $1}'"
         build_id = self.get_os_env("BUILD_ID")
         if not build_id:
             build_id = local(cmd, capture=True)
