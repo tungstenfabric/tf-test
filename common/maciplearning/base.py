@@ -83,8 +83,10 @@ class BaseMacIpLearningTest(GenericTestBase):
         '''
 
         cmdList = []
-        cmdList.extend(('deactivate interfaces ge-0/0/1 unit 0 family inet dhcp',
+        cmdList.extend(('set system arp aging-timer 1',
+                        'deactivate interfaces ge-0/0/1 unit 0 family inet dhcp',
                         'set interfaces ge-0/0/1 unit 0 family inet address %s' % target_ip,
+                        'set interfaces ge-0/0/1 mac 00:1b:44:11:3a:b7',
                         'set interfaces lo0 unit 57 family inet address %s/32' % lo_ip,
                         'set routing-options static route %s/32 next-hop %s' % (
                             gw_ip, gw_ip),
