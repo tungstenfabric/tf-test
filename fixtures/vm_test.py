@@ -2096,8 +2096,14 @@ class VMFixture(fixtures.Fixture):
         if do_cleanup:
             if self.inputs.orchestrator != 'vcenter' and \
                not self.inputs.ns_agilio_vrouter_data:
-                for each_port_id in self.port_ids or []:
-                    self.interface_detach(each_port_id)
+                if self.is_vm_active:
+                    # detach cannot work for VMs in ERROR state
+                    for each_port_id in self.port_ids or []:
+                        self.interface_detach(each_port_id)
+                else:
+                    self.logger.info(
+                        "Skip interface_detach for VM %s in state %s" % \
+                        (self.vm_obj.name, self.vm_obj.status))
             for vm_obj in list(self.vm_objs):
                 for sec_grp in self.sg_ids:
                     self.logger.info("Removing the security group"

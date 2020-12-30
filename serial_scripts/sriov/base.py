@@ -72,12 +72,6 @@ class BaseSriovTest(test_v1.BaseTestCase_v1):
         new_ip=int2ip(ip_num)
         return new_ip
 
-    def vm_force_delete(self,vm_obj):
-        cmd= 'source /etc/contrail/openstackrc;nova force-delete %s' %(vm_obj.vm_id)
-        status=self.inputs.run_cmd_on_server(self.inputs.cfgm_ip, cmd,
-                                             container='nova')
-        return status
-
     def get_sriov_mac(self,vm_fix,interface):
         intf_cmd='ip link show dev %s| grep ether'%(interface)
         output=vm_fix.run_cmd_on_vm(cmds=[intf_cmd], as_sudo=True)
