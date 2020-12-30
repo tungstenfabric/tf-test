@@ -27,6 +27,10 @@ class SriovVMFixture(VMFixture):
         self.image_name = SRIOV_VM_IMAGE
         self.flavor = SRIOV_VM_FLAVOR
 
+    # to force VN deletion during cleanups in case of any errors
+    def delete(self, verify=False, force=False):
+        super(SriovVMFixture, self).delete(verify=verify, force=True)
+
 
 class VerifySriovCases(object):
 
@@ -218,7 +222,7 @@ class VerifySriovCases(object):
         assert vm_fixture_error.wait_till_vm_status(status='ERROR'), "VM Status should be in Error as all VF already in use"
 
         # Force delete the VM
-        status=self.vm_force_delete(vm_fixture_error)
+        vm_fixture_error.delete(force=True)
         self.remove_from_cleanups(vm_fixture_error)
         self.logger.info(
                 'Delete a VM to freeup one VF on Compute %s' % (compute_1))
