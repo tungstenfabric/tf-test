@@ -80,10 +80,19 @@ class TestSubInterfaces(BaseVrouterTest):
                                      )
         assert vm1_fixture.wait_till_vm_is_up()
         assert vm2_fixture.wait_till_vm_is_up()
-        assert vm1_fixture.ping_with_certainty(vm2_fixture.vm_ip)
         assert vm3_fixture.wait_till_vm_is_up()
-        vm3_ip = self.vn1_port2.get_ip_addresses()[0]
-        assert vm1_fixture.ping_with_certainty(vm3_ip)
+        
+        interface = 'eth0.%s' %(VLAN_ID)
+        vm1_sub_intf_ip = self.vn1_port1.get_ip_addresses()[0]
+        assert vm1_fixture.wait_till_interface_created(interface,
+            ip=vm1_sub_intf_ip)[0]
+        assert vm1_fixture.ping_with_certainty(vm2_fixture.vm_ip)
+
+        vm3_sub_intf_ip = self.vn1_port2.get_ip_addresses()[0]
+        assert vm3_fixture.wait_till_interface_created(interface,
+            ip=vm3_sub_intf_ip)[0]
+        assert vm1_fixture.ping_with_certainty(vm3_sub_intf_ip)
+
     # end test_vlan_interface_1
 
     @test.attr(type=['cb_sanity', 'sanity','dev_reg'])
