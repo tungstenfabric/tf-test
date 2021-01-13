@@ -40,6 +40,21 @@ class OrangeSolutionTest(BaseSolutionsTest):
     @classmethod
     def setup_vepg(cls):
 
+        
+        ## TBD - NEED TO DERIVE VALUES BASED ON INPUTS
+        cls.NB_VSFO_CP_NODES=1
+        cls.NB_VSFO_UP_NODES =1
+        #vSFO CP sizing
+        cls.NB_VSFO_CP_EXT_NIC=1
+        cls.NB_VSFO_CP_SIGIF=3
+        cls.NB_APN_RADIUS=5
+        # vSFO UP sizing
+        cls.NB_VSFO_UP_EXT_NIC=2
+        cls.NB_VSFO_UP_CNNIC=1
+        cls.NB_VSFO_UP_CNIF=2
+        cls.NB_APN=5
+        cls.NB_BGP_PREFIXES_PER_APN=10
+
     #Quota Create.
         cls.quota_env_file=cls.deploy_path+"env/quota.yaml"
         with open(cls.quota_env_file, 'r') as fd:
@@ -157,6 +172,46 @@ class OrangeSolutionTest(BaseSolutionsTest):
                                  template=cls.vepg_template,
                                  timeout_mins=15)
             cls.vepg_stack.setUp()
+
+        stack_name = cls.connections.project_name+'_vepg'
+        op = cls.vepg_stack.heat_client_obj.stacks.get(stack_name).outputs
+        vsfo_fix = dict()
+        for output in op:
+            key = output['output_key']
+
+            for i in range(1,cls.NB_VSFO_CP_NODES+1):
+                vsfo = "vsfo_%s_id" %(i)
+                if key == vsfo:
+                    vsfo_uuid = output['output_value']
+                    vsfo_fix[i] = VMFixture(connections=cls.connections,uuid = vsfo_uuid, image_name = 'VSFO-CP-IMAGE')
+                    vsfo_fix[i].read()
+                    vsfo_fix[i].verify_on_setup()
+                i = i + 1
+
+            for i in range(cls.NB_VSFO_CP_NODES+1 ,cls.NB_VSFO_CP_NODES + cls.NB_VSFO_UP_NODES+1):
+                vsfo = "vsfo_%s_id" %(i)
+                if key == vsfo:
+                    vsfo_uuid = output['output_value']
+                    vsfo_fix[i] = VMFixture(connections=cls.connections,uuid = vsfo_uuid, image_name = 'VSFO-UP-IMAGE')
+                    vsfo_fix[i].read()
+                    vsfo_fix[i].verify_on_setup()
+                i = i+1
+
+            if key == "vrp_31_id":
+                vrp31_uuid = output['output_value']
+                vrp_31 = VMFixture(connections=cls.connections,uuid = vrp31_uuid, image_name = 'VRP-IMAGE')
+                vrp_31.read()
+                vrp_31.verify_on_setup()
+
+            if key == "vrp_32_id":
+                vrp32_uuid = output['output_value']
+                vrp_32 = VMFixture(connections=cls.connections,uuid = vrp32_uuid, image_name = 'VRP-IMAGE')
+                vrp_32.read()
+                vrp_32.verify_on_setup()
+
+        cls.vsfo_fix = vsfo_fix
+        cls.vrp_31 = vrp_31
+        cls.vrp_32 = vrp_32
 
     # Create BGPaaS stacks.
         #Define variables for template file, env file, bgpaas stack and
