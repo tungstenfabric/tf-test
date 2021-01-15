@@ -24,14 +24,14 @@ from common.vrouter.base import BaseVrouterTest
 from common.maciplearning.base import BaseMacIpLearningTest
 
 
-class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
+class TestMacIp6Learning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @classmethod
     def setUpClass(cls):
-        super(TestMacIpLearning, cls).setUpClass()
+        super(TestMacIp6Learning, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(TestMacIpLearning, cls).tearDownClass()
+        super(TestMacIp6Learning, cls).tearDownClass()
 
     def setUp(self):
         '''
@@ -43,7 +43,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         5. Create ips for macvlan intfs with same subnet as eth0 for each vm
         6. Sets up contrail-tools
         '''
-        super(TestMacIpLearning, self).setUp()
+        super(TestMacIp6Learning, self).setUp()
         self.vn1_name = get_random_name('vn1')
         self.vn2_name = get_random_name('vn2')
 
@@ -57,8 +57,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         self.vn1_fixture = self.create_vn(
             vn_name=self.vn1_name, orch=self.orchestrator)
+        self.vn1_v6_subnet = get_random_cidr(af='v6', mask=SUBNET_MASK['v6']['min'])
+        self.vn1_fixture.create_subnet({'cidr': self.vn1_v6_subnet})
+
         self.vn2_fixture = self.create_vn(
             vn_name=self.vn2_name, orch=self.orchestrator)
+        self.vn2_v6_subnet = get_random_cidr(af='v6', mask=SUBNET_MASK['v6']['min'])
+        self.vn2_fixture.create_subnet({'cidr': self.vn2_v6_subnet})
 
         assert self.vn1_fixture.set_mac_ip_learning()
         assert self.vn2_fixture.set_mac_ip_learning()
@@ -89,15 +94,6 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert self.vm3_fixture.wait_till_vm_is_up()
         assert self.vm4_fixture.wait_till_vm_is_up()
 
-        cmds = ['echo 2 | sudo tee /proc/sys/net/ipv4/conf/all/arp_ignore',
-                'echo 2 | sudo tee /proc/sys/net/ipv4/conf/all/arp_announce',
-                'echo 2 | sudo tee /proc/sys/net/ipv4/conf/all/rp_filter']
-
-        self.vm1_fixture.run_cmd_on_vm(cmds, as_sudo=True)
-        self.vm2_fixture.run_cmd_on_vm(cmds, as_sudo=True)
-        self.vm3_fixture.run_cmd_on_vm(cmds, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmds, as_sudo=True)
-
         rules = [
             {
                 'direction': '<>', 'simple_action': 'pass',
@@ -126,19 +122,23 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         self.vn1_vxlan_id = self.vn1_fixture.get_vxlan_id()
         self.vn2_vxlan_id = self.vn2_fixture.get_vxlan_id()
 
-        self.vm1_eth0_ip = self.get_intf_address('eth0', self.vm1_fixture)
-        self.vm2_eth0_ip = self.get_intf_address('eth0', self.vm2_fixture)
-        self.vm3_eth0_ip = self.get_intf_address('eth0', self.vm3_fixture)
-        self.vm4_eth0_ip = self.get_intf_address('eth0', self.vm4_fixture)
+        self.vm1_eth0_ip = self.get_intf_address('eth0', self.vm1_fixture, True)
+        self.vm2_eth0_ip = self.get_intf_address('eth0', self.vm2_fixture, True)
+        self.vm3_eth0_ip = self.get_intf_address('eth0', self.vm3_fixture, True)
+        self.vm4_eth0_ip = self.get_intf_address('eth0', self.vm4_fixture, True)
 
-        self.vm1_macvlan_ip = ".".join(self.vm1_eth0_ip.split(
-            ".")[:3]) + "." + str(int(self.vm1_eth0_ip.split(".")[3]) + 5) + "/32"
-        self.vm2_macvlan_ip = ".".join(self.vm2_eth0_ip.split(
-            ".")[:3]) + "." + str(int(self.vm2_eth0_ip.split(".")[3]) + 5) + "/32"
-        self.vm3_macvlan_ip = ".".join(self.vm3_eth0_ip.split(
-            ".")[:3]) + "." + str(int(self.vm3_eth0_ip.split(".")[3]) + 5) + "/32"
-        self.vm4_macvlan_ip = ".".join(self.vm4_eth0_ip.split(
-            ".")[:3]) + "." + str(int(self.vm4_eth0_ip.split(".")[3]) + 5) + "/32"
+        self.vm1_macvlan_ip = ":".join(self.vm1_eth0_ip.split('/')[0].split(
+            ':')[:-1]) + ":" + str(int(self.vm1_eth0_ip.split('/')[0].split(':')[-1]) + 5) + \
+            '/128'
+        self.vm2_macvlan_ip = ":".join(self.vm2_eth0_ip.split('/')[0].split(
+            ':')[:-1]) + ":" + str(int(self.vm2_eth0_ip.split('/')[0].split(':')[-1]) + 5) + \
+            '/128'
+        self.vm3_macvlan_ip = ":".join(self.vm3_eth0_ip.split('/')[0].split(
+            ':')[:-1]) + ":" + str(int(self.vm3_eth0_ip.split('/')[0].split(':')[-1]) + 5) + \
+            '/128'
+        self.vm4_macvlan_ip = ":".join(self.vm4_eth0_ip.split('/')[0].split(
+            ':')[:-1]) + ":" + str(int(self.vm4_eth0_ip.split('/')[0].split(':')[-1]) + 5) + \
+            '/128'
 
         try:
             self.inputs.run_cmd_on_server(self.vm1_fixture.vm_node_ip, "contrail-tools")
@@ -151,7 +151,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         Description:  Enable MAC-IP learning on virtual network
         Pass criteria:
-               1. Mac-Ip learning flag should be enabled on when we do vif --get for vmi on vn1
+               1. Mac-Ip learning flag should be enabled on when we do vif --get for dual stack vmi on vn1
         Maintainer : ybadaya@juniper.net
         '''
         # checking flag from vif --get on vm1
@@ -169,7 +169,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_intra_compute_l2l3_pkt_mode(self):
         '''
-        Description:  Learn MAC_IPv4 bindings on VM interface in the same VN and same compute with forwarding mode L2L3 and disabled policy (in Packet Mode).
+        Description:  Learn MAC_IPv6 bindings on VM interface in the same VN and same compute with forwarding mode L2L3 and disabled policy (in Packet Mode).
         Test steps:
                1. Disable policy on vm1 and vm4
                2. Create macvlan intf on vm1 and vm4.
@@ -184,13 +184,16 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         self.vm1_fixture.disable_interface_policy()
         self.vm4_fixture.disable_interface_policy()
+
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -242,18 +245,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
-        route = self.get_vrouter_route(self.vm4_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm1_vrf_id,
+                                        prefix=self.vm4_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm4_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -265,7 +270,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -281,7 +286,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_inter_compute_l2l3_pkt_mode(self):
         '''
-        Description: Learn MAC_IPv4 bindings on VM interface in the same VN and different compute with forwarding mode L2L3 and disabled policy (in Packet Mode).
+        Description: Learn MAC_IPv6 bindings on VM interface in the same VN and different compute with forwarding mode L2L3 and disabled policy (in Packet Mode).
         Test steps:
                1. Disable policy on vm2 and vm3
                2. Create macvlan intf on vm2 and vm3.
@@ -296,14 +301,15 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         self.vm2_fixture.disable_interface_policy()
         self.vm3_fixture.disable_interface_policy()
-
         cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm2_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
 
         cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm3_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm3_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
 
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
@@ -358,18 +364,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking if route for macvlan_ip3 is present in vm2 vrouter inet
         # table
-        route = self.get_vrouter_route(self.vm3_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm2_vrf_id,
+                                        prefix=self.vm3_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm3_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm2_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm2_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -377,12 +385,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert nh_type == "Tunnel", "Nh type is not Tunnel."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm3_macvlan_ip, int(vm2_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm2_node_ip, stitched_mac_cmd).split("(")[0]
         assert EUI(output, dialect=mac_unix_expanded) == EUI(
-            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stictched mac address is invalid."
+            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
 
         cmd = ['ip link delete macvlan1']
         self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
@@ -394,7 +402,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_intra_compute_l2l3(self):
         '''
-        Description: Learn MAC_IPv4 bindings on VM interface in the same VN and same compute with forwarding mode L2/L3.
+        Description: Learn MAC_IPv6 bindings on VM interface in the same VN and same compute with forwarding mode L2/L3.
         Test steps:
                1. Create macvlan intf on vm1 and vm4.
         Pass criteria:
@@ -408,11 +416,14 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
+
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -464,18 +475,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
-        route = self.get_vrouter_route(self.vm4_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm1_vrf_id,
+                                        prefix=self.vm4_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm4_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -487,7 +500,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -503,7 +516,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_inter_compute_l2l3(self):
         '''
-        Description:  Learn MAC_IPv4 bindings on VM interface in the same VN and different compute with forwarding mode L2/L3.
+        Description:  Learn MAC_IPv6 bindings on VM interface in the same VN and different compute with forwarding mode L2/L3.
         Test steps:
                1. Create macvlan intf on vm2 and vm3.
         Pass criteria:
@@ -517,11 +530,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm2_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
 
         cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm3_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm3_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
 
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
@@ -576,18 +591,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking if route for macvlan_ip3 is present in vm2 vrouter inet
         # table
-        route = self.get_vrouter_route(self.vm3_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm2_vrf_id,
+                                        prefix=self.vm3_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm3_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm2_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm2_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -595,12 +612,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert nh_type == "Tunnel", "Nh type is not Tunnel."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm3_macvlan_ip, int(vm2_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm2_node_ip, stitched_mac_cmd).split("(")[0]
         assert EUI(output, dialect=mac_unix_expanded) == EUI(
-            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stictched mac address is invalid."
+            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
 
         cmd = ['ip link delete macvlan1']
         self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
@@ -611,7 +628,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_intra_compute_vlan_pkt_mode_l2l3(self):
         '''
-        Description: Learn MAC_IPv4 bindings on VLAN sub intf in same VN and same compute with forwarding mode as L2L3 only mode and disabled policy (in Packet mode)
+        Description: Learn MAC_IPv6 bindings on VLAN sub intf in same VN and same compute with forwarding mode as L2L3 only mode and disabled policy (in Packet mode)
         Test steps:
                1. Disable policy on vm1 and vm4
                2. Create macvlan intf on vlan intf on vm1 and vm4. Intf should be on diff subnet
@@ -627,30 +644,38 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         self.vm1_fixture.disable_interface_policy()
         self.vm4_fixture.disable_interface_policy()
-        vn2_gw_ip = self.vn2_fixture.get_subnets()[0]['gateway_ip']
-        vm1_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 5) + "/32"
-        vm1_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 6) + "/32"
-        vm4_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 7) + "/32"
-        vm4_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 8) + "/32"
+        vn2_gw_ip = self.vn2_fixture.get_subnets()[1]['gateway_ip']
+        vm1_vlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 5) + \
+            '/128'
+        vm1_vlan_macvlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 6) + \
+            '/128'
+        vm4_vlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 7) + \
+            '/128'
+        vm4_vlan_macvlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 8) + \
+            '/128'
         cmds_vm1 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm1_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm1_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm1_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm1_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm4_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm4_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm4_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm4_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -676,7 +701,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm1_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm1_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn2_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm1_vlan_ip.split('/')[0]}])
         self.setup_vmi(self.vn2_fixture.uuid,
                        parent_vmi=parent_vmi_vm4,
@@ -684,10 +709,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm4_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm4_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn2_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm4_vlan_ip.split('/')[0]}])
 
+        # ping is reqd in order for mac ip learning
         assert self.vm1_fixture.ping_to_ip(vm4_vlan_macvlan_ip.split('/')[0])
+        assert self.vm4_fixture.ping_to_ip(vm1_vlan_macvlan_ip.split('/')[0])
         # ping from macvlan1 intf on vm1 to macvlan intf on vm4
         assert self.vm1_fixture.ping_to_ip(
             vm4_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
@@ -728,19 +755,21 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert route, ('No route seen in agent inet table for %s' %
                        (vm4_vlan_macvlan_ip.split("/")[0]))
 
-        # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
-        route = self.get_vrouter_route(vm4_vlan_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        # checking if vm4_vlan_macvlan_ip is present in vm1 vrouter inet table
+        route = inspect_h.get_vrouter_route_table(vm1_vrf_id,
+                                        prefix=vm4_vlan_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
-                       (self.vm4_macvlan_ip))
+                       (vm4_vlan_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -752,7 +781,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             vm4_vlan_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -769,7 +798,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_inter_compute_vlan_pkt_mode_l2l3(self):
         '''
-        Description:  Learn MAC_IPv4 bindings on VLAN sub intf in same VN and different compute with forwarding mode as L2L3 only mode and disabled policy (in Packet Mode)
+        Description:  Learn MAC_IPv6 bindings on VLAN sub intf in same VN and different compute with forwarding mode as L2L3 only mode and disabled policy (in Packet Mode)
         Test steps:
                1. Disable policy on vm2 and vm3
                2. Create macvlan intf on vlan intf on vm2 and vm3.
@@ -785,30 +814,38 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         self.vm2_fixture.disable_interface_policy()
         self.vm3_fixture.disable_interface_policy()
-        vn1_gw_ip = self.vn1_fixture.get_subnets()[0]['gateway_ip']
-        vm2_vlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 5) + "/32"
-        vm2_vlan_macvlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 6) + "/32"
-        vm3_vlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 7) + "/32"
-        vm3_vlan_macvlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 8) + "/32"
+        vn1_gw_ip = self.vn1_fixture.get_subnets()[1]['gateway_ip']
+        vm2_vlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 5) + \
+            '/128'
+        vm2_vlan_macvlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 6) + \
+            '/128'
+        vm3_vlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 7) + \
+            '/128'
+        vm3_vlan_macvlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 8) + \
+            '/128'
         cmds_vm2 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm2_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm2_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm2_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm2_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm3 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm3_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm3_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm3_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm3_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
@@ -835,7 +872,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm2_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm2_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn1_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm2_vlan_ip.split('/')[0]}])
         self.setup_vmi(self.vn1_fixture.uuid,
                        parent_vmi=parent_vmi_vm3,
@@ -843,10 +880,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm3_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm3_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn1_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm3_vlan_ip.split('/')[0]}])
 
+        # ping is reqd in order for mac ip learning
         assert self.vm2_fixture.ping_to_ip(vm3_vlan_macvlan_ip.split('/')[0])
+        assert self.vm3_fixture.ping_to_ip(vm2_vlan_macvlan_ip.split('/')[0])
         # ping from macvlan1 intf on vm2 to macvlan intf on vm3
         assert self.vm2_fixture.ping_to_ip(
             vm3_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
@@ -889,18 +928,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking if route for macvlan_ip3 is present in vm2 vrouter inet
         # table
-        route = self.get_vrouter_route(vm3_vlan_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm2_vrf_id,
+                                        prefix=vm3_vlan_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (vm3_vlan_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm2_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm2_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -908,12 +949,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert nh_type == "Tunnel", "Nh type is not Tunnel."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             vm3_vlan_macvlan_ip, int(vm2_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm2_node_ip, stitched_mac_cmd).split("(")[0]
         assert EUI(output, dialect=mac_unix_expanded) == EUI(
-            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stictched mac address is invalid."
+            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
 
         cmd = ['ip link delete macvlan1',
                'ip link delete eth0.100']
@@ -926,7 +967,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_intra_compute_vlan_l2l3(self):
         '''
-        Description: Learn MAC_IPv4 bindings on VLAN sub intf in same vn and same compute with forwarding mode as  L2/L3 mode.
+        Description: Learn MAC_IPv6 bindings on VLAN sub intf in same vn and same compute with forwarding mode as  L2/L3 mode.
         Test steps:
                1. Create macvlan intf on vlan intf on vm1 and vm4. Intf should be on diff subnet
                2. Create vlan vmi with parent vmi vm1 and vm4 respectively
@@ -939,30 +980,38 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                6. On vrouter: Verify POD IP is added to inet table, Encap data replaced with MAC2 in nh
         Maintainer : ybadaya@juniper.net
         '''
-        vn2_gw_ip = self.vn2_fixture.get_subnets()[0]['gateway_ip']
-        vm1_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 5) + "/32"
-        vm1_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 6) + "/32"
-        vm4_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 7) + "/32"
-        vm4_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 8) + "/32"
+        vn2_gw_ip = self.vn2_fixture.get_subnets()[1]['gateway_ip']
+        vm1_vlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 5) + \
+            '/128'
+        vm1_vlan_macvlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 6) + \
+            '/128'
+        vm4_vlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 7) + \
+            '/128'
+        vm4_vlan_macvlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 8) + \
+            '/128'
         cmds_vm1 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm1_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm1_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm1_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm1_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm4_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm4_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm4_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm4_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -988,7 +1037,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm1_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm1_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn2_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm1_vlan_ip.split('/')[0]}])
         self.setup_vmi(self.vn2_fixture.uuid,
                        parent_vmi=parent_vmi_vm4,
@@ -996,16 +1045,19 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm4_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm4_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn2_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm4_vlan_ip.split('/')[0]}])
 
+        # ping is reqd in order for mac ip learning
         assert self.vm1_fixture.ping_to_ip(vm4_vlan_macvlan_ip.split('/')[0])
+        assert self.vm4_fixture.ping_to_ip(vm1_vlan_macvlan_ip.split('/')[0])
         # ping from macvlan1 intf on vm1 to macvlan intf on vm4
         assert self.vm1_fixture.ping_to_ip(
             vm4_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
         # ping from macvlan1 intf on vm4 to macvlan intf on vm1
         assert self.vm4_fixture.ping_to_ip(
             vm1_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
+
         # checking evpn table
         vm1_node_ip = self.vm1_fixture.vm_node_ip
         vm1_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm1_fixture)
@@ -1039,19 +1091,21 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert route, ('No route seen in agent inet table for %s' %
                        (vm4_vlan_macvlan_ip.split("/")[0]))
 
-        # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
-        route = self.get_vrouter_route(vm4_vlan_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        # checking if vm4_vlan_macvlan_ip is present in vm1 vrouter inet table
+        route = inspect_h.get_vrouter_route_table(vm1_vrf_id,
+                                        prefix=vm4_vlan_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
-                       (self.vm4_macvlan_ip))
+                       (vm4_vlan_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -1063,7 +1117,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             vm4_vlan_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1080,7 +1134,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_inter_compute_vlan_l2l3(self):
         '''
-        Description: Learn MAC_IPv4 bindings on VLAN sub intf in same vn and diff compute with forwarding mode as  L2/L3 mode.
+        Description: Learn MAC_IPv6 bindings on VLAN sub intf in same vn and diff compute with forwarding mode as  L2/L3 mode.
         Test steps:
                1. Create macvlan intf on vlan intf on vm2 and vm3.
                2. Create vlan vmi with parent vmi vm2 and vm3 respectively
@@ -1093,30 +1147,38 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                6. On vrouter: Verify POD IP is added to inet table, Encap data replaced with MAC2 in nh, Nh type as Tunnel
         Maintainer : ybadaya@juniper.net
         '''
-        vn1_gw_ip = self.vn1_fixture.get_subnets()[0]['gateway_ip']
-        vm2_vlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 5) + "/32"
-        vm2_vlan_macvlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 6) + "/32"
-        vm3_vlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 7) + "/32"
-        vm3_vlan_macvlan_ip = ".".join(vn1_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn1_gw_ip.split(".")[3]) + 8) + "/32"
+        vn1_gw_ip = self.vn1_fixture.get_subnets()[1]['gateway_ip']
+        vm2_vlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 5) + \
+            '/128'
+        vm2_vlan_macvlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 6) + \
+            '/128'
+        vm3_vlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 7) + \
+            '/128'
+        vm3_vlan_macvlan_ip = ":".join(vn1_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn1_gw_ip.split(':')[-1]) + 8) + \
+            '/128'
         cmds_vm2 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm2_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm2_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm2_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm2_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm3 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm3_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm3_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm3_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm3_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
@@ -1143,7 +1205,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm2_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm2_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn1_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm2_vlan_ip.split('/')[0]}])
         self.setup_vmi(self.vn1_fixture.uuid,
                        parent_vmi=parent_vmi_vm3,
@@ -1151,10 +1213,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm3_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm3_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn1_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm3_vlan_ip.split('/')[0]}])
 
+        # ping is reqd in order for mac ip learning
         assert self.vm2_fixture.ping_to_ip(vm3_vlan_macvlan_ip.split('/')[0])
+        assert self.vm3_fixture.ping_to_ip(vm2_vlan_macvlan_ip.split('/')[0])
         # ping from macvlan1 intf on vm2 to macvlan intf on vm3
         assert self.vm2_fixture.ping_to_ip(
             vm3_vlan_macvlan_ip.split('/')[0], intf="macvlan1")
@@ -1197,18 +1261,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking if route for macvlan_ip3 is present in vm2 vrouter inet
         # table
-        route = self.get_vrouter_route(vm3_vlan_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm2_vrf_id,
+                                        prefix=vm3_vlan_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (vm3_vlan_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm2_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm2_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm2_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -1216,12 +1282,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert nh_type == "Tunnel", "Nh type is not Tunnel."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             vm3_vlan_macvlan_ip, int(vm2_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm2_node_ip, stitched_mac_cmd).split("(")[0]
         assert EUI(output, dialect=mac_unix_expanded) == EUI(
-            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stictched mac address is invalid."
+            vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
 
         cmd = ['ip link delete macvlan1',
                'ip link delete eth0.100']
@@ -1234,7 +1300,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_inter_vn_intra_compute_intra_subnet(self):
         '''
-        Description:  Verify Pod IPv4 connectivity on same compute, inter vn, intra subnet
+        Description:  Verify Pod IPv6 connectivity on same compute, inter vn, intra subnet
         Test steps:
                1. Create macvlan intf on vm1 and vm3
         Pass criteria: Ping between the VM and pod should go thru fine.
@@ -1242,15 +1308,19 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm3_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm3_macvlan_ip.split('/')[0]+'/64'),
+                    'ifup --force eth0']
 
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
-
+        time.sleep(30)
+        assert self.vm1_fixture.ping_to_ip(self.vn1_fixture.get_subnets()[1]['gateway_ip'], intf="macvlan1")
+        assert self.vm3_fixture.ping_to_ip(self.vn2_fixture.get_subnets()[1]['gateway_ip'], intf="macvlan1")
         # from vm1 to mac3 intf
         assert self.vm1_fixture.ping_to_ip(self.vm3_macvlan_ip.split('/')[0])
         # from vm3 to mac1
@@ -1271,7 +1341,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_intra_vn_inter_subnet_intra_compute(self):
         '''
-        Description: Verify Pod IPv4 connectivity on same compute, intra vn, inter subnet
+        Description: Verify Pod IPv6 connectivity on same compute, intra vn, inter subnet
         Test steps:
                1. Create a VN and launch 2 VMs in it on same compute, diff subnet.
                2. Set mac-ip learning flag on created vn
@@ -1280,52 +1350,55 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         Maintainer : ybadaya@juniper.net
         '''
         vn1_name = get_random_name("vn1")
-        (vm1_name, vm2_name) = (
-            get_random_name('vm1'), get_random_name('vm2'))
-        vn1_subnet_list = [get_random_cidr(), get_random_cidr()]
+        vn1_subnet_list = [get_random_cidr(),get_random_cidr()]
+        vn1_subnet_list_v6 = [get_random_cidr(af='v6', mask=SUBNET_MASK['v6']['min']),
+                           get_random_cidr(af='v6', mask=SUBNET_MASK['v6']['min'])]
         vn1_subnets = [{'cidr': vn1_subnet_list[0], },
                        {'cidr': vn1_subnet_list[1], }]
+        vn1_subnets_v6 = [{'cidr': vn1_subnet_list_v6[0], },
+                          {'cidr': vn1_subnet_list_v6[1], }]
         vm1_name = get_random_name('vn1-vm1')
         vm2_name = get_random_name('vn1-vm2')
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
+        vn1_fixture.create_subnet(vn1_subnets_v6[0])
+        vn1_fixture.create_subnet(vn1_subnets_v6[1])
         assert vn1_fixture.set_mac_ip_learning()
         node1 = self.inputs.host_data[self.inputs.compute_ips[0]]['name']
         self.logger.info('Create first VM in the VN')
         vm1_fixture = self.create_vm(vn1_fixture, vm1_name,
                                      image_name='ubuntu', node_name=node1)
-
         # Create a second VM in second subnet
         port_obj = self.create_port(net_id=vn1_fixture.vn_id,
-                                    fixed_ips=[{'subnet_id': vn1_fixture.vn_subnet_objs[1]['id']}])
+                                    fixed_ips=[{'subnet_id': vn1_fixture.vn_subnet_objs[1]['id']},
+                                               {'subnet_id': vn1_fixture.vn_subnet_objs[3]['id']}])
         vm2_fixture = self.create_vm(vn1_fixture, vm2_name,
                                      image_name='ubuntu',
                                      port_ids=[port_obj['id']], node_name=node1)
 
         assert vm1_fixture.wait_till_vm_is_up()
         assert vm2_fixture.wait_till_vm_is_up()
-        vm1_eth0_ip = self.get_intf_address('eth0', vm1_fixture)
-        vm2_eth0_ip = self.get_intf_address('eth0', vm2_fixture)
-        macvlan_ip1 = ".".join(vm1_eth0_ip.split(
-            ".")[:3]) + "." + str(int(vm1_eth0_ip.split(".")[3]) + 5)
-        macvlan_ip2 = ".".join(vm2_eth0_ip.split(
-            ".")[:3]) + "." + str(int(vm2_eth0_ip.split(".")[3]) + 5)
-
-        cmds = ['echo 2 | sudo tee /proc/sys/net/ipv4/conf/all/arp_ignore',
-                'echo 2 | sudo tee /proc/sys/net/ipv4/conf/all/arp_announce',
-                'echo 2 | sudo tee /proc/sys/net/ipv4/conf/all/rp_filter']
-
-        vm1_fixture.run_cmd_on_vm(cmds, as_sudo=True)
-        vm2_fixture.run_cmd_on_vm(cmds, as_sudo=True)
+        vm1_eth0_ip = self.get_intf_address('eth0', vm1_fixture, True)
+        vm2_eth0_ip = self.get_intf_address('eth0', vm2_fixture, True)
+        macvlan_ip1 = ":".join(vm1_eth0_ip.split('/')[0].split(
+            ':')[:-1]) + ":" + str(int(vm1_eth0_ip.split('/')[0].split(':')[-1]) + 5)
+        macvlan_ip2 = ":".join(vm2_eth0_ip.split('/')[0].split(
+            ':')[:-1]) + ":" + str(int(vm2_eth0_ip.split('/')[0].split(':')[-1]) + 5)
 
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (macvlan_ip1 + "/" + vn1_subnet_list[0].split('/')[1])]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (macvlan_ip1 + "/" + \
+                            vn1_subnet_list_v6[0].split('/')[1]),
+                    'ifup --force eth0']
         cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (macvlan_ip2 + "/" + vn1_subnet_list[1].split('/')[1])]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (macvlan_ip2 + "/" + \
+                            vn1_subnet_list_v6[1].split('/')[1]),
+                    'ifup --force eth0']
         vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
 
+        assert vm2_fixture.ping_to_ip(vn1_fixture.vn_subnet_objs[3]['gateway_ip'], intf="macvlan1")
+        assert vm1_fixture.ping_to_ip(vn1_fixture.vn_subnet_objs[2]['gateway_ip'], intf="macvlan1")
         # from vm1 to macvlan intf on vm2
         assert vm1_fixture.ping_to_ip(macvlan_ip2)
         # from vm2 to macvlan intf on vm1
@@ -1341,7 +1414,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_inter_vn_inter_compute(self):
         '''
-        Description:  Verify Pod IPv4 connectivity across computes, inter vn
+        Description:  Verify Pod IPv6 connectivity across computes, inter vn
         Test steps:
                1. Create macvlan intf on vm1 and vm2
         Pass criteria: Ping between the VM and pod should go thru fine.
@@ -1349,15 +1422,19 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm2_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
 
+        self.vm2_fixture.ping_to_ip(self.vn2_fixture.get_subnets()[1]['gateway_ip'], intf="macvlan1")
+        self.vm1_fixture.ping_to_ip(self.vn1_fixture.get_subnets()[1]['gateway_ip'], intf="macvlan1")
         # from vm1 to mac2
         assert self.vm1_fixture.ping_to_ip(self.vm2_macvlan_ip.split('/')[0])
         # from vm2 to mac1
@@ -1378,7 +1455,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
     @preposttest_wrapper
     def test_delete_macvlan_intf(self):
         '''
-        Description:  Verify that routes corresponding to MAC-IP pair are deleted after mac retries of ARP
+        Description:  Verify that routes corresponding to MAC-IP pair are deleted after mac retries of NS
         Test steps:
                1. Create macvlan intf on vm1 and vm4.
                2. Delete macvlan intf on vm1 and vm4.
@@ -1391,11 +1468,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
@@ -1455,10 +1534,10 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d --family inet6 | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
-        assert output != "32", "Route not deleted in vrouter inet table."
+        assert output != "128", "Route not deleted in vrouter inet table."
         return True
     # end test_delete_macvlan_intf
 
@@ -1480,11 +1559,14 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
+
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -1540,13 +1622,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                            (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d --family inet6 | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
-        assert output != "32", "Route not deleted in vrouter inet table."
+        assert output != "128", "Route not deleted in vrouter inet table."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1579,7 +1661,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         self.addCleanup(self.detach_shc_from_vmi, shc_fixture, self.vm4_fixture)
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -1625,18 +1708,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking if vm4_macvlan_ip is present in vm1 vrouter inet table
-        route = self.get_vrouter_route(self.vm4_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm1_vrf_id,
+                                        prefix=self.vm4_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm4_macvlan_ip))
         nh_id = self.inputs.run_cmd_on_server(
             vm1_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
+            "contrail-tools rt --dump %s --family inet6 | grep %s | awk '{print $5}' " %
             (vm1_vrf_id,
-             route['prefix'] +
+             route[0]['prefix'] +
                 "/" +
-                route['prefix_len']))
+                route[0]['prefix_len']))
         nh_type = self.inputs.run_cmd_on_server(
             vm1_node_ip,
             "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
@@ -1648,7 +1733,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             ":", " ") == encap_data, "Mac of macvlan intf on vm4 is not present in encap data."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1679,14 +1764,14 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         self.addCleanup(self.detach_shc_from_vmi, shc_fixture, self.vm4_fixture)
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
-
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
         mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
         vm4_macvlan_mac_addr = list(
             self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        ignore_icmp = ['echo "1" > /proc/sys/net/ipv4/icmp_echo_ignore_all']
+        ignore_icmp = ["echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_all"]
         self.vm4_fixture.run_cmd_on_vm(ignore_icmp, as_sudo=True)
         time.sleep(30)
         # from vm1 to mac4 intf
@@ -1733,13 +1818,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                            (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking if route in vrouter inet table got deleted
-        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d --family inet6 | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
-        assert output != "32", "Route not deleted in vrouter inet table."
+        assert output != "128", "Route not deleted in vrouter inet table."
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm4_macvlan_ip, int(vm1_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm1_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1763,30 +1848,38 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                4. POD IP is deleted from inet table in agent and vrouter
         Maintainer : ybadaya@juniper.net
         '''
-        vn2_gw_ip = self.vn2_fixture.get_subnets()[0]['gateway_ip']
-        vm1_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 5) + "/32"
-        vm1_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 6) + "/32"
-        vm4_vlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 7) + "/32"
-        vm4_vlan_macvlan_ip = ".".join(vn2_gw_ip.split(
-            ".")[:3]) + "." + str(int(vn2_gw_ip.split(".")[3]) + 8) + "/32"
+        vn2_gw_ip = self.vn2_fixture.get_subnets()[1]['gateway_ip']
+        vm1_vlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 5) + \
+            '/128'
+        vm1_vlan_macvlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 6) + \
+            '/128'
+        vm4_vlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 7) + \
+            '/128'
+        vm4_vlan_macvlan_ip = ":".join(vn2_gw_ip.split(
+            ':')[:-1]) + ":" + str(int(vn2_gw_ip.split(':')[-1]) + 8) + \
+            '/128'
         cmds_vm1 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm1_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm1_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm1_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm1_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add link eth0 name eth0.100 type vlan id 100',
                     'ip link set dev eth0.100 up',
-                    'ip addr add %s dev eth0.100' % (
-                        vm4_vlan_ip.split('/')[0] + "/26"),
+                    'ip -6 addr add %s dev eth0.100 scope global' % (
+                        vm4_vlan_ip.split('/')[0] + "/64"),
                     'ip link add macvlan1 link eth0.100 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (vm4_vlan_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (
+                        vm4_vlan_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -1812,7 +1905,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm1_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm1_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn2_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm1_vlan_ip.split('/')[0]}])
         self.setup_vmi(self.vn2_fixture.uuid,
                        parent_vmi=parent_vmi_vm4,
@@ -1820,13 +1913,16 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        project_obj=self.project.project_obj,
                        vlan_id="100",
                        mac_address=vm4_vlan_mac_addr,
-                       fixed_ips=[{'subnet_id': vm4_vlan_ip.split('/')[1],
+                       fixed_ips=[{'subnet_id': self.get_cidr_mask_vmi_id(self.vn2_fixture, ipv6=True)['v6'][2],
                                    'ip_address':vm4_vlan_ip.split('/')[0]}])
 
         delete_vlan_cmd = ['ip link delete eth0.100']
         self.vm1_fixture.run_cmd_on_vm(delete_vlan_cmd, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(delete_vlan_cmd, as_sudo=True)
         time.sleep(60)
+
+        assert not self.vm1_fixture.ping_to_ip(vm4_vlan_macvlan_ip.split('/')[0])
+        assert not self.vm4_fixture.ping_to_ip(vm1_vlan_macvlan_ip.split('/')[0])
         # from vm1 to mac4 intf
         assert not self.vm1_fixture.ping_to_ip(
             vm4_vlan_macvlan_ip.split('/')[0])
@@ -1873,10 +1969,10 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         # checking Vrouter inet table in vm1 for vm4_vlan_macvlan_ip
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d --family inet6 | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), vm4_vlan_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
-        assert output != "32", "Route not deleted in vrouter inet table."
+        assert output != "128", "Route not deleted in vrouter inet table."
         return True
     # end test_delete_vlan_intf
 
@@ -1911,7 +2007,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
 
@@ -1948,13 +2045,15 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         vm5_inet_nh_id = route['routes'][0]['path_list'][0]['nh']['nh_index']
 
         # checking if macvlan_ip1 is present in vm5 vrouter inet table
-        route = self.get_vrouter_route(self.vm1_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm5_vrf_id,
+                                        prefix=self.vm1_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm1_macvlan_ip))
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm1_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -1963,7 +2062,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
         mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
@@ -1972,15 +2072,18 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         cmd = ['ip link set dev macvlan1 down']
         self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
 
-        # deleting ip in arp cache to improve the time in which arp gets
-        # updated
-        cmd = ['arp -d %s' % (self.vm1_macvlan_ip.split('/')[0])]
-        vm5_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        time.sleep(30)
+        assert self.vm4_fixture.ping_to_ip(self.vn1_fixture.get_subnets()[1]['gateway_ip'] , intf="macvlan1")
+        time.sleep(60)
 
         # from vm5 to mac4 intf
-        assert vm5_fixture.ping_to_ip(self.vm1_macvlan_ip.split('/')[0])
-
+        # sometimes there is little loss in packets observed while pinging, retrying to ensure pod is reachable
+        ping_to_macvlan = False
+        for i in range(0,4):
+            if (vm5_fixture.ping_to_ip(self.vm1_macvlan_ip.split('/')[0])):
+                ping_to_macvlan = True
+                break
+            self.logger.warn("Retrying ping")
+        assert ping_to_macvlan, "Ping to macvlan failed."
         # checking evpn table
         evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
             vm5_vrf_id,
@@ -2024,14 +2127,16 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert vm5_inet_nh_id != route['routes'][0]['path_list'][0]['nh']['nh_index'], "Nh has not changed."
 
         # checking if macvlan4 route is present in vm5 Vrouter inet table
-        route = self.get_vrouter_route(self.vm1_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm5_vrf_id,
+                                        prefix=self.vm1_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm1_macvlan_ip))
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm1_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2072,7 +2177,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert vm5_fixture.wait_till_vm_is_up()
         cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s/26 dev macvlan1' % self.vm2_macvlan_ip.split('/')[0]]
+                    'ip -6 addr add %s/64 dev macvlan1 scope global' % self.vm2_macvlan_ip.split('/')[0],
+                    'ifup --force eth0']
 
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
 
@@ -2108,36 +2214,45 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm2_macvlan_ip.split("/")[0]))
         vm5_mpls_label = route['routes'][0]['path_list'][0]['label']
 
-        # checking if macvlan2 is present in vm3 Vrouter inet table
-        route = self.get_vrouter_route(self.vm2_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        # checking if macvlan2 is present in vm5 Vrouter inet table
+        route = inspect_h.get_vrouter_route_table(vm5_vrf_id,
+                                        prefix=self.vm2_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm2_macvlan_ip))
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
         assert EUI(output, dialect=mac_unix_expanded) == EUI(
             vm2_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
+
         cmd = ['ip link set dev macvlan1 down']
         self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
         cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s/26 dev macvlan1' % self.vm2_macvlan_ip.split('/')[0]]
+                    'ip -6 addr add %s/64 dev macvlan1 scope global' % self.vm2_macvlan_ip.split('/')[0],
+                    'ifup --force eth0']
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
         mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
         vm3_macvlan_mac_addr = list(
             self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        # deleting ip in arp cache to improve the time in which arp gets
-        # updated
-        cmd = ['arp -d %s' % (self.vm2_macvlan_ip.split('/')[0])]
-        vm5_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        time.sleep(30)
 
-        assert vm5_fixture.ping_to_ip(self.vm2_macvlan_ip.split('/')[0])
+        assert self.vm3_fixture.ping_to_ip(self.vn2_fixture.get_subnets()[1]['gateway_ip'] , intf="macvlan1")
+        time.sleep(60)
+
+        # sometimes there is little loss in packets observed while pinging, retrying to ensure pod is reachable
+        ping_to_macvlan = False
+        for i in range(0,4):
+            if (vm5_fixture.ping_to_ip(self.vm2_macvlan_ip.split('/')[0])):
+                ping_to_macvlan = True
+                break
+            self.logger.warn("Retrying ping")
+        assert ping_to_macvlan, "Ping to macvlan failed."
         # checking evpn table
         evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
             vm5_vrf_id,
@@ -2181,13 +2296,15 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert route['routes'][0]['path_list'][0]['nh']['type'] == 'tunnel', "Nh type is not tunnel."
 
         # checking if route for macvlan3 is present vm5 Vrouter inet table
-        route = self.get_vrouter_route(self.vm2_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm5_vrf_id,
+                                        prefix=self.vm2_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm2_macvlan_ip))
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2233,7 +2350,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         self.vm3_fixture.disable_interface_policy()
         cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s/26 dev macvlan1' % self.vm2_macvlan_ip.split('/')[0]]
+                    'ip -6 addr add %s/64 dev macvlan1 scope global' % self.vm2_macvlan_ip.split('/')[0],
+                    'ifup --force eth0']
 
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
 
@@ -2260,7 +2378,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
             vm5_vrf_id, mac=vm2_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
         assert peer == "EVPN", "Peer is not EVPN."
 
-        # checking if macvlan2 is present in vm3 inet table
+        # checking if macvlan2 is present in vm5 inet table
         inspect_h = self.agent_inspect[vm5_node_ip]
         route = inspect_h.get_vna_route(
             vrf_id=vm5_vrf_id,
@@ -2269,15 +2387,17 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                        (self.vm2_macvlan_ip.split("/")[0]))
         vm5_mpls_label = route['routes'][0]['path_list'][0]['label']
 
-        # checking if macvlan2 is present in vm3 Vrouter inet table
-        route = self.get_vrouter_route(self.vm2_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        # checking if macvlan2 is present in vm5 Vrouter inet table
+        route = inspect_h.get_vrouter_route_table(vm5_vrf_id,
+                                        prefix=self.vm2_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm2_macvlan_ip))
 
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
@@ -2286,20 +2406,25 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s/26 dev macvlan1' % self.vm2_macvlan_ip.split('/')[0]]
+                    'ip -6 addr add %s/64 dev macvlan1 scope global' % self.vm2_macvlan_ip.split('/')[0],
+                    'ifup --force eth0']
 
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
         vm3_macvlan_mac_addr = list(
             self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
         cmd = ['ip link set dev macvlan1 down']
         self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        # deleting ip in arp cache to improve the time in which arp gets
-        # updated
-        cmd = ['arp -d %s' % (self.vm2_macvlan_ip.split('/')[0])]
-        vm5_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        time.sleep(30)
 
-        assert vm5_fixture.ping_to_ip(self.vm2_macvlan_ip.split('/')[0])
+        assert self.vm3_fixture.ping_to_ip(self.vn2_fixture.get_subnets()[1]['gateway_ip'] , intf="macvlan1")
+        time.sleep(60)
+
+        # sometimes there is little loss in packets observed while pinging, retrying to ensure pod is reachable
+        for i in range(0,4):
+            if (vm5_fixture.ping_to_ip(self.vm2_macvlan_ip.split('/')[0])):
+                ping_to_macvlan = True
+                break
+            self.logger.warn("Retrying ping")
+        assert ping_to_macvlan, "Ping to macvlan failed."
 
         # checking evpn table
         evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
@@ -2344,19 +2469,20 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         assert route['routes'][0]['path_list'][0]['nh']['type'] == 'tunnel', "Nh type is not tunnel."
 
         # checking if route for macvlan3 is present vm5 Vrouter inet table
-        route = self.get_vrouter_route(self.vm2_macvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm5_vrf_id,
+                                        prefix=self.vm2_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert route, ('No route seen in vrouter for %s' %
                        (self.vm2_macvlan_ip))
         # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
+        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d --family inet6 | awk \'{print $6}\'| grep \':\'' % (
             self.vm2_macvlan_ip, int(vm5_vrf_id))
         output = self.inputs.run_cmd_on_server(
             vm5_node_ip, stitched_mac_cmd).split("(")[0]
         assert EUI(output, dialect=mac_unix_expanded) == EUI(
             vm3_macvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
-
         return True
     # end test_move_ip_across_computes_pkt_mode_l2l3
 
@@ -2376,7 +2502,9 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
+
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
         assert self.vn1_fixture.set_mac_ip_learning(
             mac_ip_learning_enable=False)
@@ -2419,10 +2547,10 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                            (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking route in vrouter got deleted
-        route_ppl_cmd = 'contrail-tools rt --dump %d | grep %s | awk \'{print $2}\'' % (
+        route_ppl_cmd = 'contrail-tools rt --dump %d --family inet6 | grep %s | awk \'{print $2}\'' % (
             int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
         output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
-        assert output != "32", "Route not deleted in vrouter inet table."
+        assert output != "128", "Route not deleted in vrouter inet table."
 
         cmd = ['ip link delete macvlan1']
         self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
@@ -2433,8 +2561,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         Description: dynamically change forwarding mode VN  and verify that routes are added/deleted/updated accordingly for MAC-IP pair
         Test steps:
-               1. launch pod1 on vm4 and change fwd mode from l2 to l2_l3
-               2. Change fwd mode to l2
+               1. launch pod1 on vm4
+               2. Change fwd mode from l2_l3 to l2
         Pass criteria:
                1. When changed from l2 to l2_l3: vm4 macvlan ip is added to vm1 inet table
                                                  MAC/IP route added to evpn table
@@ -2455,7 +2583,8 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -2517,10 +2646,11 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
                            (self.vm4_macvlan_ip.split("/")[0]))
 
         # checking for macvlan4 ip in vm1 Vrouter inet table
-        inspect_h = self.agent_inspect[vm1_node_ip]
-        route = self.get_vrouter_route(self.vm4_macvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
+        route = inspect_h.get_vrouter_route_table(vm1_vrf_id,
+                                        prefix=self.vm4_macvlan_ip.split('/')[0],
+                                        prefix_len='128',
+                                        get_nh_details=True,
+                                        v6=True)
         assert not route, ('No route seen in vrouter for %s' %
                            (self.vm4_macvlan_ip))
 
@@ -2539,11 +2669,12 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         Maintainer : ybadaya@juniper.net
         '''
         for i in range(1, 51):
-            macvlan_ip = ".".join(self.vm1_eth0_ip.split(
-                ".")[:3]) + "." + str(int(self.vm1_eth0_ip.split(".")[3]) + i + 5)
+            macvlan_ip = ":".join(self.vm1_eth0_ip.split('/')[0].split(
+                ':')[:-1]) + ":" + str(int(self.vm1_eth0_ip.split('/')[0].split(':')[-1]) + 5 + i)
             cmds_vm1 = ['ip link add macvlan%d link eth0 type macvlan' % i,
                         'ip link set dev macvlan%d up' % i,
-                        'ip addr add %s/26 dev macvlan%d' % (macvlan_ip, i)]
+                        'ip -6 addr add %s/64 dev macvlan%d scope global' % (macvlan_ip, i),
+                        'ifup --force eth0']
 
             self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
 
@@ -2551,10 +2682,17 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         vm4_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm4_fixture)
         inspect_h = self.agent_inspect[vm4_node_ip]
         for i in range(1, 51):
-            macvlan_ip = ".".join(self.vm1_eth0_ip.split(
-                ".")[:3]) + "." + str(int(self.vm1_eth0_ip.split(".")[3]) + i + 5)
+            macvlan_ip = ":".join(self.vm1_eth0_ip.split('/')[0].split(
+                ':')[:-1]) + ":" + str(int(self.vm1_eth0_ip.split('/')[0].split(':')[-1]) + 5 + i)
             self.logger.info('Starting ping to macvlan%d' % i)
-            assert self.vm4_fixture.ping_to_ip(macvlan_ip)
+            # sometimes there is little loss in packets observed while pinging, retrying to ensure pod is reachable
+            ping_to_macvlan = False
+            for j in range(0,4):
+                if(self.vm4_fixture.ping_to_ip(macvlan_ip)):
+                    ping_to_macvlan = True
+                    break
+                self.logger.warn("Retrying ping")
+            assert ping_to_macvlan, ("Ping to macvlan%d failed" % i)
             route = inspect_h.get_vna_route(vrf_id=vm4_vrf_id, ip=macvlan_ip)
             assert route, ('No route seen in inet table for %s' % (macvlan_ip))
 
@@ -2574,11 +2712,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm2 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm2_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm2_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm3 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm3_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm3_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
         self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
@@ -2589,6 +2729,7 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         vm3_macvlan_mac_addr = list(
             self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
 
+        assert self.vm2_fixture.ping_to_ip(self.vm3_macvlan_ip.split('/')[0])
         # checking from vm2 to mac3 intf
         # checking evpn table
         vm2_node_ip = self.vm2_fixture.vm_node_ip
@@ -2616,6 +2757,15 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
 
         self.inputs.run_cmd_on_server(
             vm2_node_ip, "docker restart vrouter_vrouter-agent_1")
+        time.sleep(120)
+        # sometimes there is little loss in packets observed while pinging, retrying to ensure pod is reachable
+        ping_to_macvlan = False
+        for j in range(0,4):
+            if(self.vm2_fixture.ping_to_ip(self.vm3_macvlan_ip.split('/')[0])):
+                ping_to_macvlan = True
+                break
+            self.logger.warn("Retrying ping")
+        assert ping_to_macvlan, ("Ping to macvlan failed after restart.")
         time.sleep(120)
         evpn_route = self.agent_inspect[vm2_node_ip].get_vna_evpn_route(
             vm2_vrf_id,
@@ -2648,18 +2798,65 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         Description: validate that IP is not learned if it does not belong to same subnet of interface.
         Test steps:
-               1. Create macvlan intf on vm1 with different subnet from eth0.
-        Pass criteria: Creation should hit exception.
+               1. Create macvlan intf on vm4 with different subnet from eth0.
+        Pass criteria:
+               1. Ping from vm1 to vm4 macvlan intf should not go
+               2. MAC route should not be in vm1 evpn table
+               3. Derived bridge route with peer as EVPN is not in vm1
+               4. POD IP is absent from vm1 agent and vrouter inet table
         Maintainer : ybadaya@juniper.net
         '''
-        cidr = get_random_cidr()
-        cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
+        cidr = get_random_cidr(af='v6', mask=SUBNET_MASK['v6']['min'])
+        cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (get_random_ip(cidr) + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (get_random_ip(cidr) + "/64"),
+                    'ifup --force eth0']
+        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
+        mac_cmd = ['ifconfig macvlan1 | grep HWaddr | awk \'{ print $5 }\'']
+        vm4_macvlan_mac_addr = list(
+            self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
+
+        # from vm1 to mac4 intf
+        assert not self.vm1_fixture.ping_to_ip(
+            self.vm4_macvlan_ip.split('/')[0])
+
+        # checking evpn table
+        vm1_node_ip = self.vm1_fixture.vm_node_ip
+        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
         try:
-            self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-        except SSHException:
-            assert True
+            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
+                vm1_vrf_id,
+                vxlanid=self.vn1_vxlan_id,
+                mac=vm4_macvlan_mac_addr,
+                ip=self.vm4_macvlan_ip)['mac']
+        except TypeError:
+            evpn_route = None
+        assert not evpn_route, "Mac route for macvlan4 is present in EVPN table. "
+
+        # checking bridge table
+        try:
+            peer = self.agent_inspect[vm1_node_ip].get_vna_layer2_route(
+                vm1_vrf_id, mac=vm4_macvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
+        except TypeError:
+            peer = None
+        assert not peer, "MAC Bridge route is present "
+
+        # checking inet table for vm1 pod ip
+        inspect_h = self.agent_inspect[vm1_node_ip]
+        route = inspect_h.get_vna_route(
+            vrf_id=vm1_vrf_id,
+            ip=self.vm4_macvlan_ip.split("/")[0])
+        assert not route, ('Route seen in vrouter for %s' %
+                           (self.vm4_macvlan_ip.split("/")[0]))
+
+        # checking route in vrouter
+        route_ppl_cmd = 'contrail-tools rt --dump %d --family inet6 | grep %s | awk \'{print $2}\'' % (
+            int(vm1_vrf_id), self.vm4_macvlan_ip.split('/')[0])
+        output = self.inputs.run_cmd_on_server(vm1_node_ip, route_ppl_cmd)
+        assert output != "128", "Route present in vrouter inet table."
+
+        cmd = ['ip link delete macvlan1']
+        self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
         return True
     # end test_diff_subnet_macvlanip
 
@@ -2673,11 +2870,13 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         '''
         cmds_vm1 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm1_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm1_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
 
         cmds_vm4 = ['ip link add macvlan1 link eth0 type macvlan',
                     'ip link set dev macvlan1 up',
-                    'ip addr add %s dev macvlan1' % (self.vm4_macvlan_ip.split('/')[0] + "/26")]
+                    'ip -6 addr add %s dev macvlan1 scope global' % (self.vm4_macvlan_ip.split('/')[0] + "/64"),
+                    'ifup --force eth0']
         self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
         self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
 
@@ -2705,275 +2904,3 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC):
         return True
     # end test_in_l3_mode
 
-    @test.attr(type=['sanity'])
-    @preposttest_wrapper
-    def test_bfd_on_targetip_vsrx(self):
-        '''
-        Description: Run BFD on target IP and verify BFD session is up. Fail BFD on target ip and check if target ip routes are deleted.
-        Test steps:
-               1. Create a vsrx vm with 3 vns.
-               2. Create a test vm for netconf connection
-               3. set mac-ip learning flag on test vn
-               4. Create and attach BFD health check to the test vn
-               5. Configure BFD on vsrx
-        Pass criteria:
-               1. Verify BFD session is up and mac-ip is learnt.
-               2. Remove the target ip from vsrx and verify BFD session failed. Target routes are deleted from inet and evpn tables.
-        NOTE: Tcpdump utility must be installed on the computes.
-        Maintainer : ybadaya@juniper.net
-        '''
-        vn1_name = get_random_name('left-vn')
-        vn1_subnets = [get_random_cidr()]
-        vn3_name = get_random_name('mgmt-vn')
-        vn3_subnets = [get_random_cidr()]
-        vn2_name = get_random_name('right-vn')
-        vn2_subnets = [get_random_cidr()]
-
-        vsrx_vm_name = get_random_name('vsrx_vm')
-        vm_test_name = get_random_name('vm_test')
-
-        vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
-        vn3_fixture = self.create_vn(vn3_name, vn3_subnets)
-        vn2_fixture = self.create_vn(vn2_name, vn2_subnets)
-
-        vn_objs = [vn3_fixture.obj, vn1_fixture.obj, vn2_fixture.obj]
-
-        lvn_port_obj1 = self.create_port(net_id=vn1_fixture.vn_id)
-        mvn_port_obj1 = self.create_port(net_id=vn3_fixture.vn_id)
-        rgt_port_obj1 = self.create_port(net_id=vn2_fixture.vn_id)
-        port_ids1 = [
-            mvn_port_obj1['id'], lvn_port_obj1['id'], rgt_port_obj1['id']]
-
-        vm1_fixture = self.useFixture(
-            VMFixture(
-                vn_objs=vn_objs, project_name=self.inputs.project_name, connections=self.connections,
-                image_name='vsrx-maciplearning', vm_name=vsrx_vm_name,
-                port_ids=port_ids1, zone='nova'))
-
-        test_vm = self.create_vm(vn3_fixture, 'test_vm',
-                                 image_name='ubuntu-traffic')
-        assert test_vm.wait_till_vm_is_up()
-
-        for i in range(5):
-            vm_state = vm1_fixture.wait_till_vm_is_up()
-            if vm_state:
-                break
-        assert vm_state
-        gw_ip = vn1_fixture.get_subnets()[0]['gateway_ip']
-        target_ip = ".".join(gw_ip.split(".")[:3]) + "." + str(
-            int(gw_ip.split(".")[3]) + 10) + "/" + vn1_fixture.get_cidrs()[0].split('/')[1]
-        for ip in vm1_fixture.vm_ips:
-            if ".".join(vn1_fixture.get_subnets()[0]['cidr'].split(
-                    ".")[:3]) == ".".join(ip.split(".")[:3]):
-                lo_ip = ip
-                break
-
-        vn1_fixture.set_mac_ip_learning()
-        # creating BFD health check
-        shc_fixture = self.create_hc(
-            hc_type='vn-ip-list',
-           probe_type='BFD',
-            target_ip_list={
-                'ip_address': [
-                    target_ip.split('/')[0]]})
-        self.attach_shc_to_vn(shc_fixture, vn1_fixture)
-        self.addCleanup(self.detach_shc_from_vn, shc_fixture, vn1_fixture)
-        target_mac = "00:1b:44:11:3a:b7"
-        self.config_bfd_on_vsrx(src_vm=test_vm,
-                                dst_vm=vm1_fixture,
-                                target_ip=target_ip,
-                                gw_ip=gw_ip,
-                                lo_ip=lo_ip)
-        result = self.check_bfd_packets(vm1_fixture, vn1_fixture)
-        assert result, "BFD packets are not seen"
-        state = self.check_bfd_state(test_vm, vm1_fixture, gw_ip)
-        assert state == "Up", "BFD state is not up."
-
-        vsrx_vm_node_ip = vm1_fixture.vm_node_ip
-        vsrx_vm_vrf_id = self.get_vrf_id(vn1_fixture, vm1_fixture)
-        vn1_vxlan_id = vn1_fixture.get_vxlan_id()
-
-        # checking evpn table for target mac-ip
-        evpn_route = self.agent_inspect[vsrx_vm_node_ip].get_vna_evpn_route(
-            vsrx_vm_vrf_id,
-            vxlanid=vn1_vxlan_id,
-            mac=target_mac,
-            ip=target_ip.split('/')[0] +
-            "/32")['mac']
-        assert evpn_route == str(vn1_vxlan_id) + "-" + target_mac + "-" + target_ip.split(
-            '/')[0] + "/32", "Mac route for target_ip is absent in EVPN table. "
-
-        # checking if route for target_ip is in vsrx_vm inet table route
-        inspect_h = self.agent_inspect[vsrx_vm_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vsrx_vm_vrf_id,
-            ip=target_ip.split("/")[0])
-        assert route, ('Route seen in inet table for %s' %
-                       (target_ip.split("/")[0]))
-
-        # Removing target ip
-        self.remove_target_ip_on_vsrx(
-            src_vm=test_vm,
-            dst_vm=vm1_fixture,
-            target_ip=target_ip)
-        time.sleep(30)
-
-        # Checking if BFD failed
-        result = self.check_bfd_packets(vm1_fixture, vn1_fixture)
-        assert not result, "BFD packets are seen"
-
-        # Check if target ip routes are deleted
-        # checking evpn table
-        try:
-            evpn_route = self.agent_inspect[vsrx_vm_node_ip].get_vna_evpn_route(
-                vsrx_vm_vrf_id,
-                vxlanid=vn1_vxlan_id,
-                mac=target_mac,
-                ip=target_ip.split('/')[0] +
-                "/32")['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for target_ip is present in EVPN table. "
-
-        # checking if route for target_ip is in vsrx_vm inet table route
-        route = inspect_h.get_vna_route(
-            vrf_id=vsrx_vm_vrf_id,
-            ip=target_ip.split("/")[0])
-        assert not route, ('Route seen in inet table for %s' %
-                           (target_ip.split("/")[0]))
-        return True
-    # end test_bfd_on_targetip_vsrx
-
-    @preposttest_wrapper
-    def test_detach_hc_vsrx(self):
-        '''
-        Description: Verify that target IP routes are not affected when health check is detached from VN.
-        Test steps:
-               1. Create a vsrx vm with 3 vns.
-               2. Create a test vm for netconf connection
-               3. set mac-ip learning flag on test vn
-               4. Create and attach BFD health check with target_ip_all as True to the test vn
-               5. Configure BFD on vsrx
-        Pass criteria:
-               1. Verify BFD session is up when hc is attached.
-               3. Detach hc and verify BFD goes down and target routes are not affected.
-        NOTE: Tcpdump utility must be installed on the computes.
-        Maintainer : ybadaya@juniper.net
-        '''
-        vn1_name = get_random_name('left-vn')
-        vn1_subnets = [get_random_cidr()]
-        vn3_name = get_random_name('mgmt-vn')
-        vn3_subnets = [get_random_cidr()]
-        vn2_name = get_random_name('right-vn')
-        vn2_subnets = [get_random_cidr()]
-
-        vsrx_vm_name = get_random_name('vsrx_vm')
-        vm_test_name = get_random_name('vm_test')
-
-        vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
-        vn3_fixture = self.create_vn(vn3_name, vn3_subnets)
-        vn2_fixture = self.create_vn(vn2_name, vn2_subnets)
-
-        vn_objs = [vn3_fixture.obj, vn1_fixture.obj, vn2_fixture.obj]
-
-        lvn_port_obj1 = self.create_port(net_id=vn1_fixture.vn_id)
-        mvn_port_obj1 = self.create_port(net_id=vn3_fixture.vn_id)
-        rgt_port_obj1 = self.create_port(net_id=vn2_fixture.vn_id)
-        port_ids1 = [
-            mvn_port_obj1['id'], lvn_port_obj1['id'], rgt_port_obj1['id']]
-
-        vm1_fixture = self.useFixture(
-            VMFixture(
-                vn_objs=vn_objs, project_name=self.inputs.project_name, connections=self.connections,
-                image_name='vsrx-maciplearning', vm_name=vsrx_vm_name,
-                port_ids=port_ids1, zone='nova'))
-
-        test_vm = self.create_vm(vn3_fixture, 'test_vm',
-                                 image_name='ubuntu-traffic')
-        assert test_vm.wait_till_vm_is_up()
-
-        for i in range(5):
-            vm_state = vm1_fixture.wait_till_vm_is_up()
-            if vm_state:
-                break
-        assert vm_state
-        gw_ip = vn1_fixture.get_subnets()[0]['gateway_ip']
-        target_ip = ".".join(gw_ip.split(".")[:3]) + "." + str(
-            int(gw_ip.split(".")[3]) + 10) + "/" + vn1_fixture.get_cidrs()[0].split('/')[1]
-        for ip in vm1_fixture.vm_ips:
-            if ".".join(vn1_fixture.get_subnets()[0]['cidr'].split(
-                    ".")[:3]) == ".".join(ip.split(".")[:3]):
-                lo_ip = ip
-                break
-
-        vn1_fixture.set_mac_ip_learning()
-        # creating BFD health check
-        shc_fixture = self.create_hc(
-            hc_type='vn-ip-list',
-            probe_type='BFD',
-            target_ip_all=True)
-        vn1_fixture.attach_shc(shc_fixture.uuid)
-        self.addCleanup(self.detach_shc_from_vn, shc_fixture, vn1_fixture)
-        target_mac = "00:1b:44:11:3a:b7"
-        self.config_bfd_on_vsrx(src_vm=test_vm,
-                                dst_vm=vm1_fixture,
-                                target_ip=target_ip,
-                                gw_ip=gw_ip,
-                                lo_ip=lo_ip)
-        result = self.check_bfd_packets(vm1_fixture, vn1_fixture)
-        assert result, "BFD packets are not seen"
-        time.sleep(30)
-        state = self.check_bfd_state(test_vm, vm1_fixture, gw_ip)
-        assert state == "Up", "BFD state is not up."
-
-        vsrx_vm_node_ip = vm1_fixture.vm_node_ip
-        vsrx_vm_vrf_id = self.get_vrf_id(vn1_fixture, vm1_fixture)
-        vn1_vxlan_id = vn1_fixture.get_vxlan_id()
-
-        # checking evpn table for target mac-ip
-        evpn_route = self.agent_inspect[vsrx_vm_node_ip].get_vna_evpn_route(
-            vsrx_vm_vrf_id,
-            vxlanid=vn1_vxlan_id,
-            mac=target_mac,
-            ip=target_ip.split('/')[0] +
-            "/32")['mac']
-        assert evpn_route == str(vn1_vxlan_id) + "-" + target_mac + "-" + target_ip.split(
-            '/')[0] + "/32", "Mac route for target_ip is absent in EVPN table. "
-
-        # checking if route for target_ip is in vsrx_vm inet table route
-        inspect_h = self.agent_inspect[vsrx_vm_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vsrx_vm_vrf_id,
-            ip=target_ip.split("/")[0])
-        assert route, ('Route seen in inet table for %s' %
-                       (target_ip.split("/")[0]))
-
-        # detach hc
-        self.detach_shc_from_vn(shc_fixture, vn1_fixture)
-
-        # Checking if BFD failed
-        result = self.check_bfd_packets(vm1_fixture, vn1_fixture)
-        assert result, "BFD packets are not seen"
-        state = self.check_bfd_state(test_vm, vm1_fixture, gw_ip)
-        assert state == "Down", "BFD state is Up."
-
-        # checking evpn table for target mac-ip
-        evpn_route = self.agent_inspect[vsrx_vm_node_ip].get_vna_evpn_route(
-            vsrx_vm_vrf_id,
-            vxlanid=vn1_vxlan_id,
-            mac=target_mac,
-            ip=target_ip.split('/')[0] +
-            "/32")['mac']
-        assert evpn_route == str(vn1_vxlan_id) + "-" + target_mac + "-" + target_ip.split(
-            '/')[0] + "/32", "Mac route for target_ip is absent in EVPN table. "
-
-        # checking if route for target_ip is in vsrx_vm inet table route
-        inspect_h = self.agent_inspect[vsrx_vm_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vsrx_vm_vrf_id,
-            ip=target_ip.split("/")[0])
-        assert route, ('Route seen in inet table for %s' %
-                       (target_ip.split("/")[0]))
-
-        return True
-    # end test_detach_hc_vsrx

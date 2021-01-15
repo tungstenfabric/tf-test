@@ -1202,7 +1202,7 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
         return elem2dict(xml_obj[0])
     # end get_vrouter_nh
 
-    def get_vrouter_route_table(self, vrf_id, get_nh_details=False, **kwargs):
+    def get_vrouter_route_table(self, vrf_id, get_nh_details=False, v6=False, **kwargs):
         # TODO
         # Once bug 1614824 is fixed , add filter options
         # since this table can be very big
@@ -1258,7 +1258,10 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
         '''
         filter_dict = dict((k,v) for k,v in  kwargs.items() if v is not None)
         filter_set = set(filter_dict.items())
-        xml_obj = self.dict_get('Snh_KRouteReq?x=%s' % (vrf_id))
+        if v6:
+            xml_obj = self.dict_get('Snh_KRouteReq?x=%s&family=inet6' % (vrf_id))
+        else:
+            xml_obj = self.dict_get('Snh_KRouteReq?x=%s' % (vrf_id))
         xpath_str = './KRouteResp'
         xml_obj = xml_obj.xpath(xpath_str)
         if not xml_obj:

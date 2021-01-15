@@ -1156,7 +1156,7 @@ def get_build_sku(openstack_node_ip, openstack_node_password='c0ntrail123', user
         return str(build_sku).lower()
     else:
         host_str='%s@%s' % (user, openstack_node_ip)
-        cmd = 'nova-manage version'
+        cmd = 'nova-manage version 2>/dev/null'
         if container:
             cmd = 'docker exec -it %s /bin/bash -c \'%s\'' % (container, cmd)
         try:
