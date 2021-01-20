@@ -26,7 +26,6 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
         ''' Verification routine to validate OSPF session state.
         '''
         ret = True
-
         vsfo_fix = self.vsfo_fix
         vrp_31 = self.vrp_31
         vrp_32 = self.vrp_32
@@ -235,5 +234,68 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
 
         return ret
 
+    def verify_bgpaas_session_ctrlnode(self):
+        ''' Verify bgpaas session state on control node.
+        '''
+        ret = True
+
+        vsfo_fix = self.vsfo_fix
+        self.logger.info("Validate bgpas sessions on control node.")
+
+        EXP_S = (((self.NB_VSFO_CP_SIGIF + self.NB_APN_RADIUS + 1) * self.NB_VSFO_CP_EXT_NIC )
+          )  + (( ((self.NB_VSFO_UP_CNNIC * self.NB_VSFO_UP_CNIF) + (
+          self.NB_VSFO_UP_EXT_NIC - self.NB_VSFO_UP_CNNIC) * self.NB_APN) ))
+
+        vsfoupid = self.NB_VSFO_CP_NODES+1
+        ctrl_node = vsfo_fix[vsfoupid].get_control_nodes()[0]
+        cn_bgp_entry = self.connections.get_control_node_inspect_handle(
+            ctrl_node).get_cn_bgp_neigh_entry(encoding='BGP')
+
+        bgpasUpSession = 0
+        for entry in cn_bgp_entry:
+            if entry['router_type'] == 'bgpaas-client' and entry['state'] == 'Established':
+                bgpasUpSession = bgpasUpSession + 1
+
+        if EXP_S == bgpasUpSession:
+            self.logger.info("BGPAS sessions are UP as expected. \
+                Expected  %s Actual %s."%(EXP_S,bgpasUpSession))
+        else:
+            self.logger.error("BGPAS sessions are not UP as expected. \
+                Expected  %s Actual %s."%(EXP_S,bgpasUpSession))
+            ret = False
+        return ret
+ 
+    def verify_bgpaas_routes_ctrlnode(self):
+        ''' Verify bgpaas session state on control node.
+        '''
+        self.logger.info("Validate bgpas routes on control node.")
+
+        ret = True
+        vsfo_fix = self.vsfo_fix
+        vsfoupid = self.NB_VSFO_CP_NODES+1
+
+        ctrl_node = vsfo_fix[vsfoupid].get_control_nodes()[0]
+        EXP_R = self.NB_BGP_PREFIXES_PER_APN + 2
+        for i in range(self.NB_VSFO_CP_NODES+1 ,self.NB_VSFO_CP_NODES + self.NB_VSFO_UP_NODES+1):
+            vlan = 3000
+            for vlan in range(vlan, vlan + self.NB_APN_RADIUS):
+                vrf = "EPG-B2B-VSFO-%s_EXT-2_TAGGED-%s" %(i,vlan)
+                proj =  self.project.project_fq_name
+                rt = "%s:%s:%s:%s.inet.0" %(proj[0],proj[1],vrf,vrf)
+                op = self.connections.get_control_node_inspect_handle(ctrl_node).get_cn_route_table(rt_name=rt)
+                routes = op['routes']
+                count = 0
+                for ele in routes:
+                    count = count +1
+
+                if EXP_R == count:
+                    self.logger.info("Routes are present as expected in %s. \
+                        Expected  %s Actual %s."%(rt,EXP_R,count))
+                else:
+                    self.logger.error("Routes are not present as expected in %s. \
+                        Expected  %s Actual %s."%(rt,EXP_R,count))
+                    ret = False
+        return ret
+ 
 #end BaseSolutionsTest class
 
