@@ -495,6 +495,8 @@ class FabricUtils(object):
                              'routing_bridging_roles': routing_bridging_role}
             payload['role_assignments'].append(dev_role_dict)
         for device_roles in payload['role_assignments']:
+            if device_roles['physical_role'].lower() == 'pnf':
+                continue
             device = device_roles['device_fq_name']
             self.vnc_h.associate_physical_role(device,
                 device_roles['physical_role'])

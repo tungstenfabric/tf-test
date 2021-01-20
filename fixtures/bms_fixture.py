@@ -140,7 +140,7 @@ class BMSFixture(fixtures.Fixture):
             bms_info.append(intf_dict)
         binding_profile = {'local_link_information': bms_info}
         security_groups = None if self.ep_style else self.security_groups
-        create_iip = not self.external_dhcp_server and not self.static_ip
+        #create_iip = not self.external_dhcp_server and not self.static_ip
         self.port_fixture = PortFixture(
                                  connections=self.connections,
                                  vn_id=self.vn_fixture.uuid,
@@ -152,7 +152,8 @@ class BMSFixture(fixtures.Fixture):
                                  binding_profile=binding_profile,
                                  port_group_name=self._port_group_name,
                                  tor_port_vlan_tag=self.tor_port_vlan_tag,
-                                 create_iip=create_iip)
+                                 create_iip=not self.external_dhcp_server,
+                            )
         self.port_fixture.setUp()
         self.add_port_profiles(self.port_profiles)
         if self.ep_style:
