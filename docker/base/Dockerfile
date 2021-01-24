@@ -18,7 +18,7 @@ COPY pip.conf /etc/
 #    do manual download with retries and install it locally
 RUN \
     yum repolist | grep epel || yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    curl --retry 3 --retry-delay 10 https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==20.1' && \
+    curl --retry 3 --retry-delay 10 https://bootstrap.pypa.io/2.7/get-pip.py | python2 - 'pip==20.1' && \
     yum install -y unzip vim tcpdump ant git ipmitool gcc python-devel \
       patch sshpass bzip2 wget sudo pexpect ant-junit libXpm libXrender \
       gtk2 nss GConf2 firefox openssl \
