@@ -3,8 +3,10 @@ from common.isolated_creds import *
 import time
 import sys
 
+
 class BaseTestCase_v1(BaseTestCase):
     isolation = True
+
     @classmethod
     def setUpClass(cls):
         cls.project = None
@@ -13,15 +15,15 @@ class BaseTestCase_v1(BaseTestCase):
         cls.domain_name = None
         cls.domain_obj = None
         super(BaseTestCase_v1, cls).setUpClass()
-        if 'common.k8s.base' in sys.modules and issubclass(cls,
-            sys.modules['common.k8s.base'].BaseK8sTest):
-            # no isolation for k8s, all tests run in same domain & project 
+        if 'common.k8s.base' in sys.modules and issubclass(
+                cls, sys.modules['common.k8s.base'].BaseK8sTest):
+            # no isolation for k8s, all tests run in same domain & project
             cls.isolation = False
             cls.inputs.tenant_isolation = False
         if 'v3' in cls.inputs.auth_url:
             if cls.isolation and cls.inputs.domain_isolation:
                 cls.domain_name = cls.__name__
-            #If user wants to run tests in his allocated domain
+            # If user wants to run tests in his allocated domain
             else:
                 cls.domain_name = cls.inputs.stack_domain
 
@@ -51,9 +53,10 @@ class BaseTestCase_v1(BaseTestCase):
                 logger=cls.logger)
             cls.admin_isolated_creds.setUp()
             if 'v3' in cls.inputs.auth_url:
-                cls.domain_obj = cls.admin_isolated_creds.create_domain(cls.isolated_creds.domain_name)
+                cls.domain_obj = cls.admin_isolated_creds.create_domain(
+                    cls.isolated_creds.domain_name)
             cls.project = cls.admin_isolated_creds.create_tenant(
-                cls.isolated_creds.project_name,cls.isolated_creds.domain_name)
+                cls.isolated_creds.project_name, cls.isolated_creds.domain_name)
             cls.admin_inputs = cls.admin_isolated_creds.get_inputs(cls.project)
             cls.admin_isolated_creds.create_and_attach_user_to_tenant(
                 cls.project,
@@ -94,8 +97,6 @@ class BaseTestCase_v1(BaseTestCase):
 
     @classmethod
     def create_flood_vmi_if_vcenter_gw_setup(cls):
-        if cls.inputs.vcenter_gw_setup:#For vcenter gateway setup
+        if cls.inputs.vcenter_gw_setup:  # For vcenter gateway setup
             cls.vcenter_orch = cls.connections.slave_orch
             cls.vcenter_orch.create_vn_vmi_for_stp_bpdu_to_be_flooded()
-
-
