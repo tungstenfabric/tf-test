@@ -128,6 +128,13 @@ class LogicalRouterFixture(vnc_api_test.VncLibFixture):
         self.vnc_h.update_logical_router(uuid=self.uuid, vni=vni,
            is_public=is_public_lr, relay_servers=dhcp_relay_servers)
 
+    def update_snatpool(self, napt_pool_vn_obj):
+        attr_obj = LogicalRouterVirtualNetworkType('NAPTSourcePool')
+        vn_obj = self.vnc_h.virtual_network_read(id=napt_pool_vn_obj.uuid)
+        self.vnc_h.ref_update("logical_router", self.uuid,
+                                 "virtual_network", napt_pool_vn_obj.uuid,
+                                 vn_obj.fq_name, "ADD", attr_obj)
+
     def set_vni(self, vni):
         self.logger.debug('Configuring routing VNI %s on Logical Router %s ...'%(vni,self.name))
         self.vnc_h.set_logical_router_vni(lr_id=self.uuid, vni=str(vni))

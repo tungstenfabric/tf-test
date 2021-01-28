@@ -80,6 +80,46 @@ class TestFabricDcGw(BaseFabricTest):
             assert fixture.ping_with_certainty(self.inputs.public_host)
         self.do_ping_mesh(bms_fixtures + [vm])
 
+    @test.attr(type=['mx_cgnat'])
+    @preposttest_wrapper
+    def test_dc_gw_napt(self):
+        '''
+           Create VN vn, napt_pool_vn
+           Create Logical Router and add vn
+           Add the NAPT pool VN to LR
+           Create tagged BMS instance on BMS1 of VN vn
+           ping from the BMS1 to external host ip
+        '''
+        bms_fixtures = list()
+        vn = self.create_vn()
+        dc_devices = list()
+        napt_pool_is_required = False
+        for device in self.devices:
+            prouter_details = self.inputs.physical_routers_data[device.name]
+            if 'dc_gw' in self.inputs.get_prouter_rb_roles(device.name):
+                dc_devices.append(device)
+                if prouter_details.get('model', '').startswith('mx'):
+                    if prouter_details['si_port'] and prouter_details['si_port'].startswith("ms-"):
+                        napt_pool_is_required = True
+                        device.add_service_interface(prouter_details['si_port'])
+
+        lr = self.create_logical_router([vn], is_public_lr=True, devices=dc_devices)
+        # vm = self.create_vm(vn_fixture=vn, image_name='cirros')
+        if napt_pool_is_required:
+            napt_pool_vn_obj = self.create_vn(vn_subnets=self.inputs.public_subnets[:1])
+            lr.update_snatpool(napt_pool_vn_obj)
+        for bms in self.get_bms_nodes():
+            bms_fixtures.append(self.create_bms(
+                bms_name=bms,
+                tor_port_vlan_tag=10,
+                vn_fixture=vn))
+
+        # self.check_vms_booted([vm])
+
+        for fixture in bms_fixtures:
+            assert fixture.ping_with_certainty(self.inputs.public_host)
+        # self.do_ping_mesh(bms_fixtures + [vm])
+
     @preposttest_wrapper
     def test_update_vni(self):
         vn = self.create_vn(vn_subnets=self.inputs.public_subnets[:1])
