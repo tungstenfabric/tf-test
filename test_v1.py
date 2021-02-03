@@ -1,6 +1,7 @@
 from test import BaseTestCase
 from common.isolated_creds import *
 import time
+import sys
 
 class BaseTestCase_v1(BaseTestCase):
     isolation = True
@@ -12,6 +13,11 @@ class BaseTestCase_v1(BaseTestCase):
         cls.domain_name = None
         cls.domain_obj = None
         super(BaseTestCase_v1, cls).setUpClass()
+        if 'common.k8s.base' in sys.modules and issubclass(cls,
+            sys.modules['common.k8s.base'].BaseK8sTest):
+            # no isolation for k8s, all tests run in same domain & project 
+            cls.isolation = False
+            cls.inputs.tenant_isolation = False
         if 'v3' in cls.inputs.auth_url:
             if cls.isolation and cls.inputs.domain_isolation:
                 cls.domain_name = cls.__name__

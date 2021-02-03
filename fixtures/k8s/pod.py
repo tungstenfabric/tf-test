@@ -34,7 +34,7 @@ class PodFixture(fixtures.Fixture):
         self.custom_isolation = custom_isolation
         self.fq_network_name = fq_network_name
         self.connections = connections
-        self.vnc_lib = connections.get_vnc_lib_h()
+        self.vnc_lib = connections.vnc_lib
         self.agent_inspect = connections.agent_inspect
 
         self.api_vm_obj = None
