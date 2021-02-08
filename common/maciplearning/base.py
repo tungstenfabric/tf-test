@@ -26,13 +26,21 @@ class BaseMacIpLearningTest(GenericTestBase):
         cls.api_s_inspect = cls.connections.api_server_inspect
     # end setUpClass
 
-    def get_intf_address(self, intf, pod):
+    def get_intf_address(self, intf, pod, v6=False):
         """
         Routine if to derive the ip address of the interface in a multi interface pod
         :param intf: name of the interface for which te ip address needed to be reutrned
         :param pod: name of the pod
-        :return: ipv4 address of the interface
+        :return: ipv4/ global ipv6 address of the interface
         """
+        if v6:
+            cmd = ["ifconfig " + intf + " | grep Global"]
+            output = pod.run_cmd_on_vm(cmd)
+            ip6 = re.search(
+                 r'inet6\s+addr\s*:\s*(\S*)',
+                 output['ifconfig eth0 | grep Global'])
+            ip6_addr = ip6.group(1)
+            return ip6_addr
         cmd = ["ifconfig " + intf + " | grep inet"]
         output = pod.run_cmd_on_vm(cmd)
         ip = re.search(
