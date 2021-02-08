@@ -26,7 +26,7 @@ class TestK8sResource(BaseK8sAuth):
         cmds = ['kubectl config use-context juju-context']
         for resource in TestK8sResource.resource_expectation:
             template_file = ResourceUtil.templates[resource]
-            cmd = f'kubectl delete -f {template_file} -n default'
+            cmd = 'kubectl delete -f %s -n default' % template_file
             cmds.append(cmd)
         ResourceUtil.execute_cmds_on_remote(
             ip=self.inputs.juju_server, cmd_list=cmds)

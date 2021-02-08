@@ -30,7 +30,7 @@ class Util:
         # kubectl = 'kubectl -v=5 --insecure-skip-tls-verify=true -s https://192.168.30.29:6443'
         kubectl = 'kubectl'
         template_file = Util.templates[resource]
-        cmd = [f'{kubectl} {verb} -f {template_file} -n {namespace}']
+        cmd = ['%s %s -f %s -n %s' % (kubectl, verb, template_file, namespace)]
         out, err = Util.execute_cmds_on_remote(
             ip=inputs.juju_server, cmd_list=cmd, stackrc_file=stackrc_file)
         return out, err
@@ -45,13 +45,13 @@ class Util:
             inputs=None):
         export_list = [
             'export OS_IDENTITY_API_VERSION=3',
-            f'export OS_USER_DOMAIN_NAME={domain_name}',
-            f'export OS_USERNAME={user_name}',
-            f'export OS_PROJECT_DOMAIN_NAME={domain_name}',
-            f'export OS_PROJECT_NAME={project_name}',
-            f'export OS_PASSWORD={password}',
-            f'export OS_AUTH_URL={auth_url}',
-            f'export OS_DOMAIN_NAME={domain_name}'
+            'export OS_USER_DOMAIN_NAME=%s' % domain_name,
+            'export OS_USERNAME=%s' % user_name,
+            'export OS_PROJECT_DOMAIN_NAME=%s' % domain_name,
+            'export OS_PROJECT_NAME=%s' % project_name,
+            'export OS_PASSWORD=%s' % password,
+            'export OS_AUTH_URL=%s' % auth_url,
+            'export OS_DOMAIN_NAME=%s' % domain_name
         ]
         filename = '/contrail-test/tcutils/kubernetes/auth/templates/stackrc.sh'
         with open(filename, 'w') as f:
@@ -83,7 +83,7 @@ class Util:
 
         for cmd in cmd_list:
             if stackrc_file is not None:
-                source_stackrc = f'source {stackrc_file}'
+                source_stackrc = 'source %s' % stackrc_file
                 cmd = f"{source_stackrc};{cmd}"
             stdin, stdout, stderr = client.exec_command(cmd)
             output = stdout.read().decode()
