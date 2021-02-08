@@ -113,7 +113,7 @@ class O7kLib:
         try:
             domain = self.find_domain(domain_name)
             self.keystone.projects.create(name=project_name, domain=domain)
-            logging.info(f"Project '{project_name}' created")
+            logging.info("Project '%s' created" % project_name)
         except http.Conflict:
             logging.info("Duplicate Project, not creating")
         except Exception as e:
@@ -122,7 +122,7 @@ class O7kLib:
     def create_domain(self, domain_name):
         try:
             self.keystone.domains.create(domain_name)
-            logging.info(f"Domain '{domain_name}' created")
+            logging.info("Domain '%s' created" % domain_name)
         except http.Conflict:
             logging.info("Duplicate Domain, not creating")
         except Exception as e:
@@ -135,7 +135,7 @@ class O7kLib:
             domain_id = self.find_domain(domain_name).id
             self.keystone.users.create(
                 user, domain_id, project_id, password, email, enabled=enabled)
-            logging.info(f"User '{user}' created")
+            logging.info("User '%s' created" % user)
         except http.Conflict:
             logging.info("Duplicate User, not creating")
         except Exception as e:
@@ -146,9 +146,9 @@ class O7kLib:
             if not obj:
                 obj = self.keystone.projects.find(name=project_name)
             self.keystone.projects.delete(obj)
-            logging.info(f"Project '{project_name}' deleted")
+            logging.info("Project '%s' deleted" % project_name)
         except http.NotFound:
-            logging.warning(f"Project '{project_name}' not found")
+            logging.warning("Project '%s' not found" % project_name)
 
     def delete_user(
             self,
@@ -158,7 +158,7 @@ class O7kLib:
         user = self.get_user_dct(user_name, project_name, domain_name)
         try:
             self.keystone.users.delete(user)
-            logging.info(f"User '{user_name}' deleted")
+            logging.info("User '%s' deleted" % user_name)
             return True
         except ks_exceptions.ClientException as e:
             if 'Unable to add token to revocation list' in str(e):
@@ -177,10 +177,10 @@ class O7kLib:
             if not domain_obj:
                 domain_obj = self.find_domain(domain_name)
             self.update_domain(domain_id=domain_obj.id, enabled=False)
-            logging.info(f"Domain '{domain_name}' deleted")
+            logging.info("Domain '%s' deleted" % domain_name)
             return self.keystone.domains.delete(domain_obj)
         except http.NotFound:
-            logging.warning(f"Domain '{domain_name}' not found")
+            logging.warning("Domain '%s' not found" % domain_name)
 
     def add_user_role(
             self,
@@ -193,4 +193,4 @@ class O7kLib:
         project = self.find_project(project_name)
         # domain = self.find_domain(domain_name)
         self.keystone.roles.grant(role=role, user=user, project=project)
-        logging.info(f"User '{user_name}' assigned '{role_name}' role")
+        logging.info("User '%s' assigned '%s' role" % (user_name, role_name))

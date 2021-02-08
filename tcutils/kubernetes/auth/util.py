@@ -84,7 +84,7 @@ class Util:
         for cmd in cmd_list:
             if stackrc_file is not None:
                 source_stackrc = 'source %s' % stackrc_file
-                cmd = f"{source_stackrc};{cmd}"
+                cmd = "%s;%s" % (source_stackrc, cmd)
             stdin, stdout, stderr = client.exec_command(cmd)
             output = stdout.read().decode()
             error = stderr.read().decode()
