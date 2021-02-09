@@ -91,7 +91,7 @@ class ResourceUtil(Util):
             namespace='default',
             inputs=None):
         stackrc_file = Util.source_stackrc_to_file(
-            **stackrc_dict, inputs=inputs)
+            inputs=inputs, **stackrc_dict)
         ResourceUtil.resource_with_expectation(
             verb='create',
             resource_expectation=resource_expectation,
