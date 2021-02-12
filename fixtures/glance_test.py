@@ -1,9 +1,9 @@
-from builtins import object
-import os
 import openstack
 from common.openstack_libs import glance_client as client
 from common.openstack_libs import glance_exception as glanceException
+from common import log_orig as contrail_logging
 from tcutils.util import retry
+
 
 class GlanceHelper(object):
     '''
@@ -24,10 +24,11 @@ class GlanceHelper(object):
     '''
     def __init__(self, auth_h=None, **kwargs):
         inputs = kwargs.get('inputs')
-        self.logger = kwargs.get('logger') or inputs.logger if inputs \
-                          else contrail_logging.getLogger(__name__)
+        self.logger = kwargs.get('logger') or inputs.logger \
+            if inputs \
+            else contrail_logging.getLogger(__name__)
         self.region_name = kwargs.get('region_name') or \
-                           inputs.region_name if inputs else None
+            inputs.region_name if inputs else None
         if not auth_h:
             auth_h = self.get_auth_h(**kwargs)
         self.auth_h = auth_h
@@ -41,15 +42,13 @@ class GlanceHelper(object):
                           region_name=self.region_name)
     # end setUp
 
-    def get_auth_h(self, **kwargs):
-        return openstack.OpenstackAuth(**kwargs)
-
     def create_image(self, name, filename=None, public=True, **kwargs):
         if public:
-           kwargs.update({'visibility': 'public'})
+            kwargs.update({'visibility': 'public'})
         obj = self.obj.images.create(name=name, **kwargs)
         if filename:
             self.upload_image(obj['id'], filename)
+        return obj['id']
 
     def upload_image(self, uuid, filename):
         self.obj.images.upload(uuid, open(filename, 'rb'))
@@ -61,7 +60,7 @@ class GlanceHelper(object):
                     image_id = image.id
                     break
             else:
-                self.logger.debug('Image by name %s not found'%image_name)
+                self.logger.debug('Image by name %s not found' % image_name)
                 return False
         if not image_id:
             self.logger.debug('image_id cant be empty')

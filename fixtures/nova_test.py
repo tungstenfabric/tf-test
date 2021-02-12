@@ -297,9 +297,9 @@ class NovaHelper(object):
                 except novaException.Forbidden:
                     flavor = self.admin_obj.obj.flavors.find(name=name)
                 flavor.set_keys({'hw:mem_page_size': 'large'})
-        except Exception as e:
+        except Exception:
             self.logger.exception('Exception adding flavor %s' % (name))
-            raise e
+            raise
     # end _install_flavor
 
     def _parse_image_params(self, params):
@@ -370,7 +370,7 @@ class NovaHelper(object):
             self.logger.debug('Download image from web %s' % image_url)
             local('mkdir -p %s' % folder)
             self.execute_cmd_with_proxy("wget -nv %s -O %s" % (image_url, filename), do_local=do_local)
-            self.logger.debug('Image has been downloaded')
+            self.logger.debug('Image has been downloaded to %s' % filename)
             return filename
 
     def get_image_account(self, image_name):
@@ -391,6 +391,8 @@ class NovaHelper(object):
             return None
 
     def execute_cmd_with_proxy(self, cmd, do_local=False):
+        self.logger.debug("Image download (local=%s) (proxy=%s): Execute cmd: %s" %
+                          (do_local, self.inputs.http_proxy, cmd))
         if self.inputs.http_proxy:
             with shell_env(http_proxy=self.inputs.http_proxy):
                 local(cmd) if do_local else sudo(cmd)
@@ -408,11 +410,16 @@ class NovaHelper(object):
             self.execute_cmd_with_proxy('gunzip -f %s' % image_abs_path, do_local=True)
         try:
             self.logger.debug('Try to create image in user context')
-            self.glance_h.create_image(generic_image_name, image_path_real, **params)
+            image_id = self.glance_h.create_image(generic_image_name, image_path_real, **params)
+            self.logger.debug('Image has been created in user context')
         except glanceException.Forbidden:
             self.logger.debug('Create image in admin context')
-            self.admin_obj.glance_h.create_image(generic_image_name, image_path_real, **params)
+            image_id = self.admin_obj.glance_h.create_image(generic_image_name, image_path_real, **params)
+            self.logger.debug('Image has been created in admin context')
         self.execute_cmd_with_proxy('rm -f %s' % image_path_real, do_local=True)
+        self.logger.debug('Downloaded image has been removed')
+        image = self.glance_h.get_image(image_id=image_id, check_active=False)
+        self.logger.debug('Uploaded image status = %s' % image.status)
         return True
 
     def _create_keypair(self, key_name):

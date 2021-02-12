@@ -2360,10 +2360,10 @@ class VMFixture(fixtures.Fixture):
             )
             return self.return_output_cmd_dict
         except SystemExit as e:
-            self.logger.debug('Command exection failed: %s' % (e))
-            raise e
+            self.logger.error('Command exection failed: %s' % (e))
+            raise
         except Exception as e:
-            self.logger.debug(
+            self.logger.error(
                 'Exception occured while running cmds %s' % (cmds))
             self.logger.exception(e)
 
