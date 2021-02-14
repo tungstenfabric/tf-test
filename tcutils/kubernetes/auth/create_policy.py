@@ -179,7 +179,8 @@ def check_policy_in_config_map(policies, juju_server):
 
 def apply_policies_and_check_in_config_map(policies, filename, juju_server):
     logger.info(f"Applying policy file: {filename}")
-    cmd = [f'juju config kubernetes-master keystone-policy="$(cat {filename})"']
+    cmd = [
+        'juju config kubernetes-master keystone-policy="$(cat %s)"' % filename]
     out, err = Util.execute_cmds_on_remote(
         ip=juju_server, cmd_list=cmd)
     check_policy_in_config_map(policies, juju_server)

@@ -34,7 +34,7 @@ class ExampleUser(O7kLib):
         auth_ip, err = Util.execute_cmds_on_remote(
             ip=cti_obj.juju_server, cmd_list=cmd)
         auth_ip = auth_ip.strip()
-        auth_url = f'http://{auth_ip}:5000/v3'
+        auth_url = 'http://%s:5000/v3' % auth_ip
         return auth_url
 
     def create_all(
