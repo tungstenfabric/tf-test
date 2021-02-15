@@ -1,7 +1,4 @@
 """ Module wrrapers that can be used in the tests."""
-from __future__ import print_function
-from __future__ import absolute_import
-
 from future import standard_library
 standard_library.install_aliases()
 import traceback, os, signal
@@ -15,12 +12,14 @@ from tcutils.test_lib.contrail_utils import check_xmpp_is_stable
 
 from .cores import *
 
+
 def detailed_traceback():
     buf = io.BytesIO() if sys.version_info[0] == 2 else io.StringIO()
     cgitb.Hook(format="text", file=buf).handle(sys.exc_info())
     tb_txt = buf.getvalue()
     buf.close()
     return tb_txt
+
 
 def preposttest_wrapper(function):
     """Decorator to perform pretest and posttest validations.
@@ -57,7 +56,7 @@ def preposttest_wrapper(function):
             log.warn("Test is running with crashes: %s", initial_crashes)
 
         (flap_check_result, initial_xmpp_flaps) = check_xmpp_is_stable(
-                self.inputs, self.connections)
+            self.inputs, self.connections)
 
         testfail = None
         testskip = None
@@ -83,11 +82,11 @@ def preposttest_wrapper(function):
             if self.inputs.upgrade:
                 pid = os.getpid()
                 log.info('UPGRADE: %s[%s]: Stopping self',
-                    function.__name__, pid)
+                         function.__name__, pid)
                 log.info('-' * 80)
                 os.kill(pid, signal.SIGSTOP)
                 log.info('UPGRADE: %s[%s]: Resuming validation post upgrade',
-                    function.__name__, pid)
+                         function.__name__, pid)
                 log.info('-' * 80)
                 self.validate_post_upgrade()
         except KeyboardInterrupt:
@@ -97,34 +96,33 @@ def preposttest_wrapper(function):
             log.info(msg)
             result = True
             raise
-        except Exception as msg:
-            testfail=True
+        except Exception:
+            testfail = True
             test_fail_trace = detailed_traceback()
             # Stop the test in the fail state for debugging purpose
             if self.inputs.stop_on_fail:
                 print(test_fail_trace)
                 print("Failure occured; Stopping test for debugging.")
-                import remote_pdb;
+                import remote_pdb
                 remote_pdb.set_trace()
         finally:
             cleanupfail = None
             cleanup_trace = ''
-            if getattr(self, 'parallel_cleanup',None):
-                parallel_cleanup_list = self.parallel_cleanup()
+            if getattr(self, 'parallel_cleanup', None):
+                self.parallel_cleanup()
             while self._cleanups:
                 cleanup, args, kwargs = self._cleanups.pop(-1)
                 try:
                     cleanup(*args, **kwargs)
                 except KeyboardInterrupt:
                     raise
-                except Exception as cleanupfail:
-                    #result.addError(self, sys.exc_info())
+                except Exception:
+                    # result.addError(self, sys.exc_info())
                     cet, cei, ctb = sys.exc_info()
                     formatted_traceback = ''.join(traceback.format_tb(ctb))
+                    message = getattr(cei, 'message', '')
                     cleanup_trace += '\n{0}\n{1}:\n{2}'.format(
-                                                        formatted_traceback,
-                                                        cet.__name__,
-                                                        cei.message)
+                        formatted_traceback, cet.__name__, message)
 
             final_cores = get_cores(self.inputs)
             cores = find_new(initial_cores, final_cores)
@@ -158,7 +156,7 @@ def preposttest_wrapper(function):
                 log.error(msg)
                 errmsg.append(msg)
 
-            (flap_check_result, current_xmpp_flags)= check_xmpp_is_stable(
+            (flap_check_result, current_xmpp_flags) = check_xmpp_is_stable(
                 self.inputs, self.connections, initial_xmpp_flaps)
 
             test_time = datetime.now().replace(microsecond=0) - start_time
