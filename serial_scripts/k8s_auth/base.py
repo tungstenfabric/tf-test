@@ -11,7 +11,7 @@ class BaseK8sAuth(BaseK8sTest):
             ip=juju_server,
             src='/contrail-test/tcutils/kubernetes/auth/templates/',
             dst='templates',
-            dstdir='/var/tmp/templates')
+            dstdir='/var/tmp/')
 
     @classmethod
     def tearDownClass(cls):
