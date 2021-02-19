@@ -170,6 +170,7 @@ _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP = {
     'alarmgen': ['analyticsalarm_alarm-gen_1', 'analytics_alarm_alarm-gen_1'],
 #    'alarmgen-nodemgr': ['analyticsalarm_nodemgr_1', 'analytics_alarm_nodemgr_1'],
 #    'kafka': ['analyticsalarm_kafka_1', 'analytics_alarm_kafka_1'],
+    'contrail-kube-manager': ['contrailkubernetesmaster_kubemanager_1'],
     # WebUI
     'webui': ['webui_web_1'],
     'webui-middleware': ['webui_job_1'],

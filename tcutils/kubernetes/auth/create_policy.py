@@ -12,28 +12,26 @@ from common import log_orig as contrail_logging
 logger = contrail_logging.getLogger('auth')
 
 
-def insert_policies_in_template_file(policies, filename=None, inputs=None):
+def insert_policies_in_template_file(policies, filename='auth_policy.yaml', inputs=None):
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
     TEMPLATE_DIR = os.path.join(THIS_DIR, 'templates')
 
-    if filename is None:
-        filename = os.path.join(TEMPLATE_DIR, 'auth_policy.yaml')
-    else:
-        filename = os.path.join(TEMPLATE_DIR, filename)
+    filename_with_path = os.path.join(TEMPLATE_DIR, filename)
 
     policies_json = json.dumps(policies)
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     template = env.get_template("policy.yaml.j2")
-    with open(filename, 'w') as f:
+    with open(filename_with_path, 'w') as f:
         f.write(template.render(policies=policies_json))
     inputs.copy_file_to_server(
         ip=inputs.juju_server,
-        src='/contrail-test/tcutils/kubernetes/auth/templates/',
-        dst='templates',
-        dstdir='/var/tmp/templates')
+        src='/contrail-test/tcutils/kubernetes/auth/templates/%s' % filename,
+        dst=filename,
+        dstdir='/var/tmp/templates',
+        force=True)
     rel_file = os.path.join(
         '/var/tmp/templates',
-        filename.split('templates/')[1])
+        filename)
     return rel_file
 
 
@@ -190,7 +188,7 @@ def create_and_apply_policies(
         resource={},
         match=[],
         inputs=None,
-        filename=None):
+        filename='auth_policy.yaml'):
     policies = create_policies(resource=resource, match=match)
     filename = insert_policies_in_template_file(
         policies, filename=filename, inputs=inputs)
