@@ -61,7 +61,8 @@ class Util:
             ip=inputs.juju_server,
             src=filename,
             dst='stackrc.sh',
-            dstdir='/var/tmp/templates')
+            dstdir='/var/tmp/templates',
+            force=True)
         return Util.templates['stackrc']
 
     @staticmethod
