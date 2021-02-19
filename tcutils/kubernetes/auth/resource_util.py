@@ -56,12 +56,14 @@ class ResourceUtil(Util):
                         verb='delete',
                         resource=resource,
                         namespace=namespace,
-                        stackrc_file=stackrc_file)
+                        stackrc_file=stackrc_file,
+                        inputs=inputs)
                     Util.exec_kubectl_cmd_on_file(
                         verb='create',
                         resource=resource,
                         namespace=namespace,
-                        stackrc_file=stackrc_file)
+                        stackrc_file=stackrc_file,
+                        inputs=inputs)
                 else:
                     if '[' in error:
                         errorObject = error.split("[")[1].split("]")[0]
@@ -69,7 +71,7 @@ class ResourceUtil(Util):
                         logger.error(errorMessage)
                     else:
                         logger.error(error)
-                    logger.error('Error while %s %s' (resource, verb))
+                    logger.error('Error while %s %s' % (resource, verb))
                     raise Exception(error)
 
     @staticmethod
