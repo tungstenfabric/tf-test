@@ -293,10 +293,13 @@ class ContrailConnections(object):
             if self.inputs.deployer == 'openshift':
                 self.k8s_client = Openshift_client(self.inputs.kube_config_file,
                                                 self.logger)
-            elif self.inputs.slave_orchestrator == 'kubernetes' and self.k8s_cluster:
-                        self.k8s_client = Kubernetes_client(
-                                                cluster=self.k8s_cluster,
-                                                logger=self.logger)
+            elif self.inputs.slave_orchestrator == 'kubernetes':
+                if self.k8s_cluster:
+                    self.k8s_client = Kubernetes_client(
+                                            cluster=self.k8s_cluster,
+                                            logger=self.logger)
+                else:
+                    self.k8s_client = None
             else:
                 self.k8s_client = Kubernetes_client(
                                                 self.inputs.kube_config_file,
