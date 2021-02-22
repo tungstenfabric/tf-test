@@ -115,9 +115,10 @@ class SessionLogging(SessionLoggingBase):
         self._test_logging_inter_node()
 
     @preposttest_wrapper
-    def test_client_session_aggregation(self):
+    def disable_test_client_session_aggregation(self):
         """
         Description: Verify client sessions aggregation for tcp and udp
+        disabling due to bug 1797317
         """
         self._create_resources(test_type='inter-node', no_of_server=3)
 
@@ -293,9 +294,10 @@ class SessionLogging(SessionLoggingBase):
                 "protocol %s" % (proto))
 
     @preposttest_wrapper
-    def test_server_session_aggregation(self):
+    def disable_test_server_session_aggregation(self):
         """
-        Description: Verify server sessions aggregation
+        Description: Verify server sessions aggregatioan
+        bug 1797317
         """
         self._create_resources(test_type='inter-node', no_of_client=3)
 
