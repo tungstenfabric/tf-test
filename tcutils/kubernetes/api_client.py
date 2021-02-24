@@ -659,14 +659,21 @@ class Client(object):
     # end set_deployment_replicas
 
     def get_replica_set(self, namespace, deployment=None):
-        rs_objs = self.v1_beta_h.list_namespaced_replica_set(namespace)
-        ret_list = []
-        for rs_obj in rs_objs.items:
-            if not deployment:
-                ret_list.append(rs_obj)
-            elif deployment in rs_obj.metadata.name:
-                ret_list.append(rs_obj)
-        return ret_list
+        try:
+            rs_objs = self.apps_v1_h.list_namespaced_replica_set(namespace)
+        except ApiException as e:
+            try:
+                rs_objs = self.v1_beta_h.list_namespaced_replica_set(namespace)
+            except ApiException as e:
+                self.logger.debug('ReplicaSet not present')
+        finally:
+            ret_list = []
+            for rs_obj in rs_objs.items:
+                if not deployment:
+                    ret_list.append(rs_obj)
+                elif deployment in rs_obj.metadata.name:
+                    ret_list.append(rs_obj)
+            return ret_list
     # end get_replica_set
 
     def get_pods_list(self, namespace, replica_set=None, deployment=None):

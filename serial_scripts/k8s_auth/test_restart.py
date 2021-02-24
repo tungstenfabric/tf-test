@@ -3,6 +3,8 @@ from tcutils.kubernetes.auth.resource_util import ResourceUtil
 from tcutils.kubernetes.auth.example_user import ExampleUser
 from tcutils.wrappers import preposttest_wrapper
 import test
+from k8s.deployment import DeploymentFixture
+from k8s.pod import PodFixture
 
 
 class TestRestart(BaseK8sAuth):
@@ -117,6 +119,33 @@ class TestRestart(BaseK8sAuth):
         self.restart_vrouter_agent()
         ResourceUtil.create_policy_and_perform_operations(
             match=match,
+            resource_expectation=TestRestart.resource_expectation,
+            stackrc_dict=stackrc_dict, inputs=self.inputs)
+
+    @test.attr(type=['auth'])
+    @preposttest_wrapper
+    def test_k8s_auth_pod_delete(self):
+        '''
+        Description: Test to validate normal operations after k8s auth pod deletion
+         Test steps:
+                1. Create stackrc_dict for admin user
+                2. Set the resource expectation list to all k8s resources
+                3. Delete the k8s keystone auth pods one after the other
+                4. Perform create and delete operations with keystone context
+         Pass criteria: Even after the k8s auth pods are deleted, they should come up fine and admin user must be able to perform all operations successfully
+         Maintainer : nuthanc@juniper.net
+        '''
+        dep = DeploymentFixture(
+            self.connections, name='k8s-keystone-auth', namespace='kube-system')
+        dep_obj = dep.read()
+        pods = dep.get_pods_list()
+        for pod in pods:
+            auth_pod = PodFixture(
+                self.connections, name=pod.metadata.name, namespace=pod.metadata.namespace)
+            auth_pod.delete_only()
+            auth_pod.verify_pod_is_not_in_k8s()
+        stackrc_dict = ResourceUtil.admin_stackrc()
+        ResourceUtil.create_policy_and_perform_operations(
             resource_expectation=TestRestart.resource_expectation,
             stackrc_dict=stackrc_dict, inputs=self.inputs)
 
