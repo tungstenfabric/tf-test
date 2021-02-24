@@ -58,14 +58,22 @@ class DeploymentFixture(fixtures.Fixture):
 
     def read(self):
         try:
-            self.obj = self.v1_beta_h.read_namespaced_deployment(
+            self.obj = self.k8s_client.apps_v1_h.read_namespaced_deployment(
                 self.name, self.namespace)
             self._populate_attr()
             if self.already_exists is None:
                 self.already_exists = True
             return self.obj
         except ApiException as e:
-            self.logger.debug('Deployment %s not present' % (self.name))
+            try:
+                self.obj = self.v1_beta_h.read_namespaced_deployment(
+                    self.name, self.namespace)
+                self._populate_attr()
+                if self.already_exists is None:
+                    self.already_exists = True
+                return self.obj
+            except ApiException as e:
+                self.logger.debug('Deployment %s not present' % (self.name))
             return None
     # end read
 
