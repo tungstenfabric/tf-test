@@ -25,16 +25,16 @@ class TestVrouterDetach(BaseNeutronTest):
         4. Verify Xconnect mode
         5. start vrouter-agent'''
         result = True
-        verify_Xconnect ="vif --list | grep Flags:X"
+        verify_Xconnect ="contrail-tools vif --list | grep Flags:X"
         compute_ip = self.inputs.compute_ips[0]
-        self.inputs.stop_service('contrail-vrouter-agent',[compute_ip],container='agent')
+        self.inputs.stop_container([compute_ip],container='agent')
         self.logger.info('Verify Xconnect mode ')
         output=self.inputs.run_cmd_on_server(compute_ip,issue_cmd=verify_Xconnect)
         if not output:
             result = result and False
         else:
             self.logger.info('Xconnect mode got enabled')
-        self.inputs.start_service('contrail-vrouter-agent',[compute_ip],container='agent')
+        self.inputs.start_container([compute_ip],container='agent')
         status = ContrailStatusChecker(self.inputs)
         status.wait_till_contrail_cluster_stable([compute_ip])
         assert result,'Xconnect mode not enabled'
@@ -66,8 +66,7 @@ class TestVrouterDetach(BaseNeutronTest):
         vm2_fixture.wait_till_vm_is_up()
         compute_ip = vm1_fixture.vm_node_ip
         assert vm1_fixture.ping_with_certainty(vm2_fixture.vm_ip)
-        self.inputs.stop_service('supervisor-vrouter', host_ips=[compute_ip],
-                                 container='agent')
+        self.inputs.stop_container([compute_ip],container='agent')
         self.inputs.run_cmd_on_server(compute_ip, issue_cmd=cmd_vr_unload)
         status = self.inputs.run_cmd_on_server(compute_ip,issue_cmd = 'lsmod | grep vrouter')
         if status:
@@ -83,7 +82,7 @@ class TestVrouterDetach(BaseNeutronTest):
             self.logger.error('Vrouter kernel module failed to reload')
         else:
             self.logger.info('Vrouter kernel module reloaded successfully')
-        self.inputs.start_service('supervisor-vrouter', host_ips=[compute_ip],
+        self.inputs.start_container([compute_ip],
                                   container='agent')
         status = ContrailStatusChecker(self.inputs)
         status.wait_till_contrail_cluster_stable()
