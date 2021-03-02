@@ -7,6 +7,7 @@ import fixtures
 import string
 from tcutils.util import retry, search_arp_entry, get_random_name
 from tcutils.util import get_intf_name_from_mac, run_cmd_on_server, get_af_type
+from tcutils.tcpdump_utils import start_tcpdump_for_intf, stop_tcpdump_for_intf
 from tcutils.util import get_random_string, run_dhcp_server
 from port_fixture import PortFixture
 from virtual_port_group import VPGFixture
@@ -647,7 +648,7 @@ class BMSFixture(fixtures.Fixture):
             self.bms_ip = info['inet_addr']
         return (True, output)
 
-    @retry(delay=5, tries=10)
+    @retry(delay=10, tries=10)
     def run_dhclient(self, timeout=60, expectation=True):
         if self.static_ip and not self.external_dhcp_server:
             self.logger.debug("Configuring static ip as requested")
