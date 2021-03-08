@@ -8,6 +8,9 @@ CONTRAIL_REPO=""
 OPENSTACK_REPO=""
 TAG=""
 
+#SITE_MIRROR is an URL to the root of cache. This code will look for the files inside predefined folder
+[ -z "${SITE_MIRROR+x}" ] || SITE_MIRROR="${SITE_MIRROR}/external-web-cache"
+
 download_pkg () {
     local pkg=$1
     local dir=$2
@@ -49,6 +52,7 @@ docker_build_test_sku () {
   build_arg_opts+=" --build-arg CONTRAIL_REPO=${CONTRAIL_REPO}"
   build_arg_opts+=" --build-arg OPENSTACK_REPO=${OPENSTACK_REPO}"
   build_arg_opts+=" --build-arg DOCKERFILE_DIR=${dir}"
+  build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
 
   echo "Building test container ${name}:${tag} with opts ${build_arg_opts}"
   sudo docker build --network host -t ${name}:${tag} ${build_arg_opts} -f $dockerfile . || exit 1
@@ -155,7 +159,7 @@ EOF
         TAG=latest
     fi
     echo "Building base container"
-    sudo docker build --network host -t contrail-test-base:$TAG docker/base || exit 1
+    sudo docker build --network host --build-arg SITE_MIRROR=${SITE_MIRROR} -t contrail-test-base:$TAG docker/base || exit 1
     if [[ -n $REGISTRY_SERVER ]]; then
         sudo docker tag contrail-test-base:$TAG $REGISTRY_SERVER/contrail-test-base:$TAG
     fi
