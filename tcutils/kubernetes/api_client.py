@@ -13,14 +13,17 @@ from pprint import pprint
 def retry_on_api_exception(*args, **kwargs):
     """A decorator to retry when kubernetes raises ApiException with ConnectionError."""
     def decorator(f):
+        tries = kwargs.get('tries', 5)
+        delay = kwargs.get('delay', 5)
         @functools.wraps(f)
         def wrapper(cls_obj, *func_args, **func_kwargs):
-            try:
-                return f(cls_obj, *func_args, **func_kwargs)
-            except ApiException as e:
-                cls_obj.logger.warning("ApiException is caught %s. Retrying..." % e)
-            # retry
-            time.sleep(5)
+            for i in range(tries):
+                try:
+                    return f(cls_obj, *func_args, **func_kwargs)
+                except ApiException as e:
+                    cls_obj.logger.warning("ApiException is caught %s. Retrying..." % e)
+                # retry
+                time.sleep(delay)
             cls_obj.init_clients()
             return f(cls_obj, *func_args, **func_kwargs)
         return wrapper
@@ -475,7 +478,7 @@ class Client(object):
         '''
         return self.v1_h.read_namespaced_pod_status(name, namespace)
 
-    @retry_on_api_exception("init_clients")
+    @retry_on_api_exception("init_clients", tries=5, delay=5)
     def exec_cmd_on_pod(self, name, cmd, namespace='default', stderr=True,
                         stdin=False, stdout=True, tty=False,
                         shell='/bin/bash -l -c', container=None):
