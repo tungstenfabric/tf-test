@@ -71,10 +71,10 @@ class TestNHLimitKernel(TestNHLimit):
                 self.logicalsystem[i], self.table[i], self.subnet, count)
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute, modify=True)
-        self.addCleanup(self.reset_nh_limit, compute=compute)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
         self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
+        self.reset_nh_limit(compute=compute)
         self.set_nh_limit(nh_limit=nh_limit2, compute=compute, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute)
         self.verify_nh_indexes(compute, nh_index_Range2)
@@ -113,11 +113,11 @@ class TestNHLimitKernel(TestNHLimit):
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute,
                           mpls_limit=mpls_limit, modify=True)
-        self.addCleanup(self.reset_nh_limit, compute=compute)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
         self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
-        self.set_nh_limit(nh_limit=nh_limit2, compute=compute, modify=True)
+        self.reset_nh_limit(compute=compute)
+        self.set_nh_limit(nh_limit=nh_limit2, compute=compute, mpls_limit=mpls_limit, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute)
         self.verify_nh_indexes(compute, nh_index_Range2)
         self.ping_after_nh_index()
@@ -217,18 +217,17 @@ class TestNHLimitDpdk(TestNHLimit):
         nh_index_Range2 = []
         nh_index_Range2.append(int(nh_limit2) - 5)
         nh_index_Range2.append(int(nh_limit2))
-        compute = self.get_compute()
+        compute = self.get_compute(self.agent_mode)
         for i in range(len(self.logicalsystem)):
             self.add_routes_using_rtgen_mx_side(
                 self.logicalsystem[i], self.table[i], self.subnet, count)
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute,
                           agent_mode=self.agent_mode, modify=True)
-        self.addCleanup(self.reset_nh_limit, compute=compute,
-                        agent_mode=self.agent_mode)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
         self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
+        self.reset_nh_limit(compute=compute, agent_mode=self.agent_mode)
         self.set_nh_limit(nh_limit=nh_limit2, compute=compute,
                           agent_mode=self.agent_mode, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute,
@@ -262,18 +261,17 @@ class TestNHLimitDpdk(TestNHLimit):
         nh_index_Range2 = []
         nh_index_Range2.append(int(nh_limit2) - 5)
         nh_index_Range2.append(int(nh_limit2))
-        compute = self.get_compute()
+        compute = self.get_compute(self.agent_mode)
         for i in range(len(self.logicalsystem)):
             self.add_routes_using_rtgen_mx_side(
                 self.logicalsystem[i], self.table[i], self.subnet, count)
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute,
-                          agent_mode=self.agent_mode, modify=True)
-        self.addCleanup(self.reset_nh_limit, compute=compute,
-                        agent_mode=self.agent_mode)
+                          agent_mode=self.agent_mode, mpls_limit=mpls_limit, modify=True)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
         self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
+        self.reset_nh_limit(compute=compute, agent_mode=self.agent_mode)
         self.set_nh_limit(nh_limit=nh_limit2, compute=compute,
                           agent_mode=self.agent_mode, mpls_limit=mpls_limit, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute,
