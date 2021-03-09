@@ -225,6 +225,11 @@ class AgentInspect (VerificationUtilBase):
 
         return p
 
+    def get_vna_mirror_entries(self, domain='default-domain', project='admin'):
+        vnl = self.dict_get('Snh_MirrorEntryReq?analyzer_name=')
+        mirror_entry_data=vnl.xpath('./MirrorEntryResp/mirror_entry_list')
+        return mirror_entry_data
+
     def get_vna_pkt_agentstatsreq(self):
         '''returns output of http://10.204.216.15:8085/Snh_AgentStatsReq?
         {'XmppStatsResp': {'xmpp_out_msgs': '62', 'xmpp_reconnect': '4', 'xmpp_in_msgs': '20', 'more': 'true'}, 'PktTrapStatsResp': {'invalid_agent_hdr': '0', 'invalid_interface': '8', 'exceptions': '3937', 'pkt_dropped': '8', 'no_handler': '8', 'more': 'true'}, 'IpcStatsResp': {'ipc_in_msgs': '0', 'ipc_out_msgs': '0', 'more': 'true'}, 'FlowStatsResp': {'flow_aged': '44', 'flow_denied': '0', 'flow_duplicate': '0', 'flow_allowed': '48', 'flow_active': '4', 'more': 'true'}, 'SandeshStatsResp': {'sandesh_out_msgs': '0', 'sandesh_reconnects': '0', 'sandesh_http_sessions': '0', 'sandesh_in_msgs': '0', 'more': 'false'}}'''
