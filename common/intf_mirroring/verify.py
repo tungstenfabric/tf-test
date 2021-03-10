@@ -13,6 +13,8 @@ from vnc_api.gen.resource_xsd import StaticMirrorNhType
 from vnc_api.gen.resource_xsd import MirrorActionType
 from vnc_api.gen.resource_xsd import InterfaceMirrorType
 from vnc_api.gen.resource_xsd import VirtualMachineInterfacePropertiesType
+from tcutils.contrail_status_check import ContrailStatusChecker
+from lxml import etree
 
 class VerifyIntfMirror(VerifySvcMirror):
 
@@ -876,6 +878,248 @@ class VerifyIntfMirror(VerifySvcMirror):
             tap.set_virtual_machine_interface_properties(prop_obj)
             tap = vnc.virtual_machine_interface_update(tap)
     # end disable_intf_mirrroing
+
+    def verify_intf_mirroring_scale_number(self):
+
+        compute_nodes = self.get_compute_nodes(0, 1, 2)
+        src_compute = compute_nodes[0]
+        analyzer_compute = compute_nodes[1]
+        dst_compute = compute_nodes[2]
+        analyzer_port = 8099
+        vn_fixtures = []
+        vn_objs = []
+        image_name = 'ubuntu'
+
+        # Agent restart to avoid stale entries in 'mirror --dump' output
+        self.inputs.restart_service('contrail-vrouter-agent', [src_compute], container='agent')
+        cluster_status, error_nodes = ContrailStatusChecker().wait_till_contrail_cluster_stable(nodes=[src_compute])
+        assert cluster_status, 'Hash of error nodes and services : %s' % (error_nodes)
+
+        # Create 51 VNs
+        for count in range(1,52):
+            vn_subnet = [get_random_cidr(af=self.inputs.get_af())]
+            vn_fq_name = self.connections.domain_name +":"  + self.inputs.project_name + \
+                        ":" + get_random_name("src_vn_%s" %count)
+            vn_name = vn_fq_name.split(':')[2]
+            self.vn_fixture = self.config_vn(vn_name, vn_subnet)
+            vn_fixtures.append(self.vn_fixture)
+            vn_objs.append(self.vn_fixture.obj)
+
+            if count == 1:
+
+                # Configure analyzer_vm and dest_vm in first VN
+                vn_obj = [self.vn_fixture.obj]
+                analyzer_vm_name = get_random_name("analyzer_vm")
+                routing_instance = vn_fq_name + ':' + vn_name
+                analyzer_vm_fixture = self.create_vm(vn_objs=vn_obj, vm_name=analyzer_vm_name,
+                            image_name=image_name, node_name=analyzer_compute)
+                sleep(10)
+                assert analyzer_vm_fixture.verify_on_setup()
+                self.nova_h.wait_till_vm_is_up(analyzer_vm_fixture.vm_obj)
+                analyzer_ip_address = analyzer_vm_fixture.get_vm_ips(vn_fq_name)[0]
+
+                dst_vm_name = get_random_name("dst_vm")
+                dst_vm_fixture = self.create_vm(vn_objs=vn_obj, vm_name=dst_vm_name,
+                            image_name=image_name, node_name=dst_compute)
+                sleep(10)
+                assert dst_vm_fixture.verify_on_setup()
+                self.nova_h.wait_till_vm_is_up(dst_vm_fixture.vm_obj)
+
+        # Create 51 Sub interface VMIs and Enable Interface mirroring on that
+        sub_vn_subnet = [get_random_cidr(af=self.inputs.get_af())]
+        sub_vn_fq_name = self.connections.domain_name +":"  + self.inputs.project_name + \
+                        ":" + get_random_name("sub_vn")
+        sub_vn_name = sub_vn_fq_name.split(':')[2]
+        self.sub_vn_fixture = self.config_vn(sub_vn_name, sub_vn_subnet)
+
+        intf_type = 'src'
+        vlan_range = range(2001, 2052)
+        sub_port, sub_parent_port, sub_parent_port_vn_fixture = self.create_sub_intf_scale(self.sub_vn_fixture.uuid, \
+                                                                         intf_type, vlan_range)
+        sub_port_ids=[]
+        sub_port_ids.append(sub_parent_port.uuid)
+        sub_vn_objs = [sub_parent_port_vn_fixture.obj]
+        sub_vm_name = get_random_name("sub_vm")
+
+        sub_vm_fixture = self.create_vm(vn_objs=sub_vn_objs, vm_name=sub_vm_name,
+            image_name=image_name, node_name=src_compute, port_ids=sub_port_ids)
+
+        total_mirror_entries_before_test=self.inputs.run_cmd_on_server(sub_vm_fixture.vm_node_ip, \
+                                                        "contrail-tools mirror --dump | wc -l")
+
+        assert sub_vm_fixture.verify_on_setup()
+        self.nova_h.wait_till_vm_is_up(sub_vm_fixture.vm_obj)
+        count = 1
+        for sport in sub_port:
+            analyzer_name='tap'+'-'+'sub'+'-'+str(count)
+            self.config_scale_intf_mirroring(sub_vm_fixture, analyzer_ip_address, analyzer_name, \
+                    routing_instance, src_port=sport, sub_intf=True)
+            count = count+1
+
+        # Create four VM with 51 VMIs each, enable mirroring on all, Verify traffic gets mirrored from first VMI of each VM
+        for source_vm_count in range(1,5):
+            src_vm_name = get_random_name("src_vm_%s" %source_vm_count )
+            src_vm_fixture = self.create_vm(vn_objs=vn_objs, vm_name=src_vm_name, image_name=image_name, node_name=src_compute)
+            sleep(10)
+            assert src_vm_fixture.verify_on_setup()
+            self.nova_h.wait_till_vm_is_up(src_vm_fixture.vm_obj)
+            self.config_scale_intf_mirroring(src_vm_fixture, analyzer_ip_address, analyzer_name, routing_instance, \
+                      count=source_vm_count, scale_num=51)
+            if not self.verify_port_mirroring(src_vm_fixture, dst_vm_fixture, analyzer_vm_fixture):
+                assert False, 'Intf mirroring not working on VM %s' % (source_vm_count)
+
+        total_mirror_entries=self.inputs.run_cmd_on_server(src_vm_fixture.vm_node_ip, "contrail-tools mirror --dump | wc -l")
+        total_mirror_entries= int(total_mirror_entries) - int(total_mirror_entries_before_test)
+
+        # Verify Mirroring is enabled on 255 interace
+        if  total_mirror_entries != 255:
+            assert False, 'Expected total 255 mirroring entries found : %s' % (total_mirror_entries)
+        else:
+            self.logger.info('Found mirror entries : %s' % (total_mirror_entries))
+
+        # Performe Agent Restart
+        self.inputs.restart_service('contrail-vrouter-agent', [src_compute], container='agent')
+        cluster_status, error_nodes = ContrailStatusChecker().wait_till_contrail_cluster_stable(nodes=[src_compute])
+        assert cluster_status, 'Hash of error nodes and services : %s' % (error_nodes)
+
+        assert src_vm_fixture.wait_till_vm_is_up()
+
+        total_mirror_entries=self.inputs.run_cmd_on_server(src_vm_fixture.vm_node_ip, "contrail-tools mirror --dump | wc -l")
+        total_mirror_entries= int(total_mirror_entries) - int(total_mirror_entries_before_test)
+
+        # Verify Mirroring is enabled on 255 interace
+        if  total_mirror_entries!= 255:
+            assert False, 'Expected total 255 mirroring entries found : %s' % (total_mirror_entries)
+        else:
+            self.logger.info('Found mirror entries : %s' % (total_mirror_entries))
+
+        # Verify traffic gets forwarded to analyzer
+        if not self.verify_port_mirroring(src_vm_fixture, dst_vm_fixture, analyzer_vm_fixture):
+            assert False, 'Intf mirroring not working on VM %s' % (source_vm_count)
+
+        # Create one more VM, and configure mirroring and test traffic is not mirrored for this interface
+        src_vm_name = get_random_name("src_vm_5")
+        vn_obj=[]
+        vn_obj.append(vn_objs[0])
+        analyzer_name= "analyzer_beyond_255"
+        src_vm_fixture = self.create_vm(vn_objs=vn_obj, vm_name=src_vm_name, image_name=image_name, node_name=src_compute)
+        assert src_vm_fixture.verify_on_setup()
+        self.nova_h.wait_till_vm_is_up(src_vm_fixture.vm_obj)
+
+        self.config_scale_intf_mirroring(src_vm_fixture, analyzer_ip_address, analyzer_name, routing_instance, \
+                 agent_insp=False )
+
+        inspect_h = self.agent_inspect[src_vm_fixture.vm_node_ip]
+        mirror_entry_list = inspect_h.get_vna_mirror_entries()
+        mirror_entry_name_list=mirror_entry_list[0].xpath("//analyzer_name")
+
+        for entry in mirror_entry_name_list:
+            name=etree.tostring(entry, encoding='unicode')
+            if analyzer_name in name:
+                assert False, 'Mirror Entry should not be present in Agent, when configured for more than 255 interaces'
+
+        # Verify traffic should not forwarded to analyzer
+        if self.verify_port_mirroring(src_vm_fixture, dst_vm_fixture, analyzer_vm_fixture):
+            assert False, 'Intf mirroring should not work when configured for 255th VM: %s' % (source_vm_count)
+
+    def create_sub_intf_scale(self, vn_fix_uuid, intf_type, vlan_range, mac_address=None):
+
+        parent_port_vn_subnets = [get_random_cidr(af=self.inputs.get_af())]
+        parent_port_vn_name = get_random_name( intf_type + "_parent_port_vn")
+        parent_port_vn_fixture = self.config_vn(parent_port_vn_name, parent_port_vn_subnets)
+        parent_port = self.setup_vmi(parent_port_vn_fixture.uuid)
+        mac_address = parent_port.mac_address
+        vlan_port = []
+
+        for vlan in vlan_range:
+            port = self.setup_vmi(vn_fix_uuid,
+                                           parent_vmi=parent_port.vmi_obj,
+                                           vlan_id=vlan,
+                                           api_type='contrail',
+                                           mac_address=mac_address)
+            vlan_port.append(port.vmi_obj)
+
+        return vlan_port, parent_port, parent_port_vn_fixture
+
+    def config_scale_intf_mirroring(self, src_vm_fixture, analyzer_ip_address, analyzer_name, routing_instance, \
+                src_port=None, sub_intf=False, nh_mode = 'dynamic', direction = 'both', \
+                analyzer_mac_address = '', count = None, agent_insp=True, scale_num=None, ):
+
+        vnc = src_vm_fixture.vnc_lib_h
+
+        if sub_intf:
+
+            tap_intf_obj = src_port
+            self.enable_intf_mirroring(vnc, tap_intf_obj, analyzer_ip_address, analyzer_name, routing_instance, header = True, \
+                  nh_mode = nh_mode, direction = direction, analyzer_mac_address = analyzer_mac_address)
+
+            if agent_insp:
+
+                sleep(2)
+                inspect_h = self.agent_inspect[src_vm_fixture.vm_node_ip]
+                mirror_entry_list = inspect_h.get_vna_mirror_entries()
+                mirror_entry_text = etree.tostring(mirror_entry_list[0], encoding='unicode')
+                if analyzer_name not in mirror_entry_text:
+                    result = False
+                    assert False, 'Mirror entry not found in Agent Introspect for analyzer: %s' % (analyzer_name)
+                else:
+                    self.logger.info('Mirror Entry found in Agent Introspect for analyzer: %s' % (analyzer_name))
+        else:
+
+            if scale_num != None:
+
+                analyzer_name_list=[]
+
+                for i in range(0, scale_num):
+
+                    analyzer_name='svm'+'-'+str(count)+'tap'+'-'+str(i)
+                    tap_intf_uuid = src_vm_fixture.get_tap_intf_of_vm()[i]['uuid']
+                    tap_intf_obj = vnc.virtual_machine_interface_read(id=tap_intf_uuid)
+                    self.enable_intf_mirroring(vnc, tap_intf_obj, analyzer_ip_address, analyzer_name, routing_instance, header = True, \
+                          nh_mode = nh_mode, direction = direction, analyzer_mac_address = analyzer_mac_address)
+                    analyzer_name_list.append(analyzer_name)
+
+                if agent_insp:
+
+                    inspect_h = self.agent_inspect[src_vm_fixture.vm_node_ip]
+                    mirror_entry_list = inspect_h.get_vna_mirror_entries()
+
+                    mirror_entry_name_list=mirror_entry_list[0].xpath("//analyzer_name")
+                    for entry in mirror_entry_name_list:
+                        analyzer_name=etree.tostring(entry, encoding='unicode')
+
+                    for name in analyzer_name_list:
+                        for entry in mirror_entry_name_list:
+                            analyzer_name=etree.tostring(entry, encoding='unicode')
+                            if name in analyzer_name:
+                                self.logger.info('Mirror Entry found in Agent Introspect for analyzer: %s' % (name))
+                                result = True
+                                break
+                            resutl = False
+                        if result == False:
+                            assert False, 'Mirror entry not found in Agent Introspect for analyzer: %s' % (name)
+            else:
+
+                tap_intf_uuid = src_vm_fixture.get_tap_intf_of_vm()[0]['uuid']
+                tap_intf_obj = vnc.virtual_machine_interface_read(id=tap_intf_uuid)
+
+                self.enable_intf_mirroring(vnc, tap_intf_obj, analyzer_ip_address, analyzer_name, routing_instance, header = True, \
+                    nh_mode = nh_mode, direction = direction, analyzer_mac_address = analyzer_mac_address)
+
+                name = analyzer_name
+                if agent_insp:
+                    inspect_h = self.agent_inspect[src_vm_fixture.vm_node_ip]
+                    mirror_entry_list = inspect_h.get_vna_mirror_entries()
+                    mirror_entry_name_list=mirror_entry_list[0].xpath("//analyzer_name")
+                    for entry in mirror_entry_name_list:
+                        analyzer_name=etree.tostring(entry, encoding='unicode')
+                        if name in analyzer_name:
+                            self.logger.info('Mirror Entry found in Agent Introspect for analyzer: %s' % (name))
+                            result = True
+                            break
+                        resutl = False
+                    if result == False:
+                        assert False, 'Mirror entry not found in Agent Introspect for analyzer: %s' % (name)
 
     def cleanUp(self):
         super(VerifyIntfMirror, self).cleanUp()
