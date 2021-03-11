@@ -1,4 +1,6 @@
 
+from k8s.pod import PodFixture
+from k8s.deployment import DeploymentFixture
 from tcutils.kubernetes.auth import create_policy
 from tcutils.kubernetes.auth.util import Util
 from tcutils.kubernetes.auth.example_user import ExampleUser
@@ -73,6 +75,25 @@ class ResourceUtil(Util):
                         logger.error(error)
                     logger.error('Error while %s %s' % (resource, verb))
                     raise Exception(error)
+    
+    @staticmethod
+    def restart_core_dns(connections):
+        dep = DeploymentFixture(
+            connections, name='coredns', namespace='kube-system')
+        dep.read()
+        pods = dep.get_pods_list()
+        for pod in pods:
+            dns_pod = PodFixture(
+                connections, name=pod.metadata.name, namespace=pod.metadata.namespace)
+            dns_pod.delete_only()
+            dns_pod.verify_pod_is_not_in_k8s()
+        dep.read()
+        pods = dep.get_pods_list()
+        for pod in pods:
+            dns_pod = PodFixture(
+                connections, name=pod.metadata.name, namespace=pod.metadata.namespace)
+            dns_pod.wait_till_pod_is_up()
+
 
     @staticmethod
     def create_policy_and_perform_operations(
@@ -80,9 +101,11 @@ class ResourceUtil(Util):
             match=[],
             resource_expectation={},
             stackrc_dict={},
-            inputs=None):
+            inputs=None, connections=None):
         create_policy.create_and_apply_policies(
             resource=resource, match=match, inputs=inputs)
+        if connections:
+            ResourceUtil.restart_core_dns(connections)
         ResourceUtil.perform_operations(
             stackrc_dict, resource_expectation, inputs=inputs)
 
