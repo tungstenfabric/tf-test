@@ -20,7 +20,7 @@ class AnalyticsBasicTestSanity(base.AnalyticsBaseTest):
         pass
     #end runTest
 
-    @test.attr(type=['sanity', 'ci_sanity', 'vcenter', 'suite1', 'vcenter_compute'])
+    @test.attr(type=['sanity', 'ci_sanity', 'vcenter', 'suite1', 'vcenter_compute', 'dev_sanity_dpdk'])
     @preposttest_wrapper
     def test_verify_object_logs(self):
         '''

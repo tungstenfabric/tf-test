@@ -31,7 +31,7 @@ class TestBGPaaSlocalAS(LocalASBase, BaseBGPaaS):
         super(TestBGPaaSlocalAS, self).setUp()
         result = self.is_test_applicable()
 
-    @test.attr(type=['sanity'])
+    @test.attr(type=['sanity', 'dev_sanity_dpdk'])
     @preposttest_wrapper
     def test_basic_bgpaas_local_as(self):
         '''

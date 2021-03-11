@@ -95,7 +95,7 @@ class TestSubInterfaces(BaseVrouterTest):
 
     # end test_vlan_interface_1
 
-    @test.attr(type=['cb_sanity', 'sanity','dev_reg'])
+    @test.attr(type=['cb_sanity', 'sanity','dev_reg', 'dev_sanity_dpdk'])
     @preposttest_wrapper
     def test_vlan_interface_2(self):
         '''

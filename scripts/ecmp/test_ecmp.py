@@ -1234,6 +1234,7 @@ class TestECMPFeatureIPv6(TestECMPFeature):
             return(False, 'IPv6 tests not supported in this environment ')
         return (True, None)
 
+    @test.attr(type=['dev_sanity_dpdk'])
     @preposttest_wrapper
     def test_ecmp_svc_v2_in_network_nat_with_3_instance(self):
         super(TestECMPFeatureIPv6,self).test_ecmp_svc_v2_in_network_nat_with_3_instance()

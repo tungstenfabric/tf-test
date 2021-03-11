@@ -103,6 +103,7 @@ try:
             assert vms[0].ping_with_certainty(vms[1].vm_ip, expectation=True)
         # end transit_vn_with_left_right_svc
 
+        @test.attr(type=['dev_sanity_dpdk'])
         @preposttest_wrapper
         @skip_because(address_family='v6')
         def test_transit_vn_sym_1_innetnat(self):

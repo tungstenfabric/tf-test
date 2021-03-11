@@ -30,7 +30,7 @@ class TestFirewallBasic(FirewallBasic):
         self._verify_ping(self.vms['hr_web'], self.vms['hr_logic'], self.vms['hr_db'])
 
 class TestFirewallDraftBasic(FirewallDraftBasic):
-    @test.attr(type=['sanity'])
+    @test.attr(type=['sanity', 'dev_sanity_dpdk'])
     @preposttest_wrapper
     def test_mixed_draft_mode(self):
         SCOPE1 = 'local'; SCOPE2 = 'global'
