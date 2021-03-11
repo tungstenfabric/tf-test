@@ -41,11 +41,11 @@ class TestRestart(BaseK8sAuth):
         stackrc_dict = ResourceUtil.admin_stackrc()
         ResourceUtil.create_policy_and_perform_operations(
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
         self.restart_kube_manager()
         ResourceUtil.create_policy_and_perform_operations(
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
 
     @test.attr(type=['auth'])
     @preposttest_wrapper
@@ -64,11 +64,11 @@ class TestRestart(BaseK8sAuth):
         stackrc_dict = ResourceUtil.admin_stackrc()
         ResourceUtil.create_policy_and_perform_operations(
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
         self.restart_vrouter_agent()
         ResourceUtil.create_policy_and_perform_operations(
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
 
     @test.attr(type=['auth'])
     @preposttest_wrapper
@@ -89,12 +89,12 @@ class TestRestart(BaseK8sAuth):
         ResourceUtil.create_policy_and_perform_operations(
             match=match,
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
         self.restart_kube_manager()
         ResourceUtil.create_policy_and_perform_operations(
             match=match,
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
 
     @test.attr(type=['auth'])
     @preposttest_wrapper
@@ -115,12 +115,12 @@ class TestRestart(BaseK8sAuth):
         ResourceUtil.create_policy_and_perform_operations(
             match=match,
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
         self.restart_vrouter_agent()
         ResourceUtil.create_policy_and_perform_operations(
             match=match,
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
 
     @test.attr(type=['auth'])
     @preposttest_wrapper
@@ -147,7 +147,7 @@ class TestRestart(BaseK8sAuth):
         stackrc_dict = ResourceUtil.admin_stackrc()
         ResourceUtil.create_policy_and_perform_operations(
             resource_expectation=TestRestart.resource_expectation,
-            stackrc_dict=stackrc_dict, inputs=self.inputs)
+            stackrc_dict=stackrc_dict, inputs=self.inputs, connections=self.connections)
 
 
 class TestRestartWithPodResource(BaseK8sAuth):
@@ -190,14 +190,14 @@ class TestRestartWithPodResource(BaseK8sAuth):
             match=self.match,
             stackrc_dict=self.stackrc_dict,
             resource_expectation=TestRestartWithPodResource.resource_expectation,
-            inputs=self.inputs)
+            inputs=self.inputs, connections=self.connections)
         self.restart_kube_manager()
         ResourceUtil.create_policy_and_perform_operations(
             resource=TestRestartWithPodResource.resource,
             match=self.match,
             stackrc_dict=self.stackrc_dict,
             resource_expectation=TestRestartWithPodResource.resource_expectation,
-            inputs=self.inputs)
+            inputs=self.inputs, connections=self.connections)
 
     @test.attr(type=['auth'])
     @preposttest_wrapper
@@ -218,11 +218,11 @@ class TestRestartWithPodResource(BaseK8sAuth):
             match=self.match,
             stackrc_dict=self.stackrc_dict,
             resource_expectation=TestRestartWithPodResource.resource_expectation,
-            inputs=self.inputs)
+            inputs=self.inputs, connections=self.connections)
         self.restart_vrouter_agent()
         ResourceUtil.create_policy_and_perform_operations(
             resource=TestRestartWithPodResource.resource,
             match=self.match,
             stackrc_dict=self.stackrc_dict,
             resource_expectation=TestRestartWithPodResource.resource_expectation,
-            inputs=self.inputs)
+            inputs=self.inputs, connections=self.connections)
