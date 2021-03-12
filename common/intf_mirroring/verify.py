@@ -1019,7 +1019,7 @@ class VerifyIntfMirror(VerifySvcMirror):
                 assert False, 'Mirror Entry should not be present in Agent, when configured for more than 255 interaces'
 
         # Verify traffic should not forwarded to analyzer
-        if self.verify_port_mirroring(src_vm_fixture, dst_vm_fixture, analyzer_vm_fixture):
+        if self.verify_port_mirroring(src_vm_fixture, dst_vm_fixture, analyzer_vm_fixture, mirror = False):
             assert False, 'Intf mirroring should not work when configured for 255th VM: %s' % (source_vm_count)
 
     def create_sub_intf_scale(self, vn_fix_uuid, intf_type, vlan_range, mac_address=None):
