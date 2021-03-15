@@ -15,16 +15,17 @@ from vnc_api import vnc_api
 from vnc_api.gen.resource_test import *
 from heat_test import HeatStackFixture
 from nova_test import *
+from tcutils.contrail_status_check import *
+from random import randint
 import os
 import yaml
 import time
 import glob
 from scripts.analytics.test_analytics import AnalyticsTestSanity
-
-af_test = 'dual'
+import pdb
+CONVERGENCE_TIME=int(90)
 
 class OrangeSolutionTest(BaseSolutionsTest):
-    _interface = 'json'
 
     @classmethod
     def setUpClass(cls):
@@ -206,9 +207,9 @@ class OrangeSolutionTest(BaseSolutionsTest):
                     cls.vepg_template['resources'][each_resource]['properties']\
                         ['personality'][inject_file]=data
                     fp1.close()
-                    if 'commit_config' in cls.vepg_template['resources']\
+                    if 'commit_config' in "".join(cls.vepg_template['resources']\
                                               [each_resource]['properties']\
-                                              ['personality'].keys()[0]:
+                                              ['personality'].keys()):
                         inject_file='/config/junos-config/commit_config.sh'
                         fp2=open(cls.vepg_template['resources'][each_resource]\
                                  ['properties']['personality'][inject_file]\
@@ -393,22 +394,46 @@ class OrangeSolutionTest(BaseSolutionsTest):
                                                     env=cls.bgpaas_env[each_bef],
                                                     timeout_mins=10)
                 cls.bgpaas_stacks[stack_name].setUp()
+        time.sleep(CONVERGENCE_TIME)
+        for i in range(10):
+            try:
+                assert self.verify_bgp_session_state()
+            except:
+                time.sleep(3)
+                continue
+            else:
+                break
 
     #end setup_vepg
 
     @classmethod
     def delete_vepg(cls):
         for each_stack in cls.bgpaas_stacks:
-            cls.bgpaas_stacks[each_stack].cleanUp()
+            for i in range(10):
+                try:
+                    cls.bgpaas_stacks[each_stack].cleanUp()
+                except:
+                    time.sleep(10)
+                    continue
+                else:
+                    break
 
         #Delete vepg Stack
-        cls.vepg_stack.cleanUp()
+        for i in range(10):
+            try:
+                cls.vepg_stack.cleanUp()
+            except:
+                time.sleep(10)
+                continue
+            else:
+                break
 
         #Delete fip stack, fip pool VN and ipam.
-        cls.fip_stack.cleanUp()
-        cls.fip_fixture.cleanUp()
-        cls.pub_vn_fixture.cleanUp()
-        cls.ipam_obj.cleanUp()
+        if 'orange' in cls.deploy_path:
+            cls.fip_stack.cleanUp()
+            cls.fip_fixture.cleanUp()
+            cls.pub_vn_fixture.cleanUp()
+            cls.ipam_obj.cleanUp()
 
         #Delete AZ
         cls.connections.orch.del_host_from_agg(cls.agg_id['kernel-computes'],
@@ -428,16 +453,21 @@ class OrangeSolutionTest(BaseSolutionsTest):
     #end delete_vepg
 
     @preposttest_wrapper
-    def test_orange_deploy(self):
-        ''' Dummy test routine to be changed in later commits.
+    def test_01_verify_post_deploy(self):
+        ''' Verify following, post Orange solution deployment at scale.
+            1. OSPF session state.
+            2. BGP sessions in vsfo control and data plane.
+            3. BFD sessions.
+            4. Routes in vsfo control and data plane.
+            5. BGPaaS sessions in control nodes.
+            6. BGPaaS routes in control nodes.
         '''
-        result = True
-        self.logger.info("Running test orange deployment.")
-        self.logger.info(self.connections.project_name)
-        self.logger.info(self.connections.username)
-
-        return True
-    # end test_orange_deploy
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_route_count()
+        assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_bgpaas_routes_ctrlnode()
+    # end test_01_verify_post_deploy
 
     @preposttest_wrapper
     def test_02_interface_check(self):
@@ -445,6 +475,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
             Check virtual instances are properly started with network connectivity.
         '''
 
+        ret=True
         ips_list=[]
         vm_fix_list=[self.vrp_31, self.vrp_32]
 
@@ -476,23 +507,24 @@ class OrangeSolutionTest(BaseSolutionsTest):
                          vm_fix_list[i].vm_node_ip,vm_fix_list[i].local_ip,ips_list[j])
                 output = os.popen(cmd).read()
                 print(output)
-                if '0% packet loss' not in output:
+                if ' 0% packet loss' not in output:
                     self.logger.error(" Ping from %s to %s FAILED!!",
                      vm_fix_list[i].vm_name,vm_fix_list[j].vm_name)
+                    ret=ret and False
                 else:
                     self.logger.info(" Ping from %s to %s PASSED!!",
                      vm_fix_list[i].vm_name,vm_fix_list[j].vm_name)
 
-        return True
+        return ret
     # end test_02_interface_check
-    
+
     @preposttest_wrapper
     def test_03_giant_frame_test(self):
         ''' CEM-16882
             This test is required to check traffic with high Ethernet size are able
             to be carried accross the Contrail RedHat OpenStack platform.
         '''
-        
+
         ret=True
         #copy set_mtu file and commit mtu config on up-vsfo
         for i in range (self.NB_VSFO_CP_NODES+1 ,self.NB_VSFO_CP_NODES +\
@@ -505,9 +537,9 @@ class OrangeSolutionTest(BaseSolutionsTest):
                 %(file_name, self.vsfo_fix[i].vm_node_ip)
             op=os.system(cmd)
             if op is not 0:
-               self.logger.error("Failed to copy file %s to %s"\
-                   %(file_name, self.vsfo_fix[i].vm_node_ip))
-               ret=False 
+                self.logger.error("Failed to copy file %s to %s"\
+                    %(file_name, self.vsfo_fix[i].vm_node_ip))
+                ret=False
             file_name='/tmp/'+'set_mtu.sh'
             cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
                  sshpass -p \'%s\' scp -o StrictHostKeyChecking=no -o \
@@ -517,8 +549,9 @@ class OrangeSolutionTest(BaseSolutionsTest):
                  self.vsfo_fix[i].local_ip)
             op=os.system(cmd)
             if op is not 0:
-               self.logger.error("Failed to copy file %s to %s"\
+                self.logger.error("Failed to copy file %s to %s"\
                     %(file_name, self.vsfo_fix[i].local_ip))
+                ret=False
             cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
                  sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
                  UserKnownHostsFile=/dev/null \
@@ -528,7 +561,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
             op=os.popen(cmd).read()
             if 'commit complete' not in op:
                 self.logger.error("Failed to commit config on %s"\
-                     %(self.vsfo_fix[i].vm_name))
+                    %(self.vsfo_fix[i].vm_name))
                 ret=False
 
         #set mtu on vhost0 of computes hosting vsfo
@@ -543,8 +576,8 @@ class OrangeSolutionTest(BaseSolutionsTest):
             #check if correct mtu set on vhost0
             cmd='ssh -o StrictHostKeyChecking=no -o \
                  UserKnownHostsFile=/dev/null \
-                 heat-admin@%s \
-                 \'sudo ip ad | grep vhost0| grep mtu | cut -d " " -f 5\' '\
+                 heat-admin@%s \'sudo ip ad | grep vhost0| grep mtu |\
+                 cut -d " " -f 5\' '\
                  %(self.vsfo_fix[i].vm_node_ip)
             output = os.popen(cmd).read()
             if '9000' not in output:
@@ -580,6 +613,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
                    self.vsfo_fix[j].vm_node_ip,self.vsfo_fix[j].local_ip,ips_list[k])
             output = os.popen(cmd).read()
             print(output)
+            k=k+1
             if ' 0% packet loss' not in output:
                 self.logger.error(" Ping from %s to %s FAILED!!",
                      self.vsfo_fix[j].vm_name,self.vsfo_fix[i].vm_name)
@@ -590,14 +624,193 @@ class OrangeSolutionTest(BaseSolutionsTest):
 
         return ret
     # end test_03_giant_frame_test
-  
+
     @preposttest_wrapper
     def test_04_check_tls(self):
         ''' CEM-16894
             Check TLS feature is enabled.
         '''
-        #import pdb; pdb.set_trace()
         AnalyticsTestSanity.test_redis_stunnel_provision(self)
         return True
     # end test_04_check_tls
+
+    @preposttest_wrapper
+    def test_05_bfd_bgpaas_feature(self):
+        ''' CEM-16889 & CEM-16891
+            Check BFD sessions are established to UP.
+            Check BGP sessions are established and all UP.
+            Check interfaces are up and running.
+            -Check BGP prefixes are well sent and received.
+            Check that BFD session is going down when the interface is being
+            shut onto the instance.
+            ** TBD **
+            Check IP traffic (ping) can be established between some IP belonging
+            to announced and/or received prefixes. - Need a host behind the MX-GW
+            to run such tests. Planned for later.
+        '''
+        #Check bgp and bfd sessions.
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_bgpaas_routes_ctrlnode()
+
+        #Deactivate interface on a random user plane vsfo.
+        i=randint(self.NB_VSFO_CP_NODES+1 ,self.NB_VSFO_CP_NODES +\
+                  self.NB_VSFO_UP_NODES)
+        self.vsfo_fix[i].vm_password='contrail123'
+        file_name=self.deploy_path+'vsrx_config/'+\
+                  'deactivate_interface.sh'
+        cmd='sshpass -p \'%s\'' %(self.vsfo_fix[i].vm_password)
+        cmd=cmd+' scp -o StrictHostKeyChecking=no %s heat-admin@%s:/tmp/'\
+            %(file_name, self.vsfo_fix[i].vm_node_ip)
+        op=os.system(cmd)
+        if op is not 0:
+            self.logger.error("Failed to copy deactivate interface file %s to %s"\
+                %(file_name, self.vsfo_fix[i].vm_node_ip))
+        file_name='/tmp/'+'deactivate_interface.sh'
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
+             sshpass -p \'%s\' scp -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null %s root@%s:/tmp/'\
+             %(self.vsfo_fix[i].vm_password, self.vsfo_fix[i].vm_node_ip,
+               self.vsfo_fix[i].vm_password, file_name,
+               self.vsfo_fix[i].local_ip)
+        op=os.system(cmd)
+        if op is not 0:
+            self.logger.error("Failed to copy deactivate interface file %s to %s"\
+                %(file_name, self.vsfo_fix[i].local_ip))
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
+             sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null \
+             root@%s \'sh /tmp/deactivate_interface.sh\' '\
+             %(self.vsfo_fix[i].vm_password, self.vsfo_fix[i].vm_node_ip,
+               self.vsfo_fix[i].vm_password, self.vsfo_fix[i].local_ip)
+        op=os.popen(cmd).read()
+        if 'commit complete' not in op:
+            self.logger.error("Failed to commit config on %s"\
+                %(self.vsfo_fix[i].vm_name))
+
+        #Check bgp and bfd sessions.
+        for trial in range(3):
+            time.sleep(CONVERGENCE_TIME)
+            try:
+                self.assertFalse(self.verify_bgpaas_session_ctrlnode())
+                self.assertFalse(self.verify_bgpaas_routes_ctrlnode())
+                self.assertFalse(self.verify_bgp_session_state())
+            except:
+                continue
+            else:
+                break
+
+        #Aactivate interface the interface and check bfd sessions are up again.
+        file_name=self.deploy_path+'vsrx_config/'+\
+                  'activate_interface.sh'
+        cmd='sshpass -p \'%s\'' %(self.vsfo_fix[i].vm_password)
+        cmd=cmd+' scp -o StrictHostKeyChecking=no %s heat-admin@%s:/tmp/'\
+            %(file_name, self.vsfo_fix[i].vm_node_ip)
+        op=os.system(cmd)
+        if op is not 0:
+            self.logger.error("Failed to copy activate interface file %s to %s"\
+                %(file_name, self.vsfo_fix[i].vm_node_ip))
+        file_name='/tmp/'+'activate_interface.sh'
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
+             sshpass -p \'%s\' scp -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null %s root@%s:/tmp/'\
+             %(self.vsfo_fix[i].vm_password, self.vsfo_fix[i].vm_node_ip,
+               self.vsfo_fix[i].vm_password, file_name,
+               self.vsfo_fix[i].local_ip)
+        op=os.system(cmd)
+        if op is not 0:
+            self.logger.error("Failed to copy activate interface file %s to %s"\
+                %(file_name, self.vsfo_fix[i].local_ip))
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
+             sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null \
+             root@%s \'sh /tmp/activate_interface.sh\' '\
+             %(self.vsfo_fix[i].vm_password, self.vsfo_fix[i].vm_node_ip,
+               self.vsfo_fix[i].vm_password, self.vsfo_fix[i].local_ip)
+        op=os.popen(cmd).read()
+        if 'commit complete' not in op:
+            self.logger.error("Failed to commit config on %s"\
+                %(self.vsfo_fix[i].vm_name))
+
+        #Check bgp and bfd sessions.
+        for trial in range(3):
+            time.sleep(CONVERGENCE_TIME)
+            try:
+                assert self.verify_bgpaas_session_ctrlnode()
+                assert self.verify_bgpaas_routes_ctrlnode()
+                assert self.verify_bgp_session_state()
+            except:
+                continue
+            else:
+                break
+
+        return True
+    # end test_05_bfd_bgpaas_feature
+
+    @preposttest_wrapper
+    def test_06_ha_resiliency(self):
+        ''' CEM-16886
+            Shut one of the 3 contrail physical controller nodes
+            (hosting 3 instances : control, analytics and analytics database).
+            No impact is seen.
+        '''
+        self.cn_restart=int(os.getenv('CONTROL_RESTART','1'))
+        for i in range(0, self.cn_restart):
+            active_control_name=self.vsfo_fix[len(self.vsfo_fix)].get_active_controller()
+            active_control_ip=self.inputs.host_data[active_control_name]['host_ip']
+            self.inputs.restart_service('contrail-control', [active_control_ip],
+                                            container='control')
+            self.inputs.restart_service('contrail-analytics-api', [active_control_ip],
+                                            container='analytics-api')
+            time.sleep(CONVERGENCE_TIME)
+            assert self.verify_bgpaas_routes_ctrlnode()
+            assert self.verify_bgpaas_session_ctrlnode()
+            assert self.verify_route_count()
+
+        return True
+    # end test_06_ha_resiliency
+
+    @preposttest_wrapper
+    def test_07_vrouter_restart(self):
+        ''' CEM-16883
+            Check vrouter can be restarted.
+            Virtual instance connectivity properly restored once the vrouter is back
+            to live.
+            Coredump is not generated.
+        '''
+        self.vr_restart=int(os.getenv('VROUTER_RESTART','1'))
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_route_count()
+        for i in range(0, self.vr_restart):
+            for node in self.inputs.compute_ips:
+                self.inputs.restart_service('contrail-vrouter-agent', [node],
+                                            container='agent')
+                cluster_status, error_nodes = ContrailStatusChecker(
+                ).wait_till_contrail_cluster_stable(nodes=[node])
+                assert cluster_status, 'Hash of error nodes and services : %s' % (
+                    error_nodes)
+            time.sleep(2*CONVERGENCE_TIME)
+            assert self.verify_ospf_session_state()
+            assert self.verify_bgp_session_state()
+            assert self.verify_route_count()
+
+        return True
+    # end test_07_vrouter_restart
+
+    @preposttest_wrapper
+    def test_run_all_tests(self):
+        '''
+            Run all the tests after deployment of the solution.
+        '''
+        self.test_01_verify_post_deploy()
+        self.test_02_interface_check()
+        self.test_03_giant_frame_test()
+        self.test_04_check_tls()
+        self.test_05_bfd_bgpaas_feature()
+        self.test_06_ha_resiliency()
+        self.test_07_vrouter_restart()
+
+    # end run_all_tests
+
 #end class OrangeSolutionTest
