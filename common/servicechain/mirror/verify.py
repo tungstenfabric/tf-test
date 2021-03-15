@@ -328,7 +328,7 @@ class VerifySvcMirror(ConfigSvcMirror, ECMPVerify):
         return result
 
     @retry(delay=2, tries=6)
-    def verify_port_mirroring(self, src_vm, dst_vm, mirr_vm, vlan=None, parent=False, direction = 'both', no_header = False):
+    def verify_port_mirroring(self, src_vm, dst_vm, mirr_vm, vlan=None, parent=False, direction = 'both', no_header = False, mirror = True):
         result = True
         svm = mirr_vm.vm_obj
         if svm.status == 'ACTIVE':
@@ -390,9 +390,15 @@ class VerifySvcMirror(ConfigSvcMirror, ECMPVerify):
         errmsg = "%s ICMP Packets mirrored to the analyzer VM %s,"\
                  "Expected %s packets" % (
                      mirror_pkt_count, svm_name, exp_count)
-        if mirror_pkt_count < exp_count:
-            self.logger.error(errmsg)
-            assert False, errmsg
+        if mirror:
+            if mirror_pkt_count < exp_count:
+                self.logger.error(errmsg)
+                assert False, errmsg
+        else:
+            if mirror_pkt_count != 0:
+                errmsg = "%s ICMP Packets mirrored to the analyzer VM %s,"\
+                 "Expected %s packets" % (mirror_pkt_count, svm_name, '0')
+                assert False, errmsg
 
         self.logger.info("%s ICMP packets are mirrored to the analyzer "
                          "service VM '%s'", mirror_pkt_count, svm_name)
