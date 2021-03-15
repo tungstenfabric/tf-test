@@ -46,7 +46,7 @@ class TestK8sResource(BaseK8sAuth):
         self.stackrc_dict = ResourceUtil.admin_stackrc()
         ResourceUtil.create_policy_and_perform_operations(
             resource_expectation=TestK8sResource.resource_expectation,
-            stackrc_dict=self.stackrc_dict, inputs=self.inputs)
+            stackrc_dict=self.stackrc_dict, inputs=self.inputs, connections=self.connections)
 
     @test.attr(type=['auth'])
     @preposttest_wrapper
@@ -64,7 +64,7 @@ class TestK8sResource(BaseK8sAuth):
         ResourceUtil.create_policy_and_perform_operations(
             match=match,
             resource_expectation=TestK8sResource.resource_expectation,
-            stackrc_dict=self.stackrc_dict, inputs=self.inputs)
+            stackrc_dict=self.stackrc_dict, inputs=self.inputs, connections=self.connections)
 
 
 class TestK8sResourceCustom(BaseK8sAuth):
@@ -105,7 +105,7 @@ class TestK8sResourceCustom(BaseK8sAuth):
             resource=resource,
             match=self.match,
             stackrc_dict=self.stackrc_dict,
-            resource_expectation=resource_expectation, inputs=self.inputs)
+            resource_expectation=resource_expectation, inputs=self.inputs, connections=self.connections)
 
     @test.attr(type=['auth'])
     @preposttest_wrapper
@@ -127,4 +127,4 @@ class TestK8sResourceCustom(BaseK8sAuth):
             resource=resource,
             match=self.match,
             stackrc_dict=self.stackrc_dict,
-            resource_expectation=resource_expectation, inputs=self.inputs)
+            resource_expectation=resource_expectation, inputs=self.inputs, connections=self.connections)
