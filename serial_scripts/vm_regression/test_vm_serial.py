@@ -317,6 +317,8 @@ class TestBasicVMVN0(BaseVnVmTest):
         Pass criteria: The VMs should all be UP and running after the restarts.
         Maintainer : ganeshahv@juniper.net
         '''
+        quota_dict={'cores': 30, 'instances': 30}
+        self.nova_h.update_quota(self.connections.project_id, **quota_dict)
         vm1_name = get_random_name('vm_mine')
         vn_name = get_random_name('vn222')
         vn_subnets = ['11.1.1.0/24']
@@ -342,9 +344,9 @@ class TestBasicVMVN0(BaseVnVmTest):
             if vm_host_ip not in compute_ip:
                 compute_ip.append(vm_host_ip)
         self.inputs.restart_service('openstack-nova-compute', compute_ip,
-                                    container='nova-compute')
-        self.inputs.restart_service('openstack-nova-scheduler', compute_ip,
-                                    container='nova-scheduler')
+                                    container='nova-compute', verify_service=False)
+        self.inputs.restart_service('openstack-nova-scheduler', self.inputs.cfgm_ips,
+                                    container='nova-scheduler', verify_service=False)
         sleep(30)
         for vmobj in list(vm_fixture.vm_obj_dict.values()):
             assert vmobj.verify_on_setup()
@@ -485,6 +487,8 @@ class TestBasicVMVN0(BaseVnVmTest):
         Pass criteria: The VMs should all be UP and running after the restarts.
         Maintainer : ganeshahv@juniper.net
         '''
+        quota_dict={'cores': 30, 'instances': 30}
+        self.nova_h.update_quota(self.connections.project_id, **quota_dict)
         vm1_name = 'vm_mine'
         vn_name = 'vn222'
         vn_subnets = ['11.1.1.0/24']
