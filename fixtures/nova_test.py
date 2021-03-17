@@ -12,6 +12,7 @@ from fabric.context_managers import settings, hide, cd, shell_env
 from fabric.api import run, local, env
 from fabric.operations import get, put
 from fabric.contrib.files import exists
+from keystoneauth1.exceptions import connection
 from tcutils.util import *
 from tcutils.cfgparser import parse_cfg_file
 from tcutils.timeout import timeout, TimeoutError
@@ -833,6 +834,9 @@ class NovaHelper(object):
             return False
         except novaException.ClientException:
             self.logger.error('Fatal Nova Exception while getting VM detail')
+            return False
+        except connection.ConnectFailure:
+            self.logger.error('Keystone connection failure')
             return False
     # end wait_till_vm_status
 
