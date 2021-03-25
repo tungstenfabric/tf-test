@@ -192,7 +192,7 @@ class TestBasicVMVN0(BaseVnVmTest):
             corrupt_list = [receiver1.corrupt,
                             receiver2.corrupt, receiver3.corrupt]
             for i in corrupt_list:
-                if(i > 0):
+                if(i != None):
                     result = False
             if(sender.sent == receiver1.recv == receiver2.recv == receiver3.recv):
                 self.logger.info("Packets seen on all the receivers")
