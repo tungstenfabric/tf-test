@@ -12,12 +12,14 @@ from common.base import *
 from common.device_connection import NetconfConnection
 from jnpr.junos.utils.start_shell import StartShell
 from jnpr.junos import Device
+from tcutils.util import retry
 
 
 class TestNHLimit(GenericTestBase):
     vn_fixtures = []
     vm_fixtures = []
 
+    @retry(delay=10, tries=40)
     def verify_nh_indexes(self, compute, Range):
         '''
         Description: Number of nexthop indexes are verified on vrouter agent side
@@ -45,7 +47,7 @@ class TestNHLimit(GenericTestBase):
                     nh_limit_cmd = '''sed -i '/# base command/ a DPDK_COMMAND_ADDITIONAL_ARGS="--vr_nexthops="' entrypoint.sh'''
                     updated_cmd = nh_limit_cmd[:71] + \
                         nh_limit + nh_limit_cmd[71:]
-                cmds = ['docker cp contrail-vrouter-agent-dpdk:/entrypoint.sh .',
+                cmds = ['docker cp vrouter_vrouter-agent-dpdk_1:/entrypoint.sh .',
                         'cp entrypoint.sh entrypoint_backup.sh', updated_cmd]
                 for cmd in cmds:
                     run_cmd_on_server(
@@ -68,7 +70,7 @@ class TestNHLimit(GenericTestBase):
                         cmd, compute, username='root', password='c0ntrail123')
 
         if agent_mode == 'dpdk':
-            cmds = ['docker cp entrypoint.sh contrail-vrouter-agent-dpdk:/entrypoint.sh',
+            cmds = ['docker cp entrypoint.sh vrouter_vrouter-agent-dpdk_1:/entrypoint.sh',
                     'docker stop vrouter_vrouter-agent-dpdk_1', 'docker start vrouter_vrouter-agent-dpdk_1']
         else:
             cmds = ['docker stop vrouter_vrouter-agent_1', 'ifdown vhost0',
@@ -78,6 +80,7 @@ class TestNHLimit(GenericTestBase):
                               password='c0ntrail123')
         self.verify_nh_limit(compute, nh_limit, mpls_limit)
 
+    @retry(delay=3, tries=7)
     def verify_nh_limit(self, compute, nh_limit, mpls_limit=None):
         '''
         Description: Nh limit set on vrouter agent side is checked and verified comparing with nhlimit value passed as argument. This is called whenever new nh_limit is set.
@@ -161,15 +164,28 @@ class TestNHLimit(GenericTestBase):
     def create_vmvn_for_nhlimittest(self, compute, vn_count):
         for i in range(vn_count):
             vn_fixture = self.create_vn()
-            assert vn_fixture.verify_on_setup()
+            for i in range(0,5):
+                while True:
+                    try:    
+                        assert vn_fixture.verify_on_setup()
+                    except AttributeError:
+                        self.logger.debug("agent introspect might be down only at this moment")
+                        continue
+                    break
             self.vn_fixtures.append(vn_fixture)
-            vn_fixture.add_route_target(
-                router_asn=64512, route_target_number=190)
             vm_fixture = self.create_vm(
                 vn_fixture=vn_fixture, node_name=compute)
             assert vm_fixture.wait_till_vm_is_up()
             assert vm_fixture.verify_on_setup()
             self.vm_fixtures.append(vm_fixture)
+        for i in range(len(self.vn_fixtures)):
+            for j in range(0,10):
+                while True:
+                    try:
+                        self.vn_fixtures[i].add_route_target(router_asn=64512, route_target_number=190)
+                    except vnc_api.exceptions.NoIdError:
+                        continue
+                    break
         vn1_name = self.vn_fixtures[0].vn_fq_name
         vn2_name = self.vn_fixtures[1].vn_fq_name
         rule1 = self._get_network_policy_rule(
@@ -178,7 +194,6 @@ class TestNHLimit(GenericTestBase):
             src_vn=vn2_name, dst_vn=vn1_name, action='pass')
         vn12_pol = self.create_policy(rules=[rule1, rule2])
         self.apply_policy(vn12_pol, [self.vn_fixtures[0], self.vn_fixtures[1]])
-        time.sleep(60)
 
     def get_compute(self, agent_mode=None):
         dpdk_computes = []
