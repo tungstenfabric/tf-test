@@ -3,7 +3,7 @@ import time
 import fixtures
 from kubernetes.client.rest import ApiException
 from kubernetes import client
-from vnc_api.vnc_api import NoIdError
+from vnc_api.vnc_api import NoIdError, HttpError
 
 from common import log_orig as contrail_logging
 from tcutils.util import get_random_name, retry, get_lock
@@ -221,10 +221,15 @@ class NamespaceFixture(fixtures.Fixture):
                 ' contrail-api' % (self.project_fq_name, self.name))
             return False
         except NoIdError as error:
-            self.logger.info('Project %s for Namespace %s UUID %s is deleted '
-                'from contrail-api' % (self.project_fq_name, self.name,
-                                       self.uuid))
-            return True
+            pass
+        except HttpError as error:
+            if error.content and not error.content.startswith('NoIdError: '):
+                raise
+
+        self.logger.info('Project %s for Namespace %s UUID %s is deleted '
+            'from contrail-api' % (self.project_fq_name, self.name,
+                                   self.uuid))
+        return True
     # end verify_ns_is_not_in_contrail_api
 
     def enable_isolation(self):
