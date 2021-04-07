@@ -216,7 +216,7 @@ _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP = {
     'webui' : ['contrail_webui_web'],
     'webui-middleware': ['contrail_webui_job'],
     #missing-entries
-    'agent-dpdk': ['contrail_vrouter_agent_dpdk'],
+    'agent-dpdk': ['contrail-vrouter-agent-dpdk'],
     'nova': ['nova_api'],
     'nova-compute': ['nova_compute'],
     'nova-conductor': ['nova_conductor'],
