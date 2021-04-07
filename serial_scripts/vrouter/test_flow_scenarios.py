@@ -6,7 +6,7 @@ import time
 
 
 from tcutils.wrappers import preposttest_wrapper
-from tcutils.util import skip_because, is_almost_same
+from tcutils.util import skip_because, is_almost_same, retry
 from tcutils.traffic_utils.hping_traffic import Hping3
 from compute_node_test import ComputeNodeFixture
 from common.agent.flow_table import FlowTable
@@ -401,17 +401,7 @@ class TCPFlowEvictionTests(ExtendedFlowTestsBase):
             time.sleep(3)
             flow_table = self.vn1_vm1_vrouter_fixture.get_flow_table(
                 show_evicted=False)
-            (flow_entry, junk) = self.vn1_vm1_vrouter_fixture.get_flow_entry(
-                flow_table=flow_table,
-                show_evicted=False,
-                source_ip=self.vn1_vm1_fixture.vm_ip,
-                dest_ip=self.vn1_vm2_fixture.vm_ip,
-                proto='tcp',
-                source_port=sport,
-                dest_port=dport,
-                vrf_id=self.vn1_vm1_vrouter_fixture.get_vrf_id(
-                    self.vn1_fixture.vn_fq_name)
-            )
+            result, flow_entry = self.retry_get_flow_entry(self.vn1_vm1_vrouter_fixture, flow_table, self.vn1_vm1_fixture, self.vn1_vm2_fixture, sport, dport, self.vn1_fixture)
             if not f_flow_index:
                 f_flow_index = flow_entry.index
                 r_flow_index = flow_entry.r_flow_index
@@ -435,6 +425,23 @@ class TCPFlowEvictionTests(ExtendedFlowTestsBase):
                                                "Expected: >%s, Seen: %s" % (recv, flow_entry.packets))
         # end for
     # end test_flow_on_normal_tcp_close
+
+    #sometimes entry fetch does not work on the first try. Fixing this false fail by adding a retry method
+    @retry(delay=2, tries=10)
+    def retry_get_flow_entry(self, vn1_vm1_vrouter_fixture, flow_table, vn1_vm1_fixture, vn1_vm2_fixture, sport, dport, vn1_fixture):
+            (flow_entry, junk) = vn1_vm1_vrouter_fixture.get_flow_entry(
+                flow_table=flow_table,
+                show_evicted=False,
+                source_ip=vn1_vm1_fixture.vm_ip,
+                dest_ip=vn1_vm2_fixture.vm_ip,
+                proto='tcp',
+                source_port=sport,
+                dest_port=dport,
+                vrf_id=vn1_vm1_vrouter_fixture.get_vrf_id(
+                    vn1_fixture.vn_fq_name)
+            )
+            if flow_entry:
+                return (True, flow_entry)
 
     @preposttest_wrapper
     def test_flow_eviction_on_tcp_rst(self):
