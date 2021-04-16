@@ -698,6 +698,12 @@ class TestInputs(with_metaclass(Singleton, object)):
         if 'ns_agilio_vrouter' in test_configs or 'vrouter_mode_dpdk' in test_configs:
             self.pcap_on_vm = True
 
+        if 'scale_config' in test_configs:
+            scale_conf = test_configs['scale_config']
+            self.control_node_vrf_scale = scale_conf.get('control_node_vrf_scale')
+            self.compute_node_vrf_scale = scale_conf.get('compute_node_vrf_scale')
+            self.vm_scale = scale_conf.get('vm_scale')
+
         self._parse_fabric(test_configs.get('fabric'))
         # If no explicit amqp servers are configured, it will be cfgm ips
         if not self.config_amqp_ips:

@@ -5,15 +5,15 @@ from tcutils.util import *
 import test
 import logging
 
-class TestScaleConfig(GenericTestBase):
+class TestVrfScale(GenericTestBase):
     
     @classmethod
     def setUpClass(cls):
-        super(TestScaleConfig, cls).setUpClass()
+        super(TestVrfScale, cls).setUpClass()
     
     @classmethod
     def tearDownClass(cls):
-        super(TestScaleConfig, cls).tearDownClass()
+        super(TestVrfScale, cls).tearDownClass()
         
     
     @test.attr(type=['scale_vrf'])
@@ -26,11 +26,11 @@ class TestScaleConfig(GenericTestBase):
         4.At the end of batch creation restart api-server,schema
         5.Verify contrail-status
         '''
-        scale_number = 15000
+        scale_number = self.inputs.control_node_vrf_scale
         scaled_vns = 0
         restart_services = ['api-server','schema']
         
-        n_vns = 15000
+        n_vns = self.inputs.control_node_vrf_scale
         n_vms = 1
         cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
                 --n_vns %s --vnc  --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
@@ -70,11 +70,11 @@ class TestScaleConfig(GenericTestBase):
         4.At the end of batch creation restart api-server,schema
         5.Verify contrail-status
         '''
-        scale_number = 4000
+        scale_number = self.inputs.compute_node_vrf_scale
         scaled_vns = 0
         restart_services = ['api-server','schema']
         
-        n_vns = 4000
+        n_vns = self.inputs.compute_node_vrf_scale
         n_vms = 1
         cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
                 --n_vns %s --vnc  --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
@@ -113,12 +113,12 @@ class TestScaleConfig(GenericTestBase):
         4.At the end of batch creation restart api-server,schema
         5.Verify contrail-status
         '''
-        scale_number = 15000
+        scale_number = self.inputs.vm_scale
         scaled_vns = 0
         restart_services = ['api-server','schema']
         
         n_vns = 1
-        n_vms = 15000
+        n_vms = self.inputs.vm_scale
         cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
                 --n_vns %s --vnc  --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
                                                        n_vns, n_vms)
