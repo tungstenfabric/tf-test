@@ -22,7 +22,7 @@ class VerifyIntfMirror(VerifySvcMirror):
         compute_nodes = []
 
         for host in self.inputs.compute_ips:
-            if self.inputs.domainsuffix == 'englab.juniper.net': 
+            if self.inputs.domainsuffix == 'englab.juniper.net' or self.inputs.domainsuffix == 'local': 
                 host_list.append(self.inputs.host_data[host]['name'])
             else:
                 host_list.append(self.inputs.host_data[host]['fqname'])
