@@ -161,7 +161,8 @@ class ComputeNodeFixture(fixtures.Fixture):
         cache_timeout = 'flow_cache_timeout=' + str(flow_cache_timeout)
         self.inputs.add_knob_to_container(self.ip, self.container, 'DEFAULT', \
                                          cache_timeout, restart_container=True, \
-                                         file_name='entrypoint.sh')
+                                         file_name='actions.sh')
+        time.sleep(5)
         cmd = 'docker cp %s:/%s %s' %(self.container, self.agent_conf_file, \
                                         self.agent_conf_file)
         self.inputs.run_cmd_on_server(self.ip, cmd, self.username, self.password)
@@ -564,15 +565,13 @@ class ComputeNodeFixture(fixtures.Fixture):
         '''
         self.logger.info('Reloading vrouter module on %s' % (self.ip))
         #ToDo msenthil - Need to check how to reload kernel module
-        if self.inputs.host_data[self.ip].get('containers', {}).get('agent'):
-            stop_cmd = 'docker exec -it agent service supervisor-vrouter stop'
-            start_cmd = 'docker exec -it agent service supervisor-vrouter start'
-        else:
-            stop_cmd = 'service supervisor-vrouter stop'
-            start_cmd = 'service supervisor-vrouter start'
-        self.execute_cmd('%s; '
-            'modprobe -r vrouter || rmmod vrouter; '
-            '%s ' % (stop_cmd, start_cmd), container=None)
+        agent = self.inputs.host_data[self.ip].get(
+            'containers', {}).get('agent')
+        stop_cmd = 'docker stop %s; rmmod vrouter' % agent
+        start_cmd = 'free && sync && echo 3 > /proc/sys/vm/drop_caches && free;modprobe vrouter; docker start %s' % agent
+        output = self.execute_cmd('%s; %s' % (
+            stop_cmd, start_cmd), container=None)
+        self.logger.info('Cmd output info: %s' % output)
         if wait:
             status = ContrailStatusChecker(self.inputs)
             status.wait_till_contrail_cluster_stable([self.ip])
