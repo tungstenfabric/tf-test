@@ -38,7 +38,7 @@ class TestNHLimitKernel(TestNHLimit):
         self.set_nh_limit(nh_limit=nh_limit, compute=compute, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range)
+        assert self.verify_nh_indexes(compute, nh_index_Range)
         self.ping_after_nh_index()
 
     @preposttest_wrapper
@@ -71,13 +71,14 @@ class TestNHLimitKernel(TestNHLimit):
                 self.logicalsystem[i], self.table[i], self.subnet, count)
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute, modify=True)
+        self.addCleanup(self.reset_nh_limit, compute=compute)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range1)
+        assert self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
         self.reset_nh_limit(compute=compute)
         self.set_nh_limit(nh_limit=nh_limit2, compute=compute, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute)
-        self.verify_nh_indexes(compute, nh_index_Range2)
+        assert self.verify_nh_indexes(compute, nh_index_Range2)
         self.ping_after_nh_index()
 
     @test.attr(type=['nh_limit_test'])
@@ -113,13 +114,14 @@ class TestNHLimitKernel(TestNHLimit):
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute,
                           mpls_limit=mpls_limit, modify=True)
+        self.addCleanup(self.reset_nh_limit, compute=compute)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range1)
+        assert self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
         self.reset_nh_limit(compute=compute)
         self.set_nh_limit(nh_limit=nh_limit2, compute=compute, mpls_limit=mpls_limit, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute)
-        self.verify_nh_indexes(compute, nh_index_Range2)
+        assert self.verify_nh_indexes(compute, nh_index_Range2)
         self.ping_after_nh_index()
 
     @test.attr(type=['nh_limit_test'])
@@ -143,13 +145,13 @@ class TestNHLimitKernel(TestNHLimit):
         nh_index_Range.append(int(nh_limit) - 10)
         nh_index_Range.append(int(nh_limit))
         compute = self.get_compute()
-        self.verify_nh_limit(compute, nh_limit, mpls_limit)
+        assert self.verify_nh_limit(compute, nh_limit, mpls_limit)
         for i in range(len(self.logicalsystem)):
             self.add_routes_using_rtgen_mx_side(
                 self.logicalsystem[i], self.table[i], self.subnet, count)
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range)
+        assert self.verify_nh_indexes(compute, nh_index_Range)
         self.ping_after_nh_index()
 
 
@@ -189,7 +191,7 @@ class TestNHLimitDpdk(TestNHLimit):
         self.addCleanup(self.reset_nh_limit, compute=compute,
                         agent_mode=self.agent_mode)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range)
+        assert self.verify_nh_indexes(compute, nh_index_Range)
         self.ping_after_nh_index()
 
     @test.attr(type=['nh_limit_test'])
@@ -224,15 +226,17 @@ class TestNHLimitDpdk(TestNHLimit):
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute,
                           agent_mode=self.agent_mode, modify=True)
+        self.addCleanup(self.reset_nh_limit, compute=compute,
+                        agent_mode=self.agent_mode)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range1)
+        assert self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
         self.reset_nh_limit(compute=compute, agent_mode=self.agent_mode)
         self.set_nh_limit(nh_limit=nh_limit2, compute=compute,
                           agent_mode=self.agent_mode, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute,
                         agent_mode=self.agent_mode)
-        self.verify_nh_indexes(compute, nh_index_Range2)
+        assert self.verify_nh_indexes(compute, nh_index_Range2)
         self.ping_after_nh_index()
 
     @test.attr(type=['nh_limit_test'])
@@ -268,15 +272,17 @@ class TestNHLimitDpdk(TestNHLimit):
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.set_nh_limit(nh_limit=nh_limit1, compute=compute,
                           agent_mode=self.agent_mode, mpls_limit=mpls_limit, modify=True)
+        self.addCleanup(self.reset_nh_limit, compute=compute,
+                        agent_mode=self.agent_mode)
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range1)
+        assert self.verify_nh_indexes(compute, nh_index_Range1)
         self.ping_after_nh_index()
         self.reset_nh_limit(compute=compute, agent_mode=self.agent_mode)
         self.set_nh_limit(nh_limit=nh_limit2, compute=compute,
                           agent_mode=self.agent_mode, mpls_limit=mpls_limit, modify=True)
         self.addCleanup(self.reset_nh_limit, compute=compute,
                         agent_mode=self.agent_mode)
-        self.verify_nh_indexes(compute, nh_index_Range2)
+        assert self.verify_nh_indexes(compute, nh_index_Range2)
         self.ping_after_nh_index()
 
     @test.attr(type=['nh_limit_test'])
@@ -300,11 +306,11 @@ class TestNHLimitDpdk(TestNHLimit):
         nh_index_Range.append(int(nh_limit) - 10)
         nh_index_Range.append(int(nh_limit))
         compute = self.get_compute(self.agent_mode)
-        self.verify_nh_limit(compute, nh_limit, mpls_limit)
+        assert self.verify_nh_limit(compute, nh_limit, mpls_limit)
         for i in range(len(self.logicalsystem)):
             self.add_routes_using_rtgen_mx_side(
                 self.logicalsystem[i], self.table[i], self.subnet, count)
             self.addCleanup(self.remove_routes_mx_side, self.logicalsystem[i])
         self.create_vmvn_for_nhlimittest(compute, self.vn_count)
-        self.verify_nh_indexes(compute, nh_index_Range)
+        assert self.verify_nh_indexes(compute, nh_index_Range)
         self.ping_after_nh_index()
