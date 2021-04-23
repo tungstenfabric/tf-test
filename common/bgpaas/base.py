@@ -228,15 +228,26 @@ class BaseBGPaaS(BaseNeutronTest, BaseHC):
 
     @retry(delay=5, tries=10)
     def verify_bfd_packets(self, vm, vn):
-        interface = vm.tap_intf[vn.vn_fq_name]['name']
-        username = self.inputs.host_data[vm.vm_node_ip]['username']
-        password = self.inputs.host_data[vm.vm_node_ip]['password']
-        ip = self.inputs.host_data[vm.vm_node_ip]['host_ip']
-        (session, pcap) = start_tcpdump_for_intf(
-            ip, username, password, interface)
-        time.sleep(5)
-        stop_tcpdump_for_intf(session, pcap)
-        result = search_in_pcap(session, pcap, '4784')
+        result = False
+        if self.inputs.pcap_on_vm:
+            vm_fix_pcap_pid_file = start_tcpdump_for_vm_intf(None,
+                [vm], None, pcap_on_vm=True)
+            time.sleep(5)
+            out, pkt_count = stop_tcpdump_for_vm_intf(
+                        None, None, None, vm_fix_pcap_pid_files=vm_fix_pcap_pid_file)
+            for elem in out:
+                if '4784' in elem:
+                    result = True
+        else:
+            interface = vm.tap_intf[vn.vn_fq_name]['name']
+            username = self.inputs.host_data[vm.vm_node_ip]['username']
+            password = self.inputs.host_data[vm.vm_node_ip]['password']
+            ip = self.inputs.host_data[vm.vm_node_ip]['host_ip']
+            (session, pcap) = start_tcpdump_for_intf(
+                ip, username, password, interface)
+            time.sleep(5)
+            stop_tcpdump_for_intf(session, pcap)
+            result = search_in_pcap(session, pcap, '4784')
         return result
 
     def get_bgp_router_flap_count(self, bgpaas_fixture):
