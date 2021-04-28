@@ -530,6 +530,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.vcenter_username = self.vcenter_password = None
         self.vcenter_compute = None
         self.vro_based = False
+        self.test_docker_registry = None
         with open(self.input_file, 'r') as fd:
             self.config = yaml.load(fd, Loader=yaml.FullLoader)
         deployment_configs = self.config.get('deployment', {})
@@ -550,6 +551,7 @@ class TestInputs(with_metaclass(Singleton, object)):
             kube_config_file = K8S_CONFIG_FILE
         self.kube_config_file = test_configs.get('kube_config_file') or kube_config_file
         self.juju_server = test_configs.get('juju_server')
+        self.test_docker_registry = test_configs.get('test_docker_registry')
 
         self.parse_topo()
         if self.deployer != 'contrail_command':
