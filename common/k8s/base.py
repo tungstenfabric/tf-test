@@ -258,7 +258,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             metadata['labels'].update(labels)
         spec = spec or {
             'containers': [
-                {'image': 'nginx',
+                {'image': ((self.inputs.test_docker_registry + 'nginx') if self.inputs.test_docker_registry is not None else 'nginx'),
                  'image_pull_policy': 'IfNotPresent',
                  'ports': [
                      {'container_port': int(container_port)}
@@ -306,7 +306,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         name = name or get_random_name('busybox-pod')
         spec = spec or {
             'containers': [
-                {'image': 'busybox',
+                {'image': ((self.inputs.test_docker_registry + 'library/busybox') if self.inputs.test_docker_registry is not None else 'busybox'),
                  'command': ['sleep', '1000000'],
                  'image_pull_policy': 'IfNotPresent',
                  }
@@ -338,7 +338,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         name = name or get_random_name('ubuntuapp-pod')
         spec = spec or {
             'containers': [
-                {'image': 'ubuntu-upstart',
+                {'image': ((self.inputs.test_docker_registry + 'library/ubuntu-upstart') if self.inputs.test_docker_registry is not None else 'ubuntu-upstart'),
                  'command': ['sleep', '1000000'],
                  'image_pull_policy': 'IfNotPresent',
                  }
@@ -951,7 +951,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             template_metadata['labels'].update(pod_labels)
         template_spec = template_spec or {
             'containers': [
-                {'image': 'nginx',
+                {'image': ((self.inputs.test_docker_registry + 'nginx') if self.inputs.test_docker_registry is not None else 'nginx'),
                  'ports': [
                      {'container_port': int(container_port)}
                  ],
@@ -1388,7 +1388,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             template_metadata['labels'].update(pod_labels)
         template_spec = template_spec or {
             'containers': [
-                {'image': 'nginx',
+                {'image': ((self.inputs.test_docker_registry + 'nginx') if self.inputs.test_docker_registry is not None else 'nginx'),
                  'ports': [
                      {'container_port': int(container_port)}
                  ],
