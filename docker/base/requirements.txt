@@ -1,7 +1,7 @@
 discover==0.4.0
 pyvirtualdisplay==0.2.5
 ncclient==0.6.3
-junos-eznc==1.2.2
+junos-eznc==2.3.0
 pycrypto==2.6.1
 pyvmomi==6.5.0.2017.5.post1
 dpkt==1.8.8
