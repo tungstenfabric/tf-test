@@ -93,7 +93,7 @@ python-subunit==1.3.0
 pytz==2019.3
 pyvirtualdisplay==0.2.5
 pyvmomi==6.7.3
-pyyaml==5.1.2
+pyyaml==5.4
 remote-pdb==2.0.0
 requests-oauthlib==1.3.0
 requests==2.22.0
@@ -119,7 +119,7 @@ traceback2==1.4.0
 transitions==0.7.2
 unicodecsv==0.14.1 ; python_version < '3.0'
 unittest2==1.1.0
-urllib3==1.25.6
+urllib3==1.25.8
 warlock==1.3.3
 wcwidth==0.1.8 ; sys_platform != 'win32'
 websocket-client==0.55.0
