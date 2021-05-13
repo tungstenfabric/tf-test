@@ -16,7 +16,7 @@ google-auth==1.11.2
 idna==2.9
 ipaddress==1.0.23 ; python_version == '2.7'
 jinja2==2.11.1
-junos-eznc==1.2.2
+junos-eznc==2.3.0
 jxmlease==1.0.1
 kubernetes==11.0.0
 lxml==4.5.0
