@@ -42,26 +42,15 @@ SESSION_SYSLOG_TEARDOWN = "\[ vmi = %s vn = %s ] security_policy_rule = %s remot
 
 SESSION_SYSLOG_TEARDOWN_TCP = "\[ vmi = %s vn = %s ] security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s local_ip = %s service_port = %s protocol = %s sampled_forward_bytes = %s sampled_forward_pkts = %s sampled_reverse_bytes = %s sampled_reverse_pkts = %s ip = %s port = %s forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s  ]"
 
-SESSION_CLIENT_AGGR = "\[  vmi = %s vn = %s security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s sess_agg_info= \[  \[ \[  local_ip = %s service_port = %s protocol = %s ] \[  sampled_forward_bytes = %s sampled_forward_pkts = %s sampled_reverse_bytes = %s sampled_reverse_pkts = %s sessionMap= \[  \[ \[  ip = %s port = %s ] \[  forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  \[  ip = %s port = %s ] \[  forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  \[  ip = %s port = %s ] \[  forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  ] ] ],  ] ] ]"
 
-SESSION_CLIENT_AGGR_TEARDOWN = "\[  vmi = %s vn = %s security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s sess_agg_info= \[  \[ \[  local_ip = %s service_port = %s protocol = %s ] \[  sampled_forward_bytes = %s sampled_forward_pkts = %s sampled_reverse_bytes = %s sampled_reverse_pkts = %s sessionMap= \[  \[ \[  ip = %s port = %s ] \[  forward_flow_info= \[  flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] reverse_flow_info= \[   flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  \[  ip = %s port = %s ] \[  forward_flow_info= \[  flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] reverse_flow_info= \[   flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  \[  ip = %s port = %s ] \[  forward_flow_info= \[  flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] reverse_flow_info= \[   flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  ] ] ],  ] ] ]"
+SLO_LOGGED_SESSION = "\[ vmi = %s vn = %s ] security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s local_ip = %s service_port = %s protocol = %s  logged_forward_bytes = %s logged_forward_pkts = %s logged_reverse_bytes = %s ip = %s port = %s forward_flow_info= \[  logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[   logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s  ]"
 
-SESSION_CLIENT_AGGR_TEARDOWN_TCP = "\[  vmi = %s vn = %s security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s sess_agg_info= \[  \[ \[  local_ip = %s service_port = %s protocol = %s ] \[  sampled_forward_bytes = %s sampled_forward_pkts = %s sampled_reverse_bytes = %s sampled_reverse_pkts = %s sessionMap= \[  \[ \[  ip = %s port = %s ] \[  forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  \[  ip = %s port = %s ] \[  forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  \[  ip = %s port = %s ] \[  forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  ] ] ],  ] ] ]"
-
-SESSION_SERVER_AGGR = SESSION_CLIENT_AGGR
-
-LOGGED_SESSION = "\[ vmi = %s vn = %s ] security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s local_ip = %s service_port = %s protocol = %s sampled_forward_bytes = %s sampled_forward_pkts = %s sampled_reverse_bytes = %s sampled_reverse_pkts = %s ip = %s port = %s forward_flow_info= \[ sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[  sampled_bytes = %s sampled_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s  ]"
 
 LOGGED_SESSION_FW = "\[  vmi = %s vn = %s application = %s remote_application = %s security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s sess_agg_info= \[  \[ \[  local_ip = %s service_port = %s protocol = %s ] \[   logged_forward_bytes = %s logged_forward_pkts = %s logged_reverse_bytes = %s logged_reverse_pkts = %s sessionMap= \[  \[ \[  ip = %s port = %s ] \[  forward_flow_info= \[  logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[   logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  ] ] ],  ] ] ]"
 
-LOGGED_TEARDOWN = "\[  vmi = %s vn = %s security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s sess_agg_info= \[  \[ \[  local_ip = %s service_port = %s protocol = %s ] \[   logged_forward_bytes = %s logged_forward_pkts = %s logged_reverse_bytes = %s logged_reverse_pkts = %s sessionMap= \[  \[ \[  ip = %s port = %s ] \[  forward_flow_info= \[  flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] reverse_flow_info= \[   flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  ] ] ],  ] ] ]"
-
 LOGGED_TEARDOWN_FW = "\[  vmi = %s vn = %s application = %s remote_application = %s security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s sess_agg_info= \[  \[ \[  local_ip = %s service_port = %s protocol = %s ] \[   logged_forward_bytes = %s logged_forward_pkts = %s logged_reverse_bytes = %s logged_reverse_pkts = %s sessionMap= \[  \[ \[  ip = %s port = %s ] \[  forward_flow_info= \[  flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] reverse_flow_info= \[   flow_uuid = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  ] ] ],  ] ] ]"
 
-LOGGED_TEARDOWN_TCP = "\[  vmi = %s vn = %s security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s sess_agg_info= \[  \[ \[  local_ip = %s service_port = %s protocol = %s ] \[   logged_forward_bytes = %s logged_forward_pkts = %s logged_reverse_bytes = %s logged_reverse_pkts = %s sessionMap= \[  \[ \[  ip = %s port = %s ] \[  forward_flow_info= \[  logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[   logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s teardown_time = %s teardown_bytes = %s teardown_pkts = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s ],  ] ] ],  ] ] ]"
-
-LOGGED_SYSLOG = "\[ vmi = %s vn = %s ] security_policy_rule = %s remote_vn = %s is_client_session = %s is_si = %s vrouter_ip = %s local_ip = %s service_port = %s protocol = %s  logged_forward_bytes = %s logged_forward_pkts = %s logged_reverse_bytes = %s logged_reverse_pkts = %s ip = %s port = %s forward_flow_info= \[  logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] reverse_flow_info= \[   logged_bytes = %s logged_pkts = %s flow_uuid = %s tcp_flags = %s setup_time = %s action = %s sg_rule_uuid = %s nw_ace_uuid = %s underlay_source_port = %s ] vm = %s other_vrouter_ip = %s underlay_proto = %s  ]"
-
+SLO_LOGGED_FW = "name = %s eps= \[  \[ _iter106->first = %s \[  workload = %s client= \[  \[ \[  app =  tier =  site =  deployment =  labels =  custom_tags =  remote_app_id =  remote_tier_id =  remote_site_id =  remote_deployment_id =  remote_label_ids =  remote_custom_tag_ids =  remote_prefix =  remote_vn = %s local_vn = %s added = %s deleted = %s active = %s in_bytes = %s out_bytes = %s in_pkts = %s out_pkts = %s action = %s ],  \[  app =  tier =  site =  deployment =  labels =  custom_tags =  remote_app_id =  remote_tier_id =  remote_site_id =  remote_deployment_id =  remote_label_ids =  remote_custom_tag_ids =  remote_prefix =  remote_vn = %s local_vn = %s added = %s deleted = %s active = %s in_bytes = %s out_bytes = %s in_pkts = %s out_pkts = %s action = %s ],  ] ] server= \[  \[ ] ] ],  _iter106->first = %s \[  workload = %s client= \[  \[ ] ] server= \[  \[ \[  app =  tier =  site =  deployment =  labels =  custom_tags =  remote_app_id =  remote_tier_id =  remote_site_id =  remote_deployment_id =  remote_label_ids =  remote_custom_tag_ids =  remote_prefix =  remote_vn = %s local_vn = %s added = %s deleted = %s active = %s in_bytes = %s out_bytes = %s in_pkts = %s out_pkts = %s action = %s ],  ] ] ],  ] ]"
 class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
 
     @classmethod
@@ -284,6 +273,7 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
         Supported proto are tcp, udp and icmp
         '''
         assert self.start_traffic(client_fixture, server_fixture, proto)
+        self.sleep(10)
         pkt_count = self.pkt_count
         pkt_count2 = self.pkt_count2
         client_port = self.client_port
@@ -419,6 +409,7 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
         '''
 
         assert self.start_traffic(client_fixture, server_fixture, proto)
+        self.sleep(10)
         pkt_count = self.pkt_count
         pkt_count2 = self.pkt_count2
         client_port = self.client_port
@@ -558,6 +549,7 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
         '''
 
         assert self.start_traffic(client_fixture, server_fixture, proto)
+        self.sleep(10)
         pkt_count = self.pkt_count
         pkt_count2 = self.pkt_count2
         client_port = self.client_port
@@ -590,21 +582,20 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
                 ).policy_rule[0].rule_uuid
         else:
             nw_ace_uuid = UUID_RE
-
-        expected_client_session = LOGGED_SYSLOG % (
+        expected_client_session = SLO_LOGGED_SESSION % (
             client_vmi_fqname,
             client_fixture.vn_fq_name, FIREWALL_RULE_ID_DEFAULT,
             server_fixture.vn_fq_name, is_client_session, 0,
-            client_fixture.vm_node_ip,
+            self.inputs.host_data[client_fixture.vm_node_ip]['host_data_ip'],
             client_fixture.vm_ip, service_port, proto,
-            INT_RE, pkt_count2, INT_RE, pkt_count2,
+            INT_RE, pkt_count2, INT_RE,
             server_fixture.vm_ip, client_port,
             INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,
             'pass', sg_rule_id_egress, nw_ace_uuid, INT_RE,
             INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,
             'pass', sg_rule_id_egress, nw_ace_uuid, INT_RE,
             client_fixture.vm_id,
-            server_fixture.vm_node_ip, underlay_proto)
+            self.inputs.host_data[server_fixture.vm_node_ip]['host_data_ip'], underlay_proto)
 
         #Verify client session
         result, output = self.verify_no_of_sessions_in_syslog(
@@ -617,20 +608,20 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
             server_fixture.vmi_ids[server_fixture.vn_fq_name]
         is_client_session = 0
 
-        expected_server_session = LOGGED_SYSLOG % (
+        expected_server_session = SLO_LOGGED_SESSION % (
             server_vmi_fqname,
             server_fixture.vn_fq_name, FIREWALL_RULE_ID_DEFAULT,
             client_fixture.vn_fq_name, is_client_session, 0,
-            server_fixture.vm_node_ip,
+            self.inputs.host_data[server_fixture.vm_node_ip]['host_data_ip'],
             server_fixture.vm_ip, srv_session_s_port, proto,
-            INT_RE, pkt_count2, INT_RE, pkt_count2,
+            INT_RE, pkt_count2, INT_RE,
             client_fixture.vm_ip, srv_session_c_port,
             INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,
             'pass', sg_rule_id_ingress, nw_ace_uuid, INT_RE,
             INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,
             'pass', sg_rule_id_ingress, nw_ace_uuid, INT_RE,
             server_fixture.vm_id,
-            client_fixture.vm_node_ip, underlay_proto)
+            self.inputs.host_data[client_fixture.vm_node_ip]['host_data_ip'], underlay_proto)
 
         #Verify server session
         result, output = self.verify_no_of_sessions_in_syslog(
@@ -649,6 +640,7 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
         '''
 
         assert self.start_traffic(client_fixture, server_fixture, proto)
+        self.sleep(10)
         pkt_count = self.pkt_count
         pkt_count2 = self.pkt_count2
         client_port = self.client_port
@@ -681,23 +673,21 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
                 ).policy_rule[0].rule_uuid
         else:
             nw_ace_uuid = UUID_RE
-
-        expected_client_session = LOGGED_SESSION % (
+        expected_client_session = SLO_LOGGED_SESSION % (
             client_vmi_fqname,
             client_fixture.vn_fq_name, FIREWALL_RULE_ID_DEFAULT,
             server_fixture.vn_fq_name, is_client_session, 0,
             self.inputs.host_data[client_fixture.vm_node_ip]['host_data_ip'],
             client_fixture.vm_ip, service_port, proto,
-            INT_RE, pkt_count2, INT_RE, pkt_count2,
+            INT_RE, pkt_count2, INT_RE,
             server_fixture.vm_ip, client_port,
             INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,#Fwd flow info
-            'pass', sg_rule_id_egress, nw_ace_uuid, INT_RE,
+            'pass', UUID_RE, nw_ace_uuid, INT_RE,
             INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,#Reverse flow info
-            'pass', sg_rule_id_egress, nw_ace_uuid, INT_RE,
+            'pass', UUID_RE, nw_ace_uuid, INT_RE,
             client_fixture.vm_id,
-            self.inputs.host_data[server_fixture.vm_node_ip]['host_data_ip'],
-            underlay_proto)
-
+            self.inputs.host_data[server_fixture.vm_node_ip]['host_data_ip'], underlay_proto)
+        
         self.sleep(1)
         #Verify No. of Client sessions
         result, output = self.verify_no_of_sessions_in_agent_log(
@@ -711,13 +701,13 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
             server_fixture.vmi_ids[server_fixture.vn_fq_name]
         is_client_session = 0
 
-        expected_server_session = LOGGED_SESSION % (
+        expected_server_session = SLO_LOGGED_SESSION % (
             server_vmi_fqname,
             server_fixture.vn_fq_name, FIREWALL_RULE_ID_DEFAULT,
             client_fixture.vn_fq_name, is_client_session, 0,
             self.inputs.host_data[server_fixture.vm_node_ip]['host_data_ip'],
             server_fixture.vm_ip, srv_session_s_port, proto,
-            INT_RE, pkt_count2, INT_RE, pkt_count2,
+            INT_RE, pkt_count2, INT_RE,
             client_fixture.vm_ip, srv_session_c_port,
             INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,
             'pass', sg_rule_id_ingress, nw_ace_uuid, INT_RE,
@@ -737,64 +727,6 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
 
         self.sleep(1)
         self.delete_all_flows_on_vms_compute([client_fixture, server_fixture])
-
-        #Verify teardown sessions
-
-        if proto == 6:
-            expected_client_session = LOGGED_TEARDOWN_TCP % (
-                client_vmi_fqname,
-                client_fixture.vn_fq_name, FIREWALL_RULE_ID_DEFAULT,
-                server_fixture.vn_fq_name, 1, 0,
-                self.inputs.host_data[client_fixture.vm_node_ip]['host_data_ip'],
-                client_fixture.vm_ip, service_port, proto,
-                INT_RE, INT_RE, INT_RE, INT_RE,
-                server_fixture.vm_ip, client_port,
-                INT_RE, INT_RE,
-                UUID_RE, tcp_flags, INT_RE, INT_RE, INT_RE, pkt_count,#Fwd flow
-                'pass', sg_rule_id_egress, nw_ace_uuid, INT_RE,
-                INT_RE, INT_RE,
-                UUID_RE, tcp_flags, INT_RE, INT_RE, INT_RE, pkt_count,#Reverse flow
-                'pass', sg_rule_id_egress, nw_ace_uuid, INT_RE,
-                client_fixture.vm_id,
-                self.inputs.host_data[server_fixture.vm_node_ip]['host_data_ip'],
-                underlay_proto)
-
-            result_tcp, output = self.search_session_in_agent_log(
-                client_fixture.vm_node_ip,
-                expected_client_session)
-            result = result or result_tcp
-
-            assert result, ("Expected client session not found in agent log "
-                "for protocol %s" % (proto))
-
-        server_vmi_fqname = project_fqname + ':' +\
-            server_fixture.vmi_ids[server_fixture.vn_fq_name]
-
-        if proto == 6:
-            expected_server_session = LOGGED_TEARDOWN_TCP % (
-                server_vmi_fqname,
-                server_fixture.vn_fq_name, FIREWALL_RULE_ID_DEFAULT,
-                client_fixture.vn_fq_name, 0, 0,
-                self.inputs.host_data[server_fixture.vm_node_ip]['host_data_ip'],
-                server_fixture.vm_ip, srv_session_s_port, proto,
-                INT_RE, INT_RE, INT_RE, INT_RE,
-                client_fixture.vm_ip, srv_session_c_port,
-                INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,
-                INT_RE, INT_RE, pkt_count,
-                'pass', sg_rule_id_ingress, nw_ace_uuid, INT_RE,
-                INT_RE, pkt_count2, UUID_RE, tcp_flags, INT_RE,
-                INT_RE, INT_RE, pkt_count,
-                'pass', sg_rule_id_ingress, nw_ace_uuid, INT_RE,
-                server_fixture.vm_id,
-                self.inputs.host_data[client_fixture.vm_node_ip]['host_data_ip'], underlay_proto)
-
-            result_tcp, output = self.search_session_in_agent_log(
-                server_fixture.vm_node_ip,
-                expected_server_session)
-            result = result or result_tcp
-
-            assert result, ("Expected server session not found in agent log "
-                "for protocol %s" % (proto))
 
     def start_traffic_validate_slo_fw(self, client_fixture,
             server_fixture, policy_fixture=None, proto=1, underlay_proto=0,
@@ -847,7 +779,6 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
         tag_id = fw_objs_dict['tag'].get_tag_id()
         fwp_rule = ':'.join(fw_objs_dict['fwp'].fq_name +
             [fw_objs_dict['fwr'].uuid])
-
         expected_client_session = LOGGED_SESSION_FW % (
             client_vmi_fqname,
             client_fixture.vn_fq_name, tag_fq_name, tag_id,
@@ -961,16 +892,22 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
 
     @retry(delay=1, tries=10)
     def verify_no_of_sessions_in_log(self, node_ip, log_type, session_log,
-            exp_session_count=None, container_name='agent'):
+            exp_session_count=None, container_name='agent', session_type='session_logging'):
         ''' Verify No. of sessions on compute node for given log type
             log_type: agent/syslog
         '''
         if log_type == 'agent':
             log_file = '/var/log/contrail/vrouter-agent/contrail-vrouter-agent.log*'
-            object_name = 'SessionData'
+            if session_type == 'session_logging':
+                object_name = 'SessionData'
+            else:
+                object_name = 'EndpointSecurityStats'
         elif log_type == 'syslog':
             log_file = '/var/log/syslog* /var/log/messages*'
-            object_name = 'SessionData'
+            if session_type == 'session_logging':
+                object_name = 'SessionData'
+            else:
+                object_name = 'EndpointSecurityStats'
 
         username = self.inputs.host_data[node_ip]['username']
         password = self.inputs.host_data[node_ip]['password']
@@ -985,16 +922,16 @@ class SessionLoggingBase(FlowTestBase, BaseIntrospectSsl):
             return True, int(output)
 
     def verify_no_of_sessions_in_agent_log(self, node_ip, session_log,
-            exp_session_count=None):
+            exp_session_count=None, session_type='session_logging'):
 
         return self.verify_no_of_sessions_in_log(node_ip, 'agent', session_log,
-            exp_session_count=exp_session_count)
+            exp_session_count=exp_session_count, session_type=session_type)
 
     def verify_no_of_sessions_in_syslog(self, node_ip, session_log,
-            exp_session_count=None):
+            exp_session_count=None, session_type='session_logging'):
 
         return self.verify_no_of_sessions_in_log(node_ip, 'syslog', session_log,
-            exp_session_count=exp_session_count, container_name=None)
+            exp_session_count=exp_session_count, container_name=None, session_type=session_type)
 
     def get_total_no_of_sessions_in_agent_log(self, node_ip):
         '''Returns total no. of sessions in agent log file'''
