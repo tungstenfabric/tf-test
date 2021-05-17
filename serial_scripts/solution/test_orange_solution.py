@@ -250,6 +250,8 @@ class OrangeSolutionTest(BaseSolutionsTest):
             cls.vepg_stack.setUp()
 
     # Get VM details and setup vsrx
+        cls.logger.info("########## Sleeping for 10 Min before proceeding with VM verification ##########")
+        time.sleep(7*CONVERGENCE_TIME)
         op = cls.vepg_stack.heat_client_obj.stacks.get(
                  cls.vepg_stack.stack_name).outputs
         vsfo_fix = dict()
@@ -771,7 +773,94 @@ class OrangeSolutionTest(BaseSolutionsTest):
     # end test_06_ha_resiliency
 
     @preposttest_wrapper
-    def test_07_vrouter_restart(self):
+    def test_07_restart_from_os(self):
+        ''' CEM-21753
+            Check vsfo up can be restarted from os cli.
+            Virtual instance connectivity properly restored once its back online.
+            All BGP and BFD sessions are restored after convergence time.
+        '''
+        self.vm_restart=int(os.getenv('VM_RESTART','1'))
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_route_count()
+        os_controller_ip=random.choice(self.inputs.openstack_ips)
+        for i in range(0, self.vm_restart):
+            vm_fix=random.choice([self.vsfo_fix[3], self.vsfo_fix[4]])
+            stop_reboot=random.choice(['stop', 'reboot'])
+            if 'stop' in stop_reboot:
+                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                     heat-admin@%s source overcloudrc\; openstack server \
+                     stop %s' \
+                     %(self.inputs.password, os_controller_ip, vm_fix.uuid)
+                output=os.popen(cmd).read()
+                stat_cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                         heat-admin@%s source overcloudrc\; openstack server \
+                         show %s | grep status' \
+                         %(self.inputs.password, os_controller_ip, vm_fix.uuid)
+                for i in range(10):
+                    output = os.popen(stat_cmd).read()
+                    if 'SHUTOFF' in output:
+                        break
+                    time.sleep(1)
+                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                     heat-admin@%s source overcloudrc\; openstack server \
+                     start %s' \
+                     %(self.inputs.password, os_controller_ip, vm_fix.uuid)
+                output = os.popen(cmd).read()
+                for i in range(20):
+                    output = os.popen(stat_cmd).read()
+                    if 'ACTIVE' in output:
+                        break
+                    time.sleep(3)
+            else:
+                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                     heat-admin@%s source overcloudrc\; openstack server \
+                     reboot %s' \
+                     %(self.inputs.password, os_controller_ip, vm_fix.uuid)
+                output = os.popen(cmd).read()
+                stat_cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                         heat-admin@%s source overcloudrc\; openstack server \
+                         show %s | grep status' \
+                         %(self.inputs.password, os_controller_ip, vm_fix.uuid)
+                for i in range(30):
+                    output = os.popen(stat_cmd).read()
+                    if 'ACTIVE' in output:
+                        break
+                    time.sleep(3)
+            time.sleep(CONVERGENCE_TIME)
+            exp_bfd=self.NB_VSFO_UP_CNIF*self.NB_APN
+            exp_bgp=self.NB_VSFO_UP_CNNIC*self.NB_VSFO_UP_CNIF*self.NB_APN
+            for i in range(20):
+                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                    heat-admin@%s sshpass -p \'%s\' ssh -o \
+                    StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                    root@%s \'cli show bgp summary | grep Estab | wc -l\' '\
+                    %(self.inputs.password, vm_fix.vm_node_ip, \
+                      vm_fix.vm_password, vm_fix.local_ip)
+                output = os.popen(cmd).read()
+                bgp_s=int(output.replace("\n",""))
+                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                    heat-admin@%s sshpass -p \'%s\' ssh -o \
+                    StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                    root@%s \'cli show bfd session | grep Up | wc -l\' '\
+                    %(self.inputs.password, vm_fix.vm_node_ip, \
+                      vm_fix.vm_password, vm_fix.local_ip)
+                output = os.popen(cmd).read()
+                bfd_s=int(output.replace("\n",""))
+                if exp_bfd<bfd_s and exp_bgp<bgp_s:
+                    break
+                time.sleep(30)
+                if i==19:
+                    self.logger.error("BGP and BFD sessions failed to come up \
+                        after VM stop-start or reboot through openstack cli")
+            assert self.verify_ospf_session_state()
+            assert self.verify_bgp_session_state()
+        assert self.verify_route_count()
+        return True
+    # end test_07_restart_from_os
+
+    @preposttest_wrapper
+    def test_08_vrouter_restart(self):
         ''' CEM-16883
             Check vrouter can be restarted.
             Virtual instance connectivity properly restored once the vrouter is back
@@ -790,13 +879,13 @@ class OrangeSolutionTest(BaseSolutionsTest):
                 ).wait_till_contrail_cluster_stable(nodes=[node])
                 assert cluster_status, 'Hash of error nodes and services : %s' % (
                     error_nodes)
-            time.sleep(2*CONVERGENCE_TIME)
+            time.sleep(10*CONVERGENCE_TIME)
             assert self.verify_ospf_session_state()
             assert self.verify_bgp_session_state()
             assert self.verify_route_count()
 
         return True
-    # end test_07_vrouter_restart
+    # end test_08_vrouter_restart
 
     @preposttest_wrapper
     def test_run_all_tests(self):
@@ -809,7 +898,8 @@ class OrangeSolutionTest(BaseSolutionsTest):
         self.test_04_check_tls()
         self.test_05_bfd_bgpaas_feature()
         self.test_06_ha_resiliency()
-        self.test_07_vrouter_restart()
+        self.test_07_restart_from_os()
+        self.test_08_vrouter_restart()
 
     # end run_all_tests
 

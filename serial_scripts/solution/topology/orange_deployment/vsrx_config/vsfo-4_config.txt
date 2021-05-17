@@ -87958,12 +87958,6 @@ routing-instances {
 }
 
 protocols {
-    bfd {
-        traceoptions {
-            file bfd-trace;
-            flag all;
-        }
-    }
     ospf {
         area 0.0.0.0 {
             interface ge-0/0/0.0 {
