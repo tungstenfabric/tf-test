@@ -46,7 +46,7 @@ class SecurityLogging(SloBase):
             vn_policy_obj=policy_obj)
         for vn in self.vn_fixtures:
             self.add_slo_to_vn(slo_fixture, vn)
-
+        
         #For intra node traffic there is no tunnel so underlay_proto would be zero
         underlay_proto = 0
         proto_list = [1, 17, 6]
@@ -55,7 +55,7 @@ class SecurityLogging(SloBase):
         #Clear local ips after agent restart
         self.client_fixture.clear_local_ips()
         self.server_fixture.clear_local_ips()
-
+ 
         #Verify Session logs in agent logs for SLO
         for proto in proto_list:
             self.start_traffic_validate_slo(self.client_fixture,
@@ -107,9 +107,12 @@ class SecurityLogging(SloBase):
             vn_policy_obj=policy_obj)
         for vn in self.vn_fixtures:
             self.add_slo_to_vn(slo_fixture, vn)
-
-        underlay_proto = UNDERLAY_PROTO[
-            self.connections.read_vrouter_config_encap()[0]]
+        
+        encap = self.connections.read_vrouter_config_encap()
+        if encap[0] == 'VXLAN':    
+            underlay_proto = UNDERLAY_PROTO[encap[1]]
+        else:
+            underlay_proto = UNDERLAY_PROTO[encap[0]]
         proto_list = [1, 17, 6]
         self.enable_logging_on_compute(self.client_fixture.vm_node_ip,
             log_type=AGENT_LOG, session_type='slo')
@@ -188,9 +191,11 @@ class SecurityLogging(SloBase):
                 log_type=AGENT_LOG, session_type='slo')
             #Clear local ips after agent restart
             server2_fixture.clear_local_ips()
-
-            underlay_proto = UNDERLAY_PROTO[
-                self.connections.read_vrouter_config_encap()[0]]
+            encap = self.connections.read_vrouter_config_encap()
+            if encap[0] == 'VXLAN':    
+                underlay_proto = UNDERLAY_PROTO[encap[1]]
+            else:
+                underlay_proto = UNDERLAY_PROTO[encap[0]]
             #Verify Session logs in agent logs for SLO
             self.start_traffic_validate_slo(self.client_fixture,
                 server2_fixture, self.policy_fixture, proto=proto,
@@ -237,8 +242,11 @@ class SecurityLoggingFw(SloBase, SessionLoggingFwBase):
             slo_dict = {'slo_obj': slo_fixture.obj, 'rate_obj':slo_rate_obj}
             fw_objs_dict = self.config_tag_firewall_policy(self.vn_fixtures, slo=slo_dict)
 
-        underlay_proto = UNDERLAY_PROTO[
-            self.connections.read_vrouter_config_encap()[0]]
+        encap = self.connections.read_vrouter_config_encap()
+        if encap[0] == 'VXLAN':    
+            underlay_proto = UNDERLAY_PROTO[encap[1]]
+        else:
+            underlay_proto = UNDERLAY_PROTO[encap[0]]
         proto_list = [17]
         self.enable_logging_on_compute(self.client_fixture.vm_node_ip,
             log_type=AGENT_LOG, session_type='slo')
@@ -296,8 +304,11 @@ class SecurityLoggingFw(SloBase, SessionLoggingFwBase):
         slo_dict = {'slo_obj': slo_fixture.obj, 'rate_obj':slo_rate_obj}
         fw_objs_dict = self.config_tag_firewall_policy(self.vn_fixtures, slo=slo_dict)
 
-        underlay_proto = UNDERLAY_PROTO[
-            self.connections.read_vrouter_config_encap()[0]]
+        encap = self.connections.read_vrouter_config_encap()
+        if encap[0] == 'VXLAN':    
+            underlay_proto = UNDERLAY_PROTO[encap[1]]
+        else:
+            underlay_proto = UNDERLAY_PROTO[encap[0]]
         proto_list = [17]
         self.enable_logging_on_compute(self.client_fixture.vm_node_ip,
             log_type=AGENT_LOG, session_type='slo')
