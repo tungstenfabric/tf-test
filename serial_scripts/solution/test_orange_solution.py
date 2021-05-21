@@ -23,6 +23,7 @@ import time
 import glob
 from scripts.analytics.test_analytics import AnalyticsTestSanity
 import pdb
+VSRX_RESTART=int(540) #it takes 9min for 400+ ge sub-interfaces to come up.
 CONVERGENCE_TIME=int(90)
 
 class OrangeSolutionTest(BaseSolutionsTest):
@@ -860,7 +861,124 @@ class OrangeSolutionTest(BaseSolutionsTest):
     # end test_07_restart_from_os
 
     @preposttest_wrapper
-    def test_08_vrouter_restart(self):
+    def test_08_vsrx_cli_restart(self):
+        ''' CEM-22035
+            Check vsfo up can be restarted through vsrx cli.
+            Virtual instance connectivity properly restored once its back online.
+            All BGP and BFD sessions are restored after convergence time.
+        '''
+
+        self.cli_restart=int(os.getenv('VM_RESTART','1'))
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+        for i in range(0, self.cli_restart):
+            vm_fix=random.choice([self.vsfo_fix[3], self.vsfo_fix[4]])
+            cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                 heat-admin@%s sshpass -p \'%s\' ssh -o \
+                 StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                 root@%s \'cli request system reboot\' '\
+                 %(self.inputs.password, vm_fix.vm_node_ip, \
+                   vm_fix.vm_password, vm_fix.local_ip)
+            output = os.popen(cmd).read()
+            if 'Shutdown' not in output:
+                self.logger.error("Failed reboot VSRX from cli!")
+                continue
+            time.sleep(VSRX_RESTART)
+            time.sleep(CONVERGENCE_TIME)
+            assert self.verify_ospf_session_state()
+            assert self.verify_bgp_session_state()
+            assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+
+        return True
+    # end test_08_vsrx_cli_restart
+
+    @preposttest_wrapper
+    def test_09_virsh_restart(self):
+        ''' CEM-21754
+            Check vsfo up can be restarted through virsh.
+            Virtual instance connectivity properly restored once its back online.
+            All BGP and BFD sessions are restored after convergence time.
+        '''
+        self.virsh_restart=int(os.getenv('VM_RESTART','1'))
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+        for i in range(0, self.virsh_restart):
+            vm_fix=random.choice([self.vsfo_fix[3], self.vsfo_fix[4]])
+            cmd='ssh -o StrictHostKeyChecking=no -o \
+                 UserKnownHostsFile=/dev/null \
+                 heat-admin@%s \
+                 \'sudo virsh list | grep running | cut -d \" \" -f2\' '\
+                 %(vm_fix.vm_node_ip)
+            output = os.popen(cmd).read()
+            cmd='ssh -o StrictHostKeyChecking=no -o \
+                 UserKnownHostsFile=/dev/null \
+                 heat-admin@%s \
+                 \'sudo virsh reboot %s\' '\
+                 %(vm_fix.vm_node_ip, int(output))
+            output = os.popen(cmd).read()
+            if 'being rebooted' not in output:
+                self.logger.error("Failed to reboot instance through virsh!")
+                continue
+            time.sleep(VSRX_RESTART)
+            time.sleep(CONVERGENCE_TIME)
+            assert self.verify_ospf_session_state()
+            assert self.verify_bgp_session_state()
+            assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+
+        return True
+    # end test_09_virsh_restart
+
+    @preposttest_wrapper
+    def test_10_BGP_session_flap_before_convergence(self):
+        ''' CEM-21617
+            shut down/deactivate interfaces on the Vsrx
+            wait for 30 sec
+            bring up the interface
+            wait less than the convergence time of 90 sec and repeat interface down
+            repeat couple of times
+            Wait for convergence time and check
+            All BGP and BFD sessions are restored after convergence time.
+        '''
+
+        self.bgp_flap=int(os.getenv('BGP_FLAP','20'))
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+        vm_fix=random.choice([self.vsfo_fix[3], self.vsfo_fix[4]])
+        for i in range(0, self.bgp_flap):
+            cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                 heat-admin@%s sshpass -p \'%s\' ssh -o \
+                 StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                 root@%s \'ifconfig ge-0/0/8 down\' '\
+                 %(self.inputs.password, vm_fix.vm_node_ip, \
+                   vm_fix.vm_password, vm_fix.local_ip)
+            output = os.popen(cmd).read()
+            time.sleep(30)
+            cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                 heat-admin@%s sshpass -p \'%s\' ssh -o \
+                 StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                 root@%s \'ifconfig ge-0/0/8 up\' '\
+                 %(self.inputs.password, vm_fix.vm_node_ip, \
+                   vm_fix.vm_password, vm_fix.local_ip)
+            output = os.popen(cmd).read()
+            time.sleep(CONVERGENCE_TIME/2) #wait for half the convergence time.
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+
+        return True
+    # end test_10_BGP_session_flap_before_convergence
+
+    @preposttest_wrapper
+    def test_11_vrouter_restart(self):
         ''' CEM-16883
             Check vrouter can be restarted.
             Virtual instance connectivity properly restored once the vrouter is back
@@ -885,7 +1003,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_route_count()
 
         return True
-    # end test_08_vrouter_restart
+    # end test_11_vrouter_restart
 
     @preposttest_wrapper
     def test_run_all_tests(self):
@@ -899,7 +1017,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
         self.test_05_bfd_bgpaas_feature()
         self.test_06_ha_resiliency()
         self.test_07_restart_from_os()
-        self.test_08_vrouter_restart()
+        self.test_08_vsrx_cli_restart()
+        self.test_09_virsh_restart()
+        self.test_10_BGP_session_flap_before_convergence()
+        self.test_11_vrouter_restart()
 
     # end run_all_tests
 
