@@ -1006,6 +1006,122 @@ class OrangeSolutionTest(BaseSolutionsTest):
     # end test_11_vrouter_restart
 
     @preposttest_wrapper
+    def test_12_restart_dpdk_compute_hosting_vsfoup(self):
+        ''' 
+            Restart all dpdk computes hosting vsfo user plane nodes.
+            Check all the bgp, bfd, sessions come up fine.
+        '''
+
+        self.dpdk_restart=int(os.getenv('DPDK_RESTART','1'))
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_route_count()
+        assert self.verify_bgpaas_session_ctrlnode()
+        controller_ip=random.choice(self.inputs.openstack_ips)
+        
+        for node in self.inputs.compute_ips:
+            cluster_status, error_nodes = ContrailStatusChecker(
+                ).wait_till_contrail_cluster_stable(nodes=[node])
+            assert cluster_status, 'Hash of error nodes and services : %s' % (
+                    error_nodes)
+
+        #get undercloud host-name
+        file_name=self.deploy_path+'testcase_12_13/'+'ipa.sh'
+        cmd='sshpass -p \'%s\''%(self.inputs.password)
+        cmd=cmd+' scp -o StrictHostKeyChecking=no %s heat-admin@%s:/tmp/' \
+             %(file_name, controller_ip)
+        op=os.system(cmd)
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+             heat-admin@%s \'sh /tmp/ipa.sh\' ' \
+             %(self.inputs.password, controller_ip)
+        op=os.popen(cmd).read()
+        output=op.replace("\n","")
+        host=output.replace(" ","")
+        
+        #login to undercloud and reboot dpdk computes
+        for i in range(0, self.dpdk_restart):
+            self.logger.info("#### Starting Reboot of DPDK computes ####")
+            cmd='sshpass -p \'contrail123\' ssh -o StrictHostKeyChecking=no \
+                 stack@%s \'source /home/stack/stackrc; \
+                 rm -f output_dpdk > /dev/null; openstack server list | \
+                 grep compute-dpdk | cut -d \" \" -f 2 >> output_dpdk; \
+                 while read line; do openstack reboot --wait $line; \
+                 done < output_dpdk\'' %(host)
+            os.system(cmd)
+
+            for node in self.inputs.compute_ips:
+                cluster_status, error_nodes = ContrailStatusChecker(
+                ).wait_till_contrail_cluster_stable(nodes=[node])
+                assert cluster_status, 'Hash of error nodes and services : %s' % (
+                    error_nodes)
+
+            time.sleep(4*CONVERGENCE_TIME)
+            assert self.verify_ospf_session_state()
+            assert self.verify_bgp_session_state()
+            assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+        return True
+    # end test_12_restart_dpdk_compute_hosting_vsfoup
+
+    @preposttest_wrapper
+    def test_13_restart_kernel_compute_hosting_vsfocp(self):
+        '''
+            Restart kernel computes hosting vsfo control plane nodes.
+            Check all the bgp, bfd sessions on up nodes come
+            up fine.
+        '''
+        
+        self.kernel_restart=int(os.getenv('KERNEL_RESTART','1'))
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_route_count()
+        assert self.verify_bgpaas_session_ctrlnode()
+        controller_ip=random.choice(self.inputs.openstack_ips)
+
+        for node in self.inputs.compute_ips:
+            cluster_status, error_nodes = ContrailStatusChecker(
+                ).wait_till_contrail_cluster_stable(nodes=[node])
+            assert cluster_status, 'Hash of error nodes and services : %s' % (
+                    error_nodes)
+
+        #get undercloud host-name
+        file_name=self.deploy_path+'testcase_12_13/'+'ipa.sh'
+        cmd='sshpass -p \'%s\''%(self.inputs.password)
+        cmd=cmd+' scp -o StrictHostKeyChecking=no %s heat-admin@%s:/tmp/' \
+                  %(file_name, controller_ip)
+        op=os.system(cmd)
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
+             \'sh /tmp/ipa.sh\' ' %(self.inputs.password, controller_ip)
+        op=os.popen(cmd).read()
+        output=op.replace("\n","")
+        host=output.replace(" ","")
+
+        #login to undercloud and reboot kernel computes
+        for i in range(0, self.kernel_restart):
+            self.logger.info("#### Starting Reboot of KERNEL computes ####")
+            cmd='sshpass -p \'contrail123\' ssh -o StrictHostKeyChecking=no \
+                 stack@%s \'source /home/stack/stackrc; \
+                 rm -f output_kernel > /dev/null; openstack server list | \
+                 grep novacompute | cut -d \" \" -f 2 >> output_kernel; \
+                 while read line; do openstack server reboot --wait $line; \
+                 done < output_kernel\'' %(host)
+            os.system(cmd)
+
+            for node in self.inputs.compute_ips:
+                cluster_status, error_nodes = ContrailStatusChecker(
+                ).wait_till_contrail_cluster_stable(nodes=[node])
+                assert cluster_status, 'Hash of error nodes and services : %s' % (
+                    error_nodes)
+
+            time.sleep(4*CONVERGENCE_TIME)
+            assert self.verify_ospf_session_state()
+            assert self.verify_bgp_session_state()
+            assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()
+        return True
+    # end test_13_restart_kernel_compute_hosting_vsfocp
+
+    @preposttest_wrapper
     def test_run_all_tests(self):
         '''
             Run all the tests after deployment of the solution.
@@ -1021,6 +1137,8 @@ class OrangeSolutionTest(BaseSolutionsTest):
         self.test_09_virsh_restart()
         self.test_10_BGP_session_flap_before_convergence()
         self.test_11_vrouter_restart()
+        self.test_12_restart_dpdk_compute_hosting_vsfoup()
+        self.test_13_restart_kernel_compute_hosting_vsfocp()
 
     # end run_all_tests
 
