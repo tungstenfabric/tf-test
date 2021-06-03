@@ -1427,6 +1427,49 @@ class TestBGPaaS(BaseBGPaaS):
                 bgpaas_vm1, vn_fixture), 'Multihop BFD packets not seen over the BGPaaS interface'
         # end test_bgpaas_vsrx
 
+    #Until cem-20052 is completely fixed, this testcase will fail.
+    @preposttest_wrapper
+    def test_cem20052(self):
+        '''
+        1. Create a BGPaaS object with shared attribute, IP address and ASN.
+        2. Launch a VM which will act as the BGPaaS client.
+        3. Configure BGPaaS on it.
+        4. Verify BGP sessions over it come up fine.
+        5. Send tcp messages and check if bgp goes down.
+        Maintainer: skiranh@juniper.net
+        '''
+        vn_name = get_random_name('bgpaas_vn')
+        vn_subnets = [get_random_cidr()]
+        vn_fixture = self.create_vn(vn_name, vn_subnets)
+        bgpaas_vm = self.create_vm(vn_fixture, 'bgpaas_vm1',
+                                    image_name='ubuntu-bird')
+        assert bgpaas_vm.wait_till_vm_is_up()
+        bgp_vm_port = bgpaas_vm.vmi_ids[bgpaas_vm.vn_fq_name]
+        local_as = random.randint(29000,30000)
+        local_ip = bgpaas_vm.vm_ip
+        gw_ip = vn_fixture.get_subnets()[0]['gateway_ip']
+        dns_ip = vn_fixture.get_subnets()[0]['dns_server_address']
+        neighbors = [gw_ip, dns_ip]
+        peer_as=self.connections.vnc_lib_fixture.get_global_asn()
+        bgpaas_fixture = self.create_bgpaas(
+            bgpaas_shared=True, autonomous_system=local_as, bgpaas_ip_address=local_ip)
+        self.logger.info('We will configure BGP on the VM')
+        self.config_bgp_on_bird(bgpaas_vm, local_ip,local_as,neighbors, peer_as)
+        self.logger.info('Attaching the VMI to the BGPaaS object')
+        self.attach_vmi_to_bgpaas(bgp_vm_port, bgpaas_fixture)
+
+        assert bgpaas_fixture.verify_in_control_node(
+            bgpaas_vm), 'BGPaaS Session not seen in the control-node'
+        op= bgpaas_vm.run_cmd_on_vm(cmds=['birdc show protocols bfd1'], as_sudo=True)
+        assert 'up' in op['birdc show protocols bfd1'], 'BFD session not UP'
+
+        self.addCleanup(self.detach_vmi_from_bgpaas,
+                        bgp_vm_port, bgpaas_fixture)
+        bgpaas_vm.run_cmd_on_vm(cmds=['while sleep 0.1 ; do echo "x" > /dev/tcp/%s/179 ; echo -n "." ; done'%(bgpaas_vm.get_active_controller())], as_sudo=True)
+        assert bgpaas_fixture.verify_in_control_node(
+            bgpaas_vm), 'BGPaaS Session not seen in the control-node after sending tcp message'
+    #end test
+
     @preposttest_wrapper
     def test_cem19989_adddelete_vmi(self):
         '''
