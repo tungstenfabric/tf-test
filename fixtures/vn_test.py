@@ -381,6 +381,8 @@ class VNFixture(fixtures.Fixture):
             self.api_vn_obj = VirtualNetwork(
                 name=vn_name, parent_obj=project_obj)
             if not self.verify_if_vn_already_present(self.api_vn_obj, project_obj):
+                if self.router_external:
+                    self.api_vn_obj.router_external = self.router_external
                 if self.shared:
                     self.api_vn_obj.is_shared = self.shared
                 self.uuid = self.vnc_lib_h.virtual_network_create(
