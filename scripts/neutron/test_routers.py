@@ -275,6 +275,7 @@ class TestRouterSNAT(BaseNeutronTest):
         self.add_vn_to_router(router_dict['id'], vn1_fixture)
         assert self.verify_snat(vm1_fixture)
 
+    @test.attr(type=['upgrade'])
     @preposttest_wrapper
     def test_basic_snat_behavior_with_fip(self):
         vm1_name = get_random_name('vm_private')
@@ -297,10 +298,14 @@ class TestRouterSNAT(BaseNeutronTest):
                 router_dict['id'],
                 self.public_vn_obj.public_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn1_fixture)
-        assert self.verify_snat(vm1_fixture)
-        assert self.verify_snat_with_fip(self.public_vn_obj, \
-                vm2_fixture, vm1_fixture, connections= self.connections,
-                inputs = self.inputs)
+        def validate():
+            assert self.verify_snat(vm1_fixture)
+            assert self.verify_snat_with_fip(self.public_vn_obj, \
+                    vm2_fixture, vm1_fixture, connections= self.connections,
+                    inputs = self.inputs)
+        validate()
+        self.validate_post_upgrade = validate
+        return True
 
     @preposttest_wrapper
     def test_basic_snat_behavior_with_diff_projects(self):
