@@ -139,6 +139,10 @@ class ComputeNodeFixture(fixtures.Fixture):
             self.username, self.ip), password=self.password, warn_only=True,
             abort_on_prompts=False):
             if type == "get":
+                if self.inputs.l3mh_cidr:
+                    cmd = 'docker cp %s:/%s %s' %(self.container, self.agent_conf_file, \
+                                        self.agent_conf_file)
+                    self.inputs.run_cmd_on_server(self.ip, cmd, self.username, self.password)
                 result = get(node_file, local_file)
                 self.logger.debug(result)
                 if result.failed:
@@ -152,6 +156,11 @@ class ComputeNodeFixture(fixtures.Fixture):
                     self.logger.error('Failed to upload %s(as %s) to %s' % (
                         node_file, local_file, self.ip))
                 return result.succeeded
+
+            # delete files copied to node
+            if self.inputs.l3mh_cidr:
+                del_file_cmd = 'rm -rf %s %s' % (local_file, node_file)
+                self.inputs.run_cmd_on_server(self.ip, cmd, self.username, self.password)
     # end file_transfer
 
     def set_flow_aging_time(self, flow_cache_timeout=100):

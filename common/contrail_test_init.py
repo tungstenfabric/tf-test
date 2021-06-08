@@ -232,6 +232,8 @@ class TestInputs(with_metaclass(Singleton, object)):
     def _get_ip_for_service(self, host, service):
         host_dict = self.host_data[host]
         if service.lower() == 'vrouter':
+            if self.contrail_configs.get('L3MH_CIDR', None):
+                return host
             ip = self.get_ips_of_host(host, 'vhost0')[0]
             self.host_data[host]['control_data_ip'] = ip
             return ip
@@ -580,6 +582,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.config_amqp_port = contrail_configs.get('RABBITMQ_NODE_PORT', 5673)
         self.xmpp_auth_enable = contrail_configs.get('XMPP_SSL_ENABLE')
         self.xmpp_dns_auth_enable = contrail_configs.get('XMPP_SSL_ENABLE')
+        self.l3mh_cidr = contrail_configs.get('L3MH_CIDR', '')
 
         # openstack related configs
         keystone_configs = orchestrator_configs.get('keystone') or {}

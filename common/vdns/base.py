@@ -279,7 +279,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
             vm_fixture[vm_name] = self.useFixture(
                 VMFixture(project_name=self.inputs.project_name, connections=self.connections, vn_obj=vn_quantum_obj, vm_name=vm_name))
             vm_fixture[vm_name].verify_vm_launched()
-            vm_fixture[vm_name].verify_on_setup()
+            #vm_fixture[vm_name].verify_on_setup()
             vm_fixture[vm_name].wait_till_vm_is_up()
             vm_ip = vm_fixture[vm_name].get_vm_ip_from_vm(
                 vn_fq_name=vm_fixture[vm_name].vn_fq_name)
@@ -396,6 +396,7 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
             agent_inspect_h = self.agent_inspect[vm_fixture[vm_name].vm_node_ip]
             assigned_dns_ips = agent_inspect_h.get_vna_dns_server()
             self.verify_vm_dns_data(vm_dns_exp_data[vm_name], assigned_dns_ips[0])
+
         return True
     # end test_vdns_controlnode_switchover
 
@@ -437,11 +438,13 @@ class BasevDNSTest(test_v1.BaseTestCase_v1):
     def verify_vm_dns_data(self, vm_dns_exp_data, dns_server_ip):
         result = True
         dns_data_list = []
-        dns_server_ip = self.inputs.host_data[dns_server_ip]['host_ip']
+        if self.inputs.l3mh_cidr:
+            dns_server_ip = self.inputs.contrail_configs.get('CONTROL_NODES').split(',')[0]
+        else:
+            dns_server_ip = self.inputs.host_data[dns_server_ip]['host_ip']
         for bgp_ip in self.inputs.bgp_ips:
             dnsinspect_h = self.dnsagent_inspect[dns_server_ip]
             dns_data_list.append(dnsinspect_h.get_dnsa_config())
-
         # Traverse over expected record data
         for expected in vm_dns_exp_data:
             # Get te actual record data from introspect

@@ -77,6 +77,7 @@ contrail_configuration:
     INTROSPECT_SSL_ENABLE:
     XMPP_SSL_ENABLE:
     METADATA_PROXY_SECRET:
+    L3MH_CIDR: 108.1.1.0/24
 
 orchestrator_configuration:
     keystone:
@@ -384,6 +385,18 @@ test_configuration:
       deploy_kernel: trusty-ird2.kernel
       deploy_ramdisk: trusty-ird2.ramdisk
       bms_image: ub_bm_cloudinit2.qcow2
+    l3_mh_configuration:
+      physical_routers:
+        leaf1:
+            mgmt_ip: 192.168.120.14
+            ssh_username: root
+            ssh_password: c0ntrail123
+            cidr: 10.1.1.0/24
+        leaf2:
+            mgmt_ip: 192.168.120.15
+            ssh_username: root
+            ssh_password: c0ntrail123
+            cidr: 20.1.1.0/24
     web_server:
         server:
         username:
