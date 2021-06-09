@@ -42,7 +42,7 @@ class BaseSriovTest(test_v1.BaseTestCase_v1):
         sriov_host_name_list=[]
         sriov_host_list=list(self.inputs.sriov_data[0].keys())
         for item in sriov_host_list:
-            sriov_host_name_list.append(self.inputs.host_data[item.split('@')[1]]['name'])
+            sriov_host_name_list.append(self.inputs.host_data[item.split('@')[1]]['fqname'])
         return sriov_host_name_list
 
 
