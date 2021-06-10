@@ -28,6 +28,6 @@ RUN \
     rm -rf /var/cache/yum && \
     rm -rf /etc/yum.repos.d && \
     mv /etc/yum.repos.d.orig /etc/yum.repos.d && \
-    wget -nv -c --tries=3 http://chromedriver.storage.googleapis.com/2.34/chromedriver_linux64.zip && \
+    wget -nv -c --tries=3 ${SITE_MIRROR:-"http://chromedriver.storage.googleapis.com"}/2.34/chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip && cp ./chromedriver /usr/bin/ && \
     chmod ugo+rx /usr/bin/chromedriver
