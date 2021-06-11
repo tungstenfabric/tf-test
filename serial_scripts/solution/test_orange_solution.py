@@ -1122,6 +1122,62 @@ class OrangeSolutionTest(BaseSolutionsTest):
     # end test_13_restart_kernel_compute_hosting_vsfocp
 
     @preposttest_wrapper
+    def test_14_network_restart_on_compute(self):
+        ''' 
+            Restart network services on kernel and dpdk computes.
+            Verify all bgp, bfd sessions are up.
+        '''
+
+        self.vr_restart=int(os.getenv('VROUTER_RESTART','1'))
+        kernel_ip=[]
+        dpdk_ip=[]
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_route_count()
+        assert self.verify_bgpaas_session_ctrlnode()
+
+        #get separate list of kernel and dpdk compute ips
+        for i in range(len(self.inputs.compute_ips)):
+            if 'nova' in self.inputs.compute_names[i]:
+                kernel_ip.append(self.inputs.compute_ips[i])
+            elif 'dpdk' in self.inputs.compute_names[i]:
+                 dpdk_ip.append(self.inputs.compute_ips[i])
+
+        #looping through number of restarts
+        for i in range(0, self.vr_restart):
+            #network restart on kernel computes
+            self.logger.info("Performing network Restart on Kernel computes")
+            for i in range(len(kernel_ip)):
+                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                     heat-admin@%s sudo systemctl restart network' \
+                     %(self.inputs.password, kernel_ip[i])
+                os.system(cmd)
+
+            #network restart on dpdk computes
+            self.logger.info("Performing network Restart on DPDK computes")
+            for i in range(len(dpdk_ip)):
+                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                     heat-admin@%s \'sudo ifconfig vhost0 down; \
+                     sudo systemctl restart network\'' \
+                     %(self.inputs.password, dpdk_ip[i])
+                os.system(cmd)
+
+            for node in self.inputs.compute_ips:
+                cluster_status, error_nodes = ContrailStatusChecker(
+                ).wait_till_contrail_cluster_stable(nodes=[node])
+                assert cluster_status, 'Hash of error nodes and services : %s' % (
+                    error_nodes)
+
+            time.sleep(VSRX_RESTART)
+            time.sleep(2*CONVERGENCE_TIME)
+            assert self.verify_ospf_session_state()
+            assert self.verify_bgp_session_state()
+            assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_route_count()   
+        return True
+    # end test_14_network_restart_on_compute
+
+    @preposttest_wrapper
     def test_run_all_tests(self):
         '''
             Run all the tests after deployment of the solution.
@@ -1139,6 +1195,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
         self.test_11_vrouter_restart()
         self.test_12_restart_dpdk_compute_hosting_vsfoup()
         self.test_13_restart_kernel_compute_hosting_vsfocp()
+        self.test_14_network_restart_on_compute()
 
     # end run_all_tests
 
