@@ -49,7 +49,7 @@ class SecurityLogging(SloBase):
         
         #For intra node traffic there is no tunnel so underlay_proto would be zero
         underlay_proto = 0
-        proto_list = [1, 17, 6]
+        proto_list = [17, 1, 6]
         self.enable_logging_on_compute(self.client_fixture.vm_node_ip,
             log_type=AGENT_LOG, session_type='slo')
         #Clear local ips after agent restart
@@ -113,7 +113,7 @@ class SecurityLogging(SloBase):
             underlay_proto = UNDERLAY_PROTO[encap[1]]
         else:
             underlay_proto = UNDERLAY_PROTO[encap[0]]
-        proto_list = [1, 17, 6]
+        proto_list = [17, 1, 6]
         self.enable_logging_on_compute(self.client_fixture.vm_node_ip,
             log_type=AGENT_LOG, session_type='slo')
         self.enable_logging_on_compute(self.server_fixture.vm_node_ip,
