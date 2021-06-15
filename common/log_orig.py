@@ -45,11 +45,11 @@ def getLogger(name='unknown',**kwargs):
     return _loggers[name].logger
 
 class ContrailLogger(object):
-    def __init__(self, name, log_to_console=True, max_message_size=None):
+    def __init__(self, name, log_to_console=True, max_message_size=None, level=logging.DEBUG):
         self.name = name
         self.logger = logging.getLogger(name or LOG_KEY)
         self.logger.disabled = False
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(level)
         self.logger.propagate = False
         self.log_file = name
         self.log_to_console = log_to_console
