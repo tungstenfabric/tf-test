@@ -1178,6 +1178,49 @@ class OrangeSolutionTest(BaseSolutionsTest):
     # end test_14_network_restart_on_compute
 
     @preposttest_wrapper
+    @skip_because(deploy_path=os.getenv('DEPLOYMENT_PATH',
+                      'serial_scripts/solution/topology/orange_deployment/'))
+    def test_15_HC_on_BGPaaS(self):
+        ''' CEM-20918(automation - CEM-21921)
+            Issue seen before fix:
+            At least one interface with BGPaaS configured, and with HC applied
+            on the BGPaaS. Leave this HC unconfigured on the VM side, so that
+            the agent detects it as down. After some time, all interfaces that
+            are internally listed, before the one with HC on BGPaaS, will be
+            incorrectly associated with the BGPaaS HC and will show HC as being
+            down, at the same time as having BFD up.
+        '''
+
+        bgpaas_stack_env_file=glob.glob(self.deploy_path+'env/*VSFO3_EXT3*')
+        if not bgpaas_stack_env_file:
+            assert False, 'Env file for stack updation doesn\'t exist.\
+                           Exiting the test case!!!'
+        bgpaas_stack_env=self.bgpaas_env[bgpaas_stack_env_file[0]]
+        bgpaas_stack_update_file=glob.glob(self.deploy_path + \
+                                           'template/update_vsfo3_ext3*')
+        if not bgpaas_stack_update_file:
+            assert False, 'Template file for stack updation doesn\'t exist.\
+                           Exiting the test case!!!'
+        bgpaas_stack_update_template=''
+        with open(bgpaas_stack_update_file[0], 'r') as fd:
+            bgpaas_stack_update_template = yaml.load(fd, Loader=yaml.FullLoader)
+        if self.bgpaas_stacks['VEPG_BGP_VSFO3_EXT3_000_049'].stack_name is None:
+            assert False, 'Stack not created, nothing to update.\
+                           Exiting the test case!!!'
+        self.bgpaas_stacks['VEPG_BGP_VSFO3_EXT3_000_049'].update_template_env(
+                                          template=bgpaas_stack_update_template,
+                                          env=bgpaas_stack_env)
+
+        #Check the BGP and BFD sessions are stable for 15 min after updating the
+        #stack with HC on BGPaaS.
+        for i in range(10):
+            time.sleep(CONVERGENCE_TIME)
+            assert self.verify_bgp_session_state()
+            assert self.verify_bgpaas_session_ctrlnode()
+        return True
+    # end test_15_HC_on_BGPaaS
+
+    @preposttest_wrapper
     def test_run_all_tests(self):
         '''
             Run all the tests after deployment of the solution.
@@ -1196,6 +1239,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
         self.test_12_restart_dpdk_compute_hosting_vsfoup()
         self.test_13_restart_kernel_compute_hosting_vsfocp()
         self.test_14_network_restart_on_compute()
+        self.test_15_HC_on_BGPaaS()
 
     # end run_all_tests
 
