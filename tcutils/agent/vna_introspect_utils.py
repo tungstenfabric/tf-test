@@ -659,6 +659,11 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
                         for ee in bd:
                             pp[ee.tag] = ee.text
                         p[e.tag].append(pp)
+                elif e.tag == 'sg_uuid_list':
+                    pp = []
+                    for sg in e.xpath('./list/VmIntfSgUuid/sg_uuid'):
+                        pp.append(sg.text)
+                    p[e.tag] = pp
                 else:
                     p[e.tag] = e.text
             ret_list.append(p)
@@ -880,7 +885,7 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
 
         '''
         l = []
-        sg = self.dict_get('Snh_SgListReq?name=')
+        sg = self.dict_get('Snh_PageReq?x=begin:-1,end:-1,table:db.sg.0')
         asg = sg.xpath('./SgListResp/sg_list/list/SgSandeshData') or \
                 sg.xpath('./sg_list/list/SgSandeshData')
 
@@ -908,6 +913,34 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
             for e in s:
                 p[e.tag] = e.text
             l.append(p)
+        return l
+
+    def get_acl(self, acl_uuid):
+        l = []
+        query = 'Snh_AclReq?uuid=' + str(acl_uuid)
+        acl = self.dict_get(query)
+        aacl = acl.xpath('./AclResp/acl_list/list/AclSandeshData') or \
+                    acl.xpath('./acl_list/list/AclSandeshData')
+        for acl_id in acl_id_list:
+            query = 'Snh_AclReq?uuid=' + str(acl_id)
+            acl = self.dict_get(query)
+            aacl = acl.xpath('./AclResp/acl_list/list/AclSandeshData') or \
+                    acl.xpath('./acl_list/list/AclSandeshData')
+            for a in aacl:
+                p = {}
+                for e in a:
+                    if e.tag == 'entries':
+                        entry = e.xpath('./list/AclEntrySandeshData')
+                        enl = []
+                        for rule in entry:
+                            en = {}
+                            for x in rule:
+                                en[x.tag] = x.text
+                            enl.append(en)
+                        p[e.tag] = enl
+                    else:
+                        p[e.tag] = e.text
+                l.append(p)
         return l
 
     def get_sg_acls_list(self, sg_uuid):
