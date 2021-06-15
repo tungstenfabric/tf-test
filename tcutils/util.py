@@ -1126,6 +1126,13 @@ def skip_because(*args, **kwargs):
                     skip = True
                     msg = "Skipped as not supported in non remote compute setup"
                     raise testtools.TestCase.skipException(msg)
+
+            if "deploy_path" in kwargs:
+                if 'orange_deployment' not in kwargs['deploy_path']:
+                    skip = True
+                    msg = "Skipped as test is only supported in orange solution deployment."
+                    raise testtools.TestCase.skipException(msg)
+
             return f(self, *func_args, **func_kwargs)
         return wrapper
     return decorator
