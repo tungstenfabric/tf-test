@@ -4,6 +4,7 @@ from builtins import range
 from .base import BaseSolutionsTest
 from common.heat.base import BaseHeatTest
 from tcutils.wrappers import preposttest_wrapper
+from common.device_connection import NetconfConnection
 import test
 from ipam_test import *
 from vn_test import *
@@ -751,7 +752,102 @@ class OrangeSolutionTest(BaseSolutionsTest):
     # end test_05_bfd_bgpaas_feature
 
     @preposttest_wrapper
-    def test_06_ha_resiliency(self):
+    def test_06_sdn_gw_feature(self):
+        ''' CEM-16892
+            This test is required to check BGP routing information exchange with
+            SDN GW is working well.
+            Some prefixes are announced by the SDN gateway.
+            Some Virtual Networks are announced by Contrail.
+            Verification:-
+              - Check BGP sessions are all UP.
+              - Check BGP prefixes are well sent and received.
+              - Check IP traffic (ping) can be established between virtual instances
+                and IP addresses belonging to external prefixes announced by the SDN
+                Gateway.
+        '''
+
+        router_params = list(self.inputs.physical_routers_data.values())[0]
+        mx_ip=router_params['control_ip']
+        mx_pswd=router_params['ssh_password']
+        # 4 VN's are created through heat template in Orange deployment with
+        # rt -- 65000:3029 and each VN anounces 386 route prefixes. So we expect
+        # 386*4 = 1544 active route prefixes in total.
+        total_announced_prefix=1544
+        rd = "65000:3029"
+        rt = "target:65000:3029"
+        ri_interface = "lo0.9"
+        ri_ip='99.99.99.99'
+        cmds = []
+        cmds.append("set interfaces lo0 unit 9 family inet address %s/32" %ri_ip)
+        cmds.append("set routing-instances contrail-window-mx1 instance-type vrf")
+        cmds.append("set routing-instances contrail-window-mx1 interface %s"\
+                     %ri_interface)
+        cmds.append("set routing-instances contrail-window-mx1 \
+                     route-distinguisher %s" %rd)
+        cmds.append("set routing-instances contrail-window-mx1 vrf-target %s" %rt)
+
+        # Configure MX.
+        mx_handle = NetconfConnection(host=mx_ip)
+        mx_handle.connect()
+        cli_output = mx_handle.config(stmts=cmds, ignore_errors=False,
+                                      timeout=120)
+        mx_handle.disconnect()
+        assert cli_output[0], "Not able to push config to mx."
+
+        # Clear BGP neighborship
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null root@%s \
+             \'cli clear bgp neighbor all\' ' %(mx_pswd, mx_ip)
+        op=os.popen(cmd).read()
+        if 'Cleared 3 connections' not in op:
+            assert False, 'Failed to clear BGP neighborship.'
+        time.sleep(CONVERGENCE_TIME)
+
+        # Check BGP sessions are all UP
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null root@%s \
+             \'cli show bgp summary | grep Est | wc -l\' ' %(mx_pswd, mx_ip)
+        op=os.popen(cmd).read()
+        self.assertEqual(int(op.strip()),
+                         len(self.inputs.bgp_ips),
+                         'All BGP neighbors are not in Established state.')
+
+        # Check BGP prefixes are well sent and received
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null root@%s \
+             \'cli show bgp group | grep bgp.l3vpn.0 | grep /\' ' %(mx_pswd, mx_ip)
+        op=os.popen(cmd).read()
+        self.assertEqual(int(op.split()[1].split('/')[0]),
+                         total_announced_prefix,
+                         '386 routes per VN * 4 VNs with route target 65000:3029.\
+                          Total expected 1544 active routes not seen on the MX.')
+
+        # Check IP traffic (ping) can be established between virtual
+        # instances and IP addresses belonging to external prefixes
+        # announced by the SDN Gateway.
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
+             sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null root@%s \'cli show route | grep %s\''\
+             %(self.vsfo_fix[4].vm_password, self.vsfo_fix[4].vm_node_ip,
+               self.vsfo_fix[4].vm_password, self.vsfo_fix[4].local_ip, ri_ip)
+        op=os.popen(cmd).read()
+        assert (len(op.split('\n')) > 0),\
+            'Routes announced by SDN GW not seen in the VM.'
+
+        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
+             sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
+             UserKnownHostsFile=/dev/null root@%s \
+             \'cli ping routing-instance apn_3029_ext4_vpn %s count 10\''\
+             %(self.vsfo_fix[4].vm_password, self.vsfo_fix[4].vm_node_ip,
+               self.vsfo_fix[4].vm_password, self.vsfo_fix[4].local_ip, ri_ip)
+        op=os.popen(cmd).read()
+        assert (' 0% packet loss' in op),\
+            'Failed to ping external prefixes announced by the SDN GW.'
+
+    # end test_06_sdn_gw_feature
+
+    @preposttest_wrapper
+    def test_07_ha_resiliency(self):
         ''' CEM-16886
             Shut one of the 3 contrail physical controller nodes
             (hosting 3 instances : control, analytics and analytics database).
@@ -771,10 +867,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_route_count()
 
         return True
-    # end test_06_ha_resiliency
+    # end test_07_ha_resiliency
 
     @preposttest_wrapper
-    def test_07_restart_from_os(self):
+    def test_08_restart_from_os(self):
         ''' CEM-21753
             Check vsfo up can be restarted from os cli.
             Virtual instance connectivity properly restored once its back online.
@@ -858,10 +954,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_bgp_session_state()
         assert self.verify_route_count()
         return True
-    # end test_07_restart_from_os
+    # end test_08_restart_from_os
 
     @preposttest_wrapper
-    def test_08_vsrx_cli_restart(self):
+    def test_09_vsrx_cli_restart(self):
         ''' CEM-22035
             Check vsfo up can be restarted through vsrx cli.
             Virtual instance connectivity properly restored once its back online.
@@ -893,10 +989,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
         assert self.verify_route_count()
 
         return True
-    # end test_08_vsrx_cli_restart
+    # end test_09_vsrx_cli_restart
 
     @preposttest_wrapper
-    def test_09_virsh_restart(self):
+    def test_10_virsh_restart(self):
         ''' CEM-21754
             Check vsfo up can be restarted through virsh.
             Virtual instance connectivity properly restored once its back online.
@@ -932,10 +1028,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
         assert self.verify_route_count()
 
         return True
-    # end test_09_virsh_restart
+    # end test_10_virsh_restart
 
     @preposttest_wrapper
-    def test_10_BGP_session_flap_before_convergence(self):
+    def test_11_BGP_session_flap_before_convergence(self):
         ''' CEM-21617
             shut down/deactivate interfaces on the Vsrx
             wait for 30 sec
@@ -975,10 +1071,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
         assert self.verify_route_count()
 
         return True
-    # end test_10_BGP_session_flap_before_convergence
+    # end test_11_BGP_session_flap_before_convergence
 
     @preposttest_wrapper
-    def test_11_vrouter_restart(self):
+    def test_12_vrouter_restart(self):
         ''' CEM-16883
             Check vrouter can be restarted.
             Virtual instance connectivity properly restored once the vrouter is back
@@ -1003,10 +1099,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_route_count()
 
         return True
-    # end test_11_vrouter_restart
+    # end test_12_vrouter_restart
 
     @preposttest_wrapper
-    def test_12_restart_dpdk_compute_hosting_vsfoup(self):
+    def test_13_restart_dpdk_compute_hosting_vsfoup(self):
         ''' 
             Restart all dpdk computes hosting vsfo user plane nodes.
             Check all the bgp, bfd, sessions come up fine.
@@ -1061,10 +1157,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_bgpaas_session_ctrlnode()
         assert self.verify_route_count()
         return True
-    # end test_12_restart_dpdk_compute_hosting_vsfoup
+    # end test_13_restart_dpdk_compute_hosting_vsfoup
 
     @preposttest_wrapper
-    def test_13_restart_kernel_compute_hosting_vsfocp(self):
+    def test_14_restart_kernel_compute_hosting_vsfocp(self):
         '''
             Restart kernel computes hosting vsfo control plane nodes.
             Check all the bgp, bfd sessions on up nodes come
@@ -1119,10 +1215,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_bgpaas_session_ctrlnode()
         assert self.verify_route_count()
         return True
-    # end test_13_restart_kernel_compute_hosting_vsfocp
+    # end test_14_restart_kernel_compute_hosting_vsfocp
 
     @preposttest_wrapper
-    def test_14_network_restart_on_compute(self):
+    def test_15_network_restart_on_compute(self):
         ''' 
             Restart network services on kernel and dpdk computes.
             Verify all bgp, bfd sessions are up.
@@ -1175,12 +1271,12 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_bgpaas_session_ctrlnode()
         assert self.verify_route_count()   
         return True
-    # end test_14_network_restart_on_compute
+    # end test_15_network_restart_on_compute
 
     @preposttest_wrapper
     @skip_because(deploy_path=os.getenv('DEPLOYMENT_PATH',
                       'serial_scripts/solution/topology/orange_deployment/'))
-    def test_15_HC_on_BGPaaS(self):
+    def test_16_HC_on_BGPaaS(self):
         ''' CEM-20918(automation - CEM-21921)
             Issue seen before fix:
             At least one interface with BGPaaS configured, and with HC applied
@@ -1218,7 +1314,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert self.verify_bgp_session_state()
             assert self.verify_bgpaas_session_ctrlnode()
         return True
-    # end test_15_HC_on_BGPaaS
+    # end test_16_HC_on_BGPaaS
 
     @preposttest_wrapper
     def test_run_all_tests(self):
@@ -1230,16 +1326,17 @@ class OrangeSolutionTest(BaseSolutionsTest):
         self.test_03_giant_frame_test()
         self.test_04_check_tls()
         self.test_05_bfd_bgpaas_feature()
-        self.test_06_ha_resiliency()
-        self.test_07_restart_from_os()
-        self.test_08_vsrx_cli_restart()
-        self.test_09_virsh_restart()
-        self.test_10_BGP_session_flap_before_convergence()
-        self.test_11_vrouter_restart()
-        self.test_12_restart_dpdk_compute_hosting_vsfoup()
-        self.test_13_restart_kernel_compute_hosting_vsfocp()
-        self.test_14_network_restart_on_compute()
-        self.test_15_HC_on_BGPaaS()
+        self.test_06_sdn_gw_feature()
+        self.test_07_ha_resiliency()
+        self.test_08_restart_from_os()
+        self.test_09_vsrx_cli_restart()
+        self.test_10_virsh_restart()
+        self.test_11_BGP_session_flap_before_convergence()
+        self.test_12_vrouter_restart()
+        self.test_13_restart_dpdk_compute_hosting_vsfoup()
+        self.test_14_restart_kernel_compute_hosting_vsfocp()
+        self.test_15_network_restart_on_compute()
+        self.test_16_HC_on_BGPaaS()
 
     # end run_all_tests
 
