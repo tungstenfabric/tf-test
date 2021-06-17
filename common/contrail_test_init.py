@@ -630,6 +630,8 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.verify_webui = test_configs.get('verify_webui', False)
         self.verify_horizon = test_configs.get('verify_horizon', False)
         self.use_devicemanager_for_md5 = test_configs.get('use_devicemanager_for_md5', False)
+        self.community_on_mx_k8s = test_configs.get('community_on_mx_k8s', '')
+        #example for community_on_mx_k8s: RT value like "64512:12345"
         self.verify_on_setup = False if test_configs.get('verify_on_setup') is False else True
         self.upgrade = test_configs.get('upgrade') or False
         self.stop_on_fail = test_configs.get('stop_on_fail') or False
