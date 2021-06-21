@@ -200,14 +200,18 @@ class ContrailVncApi(object):
             vmi.set_security_group_list(sg_lst)
             self._vnc.virtual_machine_interface_update(vmi)
 
-    def set_security_group(self, vm_id, sg_ids, **kwargs):
-        sgs = [self.get_security_group(sg_id) for sg_id in sg_ids]
-        vnc_vm = self._vnc.virtual_machine_read(id=vm_id)
-        vmis = [vmi['uuid']
+    def set_security_group(self, vm_id=None, sg_ids=None, sgs=None, **kwargs):
+        sgs = sgs or [self.get_security_group(sg_id) for sg_id in sg_ids]
+        vmi_id = kwargs.get('vmi_id')
+        if vmi_id:
+            vmis = [self._vnc.virtual_machine_interface_read(id=vmi_id)]
+        else:
+            vnc_vm = self._vnc.virtual_machine_read(id=vm_id)
+            vmis = [vmi['uuid']
                     for vmi in vnc_vm.get_virtual_machine_interface_back_refs()]
-        vmis = [
-            self._vnc.virtual_machine_interface_read(
-                id=vmi) for vmi in vmis]
+            vmis = [
+                self._vnc.virtual_machine_interface_read(
+                    id=vmi) for vmi in vmis]
         for vmi in vmis:
             sg_lst = []
             for sg in sgs:

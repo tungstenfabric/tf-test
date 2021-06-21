@@ -153,6 +153,31 @@ class ComputeNodeFixture(fixtures.Fixture):
                         node_file, local_file, self.ip))
                 return result.succeeded
     # end file_transfer
+    def set_flow_thread_count(self, count=4):
+        self.logger.debug(
+            'Set flow thread count in node %s to %s' %
+            (self.ip, count))
+        thread_count = 'thread_count=' + str(count)
+        self.inputs.add_knob_to_container(self.ip, self.container, 'FLOWS', \
+                                         thread_count, restart_container=True, \
+                                         file_name='actions.sh')
+        time.sleep(5)
+        cmd = 'docker cp %s:/%s %s' %(self.container, self.agent_conf_file, \
+                                        self.agent_conf_file)
+        self.inputs.run_cmd_on_server(self.ip, cmd, self.username, self.password)
+        self.get_flow_thread_count()
+        if self.flow_thread_count != count:
+            self.logger.error(
+                "Problem in setting flow_thread_count in node %s, expected %s, got %s" %
+                (self.name, count, self.flow_thread_count))
+        else:
+            self.logger.info(
+                "flow_thread_count set to %s on %s" %
+                (count, self.ip))
+
+    def get_flow_thread_count(self):
+        self.flow_thread_count = int(self.get_option_value('FLOWS', 'thread_count'))
+        return self.flow_thread_count
 
     def set_flow_aging_time(self, flow_cache_timeout=100):
         self.logger.debug(
