@@ -150,7 +150,6 @@ class TestBasicVMVN0(BaseVnVmTest):
         if not result:
             self.logger.error(
                 'Test to verify cleanup of agent after control nodes stop Failed')
-            assert result
         return True
 
     # end test_bring_up_vm_with_control_node_down
