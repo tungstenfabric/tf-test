@@ -173,11 +173,17 @@ class TestBasicPolicyConfig(BasePolicyTest):
             cmd_to_output = [cmd]
             vm1_fixture.run_cmd_on_vm(cmds=cmd_to_output, as_sudo=True)
             output = vm1_fixture.return_output_cmd_dict[cmd]
-        for ip in multivn_vm_ip_list:
-            if ip not in output:
+        if 'dual' == self.inputs.get_af():
+            if multivn_vm_ip_list[3] not in output:
                 self.logger.error(
                     "IP %s not assigned to any eth intf of %s" %
-                    (ip, vm1_fixture.vm_name))
+                    (multivn_vm_ip_list[3], vm1_fixture.vm_name))
+                assert False
+        else:
+            if multivn_vm_ip_list[1] not in output:
+                self.logger.error(
+                    "IP %s not assigned to any eth intf of %s" %
+                    (multivn_vm_ip_list[1], vm1_fixture.vm_name))
                 assert False
         # Ping test from multi-vn vm to peer vn, result will be based on action
         # defined in policy attached to VN which has the default gw of VM
@@ -356,10 +362,11 @@ class TestBasicPolicyConfig(BasePolicyTest):
         assert not vm1_fixture.ping_to_ip(vm2_fixture.vm_ip),err_msg_on_pass
         self.logger.debug('Verify packets are dropped by policy')
         vm_node_ip = vm1_fixture.vm_node_ip
-        cmd= ' flow -l | grep -A3 %s | grep -A3 %s | grep \"Action:D(Policy)\" | wc -l ' %(
-                                                vm2_fixture.vm_ip,vm1_fixture.vm_ip)
-        output = self.inputs.run_cmd_on_server(vm_node_ip,cmd,username='root',password='c0ntrail123',
-                                               container='agent')
+        cmd= 'contrail-tools flow -l | grep -A3 %s | grep -A3 %s |\
+              grep \"Action:D(Policy)\" | wc -l '\
+              %(vm2_fixture.vm_ip,vm1_fixture.vm_ip)
+        output = self.inputs.run_cmd_on_server(vm_node_ip,cmd,username='root',
+                                               password='c0ntrail123')
         assert int(output)>0,'Packets are not dropped by policy rule'
         assert vm1_fixture.ping_to_ip(vm3_fixture.vm_ip),err_msg_on_fail
         self.logger.info('Ping from %s to %s failed,expected to fail.Test passed' %
