@@ -1471,6 +1471,45 @@ class TestBGPaaS(BaseBGPaaS):
     #end test
 
     @preposttest_wrapper
+    def test_cem20284(self):
+        '''
+        1. Create a BGPaaS object with shared attribute, IP address and ASN.
+        2. Launch a VM which will act as the BGPaaS client.
+        3. Configure BGPaaS on it.
+        4. Verify BGP sessions over it come up fine.
+        5. Try bringing up more bgpaas sessions to hit timing issue and see if bgp goes down.
+        Maintainer: skiranh@juniper.net
+        '''
+        bgpaas_fixture = {}
+        bgpaas_vm = {}
+        for i in range(0,4):
+            vn_name = get_random_name('bgpaas_vn')
+            vn_subnets = [get_random_cidr()]
+            vn_fixture = self.create_vn(vn_name, vn_subnets)
+            bgpaas_vm[i] = self.create_vm(vn_fixture, 'bgpaas_vm1' + str(i),
+                                        image_name='ubuntu-bird')
+            assert bgpaas_vm[i].wait_till_vm_is_up()
+            bgp_vm_port = bgpaas_vm[i].vmi_ids[bgpaas_vm[i].vn_fq_name]
+            local_as = random.randint(29000,30000)
+            local_ip = bgpaas_vm[i].vm_ip
+            gw_ip = vn_fixture.get_subnets()[0]['gateway_ip']
+            dns_ip = vn_fixture.get_subnets()[0]['dns_server_address']
+            neighbors = [gw_ip, dns_ip]
+            peer_as=self.connections.vnc_lib_fixture.get_global_asn()
+            bgpaas_fixture[i] = self.create_bgpaas(
+                bgpaas_shared=True, autonomous_system=local_as, bgpaas_ip_address=local_ip)
+            self.logger.info('We will configure BGP on the VM')
+            self.config_bgp_on_bird(bgpaas_vm[i], local_ip,local_as,neighbors, peer_as)
+            self.logger.info('Attaching the VMI to the BGPaaS object')
+            self.attach_vmi_to_bgpaas(bgp_vm_port, bgpaas_fixture[i])
+
+            for j in range(0,i):
+                assert bgpaas_fixture[j].verify_in_control_node(
+                    bgpaas_vm[j]), 'BGPaaS Session not seen in the control-node'
+
+    #end test
+
+    @preposttest_wrapper
     def test_cem19989_adddelete_vmi(self):
         '''
         1. Create a BGPaaS object with shared attribute, IP address and ASN.
