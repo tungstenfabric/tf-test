@@ -2704,6 +2704,29 @@ class TestBasicVMVN9(BaseVnVmTest):
         return True
     # end test_dns_resolution_for_link_local_service
 
+    @preposttest_wrapper
+    def test_cem19894(self):
+        '''
+        Description: Test RI reference and check if there is a back ref for RT
+        Test steps:
+                1. Create VN and VM
+                2. Get RI reference and check if there is a back ref for RT
+        Pass criteria: RI should have reference to RT
+        Maintainer : skiranh@juniper.net
+        '''
+        vn_fixture = self.create_vn()
+        assert vn_fixture.verify_on_setup()
+        vm1_fixture = self.create_vm(vn_fixture=vn_fixture)
+        assert vm1_fixture.verify_on_setup()
+        user_def_rt_num = get_random_rt()
+        rtgt_val = "target:%s:%s" % (self.inputs.router_asn, user_def_rt_num)
+        route_targets = RouteTargetList([rtgt_val])
+        vn_fixture.api_vn_obj.set_route_target_list(route_targets)
+        self.vnc_lib.virtual_network_update(vn_fixture.api_vn_obj)
+        ri_details = str(vn_fixture.ri_ref)
+        if not user_def_rt_num in ri_details:
+            self.logger.error('RT back ref not found in RI. Check CEM-19894')
+    #end test
 
 # IPv6 classes follow
 class TestBasicIPv6VMVN0(TestBasicVMVN0):
