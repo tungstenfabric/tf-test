@@ -53,6 +53,57 @@ try:
                 'The following are the stacks currently : %s' % stacks_list)
         # end test_heat_stacks_list
 
+        @preposttest_wrapper
+        def test_security_group_update(self):
+            '''
+            Validate that security groups can be creation & updation
+            test coverage for CEM-20931
+            '''
+            def verify(connections, sg_id, params):
+                secgrp = self.connections.quantum_h.show_security_group(sg_id)
+                rules = secgrp['security_group']['security_group_rules']
+                for i, r in enumerate(rules):
+                    i+=1
+                    msg = f' doesnt match for rule:{i}'
+                    cidr = params.get(f'r{i}_cidr')
+                    if not cidr:
+                        cidr = '::/0' if self.connections.inputs.get_af() == 'v6' else '0.0.0.0/0' 
+                    assert r['remote_ip_prefix'] == cidr, 'remote_ip_prefix' + msg
+                    assert r['port_range_min'] == params[f'r{i}_port_min'], 'port_range_min' + msg
+                    assert r['port_range_max'] == params[f'r{i}_port_max'], 'port_range_max' + msg
+                    assert r['protocol'] == params[f'r{i}_proto'], 'protocol' + msg
+
+            stack_name = get_random_name('secgrp')
+            template = self.get_template('sec_grp_CEM20931')
+            env = self.get_env('sec_grp_CEM20931')
+            params = env['parameters']
+            params['ip_family'] = 'IPv6' if self.inputs.get_af() == 'v6' else 'IPv4'
+            params['r2_cidr'] = get_random_cidr(af=self.inputs.get_af())
+            params['r3_cidr'] = get_random_cidr(af=self.inputs.get_af())
+            params['r4_cidr'] = get_random_cidr(af=self.inputs.get_af())
+            st_obj = self.config_heat_obj(stack_name, template, env)
+            sg_id = self.get_stack_output(st_obj, 'sg_id')
+            verify(self.connections, sg_id, params)
+
+            update_params = []
+            # rule1: update the protocol
+            update_params.append(('r1_proto', 'udp' if params['r1_proto'] == 'tcp' else 'tcp'))
+            # rule2: update the cidr
+            update_params.append(('r2_cidr', get_random_cidr(af=self.inputs.get_af())))
+            # rule3: update the ports
+            p1, p2 = random.randint(0, 65535), random.randint(0, 65535)
+            update_params.append(('r3_port_min', min(p1, p2)))
+            update_params.append(('r3_port_max', max(p1, p2)))
+            # rule4: update cidr, protocol & ports
+            update_params.append(('r4_cidr', get_random_cidr(af=self.inputs.get_af())))
+            update_params.append(('r4_proto', 'udp' if params['r2_proto'] == 'tcp' else 'tcp'))
+            p1, p2 = random.randint(0, 65535), random.randint(0, 65535)
+            update_params.append(('r4_port_min', min(p1, p2)))
+            update_params.append(('r4_port_max', max(p1, p2)))
+            self.update_stack(st_obj, update_params)
+            env['parameters'].update(update_params)
+            verify(self.connections, sg_id, env['parameters'])
+            return True
 
         def transit_vn_with_left_right_svc(self, left_svcs, right_svcs):
             '''

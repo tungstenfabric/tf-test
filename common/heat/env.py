@@ -320,3 +320,24 @@ svc_chain_v2 = {
     u'policy_name': u'',
   }
 }
+
+sec_grp_CEM20931 = {
+  u'parameters': {
+    u'ip_family': u'IPv4',
+    u'r1_proto': u'udp',
+    u'r1_port_min': 0,
+    u'r1_port_max': 65535,
+    u'r2_cidr': u'0.0.0.0/0',
+    u'r2_proto': u'tcp',
+    u'r2_port_min': 0,
+    u'r2_port_max': 65535,
+    u'r3_cidr': u'0.0.0.0/0',
+    u'r3_proto': u'udp',
+    u'r3_port_min': 0,
+    u'r3_port_max': 65535,
+    u'r4_cidr': u'0.0.0.0/0',
+    u'r4_proto': u'tcp',
+    u'r4_port_min': 0,
+    u'r4_port_max': 65535,
+  }
+}

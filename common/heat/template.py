@@ -3130,3 +3130,99 @@ intf_rt_table = {
     },
  }
 }
+
+sec_grp_CEM20931 = {
+  u'description': u'HOT template to create a Security Group \n',
+  u'heat_template_version': u'2015-04-30',
+  u'outputs': {
+    u'sg_id': {
+      u'description': u'Id of the Security Group',
+      u'value': {u'get_resource': u'secgrp'}},
+  },
+  u'parameters': {
+    u'ip_family': {
+      u'description': u'IP address family IPv4 or IPv6',
+      u'type': u'string'},
+    u'r1_proto': {
+      u'description': u'Protocol for rule1',
+      u'type': u'string'},
+    u'r1_port_min': {
+      u'description': u'Min port for rule1',
+      u'type': u'number'},
+    u'r1_port_max': {
+      u'description': u'Max port for rule1',
+      u'type': u'number'},
+    u'r2_cidr': {
+      u'description': u'IP prefix for the rule2',
+      u'type': u'string'},
+    u'r2_proto': {
+      u'description': u'Protocol for rule2',
+      u'type': u'string'},
+    u'r2_port_min': {
+      u'description': u'Min port for rule2',
+      u'type': u'number'},
+    u'r2_port_max': {
+      u'description': u'Max port for rule2',
+      u'type': u'number'},
+    u'r3_cidr': {
+      u'description': u'IP prefix for the rule3',
+      u'type': u'string'},
+    u'r3_proto': {
+      u'description': u'Protocol for rule3',
+      u'type': u'string'},
+    u'r3_port_min': {
+      u'description': u'Min port for rule3',
+      u'type': u'number'},
+    u'r3_port_max': {
+      u'description': u'Max port for rule3',
+      u'type': u'number'},
+    u'r4_cidr': {
+      u'description': u'IP prefix for the rule4',
+      u'type': u'string'},
+    u'r4_proto': {
+      u'description': u'Protocol for rule4',
+      u'type': u'string'},
+    u'r4_port_min': {
+      u'description': u'Min port for rule4',
+      u'type': u'number'},
+    u'r4_port_max': {
+      u'description': u'Max port for rule4',
+      u'type': u'number'},
+  },
+  u'resources': {
+    u'secgrp': {
+      u'type': u'OS::Neutron::SecurityGroup',
+      u'properties': {
+        u'name': u'CEM-20931',
+        u'rules': [{
+          u'direction': u'ingress',
+          u'ethertype': {u'get_param': u'ip_family'},
+          u'protocol': {u'get_param': u'r1_proto'},
+          u'port_range_min': {u'get_param': u'r1_port_min'},
+          u'port_range_max': {u'get_param': u'r1_port_max'},
+          },{
+          u'direction': u'ingress',
+          u'ethertype': {u'get_param': u'ip_family'},
+          u'remote_ip_prefix': {u'get_param': u'r2_cidr'},
+          u'protocol': {u'get_param': u'r2_proto'},
+          u'port_range_min': {u'get_param': u'r2_port_min'},
+          u'port_range_max': {u'get_param': u'r2_port_max'},
+          },{
+          u'direction': u'egress',
+          u'ethertype': {u'get_param': u'ip_family'},
+          u'remote_ip_prefix': {u'get_param': u'r3_cidr'},
+          u'protocol': {u'get_param': u'r3_proto'},
+          u'port_range_min': {u'get_param': u'r3_port_min'},
+          u'port_range_max': {u'get_param': u'r3_port_max'},
+          },{
+          u'direction': u'egress',
+          u'ethertype': {u'get_param': u'ip_family'},
+          u'remote_ip_prefix': {u'get_param': u'r4_cidr'},
+          u'protocol': {u'get_param': u'r4_proto'},
+          u'port_range_min': {u'get_param': u'r4_port_min'},
+          u'port_range_max': {u'get_param': u'r4_port_max'},
+          }]
+      }
+    }
+  }
+}
