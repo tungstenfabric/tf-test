@@ -64,14 +64,14 @@ try:
                 rules = secgrp['security_group']['security_group_rules']
                 for i, r in enumerate(rules):
                     i+=1
-                    msg = f' doesnt match for rule:{i}'
-                    cidr = params.get(f'r{i}_cidr')
+                    msg = ' doesnt match for rule:%d' % i
+                    cidr = params.get('r%d_cidr' % i)
                     if not cidr:
                         cidr = '::/0' if self.connections.inputs.get_af() == 'v6' else '0.0.0.0/0' 
                     assert r['remote_ip_prefix'] == cidr, 'remote_ip_prefix' + msg
-                    assert r['port_range_min'] == params[f'r{i}_port_min'], 'port_range_min' + msg
-                    assert r['port_range_max'] == params[f'r{i}_port_max'], 'port_range_max' + msg
-                    assert r['protocol'] == params[f'r{i}_proto'], 'protocol' + msg
+                    assert r['port_range_min'] == params['r%d_port_min'%i], 'port_range_min' + msg
+                    assert r['port_range_max'] == params['r%d_port_max'%i], 'port_range_max' + msg
+                    assert r['protocol'] == params['r%d_proto'%i], 'protocol' + msg
 
             stack_name = get_random_name('secgrp')
             template = self.get_template('sec_grp_CEM20931')
