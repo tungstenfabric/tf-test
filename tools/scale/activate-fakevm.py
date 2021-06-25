@@ -5,6 +5,7 @@ import os
 import time
 from fabric.api import *
 from tempfile import NamedTemporaryFile
+from common.contrail_services import *
 
 class ActivateScaleVMTest(object):
     def __init__ (self, args):
@@ -14,9 +15,8 @@ class ActivateScaleVMTest(object):
         self.create_file = args.filename+'-create'
         self.delete_file = args.filename+'-delete'
         self.computes = args.computes
-
         self._args = args
-
+    
     def create_scale_vms(self):
         self.copy_files()
         start_time = time.time()
@@ -67,22 +67,31 @@ class ActivateScaleVMTest(object):
                 print ("============================================")
 
     def run_fake_vm_file(self, file, compute):
-            with settings(host_string='%s@%s'%(self.username, compute),
-                      password=self.password, warn_only=True):
-                self.copy_file_to_container(file, compute)
-                start_time = time.time()
-                sudo("docker exec -it vrouter_vrouter-agent_1 bash %s > /dev/null 2>&1" %(file))
+        with settings(host_string='%s@%s' % (self.username, compute),
+                        password=self.password, warn_only=True):
+            self.copy_file_to_container(file, compute)
+            start_time = time.time()
+            sudo("docker exec -it %s bash %s > /dev/null 2>&1" % (self.container(compute), file))
 
     def copy_file_to_container(self, file, compute):
-            with settings(host_string='%s@%s'%(self.username, compute),
+        with settings(host_string='%s@%s' % (self.username, compute),
                       password=self.password, warn_only=True):
-                sudo("docker cp %s vrouter_vrouter-agent_1:/" %(file))
+            sudo("docker cp %s %s:/" % (file, self.container(compute))
 
     def delete_files_from_container(self, compute):
-            os.system("sshpass -p '%s' ssh %s@%s rm -rf %s*" %(self.password, self.username, compute, self.file))
-            with settings(host_string='%s@%s'%(self.username, compute),
+        os.system("sshpass -p '%s' ssh %s@%s rm -rf %s*" % (self.password, self.username, compute, self.file))
+        with settings(host_string='%s@%s' % (self.username, compute),
                       password=self.password, warn_only=True):
-                sudo("docker exec -it vrouter_vrouter-agent_1 rm -rf %s*" %(self.file))
+            sudo("docker exec -it %s rm -rf %s*" % (self.container(compute), self.file))
+
+    def container(self, compute):
+        containers = get_contrail_services_map(self).get('agent')
+        for container in containers:
+            with settings(host_string='%s@%s' % (self.username, compute),
+                      password=self.password, warn_only=True):
+                container = sudo("docker ps -a| grep agent | awk '{print $NF}'")
+        if container:
+            return container
 
 def parse_cli(args):
     '''Define and Parser arguments for the script'''
