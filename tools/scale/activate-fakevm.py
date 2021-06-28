@@ -1,10 +1,8 @@
 import sys
-import ast
 import argparse
 import os
 import time
 from fabric.api import *
-from tempfile import NamedTemporaryFile
 from common.contrail_services import *
 
 class ActivateScaleVMTest(object):
@@ -76,7 +74,7 @@ class ActivateScaleVMTest(object):
     def copy_file_to_container(self, file, compute):
         with settings(host_string='%s@%s' % (self.username, compute),
                       password=self.password, warn_only=True):
-            sudo("docker cp %s %s:/" % (file, self.container(compute))
+            sudo("docker cp %s %s:/" % (file, self.container(compute)))
 
     def delete_files_from_container(self, compute):
         os.system("sshpass -p '%s' ssh %s@%s rm -rf %s*" % (self.password, self.username, compute, self.file))
