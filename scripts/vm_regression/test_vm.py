@@ -1334,8 +1334,8 @@ class TestBasicVMVN4(BaseVnVmTest):
         '''
 
         list_of_ips = []
-        vn1_fixture = self.create_vn()
-        vn2_fixture = self.create_vn()
+        vn1_fixture = self.create_vn(af='dual')
+        vn2_fixture = self.create_vn(af='dual')
         assert vn1_fixture.verify_on_setup()
         assert vn2_fixture.verify_on_setup()
 
@@ -2387,7 +2387,7 @@ class TestBasicVMVN9(BaseVnVmTest):
             'virtual-machine-interface']['uuid']
 
         api_server_ip = self.inputs.cfgm_ip
-        add_static_route_cmd = 'python \/usr\/share\/contrail-utils\/provision_static_route.py \
+        add_static_route_cmd = 'python \/opt\/contrail\/utils\/provision_static_route.py \
                                 --prefix 1.2.3.4/32 --virtual_machine_interface_id %s \
                                  --tenant_name %s --api_server_ip %s --api_server_port 8082 \
                                 --oper add --route_table_name my_route_table \
@@ -2457,7 +2457,7 @@ class TestBasicVMVN9(BaseVnVmTest):
 
         self.logger.info(
             '-------------------------Will delete the static route now------------------')
-        del_static_route_cmd = 'python \/usr\/share\/contrail-utils\/provision_static_route.py --prefix 1.2.3.4/32 \
+        del_static_route_cmd = 'python \/opt\/contrail\/utils\/provision_static_route.py --prefix 1.2.3.4/32 \
                                 --virtual_machine_interface_id %s \
                                 --tenant_name %s --api_server_ip %s \
                                 --api_server_port 8082 \
@@ -2583,7 +2583,7 @@ class TestBasicVMVN9(BaseVnVmTest):
                           abort_on_prompts=False):
                 username = self.inputs.username
                 password = self.inputs.password
-                cmd = 'python /usr/share/contrail-utils/provision_linklocal.py %s' % (metadata_args)
+                cmd = 'python /opt/contrail/utils/provision_linklocal.py %s' % (metadata_args)
                 status = self.inputs.run_cmd_on_server( self.inputs.cfgm_ips[0], cmd, username, password, container='api-server')
 
                 self.logger.debug("%s" % status)
@@ -2593,11 +2593,12 @@ class TestBasicVMVN9(BaseVnVmTest):
             result = vm_fixture.return_output_cmd_dict[cmd]
             result = self.trim_command_output_from_vm(result)
             lookup = re.search(r"Name:\s*(\S+)\s*Address:\s*(\S+)", result)
-            if (lookup.group(1) == service) and (
-                    lookup.group(2) == service_info[service][0]):
-                self.logger.info(
-                    'DNS resolution worked for link local service %s' %
-                    service)
+            if lookup:
+                if (lookup.group(1) == service) and (
+                        lookup.group(2) == service_info[service][0]):
+                    self.logger.info(
+                        'DNS resolution worked for link local service %s' %
+                        service)
             else:
                 assert False, "DNS resolution for \
                                 link local service %s failed" % service
@@ -2697,7 +2698,7 @@ class TestBasicVMVN9(BaseVnVmTest):
                           abort_on_prompts=False):
                 username = self.inputs.username
                 password = self.inputs.password
-                cmd = 'python /usr/share/contrail-utils/provision_linklocal.py %s' % (metadata_args_delete)
+                cmd = 'python /opt/contrail/utils/provision_linklocal.py %s' % (metadata_args_delete)
                 status = self.inputs.run_cmd_on_server( self.inputs.cfgm_ips[0], cmd, username, password, container='api-server')
 
                 self.logger.debug("%s" % status)
