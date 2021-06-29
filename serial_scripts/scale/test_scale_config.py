@@ -22,7 +22,7 @@ class TestScaleConfig(GenericTestBase):
         1.scale vns to 20k in a batch of 5k vns each and timeit
         2.Verify creation after each batch creation
         3.Verify contrail-status
-        4.At the end of batch creation restart api-server,schema
+        4.At the end of creation restart api-server,schema
         5.Verify contrail-status
         '''
         scale_number = 20000
@@ -38,12 +38,13 @@ class TestScaleConfig(GenericTestBase):
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
                 pass
-            vns = self.verify_scale_objects(object_type='vn')
+            vns = self.verify_scale_objects(object_type='vns')
+            self.logger.info('Number of vns scaled: %s'%vns)
             assert self.inputs.verify_state()
-            scaled_vns = scaled_vns + vns
+            scaled_vns = vns
         for service in restart_services:
-            self.inputs.restart_containers(self.inputs.cfgm_ips, service)
-        total_vns = self.verify_scale_objects(object_type='vn')
+            self.inputs.restart_container(self.inputs.cfgm_ips, service)
+        total_vns = self.verify_scale_objects(object_type='vns')
         assert (total_vns/scale_number)*100 < 90, 'Not able to scale expected number of Vns'
         self.logger.info('Total Vns scaled successfully')
         
@@ -72,12 +73,13 @@ class TestScaleConfig(GenericTestBase):
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
                 pass
-            ports = self.verify_scale_objects(object_type='port')
+            ports = self.verify_scale_objects(object_type='ports')
+            self.logger.info('Number of ports scaled: %s'%ports)
             assert self.inputs.verify_state()
-            scaled_ports = scaled_ports + ports
-            for service in restart_services:
-                self.inputs.restart_containers(self.inputs.cfgm_ips, service)
-        total_ports = self.verify_scale_objects(object_type='vn')
+            scaled_ports = ports
+        for service in restart_services:
+            self.inputs.restart_container(self.inputs.cfgm_ips, service)
+        total_ports = self.verify_scale_objects(object_type='ports')
         assert (total_ports/scale_number)*100 < 90, 'Not able to scale expected number of ports'
         self.logger.info('Total ports scaled successfully')
     
@@ -105,12 +107,13 @@ class TestScaleConfig(GenericTestBase):
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
                 pass
-            sgs = self.verify_scale_objects(object_type='sg')
+            sgs = self.verify_scale_objects(object_type='sgs')
+            self.logger.info('Number of sgs scaled: %s'%sgs)
             assert self.inputs.verify_state()
-            scaled_sgs = scaled_sgs + sgs
-            for service in restart_services:
-                self.inputs.restart_containers(self.inputs.cfgm_ips, service)
-        total_sgs = self.verify_scale_objects(object_type='sg')
+            scaled_sgs = sgs
+        for service in restart_services:
+            self.inputs.restart_container(self.inputs.cfgm_ips, service)
+        total_sgs = self.verify_scale_objects(object_type='sgs')
         assert (total_sgs/scale_number)*100 < 90, 'Not able to scale expected number of sgs'
         self.logger.info('Total sgs scaled successfully')
     
@@ -139,10 +142,11 @@ class TestScaleConfig(GenericTestBase):
             except subprocess.CalledProcessError:
                 pass
             sgs_rules = self.verify_scale_objects(object_type='sg_rules')
+            self.logger.info('Number of sg_rules scaled: %s'%sg_rules)
             assert self.inputs.verify_state()
-            scaled_sgs_rules = scaled_sgs_rules + sgs_rules
-            for service in restart_services:
-                self.inputs.restart_containers(self.inputs.cfgm_ips, service)
+            scaled_sgs_rules = sgs_rules
+        for service in restart_services:
+            self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_sgs_rules = self.verify_scale_objects(object_type='sg_rules')
         assert (total_sgs_rules/scale_number)*100 < 90, 'Not able to scale expected number of sgs_rules'
         self.logger.info('Total sgs_rules scaled successfully')
@@ -171,12 +175,13 @@ class TestScaleConfig(GenericTestBase):
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
                 pass
-            nps = self.verify_scale_objects(object_type='np')
+            nps = self.verify_scale_objects(object_type='nps')
+            self.logger.info('Number of nps scaled: %s'%nps)
             assert self.inputs.verify_state()
-            scaled_nps = scaled_nps + nps
-            for service in restart_services:
-                self.inputs.restart_containers(self.inputs.cfgm_ips, service)
-        total_nps = self.verify_scale_objects(object_type='np')
+            scaled_nps = nps
+        for service in restart_services:
+            self.inputs.restart_container(self.inputs.cfgm_ips, service)
+        total_nps = self.verify_scale_objects(object_type='nps')
         assert (total_nps/scale_number)*100 < 90, 'Not able to scale expected number of network policies'
         self.logger.info('Total network policies scaled successfully')
     
@@ -205,10 +210,11 @@ class TestScaleConfig(GenericTestBase):
             except subprocess.CalledProcessError:
                 pass
             np_rules = self.verify_scale_objects(object_type='np_rules')
+            self.logger.info('Number of np_rules scaled: %s'%np_rules)
             assert self.inputs.verify_state()
-            scaled_np_rules = scaled_np_rules + np_rules
-            for service in restart_services:
-                self.inputs.restart_containers(self.inputs.cfgm_ips, service)
+            scaled_np_rules = np_rules
+        for service in restart_services:
+            self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_np_rules = self.verify_scale_objects(object_type='np_rules')
         assert (total_np_rules/scale_number)*100 < 90, 'Not able to scale expected number of network policies rules'
         self.logger.info('Total network policies rules scaled successfully')
@@ -238,48 +244,57 @@ class TestScaleConfig(GenericTestBase):
             except subprocess.CalledProcessError:
                 pass
             fips = self.verify_scale_objects(object_type='fips')
+            self.logger.info('Number of fips scaled: %s'%fips)
             assert self.inputs.verify_state()
-            scaled_fips = scaled_fips + fips
-            for service in restart_services:
-                self.inputs.restart_containers(self.inputs.cfgm_ips, service)
+            scaled_fips = fips
+        for service in restart_services:
+            self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_fips = self.verify_scale_objects(object_type=fips)
         assert (total_fips/scale_number)*100 < 90, 'Not able to scale expected number of fips'
         self.logger.info('Total fips scaled successfully')
-    
-    @retry(tries=3)
-    def verify_scale_objects(self, object_type='vn'):
-        if object_type == 'vn':
+
+    def verify_scale_objects(self, object_type='vns'):
+        if object_type == 'vns':
             try:
                 return len(self.connections.api_server_inspects[0].get_cs_vn_list())
             except:
                 return False
         elif object_type == 'ports':
             try:
-                return len(self.connections.nova_h.list_ports())
+                return len(self.vnc_lib.virtual_machine_interfaces_list()['virtual-machine-interfaces'])
             except:
                 return False
         elif object_type == 'sgs':
             try:
-                return len(self.connections.quantum_h.security_groups())
+                return len(self.connections.quantum_h.list_security_groups()['security_groups'])
             except:
                 return False
         elif object_type == 'sg_rules':
             try:
-                return len(self.connections.quantum_h.security_group_rules())
+                return len(self.connections.quantum_h.list_security_group_rules()['security_group_rules'])
             except:
                 return False
         elif object_type == 'nps':
             try:
-                return len(self.connections.quantum_h.policy())
+                return len(self.vnc_lib.network_policys_list()['network-policys'])
             except:
                 return False
         elif object_type == 'np_rules':
             try:
-                return len(self.connections.quantum_h.policy_rules())
+                return self.get_policy_rules()
             except:
                 return False
         elif object_type == 'fips':
             try:
-                return len(self.connections.api_server_inspects[0].get_cs_fip_list())
+                return len(self.vnc_lib.floating_ips_list()['floating-ips'])
             except:
                 return False
+    
+    def get_policy_rules(self):
+        rules = 0
+        policys = self.vnc_lib.network_policys_list()['network-policys']
+        for policy in policys:
+            obj = self.vnc_lib.network_policy_read(id=policy['uuid'])
+            rule_obj = obj.get_network_policy_entries()
+            rules = len(rule_obj.policy_rule)
+        return rules
