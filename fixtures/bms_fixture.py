@@ -7,6 +7,7 @@ import fixtures
 import string
 from tcutils.util import retry, search_arp_entry, get_random_name
 from tcutils.util import get_intf_name_from_mac, run_cmd_on_server, get_af_type
+from tcutils.tcpdump_utils import start_tcpdump_for_intf, stop_tcpdump_for_intf
 from tcutils.util import get_random_string, run_dhcp_server
 from port_fixture import PortFixture
 from virtual_port_group import VPGFixture
