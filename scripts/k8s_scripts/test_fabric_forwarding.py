@@ -44,12 +44,12 @@ class TestFabricFWD(BaseK8sTest):
                                                labels={'app': label})
         spec =  {
                 'containers': [
-                    {'image': 'ubuntu-upstart',
+                    {'image': ((self.inputs.test_docker_registry + 'library/ubuntu-upstart') if self.inputs.test_docker_registry is not None else 'ubuntu-upstart'),
                       "name": "c1",
                       'command': ['sleep', '1000000'],
                       'image_pull_policy': 'IfNotPresent'
                     },
-                    {'image': 'ubuntu-upstart',
+                    {'image': ((self.inputs.test_docker_registry + 'library/ubuntu-upstart') if self.inputs.test_docker_registry is not None else 'ubuntu-upstart'),
                      "name": "c2",
                      'command': ['sleep', '1000000'],
                      'image_pull_policy': 'IfNotPresent'
@@ -204,7 +204,7 @@ class TestFabricFWD(BaseK8sTest):
         template_metadata['labels'] = labels
         template_spec = {
                 'containers': [
-                    {'image': 'ubuntu-upstart',
+                    {'image': ((self.inputs.test_docker_registry + 'library/ubuntu-upstart') if self.inputs.test_docker_registry is not None else 'ubuntu-upstart'),
                       "name": "c1",
                       'command': ['sleep', '1000000'],
                       'image_pull_policy': 'IfNotPresent',
@@ -261,7 +261,7 @@ class TestFabricFWD(BaseK8sTest):
         template_metadata['labels'] =labels
         template_spec = {
                 'containers': [
-                    {'image': 'ubuntu-upstart',
+                    {'image': ((self.inputs.test_docker_registry + 'library/ubuntu-upstart') if self.inputs.test_docker_registry is not None else 'ubuntu-upstart'),
                       "name": "c1",
                       'command': ['sleep', '1000000'],
                       'image_pull_policy': 'IfNotPresent',
