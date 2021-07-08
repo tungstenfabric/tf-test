@@ -1319,7 +1319,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         cname = get_random_name('container')
         spec = spec or  {
                 'containers': [
-                    {'image': 'cirros',
+                    {'image': ((self.inputs.test_docker_registry + 'cirros') if self.inputs.test_docker_registry is not None else 'cirros'),
                      'image_pull_policy': 'IfNotPresent',
                       "name": cname
                     }

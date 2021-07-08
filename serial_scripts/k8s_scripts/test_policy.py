@@ -237,9 +237,9 @@ class TestNetworkPolicyRestart(BaseK8sTest):
                 client1_label_ns1, client1_label_ns2, client1_label_ns3 = 'client1_ns1', 'client1_ns2', 'client1_ns3'
                 client2_label_ns1, client2_label_ns2, client2_label_ns3 = 'client2_ns1', 'client2_ns2', 'client2_ns3'
                 client3_label_ns3 = 'client3_ns3'
-                nginx_spec_1 = {'containers': [{'image': 'nginx',
+                nginx_spec_1 = {'containers': [{'image': ((self.connections.inputs.test_docker_registry + 'nginx') if self.connections.inputs.test_docker_registry is not None else 'nginx'),
                                                 'ports': [{'container_port': 80}]}]}
-                nginx_spec_2 = {'containers': [{'image': 'nginx',
+                nginx_spec_2 = {'containers': [{'image': ((self.connections.inputs.test_docker_registry + 'nginx') if self.connections.inputs.test_docker_registry is not None else 'nginx'),
                                                 'ports': [{'container_port': 80}]}]}
                 nginx_metadata_ns1 = {'labels': {'app': web_label_ns1}}
                 nginx_metadata_ns2 = {'labels': {'app': web_label_ns2}}
@@ -253,7 +253,7 @@ class TestNetworkPolicyRestart(BaseK8sTest):
                                             metadata=nginx_metadata_ns2,
                                             spec=nginx_spec_2)
                 self.web_pod_ns2.setUp()
-                busybox_spec_1 = {'containers': [{'image': 'busybox','command': ['sleep', '1000000'],
+                busybox_spec_1 = {'containers': [{'image': ((self.connections.inputs.test_docker_registry + 'library/busybox') if self.connections.inputs.test_docker_registry is not None else 'busybox'),'command': ['sleep', '1000000'],
                                                 'image_pull_policy': 'IfNotPresent',}],
                                             'restart_policy': 'Always'}
                 busybox_spec_2 = dict(busybox_spec_1)
