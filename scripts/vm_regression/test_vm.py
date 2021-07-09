@@ -664,6 +664,83 @@ echo "Hello World.  The time is now $(date -R)!" | tee /tmp/output.txt
         return True
     # end test_diff_proj_same_vn_vm_add_delete
 
+    @preposttest_wrapper
+    def test_Policy_CEM_22032(self):
+        '''
+         Description: Test to validate that policy to deny and pass under different projects should behave accordingly.
+         Test steps:
+                1. Create 1 project.
+                2. Launch 2 VNs (starting with "service-" keyword)and 2 VMs under each VN.
+                3. Configure a policy to allow ICMP .
+                4: Advertise routes across VNs with Service keywords using above created policy
+         Maintainer : manasd@juniper.net
+        '''
+        vn1_name = get_random_name('service-vn1', '')
+        vn2_name = get_random_name('service-vn2', '')
+        policy_names = ['policy1']
+        projects = ['project111']
+        rules = [
+            {
+                'direction': '<>', 'simple_action': 'pass',
+                'protocol': 'icmp',
+                'source_network': vn1_name,
+                'dest_network': vn2_name,
+            },
+        ]
+
+        user_list = [('gudi', 'gudi123', 'admin'), ('mal', 'mal123', 'admin')]
+
+        user1_fixture= self.useFixture(
+            UserFixture(
+                connections=self.connections, username=user_list[0][0], password=user_list[0][1]))
+        project_fixture1 = self.useFixture(
+            ProjectFixture(
+                project_name=projects[0], username=user_list[0][0],
+                password=user_list[0][1], connections=self.connections))
+        project_fixture1.set_user_creds(project_fixture1.username,project_fixture1.password)
+        user1_fixture.add_user_to_tenant(projects[0], user_list[0][0] , user_list[0][2])
+        project_inputs1 = ContrailTestInit(
+            self.input_file, stack_user=project_fixture1.project_username,
+            stack_password=project_fixture1.project_user_password,
+            stack_tenant=projects[0], logger = self.logger)
+        project_connections1 = ContrailConnections(project_inputs1 , self.logger)
+
+        policy1_fixture = self.useFixture(PolicyFixture(
+                                          policy_name=policy_names[0],
+                                          rules_list=rules,
+                                          inputs=project_inputs1,
+                                          connections=project_connections1))
+
+        vn1_fixture = self.useFixture(VNFixture(project_name=projects[0],
+                                      connections=project_connections1,
+                                      vn_name=vn1_name,
+                                      inputs=project_inputs1,
+                                      policy_objs=[policy1_fixture.policy_obj]))
+        vn2_fixture = self.useFixture(VNFixture(project_name=projects[0],
+                                      connections=project_connections1,
+                                      vn_name=vn2_name,
+                                      inputs=project_inputs1,
+                                      policy_objs=[policy1_fixture.policy_obj]))
+
+        assert vn1_fixture.verify_on_setup()
+        assert vn2_fixture.verify_on_setup()
+
+        vm1_fixture= self.useFixture(VMFixture(connections=project_connections1,
+                                     vn_obj=vn1_fixture.obj,vm_name=get_random_name('vm1'),
+                                     project_name=projects[0]))
+        vm2_fixture= self.useFixture(VMFixture(connections=project_connections1,
+                                     vn_obj=vn2_fixture.obj,vm_name=get_random_name('vm2'),
+                                     project_name=projects[0]))
+
+        assert vm1_fixture.verify_on_setup()
+        assert vm2_fixture.verify_on_setup()
+        vm1_fixture.wait_till_vm_is_up()
+        vm2_fixture.wait_till_vm_is_up()
+        assert vm1_fixture.ping_to_vn(dst_vm_fixture=vm2_fixture)
+
+    # end test_CEM_22032
+
+
 class TestBasicVMVN1(BaseVnVmTest):
 
     @classmethod

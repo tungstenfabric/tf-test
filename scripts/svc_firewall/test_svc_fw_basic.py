@@ -11,6 +11,7 @@ from common.servicechain.config import ConfigSvcChain
 import test
 from common import isolated_creds
 import inspect
+from tcutils.util import *
 
 
 class TestSvcRegr(BaseSvc_FwTest, VerifySvcFirewall, ConfigSvcChain, ECMPVerify):
@@ -29,4 +30,13 @@ class TestSvcRegr(BaseSvc_FwTest, VerifySvcFirewall, ConfigSvcChain, ECMPVerify)
             return self.verify_svc_chain(svc_img_name='tiny_nat_fw',
                                      service_mode='in-network-nat',
                                      create_svms=True)
+
+    @test.attr(type=['ci_sanity_WIP', 'sanity', 'quick_sanity', 'suite1', 'vcenter_compute', 'vcenter'])
+    @preposttest_wrapper
+    def test_svc_CEM_22032(self):
+            return self.verify_svc_chain(svc_img_name='tiny_nat_fw',
+                                     service_mode='in-network-nat',
+                                     create_svms=True,
+                                     left_vn_name=get_random_name('service-left-vn', ''),
+                                     right_vn_name=get_random_name('service-right-vn', ''))
 

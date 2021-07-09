@@ -608,3 +608,28 @@ class TestRouterSNAT(BaseNeutronTest):
                     (dest_vm_fixture=vm_fixture, mode='scp', size='1000', fip = fip)
         fip_fixture.disassoc_and_delete_fip(fip_id)
         return result
+
+    @test.attr(type=['cb_sanity'])
+    @preposttest_wrapper
+    def test_basic_snat_CEM_22032(self):
+        '''Create an external network and a router
+        set router-gateway to external network
+        launch a private network starting with "service-" keywordand attach it to router
+        validate ftp and ping to 8.8.8.8 from vm here
+        '''
+        vm1_name = get_random_name('vm_private')
+        vn1_name = get_random_name('service-vn', '')
+        vn1_subnets = [get_random_cidr()]
+        self.allow_default_sg_to_allow_all_on_project(self.inputs.project_name)
+        vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
+        vn1_fixture.verify_on_setup()
+        vm1_fixture = self.create_vm(vn1_fixture, vm1_name,
+                                         image_name='ubuntu')
+        vm1_fixture.wait_till_vm_is_up()
+        router_name = get_random_name('router1')
+        router_dict = self.create_router(router_name)
+        router_rsp = self.quantum_h.router_gateway_set(
+                router_dict['id'],
+                self.public_vn_obj.public_vn_fixture.vn_id)
+        self.add_vn_to_router(router_dict['id'], vn1_fixture)
+        assert self.verify_snat(vm1_fixture)
