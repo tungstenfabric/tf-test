@@ -170,3 +170,57 @@ class TestBasicRTFilter(BaseRtFilterTest):
         assert self.verify_dep_rt_entry(active_ctrl_node, user_def_rt, ip1)
         return True
     # end test_dep_routes_two_vns_with_same_rt
+
+    @test.attr(type=['cb_sanity', 'sanity', 'vcenter_compute', 'vcenter'])
+    @preposttest_wrapper
+    def test_rt_CEM_22032(self):
+        '''
+        Description: Validate Advertise of routes across VNs with Service keywords using RTs
+        Test steps:
+                  1. Create a VM in a VN (starting with "service-" keyword).
+                  2. Add a route-target entry to the VN.
+                  3. Check the rt_group and  bgp.rtarget.0 table on the control nodes.
+        Pass criteria: The system-defined, user-defined route target of the VN and the VM IP should
+        be seen in the respective tables.
+        Maintainer : manasd@juniper.net
+        '''
+        vn1_name = get_random_name('service-vn', '')
+        vn1_subnets = [get_random_cidr()]
+        vn1_vm1_name = get_random_name('vm1')
+        vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
+        assert vn1_fixture.verify_on_setup()
+        user_def_rt_num = get_random_rt()
+        user_def_rt = "target:%s:%s" % (
+            self.inputs.router_asn, user_def_rt_num)
+        system_rt = vn1_fixture.rt_names[0]
+        routing_instance = vn1_fixture.ri_name
+        self.logger.info('Will add a user-defined RT to the VN')
+        vn1_fixture.add_route_target(
+            routing_instance, self.inputs.router_asn, user_def_rt_num)
+        sleep(5)
+        rt_list = [user_def_rt, system_rt]
+        for bgp_ip in self.inputs.bgp_ips:
+            for rt in rt_list:
+                assert self.verify_rt_group_entry(bgp_ip, rt)
+        vm1_fixture = self.create_vm(vn1_fixture, vm_name=vn1_vm1_name,
+                                     flavor='contrail_flavor_small', image_name='ubuntu-traffic')
+        assert vm1_fixture.wait_till_vm_is_up()
+        ip = vm1_fixture.vm_ip + '/32'
+        active_ctrl_node = self.get_active_control_node(vm1_fixture)
+        for rt in rt_list:
+            assert self.verify_dep_rt_entry(active_ctrl_node, rt, ip)
+            assert self.verify_rtarget_table_entry(active_ctrl_node, rt)
+        self.logger.info(
+            'Will remove the user-defined RT to the VN and verify that the entry is removed from the tables')
+        vn1_fixture.del_route_target(
+            routing_instance, self.inputs.router_asn, user_def_rt_num)
+        sleep(5)
+        assert self.verify_rt_entry_removal(active_ctrl_node, user_def_rt)
+        self.logger.info(
+            'Will verify that the system generated RT is still seen in the control-nodes')
+        assert self.verify_rt_group_entry(active_ctrl_node, system_rt)
+        assert self.verify_dep_rt_entry(active_ctrl_node, system_rt, ip)
+        assert self.verify_rtarget_table_entry(active_ctrl_node, system_rt)
+        return True
+    # end test_CEM_22032
+
