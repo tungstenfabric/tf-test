@@ -265,8 +265,7 @@ class GWLessFWDTestBase(BaseVrouterTest, ConfigSvcChain):
                     node_name = self.inputs.compute_names[index]
                 elif launch_mode == 'default':
                     node_name=None
-                image_name='cirros'
-                if self.inputs.ns_agilio_vrouter_data:
+                if self.inputs.is_dpdk_cluster or self.inputs.ns_agilio_vrouter_data:
                     image_name = 'ubuntu-traffic'
                 vm_fixture = self.create_vm(vn_objs=vn_fix_obj_list,
                                             port_ids=vmi_fix_uuid_list,
