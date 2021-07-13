@@ -1364,7 +1364,7 @@ class VMFixture(fixtures.Fixture):
                 return False
         return True
 
-    def ping_to_ip(self, ip, intf=None, return_output=False, other_opt='', size='56', count='3', timewait='1', expectation=True):
+    def ping_to_ip(self, ip, intf=None, return_output=False, other_opt='', size='56', count='3', timewait='1', expectation=True, netns=None):
         """Ping from a VM to an IP specified.
         This method logs into the VM from the host machine using ssh and runs ping test to an IP.
         """
@@ -1392,6 +1392,11 @@ class VMFixture(fixtures.Fixture):
             else:
                 cmd = '%s -I %s -s %s -c %s -W %s %s %s' % (
                       util, intf, str(size), str(count), str(timewait), other_opt, ip
+                )
+
+            if netns is not None:
+                cmd = 'ip netns exec %s %s -s %s -c %s -W %s %s %s' % (
+                      netns, util, str(size), str(count), str(timewait), other_opt, ip
                 )
 
             timeout = int(count) if int(count) > 120 else 120

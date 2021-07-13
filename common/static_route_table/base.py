@@ -184,6 +184,19 @@ class StaticRouteTableBase(BaseNeutronTest):
             self.nw_handle_to_left_objs.append(nw_handle_to_left)
             self.nw_handle_to_right_objs.append(nw_handle_to_right)
     # delete net route table
+
+    def create_and_add_network_static_table_to_vn(self, prefix, next_hop, vn_uuid, multiple_tables=1):
+        nw_handle = self.static_table_handle.create_route_table(
+            prefixes=[prefix],
+            name=get_random_name("network-table-"),
+            next_hop=next_hop,
+            parent_obj=self.project.project_obj,
+            next_hop_type='ip-address',
+            route_table_type='network',
+        )
+        self.static_table_handle.bind_network_route_table_to_vn(
+            vn_uuid, nw_route_table_obj=nw_handle)
+
     def del_nw_route_table(self):
         self.unbind_network_table(self.vn1_fixture, self.vn2_fixture)
         for nw_handle_to_right in self.nw_handle_to_right_objs:
