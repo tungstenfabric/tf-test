@@ -13,7 +13,7 @@ from optparse import OptionParser
 from scapy.data import *
 from scapy.config import conf
 from scapy.utils import PcapReader
-from scapy.all import plist
+from scapy import plist
 from scapy.layers.inet import IP, TCP, UDP, ICMP
 from scapy.layers.inet6 import IPv6, ICMPv6EchoRequest
 
@@ -147,7 +147,7 @@ class CaptureBase(Process):
             return True
         log.debug("Received L3 checksum: %s", l3_chksum)
         del p[IP].chksum
-        p = p.__class__(str(p))
+        p = p.__class__(bytes(p))
         log.debug("Calculated L3 checksum: %s", p[IP].chksum)
         if p[IP].chksum == l3_chksum:
             return True
@@ -161,7 +161,7 @@ class CaptureBase(Process):
             l4_chksum = p[proto].cksum
             del p[proto].cksum
         log.debug("Received L4 checksum: %s", l4_chksum)
-        p = p.__class__(str(p))
+        p = p.__class__(bytes(p))
         try:
             calc_l4_chksum = p[proto].chksum
         except AttributeError:
@@ -322,6 +322,7 @@ class PktListener(object):
         log.debug("Stream L3: %s", self.stream.l3.__dict__)
         if self.stream.l4 is not None:
             log.debug("Stream L4: %s", self.stream.l4.__dict__)
+        
         self.create_listener()
         self.create_sniffer()
         self.pcap = 0

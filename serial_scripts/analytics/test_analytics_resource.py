@@ -741,9 +741,6 @@ class AnalyticsTestSanityWithResource(
         self.res.vn1_vm1_fixture.verify_on_setup()
         self.res.vn2_vm2_fixture.verify_on_setup()
         self.res.fvn_vm1_fixture.verify_on_setup()
-        self.res.vn1_vm1_fixture.install_pkg("Traffic")
-        self.res.vn2_vm2_fixture.install_pkg("Traffic")
-        self.res.fvn_vm1_fixture.install_pkg("Traffic")
 
         self.tx_vm_node_ip = self.res.vn1_vm1_fixture.vm_node_ip
         self.rx_vm_node_ip = self.res.vn2_vm2_fixture.vm_node_ip

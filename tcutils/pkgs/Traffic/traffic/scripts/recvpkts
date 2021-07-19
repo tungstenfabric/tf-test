@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 
 """Module to receive packets.
 """
@@ -64,5 +64,5 @@ def main():
 
 if __name__ == "__main__":
     result = main()
-    print result
+    print(result)
     sys.exit(0)
