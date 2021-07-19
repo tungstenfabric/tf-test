@@ -18,7 +18,7 @@ class TestIngressTLS(BaseK8sTest):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
 
-    @test.attr(type=['k8s_sanity'])
+    @test.attr(type=['k8s_sanity', 'k8s_upgrade'])
     @skip_because(mx_gw = False, slave_orchestrator='kubernetes')
     @preposttest_wrapper
     def test_ingress_tls_1(self):
@@ -50,20 +50,23 @@ class TestIngressTLS(BaseK8sTest):
         self.verify_nginx_pod(pod2)
         assert pod3.verify_on_setup()
 
-        # Now validate ingress from within the cluster network
-        assert self.validate_nginx_lb([pod1, pod2], ingress.cluster_ip,
-                                      test_pod=pod3, protocol='https',
-                                      port='443')
+        def validate():
+            # Now validate ingress from within the cluster network
+            assert self.validate_nginx_lb([pod1, pod2], ingress.cluster_ip,
+                                        test_pod=pod3, protocol='https',
+                                        port='443')
 
-        # Now validate ingress from public network
-        assert self.validate_nginx_lb([pod1, pod2], ingress.external_ips[0],
-                                      protocol='https', port='443')
-        ingress.disable_tls()
-        link = 'https://%s:443' % (ingress.cluster_ip)
-        assert self.validate_wget(pod3, link, expectation=False)
+            # Now validate ingress from public network
+            assert self.validate_nginx_lb([pod1, pod2], ingress.external_ips[0],
+                                        protocol='https', port='443')
+            ingress.disable_tls()
+            link = 'https://%s:443' % (ingress.cluster_ip)
+            assert self.validate_wget(pod3, link, expectation=False)
 
-        # Enable it again
-        ingress.enable_tls()
-        assert self.validate_nginx_lb([pod1, pod2], ingress.external_ips[0],
-                                      protocol='https', port='443')
+            # Enable it again
+            ingress.enable_tls()
+            assert self.validate_nginx_lb([pod1, pod2], ingress.external_ips[0],
+                                        protocol='https', port='443')
+        validate()
+        self.validate_post_upgrade = validate
     # end test_ingress_tls_1

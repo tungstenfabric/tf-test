@@ -232,18 +232,21 @@ class TestService(BaseK8sTest):
 
     # end test_service_scale_up_down
 
-    @test.attr(type=['k8s_sanity'])
+    @test.attr(type=['k8s_sanity', 'k8s_upgrade'])
     @preposttest_wrapper
     def test_kube_dns_lookup(self):
         namespace = self.setup_namespace()
         client_pod = self.setup_busybox_pod(namespace=namespace.name)
         assert client_pod.verify_on_setup()
-        lookup_str = 'nslookup kubernetes.default.svc.cluster.local'
-        output = client_pod.run_cmd(lookup_str)
-        msg = 'DNS resolution failed'
-        assert ('connection timed out' not in output) and ('nslookup: can\'t resolve' not in output), msg
-        self.logger.info('DNS resolution check : %s passed. Output: %s' % (
-            lookup_str, output))
+        def validate():
+            lookup_str = 'nslookup kubernetes.default.svc.cluster.local'
+            output = client_pod.run_cmd(lookup_str)
+            msg = 'DNS resolution failed'
+            assert ('connection timed out' not in output) and ('nslookup: can\'t resolve' not in output), msg
+            self.logger.info('DNS resolution check : %s passed. Output: %s' % (
+                lookup_str, output))
+        validate()
+        self.validate_post_upgrade = validate
     # end test_kube_dns_lookup
 
     @test.attr(type=['openshift_1'])
@@ -311,7 +314,7 @@ class TestServiceExternalIP(BaseK8sTest):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
 
-    @test.attr(type=['k8s_sanity'])
+    @test.attr(type=['k8s_sanity', 'k8s_upgrade'])
     @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_service_with_external_ip(self):
@@ -348,17 +351,20 @@ class TestServiceExternalIP(BaseK8sTest):
         assert pod3.verify_on_setup()
         assert service.verify_on_setup()
 
-        # Now validate load-balancing on the service
-        assert self.validate_nginx_lb([pod1, pod2], service.cluster_ip,
-                                      test_pod=pod3)
+        def validate():
+            # Now validate load-balancing on the service
+            assert self.validate_nginx_lb([pod1, pod2], service.cluster_ip,
+                                        test_pod=pod3)
 
-        # When Isolation enabled we need to change SG to allow traffic
-        # from outside. For that we need to disiable service isolation
-        if self.setup_namespace_isolation:
-            namespace.disable_service_isolation()
+            # When Isolation enabled we need to change SG to allow traffic
+            # from outside. For that we need to disiable service isolation
+            if self.setup_namespace_isolation:
+                namespace.disable_service_isolation()
 
-        # Now validate ingress from public network
-        assert self.validate_nginx_lb([pod1, pod2], service.external_ips[0])
+            # Now validate ingress from public network
+            assert self.validate_nginx_lb([pod1, pod2], service.external_ips[0])
+        validate()
+        self.validate_post_upgrade = validate
     # end test_service_with_external_ip
 
 class TestServiceVNIsolated(TestService):
