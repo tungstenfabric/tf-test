@@ -7,7 +7,8 @@ from time import sleep
 from fabric.api import run
 from fabric.operations import put
 from fabric.context_managers import settings, hide
-from tcutils.fabutils import remote_cmd
+from tcutils.fabutils import remote_cmd,remote_copy
+from tcutils.util import get_random_name
 
 try:
     # Running from the source repo "test".
@@ -70,15 +71,24 @@ class Helper(object):
                          password=self.rhost.password, logger=self.log, tries=retry)
         self.log.debug(output)
         return output
+    
+    def copy_file_to_vm(self, localfile):
+        dest_dir = '%s@%s:/tmp/' % (self.rhost.user, self.rhost.ip)
+        dest_gw_login = "%s@%s" % (self.lhost.user, self.lhost.ip)
+        remote_copy(localfile, dest_dir, dest_password=self.rhost.password,
+                    dest_gw=dest_gw_login, dest_gw_password=self.lhost.password, logger=self.log)
 
+        
 class Sender(Helper):
 
     def __init__(self, name, profile, lhost, rhost, log=LOG):
         super(Sender, self).__init__(lhost, rhost, log)
         self.name = name
         self.pktheader = profile.stream.all_fields
-        # Pickle the profile object, so that it can be sent across network.
-        self.profile = create(profile)
+        # Pickle the profile object to  a file.
+        file = '%s.pkl'%get_random_name(profile.listener)
+        self.profile = create(profile, file)
+        self.copy_file_to_vm(self.profile)
         # Initialize the packet sent/recv count
         self.sent = None
         self.recv = None
@@ -128,7 +138,9 @@ class Receiver(Helper):
         super(Receiver, self).__init__(lhost, rhost, log)
         self.name = name
         # Pickle the profile object, so that it can be sent across network.
-        self.profile = create(profile)
+        file = '%s.pkl'%get_random_name(profile.listener)
+        self.profile = create(profile, file)
+        self.copy_file_to_vm(self.profile)
         # Initialize the packet recv count
         self.recv = None
         self.corrupt = None

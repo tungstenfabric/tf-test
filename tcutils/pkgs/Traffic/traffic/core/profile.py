@@ -4,7 +4,7 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-from pickle import dumps, loads
+from pickle import dump, loads
 
 try:
     # Running from the source repo "test".
@@ -24,26 +24,24 @@ log = get_logger(name=LOGGER, level=LOG_LEVEL)
 ENCRYPT = [("\n", "#"), (" ", "@"), ("(", "{"), ("'", "}")]
 
 
-def create(obj):
-    """Creates the string representation of the profile object.
+def create(profile,f):
+    """Dump object to picklefile.
     Which can be passed as command line argument to the sendpkts/recvpkts
     scripts that are run in another machine(VM, Host).
     """
-    objs = dumps(obj)
-    for actual, encrypt in ENCRYPT:
-        objs = objs.replace(actual.encode(), encrypt.encode())
-    return "\"%s\"" % objs
+    
+    with open('/tmp/%s'%f, 'wb') as pickle_file:
+        dump(profile, pickle_file)
+        return pickle_file.name
 
-
-def load(objs):
-    """Converts the string representation of the profile object to Object.
+def load(f):
+    """Load from pickle_file.
     Which will be used by the listener and generator modules in another
     Machine(VM , Host).
     """
-    ENCRYPT.reverse()
-    for actual, encrypt in ENCRYPT:
-        objs = objs.replace(encrypt, actual)
-    return loads(objs)
+    
+    with open(f, 'rb') as pickle_file:
+        return loads(pickle_file.read())
 
 
 class StandardProfile(object):
