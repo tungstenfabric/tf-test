@@ -179,6 +179,7 @@ class TestEncapCases(base.BaseEncapTest):
         return True
     # end test_encaps_mx_gateway
 
+    @skip_because(dpdk_cluster=True)
     @test.attr(type=[ 'serial', 'sanity', 'vcenter' ])
     @preposttest_wrapper
     def test_apply_policy_fip_on_same_vn_gw_mx(self):
