@@ -118,7 +118,7 @@ failure_threshold=''
 contrail_fab_path='/opt/contrail/utils'
 export SCRIPT_TS=${SCRIPT_TS:-$(date +"%Y_%m_%d_%H_%M_%S")}
 
-if ! options=$(getopt -o pVNnfuUsthdC:lLmF:T:c: -l test-failure-threshold:,prepare,virtual-env,no-virtual-env,no-site-packages,force,upgrade,update,upload,sanity,parallel,help,debug,config:,logging,logging-config,send-mail,features:,tags:,concurrency:,contrail-fab-path: -- "$@")
+if ! options=$(getopt -o pVNnfuUsthdC:lLmF:T:c: -l test-failure-threshold:,prepare,virtual-env,no-virtual-env,no-site-packages,force,upgrade,k8s_upgrade,update,upload,sanity,parallel,help,debug,config:,logging,logging-config,send-mail,features:,tags:,concurrency:,contrail-fab-path: -- "$@")
 then
     # parse error
     usage
@@ -137,6 +137,7 @@ while [ $# -gt 0 ]; do
     -f|--force) force=1;;
     -u|--update) update=1;;
     --upgrade) upgrade=1; debug=1; tags="upgrade";;
+    --k8s_upgrade) upgrade=1; debug=1; tags="k8s_upgrade";;
     -U|--upload) upload=1;;
     -d|--debug) debug=1;;
     -C|--config) config_file=$2; shift;;

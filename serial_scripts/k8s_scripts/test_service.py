@@ -179,15 +179,18 @@ class TestService(BaseK8sTest):
         self.restart_vrouter_agent()
         self.common_checks_for_nodeport_service(svc, pds)
 
-    @test.attr(type=['k8s_sanity'])
+    @test.attr(type=['k8s_sanity', 'k8s_upgrade'])
     @skip_because(slave_orchestrator='kubernetes')
     @preposttest_wrapper
     def test_kube_manager_restart_with_nodeport_services(self):
         (svc,pds) = self.common_setup_for_nodeport()
-        self.common_checks_for_nodeport_service(svc, pds)
-        # Restart Kube manager
-        self.restart_kube_manager()
-        self.common_checks_for_nodeport_service(svc, pds)
+        def validate():
+            self.common_checks_for_nodeport_service(svc, pds)
+            # Restart Kube manager
+            self.restart_kube_manager()
+            self.common_checks_for_nodeport_service(svc, pds)
+        validate()
+        self.validate_post_upgrade = validate
 
     @preposttest_wrapper
     def test_reboot_slaves_with_nodeport_services(self):

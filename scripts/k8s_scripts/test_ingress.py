@@ -20,7 +20,7 @@ class TestIngressClusterIp(BaseK8sTest):
         parallelCleanupCandidates = ["PodFixture"]
         self.delete_in_parallel(parallelCleanupCandidates)
 
-    @test.attr(type=['ci_k8s_sanity', 'k8s_sanity'])
+    @test.attr(type=['ci_k8s_sanity', 'k8s_sanity', 'k8s_upgrade'])
     @preposttest_wrapper
     def test_ingress_ip_assignment(self):
         '''
@@ -70,9 +70,12 @@ class TestIngressClusterIp(BaseK8sTest):
         self.verify_nginx_pod(pod2)
         assert pod3.verify_on_setup()
 
-        # Now validate ingress from within the cluster network
-        assert self.validate_nginx_lb([pod1, pod2], ingress.cluster_ip,
-                                      test_pod=pod3)
+        def validate():
+            # Now validate ingress from within the cluster network
+            assert self.validate_nginx_lb([pod1, pod2], ingress.cluster_ip,
+                                        test_pod=pod3)
+        validate()
+        self.validate_post_upgrade = validate
     # end test_ingress_ip_assignment
 
 class TestIngress(BaseK8sTest):
