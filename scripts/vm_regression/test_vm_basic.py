@@ -53,7 +53,7 @@ class TestBasicVMVN(BaseVnVmTest):
             Maintainer: sandipd@juniper.net
         '''
         result = False
-        mtries = 3
+        mtries = 10
         gvrouter_cfg_obj = self.api_s_inspect.get_global_vrouter_config()
         ln_svc = gvrouter_cfg_obj.get_link_local_service()
         assert ln_svc, "Metadata NOT configured in global_vrouter_config"
