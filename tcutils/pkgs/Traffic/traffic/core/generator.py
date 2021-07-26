@@ -338,7 +338,7 @@ class PktGenerator(object):
     def __init__(self, params):
         self.params = params
         self.profile = load(params.profile)
-        log.debug("Profile: %s", self.profile.__dict__)
+        log.debug("Profile: %s", self.profile)
 
     def handler(self, signum, frame):
         self.generator.stop()
