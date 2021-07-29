@@ -7,11 +7,18 @@ from k8s.service import ServiceFixture
 from tcutils.wrappers import preposttest_wrapper
 from tcutils.util import get_lock
 import test
+from vm_test import VNFixture
+from floating_ip import FloatingIPFixture
+import time
+from tcutils.util import get_random_cidr
+from contrailapi import ContrailVncApi
+import common.static_route_table.base
+from scripts.routing_policy.base import RPBase
 from tcutils.util import get_random_name
 
 
 
-class TestService(BaseK8sTest):
+class TestService(BaseK8sTest, RPBase):
 
     @classmethod
     def setUpClass(cls):
@@ -135,6 +142,93 @@ class TestService(BaseK8sTest):
         # Now validate ingress from public network
         assert self.validate_nginx_lb([pod1, pod2], service.external_ips[0])
     # end test_service_with_type_loadbalancer
+
+    @preposttest_wrapper
+    def test_cem20907(self):
+        ''' Create a service type loadbalancer with 2 pods running nginx
+            Create a third busybox pod and validate that webservice is
+            load-balanced. Create a static route and check if route gets deleted from vrf
+            Validate that webservice is load-balanced from outside network
+            Please make sure BGP multipath and per packer load balancing
+            is enabled on the MX
+        '''
+        app = 'http_test'
+        labels = {'app': app}
+        namespace = self.setup_namespace()
+
+        service = self.setup_http_service(namespace=namespace.name,
+                                          labels=labels, type='LoadBalancer')
+        pod1 = self.setup_nginx_pod(namespace=namespace.name,
+                                    labels=labels)
+        pod2 = self.setup_nginx_pod(namespace=namespace.name,
+                                    labels=labels)
+        if not getattr(self.public_vn, 'public_vn_fixture', None):
+            vn_fixture = self.useFixture(VNFixture(
+                                               vn_name='accesspublic',
+                                               connections=self.connections,
+                                               inputs=self.inputs,
+                                               router_external=True,
+                                               option="contrail"))
+            assert vn_fixture.verify_on_setup()
+            fip_pool_fixture = self.useFixture(FloatingIPFixture(
+                                            inputs=self.inputs,
+                                            connections=self.connections,
+                                            pool_name='__fip_pool_public__',
+                                            vn_id=vn_fixture.vn_id))
+            assert fip_pool_fixture.verify_on_setup()
+
+        vn1_dict = {"domain": 'default-domain',
+            "project" : 'k8s-default',
+            "name": 'accesspublic'
+           }
+        pod3 = self.setup_busybox_pod(namespace=namespace.name, custom_isolation=True, fq_network_name=vn1_dict)
+
+        assert self.verify_nginx_pod(pod1)
+        assert self.verify_nginx_pod(pod2)
+        assert pod3.verify_on_setup()
+        assert service.verify_on_setup()
+
+        # When Isolation enabled we need to change SG to allow traffic
+        # from outside. For that we need to disiable service isolation
+        if self.setup_namespace_isolation:
+            namespace.disable_service_isolation()
+
+        # Now validate ingress from public network
+        assert self.validate_nginx_lb([pod1, pod2], service.external_ips[0])
+
+        self.static_table_handle = ContrailVncApi(self.vnc_lib, self.logger)
+        random_cidr = get_random_cidr()
+        self.nw_handle_to_right = self.static_table_handle.create_route_table(
+                prefixes=[random_cidr],
+                name="network_table_public_access",
+                next_hop=pod3.pod_ip,
+                parent_obj=self.project.project_obj,
+                next_hop_type='ip-address',
+                route_table_type='network',
+            )
+        self.static_table_handle.bind_network_route_table_to_vn(
+                vn_uuid=vn_fixture.uuid,
+                nw_route_table_obj=self.nw_handle_to_right)
+
+        config_dicts = {'vn_fixture':vn_fixture, 'from_term':'protocol', 'sub_from':'static', 'to_term':'community', 'sub_to':self.inputs.inputs.community_on_mx_k8s}
+        rp = self.configure_term_routing_policy(config_dicts)
+
+        found_in_vrf = True
+        self.logger.info('Lets wait for 1 hour if route is found, if not, fail')
+        for i in range(0,240):
+            found_in_vrf = False
+            for cn in self.inputs.bgp_control_ips:
+                cn_entries = self.cn_inspect[cn].get_cn_route_table_entry(prefix=[random_cidr][0][:-3],table="inet.0",ri_name=vn_fixture.ri_name)
+                if cn_entries:
+                    found_in_vrf = True
+            time.sleep(20)
+            if not found_in_vrf:
+                break
+        self.static_table_handle.unbind_vn_from_network_route_table(vn_fixture.uuid, self.nw_handle_to_right)
+        self.static_table_handle.delete_network_route_table(self.nw_handle_to_right.uuid)
+        assert found_in_vrf,"Route was not found in vrf during wait time period. Please check cem-20907"
+
+    # end test
 
     @test.attr(type=['openshift_1', 'ci_openshift'])
     @preposttest_wrapper
