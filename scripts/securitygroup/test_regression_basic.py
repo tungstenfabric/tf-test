@@ -7,6 +7,7 @@ from vnc_api.vnc_api import NoIdError
 from vn_test import VNFixture
 from vm_test import VMFixture
 import os
+import time
 import sys
 import test
 from tcutils.util import get_random_name, get_random_cidrs, set_attr
@@ -152,7 +153,14 @@ class SecurityGroupBasicRegressionTests1(BaseSGTest, VerifySecGroup, ConfigPolic
 
         #TCP test, should pass
         nc_options = '' if self.inputs.get_af() == 'v4' else '-6'
-        assert vm1_fixture.nc_file_transfer(vm2_fixture, nc_options=nc_options)
+        tcp_test=False
+        for i in range(10):
+            tcp_test = vm1_fixture.nc_file_transfer(vm2_fixture,
+                                                    nc_options=nc_options)
+            if tcp_test is True:
+                break
+            time.sleep(12)
+        assert tcp_test, 'Failed at TCP test with netcat'
 
         proto = '1' if self.inputs.get_af() == 'v4' else '58'
         rule = [{'protocol': proto,
