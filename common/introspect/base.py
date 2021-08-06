@@ -98,7 +98,7 @@ class BaseIntrospectSsl(GenericTestBase):
         '''
             delete cert file on node or container
         '''
-        cmd = "rm %s" % (file)
+        cmd = "rm %s > /dev/null 2>&1" % (file)
         self.inputs.run_cmd_on_server(
             host_ip,
             cmd,

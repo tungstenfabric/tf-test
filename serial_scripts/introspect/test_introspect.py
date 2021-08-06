@@ -89,8 +89,20 @@ class IntrospectSslTest(BaseIntrospectSsl):
         url_http = 'http://%s:%s' % (host_name, port)
         output_http = self.get_url_and_verify(url_http, agent_inspect)
 
-        assert (self.create_agent_certs_and_update_on_compute(host_ip,
-            subject='/', ssl_enable='true') == False)
+        self.create_agent_certs_and_update_on_compute(host_ip,
+            subject='/', ssl_enable='true')
+        http_ok = https_ok = True
+        try:
+            url = 'http://%s:%s' % (host_name, port)
+            self.get_url_and_verify(url, agent_inspect, exp_out=output_http)
+        except Exception as err:
+            http_ok = False
+        try:
+            url = 'https://%s:%s' % (host_name, port)
+            self.get_url_and_verify(url, agent_inspect, exp_out=output_http)
+        except Exception as err:
+            https_ok = False
+        assert not http_ok and not https_ok, "vRouter agent expected to be down"
 
         subjectAltName = 'IP:%s,DNS:%s,DNS:%s' % (host_ip, host_fqname, host_name)
         assert self.create_agent_certs_and_update_on_compute(host_ip,
