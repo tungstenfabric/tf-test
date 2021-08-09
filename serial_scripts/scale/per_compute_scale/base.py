@@ -339,6 +339,8 @@ class BaseComputeScale(GenericTestBase):
                 return True, None
             vmi = vmis[0]['uuid']
             vmi = self.vnc_lib.virtual_machine_interface_read(id=vmi)
+            if not vmi.virtual_machine_interface_bindings:
+                return True, None
             for item in vmi.virtual_machine_interface_bindings.get_key_value_pair():
                 if item.key == 'host_id':
                     compute = item.value
@@ -435,11 +437,115 @@ class BaseComputeScale(GenericTestBase):
         assert ret, msg
         self.logger.info('all sgs rules synced to compute')
 
-    def create_networks(self, nr, start_index=1, name_prefix='VN'):
+    @retry(tries=12, delay=5)
+    def _verify_snat_is_active(self, snat_id):
+        svc_mon = self.connections.get_svc_mon_h()
+        snat = self.vnc_lib.logical_router_read(id=snat_id)
+        si = snat.get_service_instance_refs()
+        if not si:
+            return False, "snat %s no service instance found" % snat.name
+        ret = svc_mon.get_service_instance(si[0]['to'][-1], refresh=True)
+        if not ret or not ret.is_launched():
+            return False, "snat %s not active" % snat.name
+        return True, None
+
+    def create_snat(self, name, public_vn, private_vn):
+        self.logger.info('create SNAT: %s' % name)
+        router = self.create_router(name)
+        router_rsp = self.quantum_h.router_gateway_set(router['id'], public_vn.vn_id)
+        self.add_vn_to_router(router['id'], private_vn)
+        ret, msg = self._verify_snat_is_active(router['id'])
+        assert ret, msg
+
+    def delete_fake_vm(self, fake):
+        self.logger.info('deleting fake vm %s' % fake['name'])
+        if fake.get('vmi_id'):
+            cmds = 'vrouter-port-control --oper=delete --uuid=%s'%fake['vmi_id']
+            self.inputs.run_cmd_on_server(fake['compute'], cmds, container='agent')
+        cmds = []
+        cmds.append('ip netns exec %s ip link delete dev %s-1' % (fake['name'], fake['name']))
+        cmds.append('ip netns delete %s' % fake['name'])
+        cmds = ';'.join(cmds)
+        self.inputs.run_cmd_on_server(fake['compute'], cmds)
+        if fake.get('iip_id'):
+            self.vnc_lib.instance_ip_delete(id=fake['iip_id'])
+        if fake.get('vmi_id'):
+            self.vnc_lib.virtual_machine_interface_delete(id=fake['vmi_id'])
+        if fake.get('id'):
+                self.vnc_lib.virtual_machine_delete(id=fake['id'])
+
+    def create_fake_vm(self, vn, compute_ip, vm_name):
+        gw = vn.api_vn_obj.get_network_ipam_refs()[0]['attr'].get_ipam_subnets()[0].get_default_gateway()
+        prefix_len = vn.api_vn_obj.get_network_ipam_refs()[0]['attr'].get_ipam_subnets()[0].get_subnet().ip_prefix_len
+        fake_vm = {'name': vm_name, 'compute': compute_ip}
+        self.addCleanup(self.delete_fake_vm, fake_vm)
+        self.logger.info('creating FAKE-VM: %s' % fake_vm['name'])
+
+        vm_obj = VirtualMachine(vm_name)
+        vm_id = self.vnc_lib.virtual_machine_create(vm_obj)
+        vm_obj = self.vnc_lib.virtual_machine_read(id=vm_id)
+        fake_vm['id'] = vm_id
+
+        sg_obj = self.vnc_lib.security_group_read(fq_name=self.project.project_fq_name+['default'])
+        port_obj = VirtualMachineInterface(vm_name,
+                        fq_name=self.project.project_fq_name+[vm_name],
+                        parent_type='project')
+        port_obj.add_virtual_network(vn.api_vn_obj)
+        port_obj.add_virtual_machine(vm_obj)
+        port_obj.add_security_group(sg_obj)
+        vmi_id = self.vnc_lib.virtual_machine_interface_create(port_obj)
+        port_obj = self.vnc_lib.virtual_machine_interface_read(id=vmi_id)
+        fake_vm['vmi_id'] = vmi_id
+
+        iip_obj = InstanceIp(name=vm_name)
+        iip_obj.add_virtual_network(vn.api_vn_obj)
+        iip_obj.add_virtual_machine_interface(port_obj)
+        iip_id = self.vnc_lib.instance_ip_create(iip_obj)
+        iip_obj = self.vnc_lib.instance_ip_read(id=iip_id)
+        fake_vm['iip_id'] = iip_id
+
+        mac_addr = port_obj.virtual_machine_interface_mac_addresses.mac_address[0]
+        fake_vm['ip'] = ip_addr = iip_obj.instance_ip_address
+        cmds = []
+        cmds.append('ip netns add %s'%vm_name)
+        cmds.append('ip link add %s-1 type veth peer name %s-2' % (vm_name, vm_name))
+        cmds.append('ip link set %s-1 netns %s' % (vm_name, vm_name))
+        cmds.append('ip netns exec %s ip link set dev %s-1 address %s' % (vm_name, vm_name, mac_addr))
+        cmds.append('ip netns exec %s ip addr add %s/%d dev %s-1' % (vm_name, ip_addr, prefix_len, vm_name))
+        cmds.append('ip netns exec %s ip link set dev %s-1 up' % (vm_name, vm_name))
+        cmds.append('ip netns exec %s ip route add default via %s' % (vm_name, gw))
+        cmds.append('ip link set dev %s-2 up' % vm_name)
+        cmds = ';'.join(cmds)
+        output = self.inputs.run_cmd_on_server(compute_ip, cmds)
+        port_ctrl = 'vrouter-port-control --tx_vlan_id=-1 --rx_vlan_id=-1'
+        port_ctrl += ' --ipv6_address="" --port_type=NovaVMPort'
+        port_ctrl += ' --vif_type=Vrouter --vm_project_uuid=%s'%self.connections.get_project_id()
+        cmds = '%s --oper=add --uuid=%s --instance_uuid=%s --vn_uuid=%s --ip_address=%s\
+                    --vm_name=%s --mac=%s --tap_name=%s-2'%(port_ctrl, port_obj.uuid, vm_obj.uuid,
+                    vn.vn_id, ip_addr, vm_obj.name, mac_addr, vm_name)
+        self.inputs.run_cmd_on_server(compute_ip, cmds, container='agent')
+        return fake_vm
+
+    def verify_fake_vm_ping(self, to_vm, from_vm):
+        cmd = 'ip netns exec %s ping -c 10 %s | grep loss' % (from_vm['name'], to_vm['ip'])
+        output = self.inputs.run_cmd_on_server(from_vm['compute'], cmd)
+        match = re.match(r'.* ([0-9]+)% packet loss', output)
+        if not match:
+            return False, 'unable to process output'
+        cnt = int(match.groups()[0])
+        if cnt == 100:
+            return False, 'ping test failed'
+        if cnt > 10:
+            self.logger.info('ping test had %d packet loss' % cnt)
+        self.logger.info('ping from %s to %s works' % (from_vm['name'], to_vm['name']))
+        return True, None
+
+    def create_networks(self, nr, start_index=1, name_prefix='VN', public=False):
         try:
             for i in range(start_index, start_index + nr):
                 vn_fixture = self.create_vn(vn_name=name_prefix + str(i),
-                                  vn_subnets=[get_random_cidr(mask=16)])
+                                  vn_subnets=[get_random_cidr(mask=16)],
+                                  router_external=public)
                 vn_fixture.read()
                 self.logger.info("created VN: %s (%s)"%(vn_fixture.vn_name,
                         vn_fixture.uuid))
