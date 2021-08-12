@@ -129,6 +129,49 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             spec=spec))
     # end setup_http_service
 
+    def setup_ssh_service(self,
+                           name=None,
+                           namespace='default',
+                           labels=None,
+                           metadata=None,
+                           spec=None,
+                           type=None,
+                           external_ips=None,
+                           frontend_port=22,
+                           nodePort=None,
+                           backend_port=22):
+        '''
+        A simple helper method to create a ssh webservice
+        '''
+        metadata = metadata or {}
+        spec = spec or {}
+        name = name or get_random_name('ssh-webservice')
+        metadata.update({'name': name})
+        selector_dict = {}
+        labels = labels or {}
+        d1 =  {'protocol': 'TCP','port': int(frontend_port),'targetPort': int(backend_port) }
+        if nodePort:
+            d1['nodePort'] = int(nodePort)
+        spec.update({
+            'ports': [d1]
+        })
+        if labels:
+            selector_dict = {'selector': labels}
+            spec.update(selector_dict)
+        if type:
+            type_dict = {'type': type}
+            spec.update(type_dict)
+        if external_ips:
+            external_ips_dict = {'external_i_ps': external_ips}
+            spec.update(external_ips_dict)
+        return self.useFixture(ServiceFixture(
+            connections=self.connections,
+            name=name,
+            namespace=namespace,
+            metadata=metadata,
+            spec=spec))
+    # end setup_ssh_service
+
     def setup_simple_nginx_ingress(self,
                                    service_name,
                                    name=None,
@@ -290,6 +333,75 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                 pod.name))
         return result
     # end verify_nginx_pod
+
+    def setup_ssh_webserver_pod(self,
+                          name=None,
+                          namespace='default',
+                          metadata=None,
+                          spec=None,
+                          labels=None,
+                          custom_isolation = False,
+                          fq_network_name = {},
+                          compute_node_selector=None):
+        metadata = metadata or {}
+        spec = spec or {}
+        labels = labels or {}
+        name = name or get_random_name('ssh-webserver')
+        spec = spec or {
+            'containers': [
+                {'image': 'mmumshad/ubuntu-ssh-enabled',
+                 'image_pull_policy': 'IfNotPresent',
+                 }
+            ],
+            'restart_policy': 'Always',
+        }
+        if compute_node_selector:
+           spec['node_selector'] = compute_node_selector
+
+        return self.setup_pod(name=name,
+                              namespace=namespace,
+                              metadata=metadata,
+                              spec=spec,
+                              labels=labels,
+                              shell='/bin/sh',
+                              custom_isolation = custom_isolation,
+                              fq_network_name = fq_network_name)
+    # end setup_ssh_webserver_pod
+
+    def setup_ssh_client_pod(self,
+                          name=None,
+                          namespace='default',
+                          metadata=None,
+                          spec=None,
+                          labels=None,
+                          custom_isolation = False,
+                          fq_network_name = {},
+                          compute_node_selector=None):
+        metadata = metadata or {}
+        spec = spec or {}
+        labels = labels or {}
+        name = name or get_random_name('ssh-client')
+        spec = spec or {
+            'containers': [
+                {'image': 'rsalian/centos-sshpass',
+                 'command': ['sleep', '1000000'],
+                 'image_pull_policy': 'IfNotPresent',
+                 }
+            ],
+            'restart_policy': 'Always',
+        }
+        if compute_node_selector:
+           spec['node_selector'] = compute_node_selector
+
+        return self.setup_pod(name=name,
+                              namespace=namespace,
+                              metadata=metadata,
+                              spec=spec,
+                              labels=labels,
+                              shell='/bin/sh',
+                              custom_isolation = custom_isolation,
+                              fq_network_name = fq_network_name)
+    # end setup_ssh_client_pod
 
     def setup_busybox_pod(self,
                           name=None,
@@ -976,6 +1088,54 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                                      spec=spec)
     # end setup_nginx_deployment
 
+    def setup_ssh_webserver_deployment(self,
+                               name=None,
+                               namespace='default',
+                               replicas=1,
+                               pod_labels=None,
+                               container_port=22,
+                               metadata=None,
+                               spec=None,
+                               template_metadata=None,
+                               template_spec=None):
+
+        metadata = metadata or {}
+        spec = spec or {}
+        pod_labels = pod_labels or {}
+        name = name or get_random_name('ssh-webserver-dep')
+        template_metadata = template_metadata or {}
+
+        if pod_labels:
+            template_metadata['labels'] = template_metadata.get('labels', {})
+            template_metadata['labels'].update(pod_labels)
+        template_spec = template_spec or {
+            'containers': [
+                {'image': 'mmumshad/ubuntu-ssh-enabled',
+                 'image_pull_policy': 'IfNotPresent',
+                 'ports': [
+                     {'container_port': int(container_port)}
+                 ],
+                 }
+            ]
+        }
+        if replicas:
+            spec.update({'replicas': replicas})
+
+            # below mandatory for Openshift_client and as being part of existing spec should work fine for K8s_client also
+            selector_dict = {'match_labels': pod_labels}
+            spec.update({'selector': selector_dict})
+        spec.update({
+            'template': {
+                'metadata': template_metadata,
+                'spec': template_spec
+            }
+        })
+        return self.setup_deployment(name=name,
+                                     namespace=namespace,
+                                     metadata=metadata,
+                                     spec=spec)
+    # end setup_ssh_webserver_deployment
+
     def restart_kube_manager(self, ips=None):
         '''
         Restarts kube-managers
@@ -1002,10 +1162,24 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         '''
         ips = ips or self.inputs.compute_ips
 
-        self.logger.info('Will restart contrail-vrouter-agent  services now on'
+        self.logger.info('Will restart contrail-vrouter-agent services now on'
             ' %s' %(ips))
         self.inputs.restart_service('contrail-vrouter-agent', ips,
                                      container='agent',
+                                     verify_service=True)
+    # end restart_vrouter_agent
+
+    def restart_contrail_control(self, ips=None):
+        '''
+        Restarts vrouter agent
+        If no ips is specified, restarts all control services
+        '''
+        ips = ips or self.inputs.bgp_control_ips
+
+        self.logger.info('Will restart contrail-control services now on'
+            ' %s' %(ips))
+        self.inputs.restart_service('contrail-control', ips,
+                                     container='control',
                                      verify_service=True)
     # end restart_vrouter_agent
 
@@ -1461,4 +1635,104 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             self.logger.error("Pod {} is not in Running or Succeeded state".format(pod.metadata.name))
             return False
         return True
+
+    @retry(delay=2, tries=10)
+    def validate_scp(self, pod, ip, expectation=True, port=22):
+        """
+        Copy python3.5 binary from server pod to client pod.
+        Check if it gets copied.
+        """
+        self.do_scp(pod, ip, port)
+        ls_cmd = 'ls /tmp/python3.5'
+        if not pod:
+            with settings(warn_only=True):
+                output = local(ls_cmd, capture=True)
+        else:
+            output = pod.run_cmd_on_pod(ls_cmd)
+
+        if 'No such file or directory' not in output:
+            rm_cmd = 'rm -rf /tmp/python3.5'
+            if not pod:
+                with settings(warn_only=True):
+                    output = local(rm_cmd, capture=True)
+                    self.logger.info('[local] scp cmd Passed')
+            else:
+                pod.run_cmd_on_pod(rm_cmd)
+                self.logger.info('[Pod %s] scp cmd Passed.' % (pod.name))
+            ret_val = True
+        else:
+            self.logger.info('scp cmd failed.')
+            ret_val = False
+        return ret_val == expectation
+    # end validate_scp
+
+    def do_scp(self, pod, ip, port=22, limit_rate=False):
+        """
+        This function will copy python3.5 binary from server pod to client pod
+        If limit rate is set true then copy will be done very slowly at 1B/s.
+        This will allow us to have flow for longer time so that scale up/down
+        can be tested and we can verify that flow is not deleted.
+        """
+        if limit_rate:
+            cmd = "sshpass -p Passw0rd scp -l 1 -o StrictHostKeyChecking=no "\
+                    "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
+                    "root@%s:/usr/bin/python3.5 /tmp/ > /dev/null 2>&1 &" %(port, ip)
+        else:
+            cmd = "sshpass -p Passw0rd scp -o StrictHostKeyChecking=no "\
+                    "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
+                    "root@%s:/usr/bin/python3.5 /tmp/" % (port, ip)
+        if not pod:
+            with settings(warn_only=True):
+                output = local(cmd, capture=True)
+        else:
+            output = pod.run_cmd_on_pod(cmd)
+    # end do_scp
+
+    @retry(delay=2, tries=10)
+    def validate_ssh(self, pod=None, expectation=True):
+        """
+        Verify that ssh connection is not broken
+        """
+        cmd = "ps auxww"
+        output = None
+        if not pod:
+            with settings(warn_only=True):
+                output = local(cmd, capture=True)
+        else:
+            output = pod.run_cmd_on_pod(cmd)
+        return expectation == ('ssh -x' in output)
+    # end validate_ssh
+
+    def validate_ecmp_flow(self, compute_ip_list, service_ip, client_ip, port=22):
+        cmd = "contrail-tools flow --match %s:%s,%s" %(service_ip, port, client_ip)
+        for compute_ip in compute_ip_list:
+            output = self.inputs.run_cmd_on_server(compute_ip, cmd)
+            assert service_ip in output, ("Flow not present for %s" %service_ip)
+            if 'E:' in output:
+                self.logger.info("Ecmp flow present for %s" %service_ip)
+                return True
+        self.logger.info("Ecmp flow not present")
+        return False
+
+    def get_ecmp_index(self, compute_ip_list, service_ip, client_ip, port=22):
+        cmd = "contrail-tools flow --match %s:%s,%s" %(service_ip, port, client_ip)
+        for compute_ip in compute_ip_list:
+            output = self.inputs.run_cmd_on_server(compute_ip, cmd)
+            assert service_ip in output, ("Flow not present for %s" %service_ip)
+            if 'E:' in output:
+                ecmp_index = output.split('E:')[1].split(',')[0]
+                self.logger.info("Ecmp flow present for %s" %service_ip)
+                return ecmp_index
+        return -1
+
+    def get_ecmp_flow_index(self, compute_ip_list, service_ip, client_ip, port=22):
+        cmd = "contrail-tools flow --match %s:%s,%s | grep '<=>' | awk '{print $1}'"\
+                                %(service_ip, port, client_ip)
+        for compute_ip in compute_ip_list:
+            output = self.inputs.run_cmd_on_server(compute_ip, cmd)
+            if (output and self.validate_ecmp_flow(compute_ip_list, service_ip, client_ip)):
+                flow_index = output.split("<=>")[0]
+                self.logger.info("Flow index for %s is %s" %(service_ip, flow_index))
+                return flow_index
+        return -1
 
