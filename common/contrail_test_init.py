@@ -709,6 +709,7 @@ class TestInputs(with_metaclass(Singleton, object)):
             scale_conf = test_configs['scale_config']
             self.control_node_vrf_scale = scale_conf.get('control_node_vrf_scale')
             self.compute_node_vrf_scale = scale_conf.get('compute_node_vrf_scale')
+            self.compute_node_snat_scale= scale_conf.get('compute_node_snat_scale')
             self.vm_scale = scale_conf.get('vm_scale')
 
         self._parse_fabric(test_configs.get('fabric'))

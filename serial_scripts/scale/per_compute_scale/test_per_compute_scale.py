@@ -21,6 +21,7 @@ class TestPerComputeScale(BaseComputeScale):
         min_rules = 1000
         last_tested = 1300
         for nr in range(min_rules, 2000, 100):
+            self.logger.info('testing with %d rules SG' % nr)
             try:
                 self.create_security_groups(port_range=[0,nr,1])
                 self.apply_sgs_to_vms()
@@ -51,6 +52,7 @@ class TestPerComputeScale(BaseComputeScale):
         min_rules = 1000
         last_tested = 1200
         for nr in range(min_rules, 2000, 100):
+            self.logger.info('testing with %d rules NP' % nr)
             try:
                 self.create_network_policys(port_partition=nr)
                 max_rules = len(self.nps[0].get_network_policy_entries().policy_rule)
@@ -144,6 +146,7 @@ class TestPerComputeScale(BaseComputeScale):
 
         def get_max_nps_per_vn(test, nr_rules, min_nps, max_nps, step):
             ret = 0
+            self.logger.info('testing with %d rules NP' % nr_rules)
             for nr in range(min_nps, max_nps, step):
                 idx = len(test.vns)
                 try:
@@ -451,3 +454,38 @@ class TestPerComputeScale(BaseComputeScale):
         self.run_hping(self.vms[0], self.vms[1:],
             "test with 100 SG & NP with 1K rules",
             base_port_range=(port, port+75))
+
+    @preposttest_wrapper
+    def test_max_snat_per_vrouter(self):
+        '''
+        Verify maximum number of SNAT per vrouter
+        1. create a public & private VN
+        2. create a SNAT router & associate VNs
+        3. create fake vm on both the VNs
+        4. check ping from private to public
+        5. iterate steps 1-4
+        '''
+        if len(self.inputs.compute_ips) > 1:
+            raise self.skipTest(
+                "Skipping Test. Testbed should have only one compute")
+
+        max_snat = 0
+        last_tested = self.inputs.compute_node_snat_scale or 1000
+        compute_ip = self.inputs.compute_ips[0]
+        for i in range(last_tested):
+            try:
+                idx = i + 1
+                self.create_networks(nr=1, start_index=idx, name_prefix='pub', public=True)
+                self.create_networks(nr=1, start_index=idx, name_prefix='prv')
+                self.create_snat('SNAT%d' % idx, self.vns[-2], self.vns[-1])
+                pub_vm = self.create_fake_vm(self.vns[-2], compute_ip, vm_name='pub%d' % idx)
+                priv_vm = self.create_fake_vm(self.vns[-1], compute_ip, vm_name='prv%d' % idx)
+                ret, msg = self.verify_fake_vm_ping(pub_vm, priv_vm)
+                assert ret, msg
+                max_snat = idx
+            except Exception as err:
+                self.logger.warn(err)
+                break
+        self.logger.info('SCALE-RESULTS: max %d snat per vrouter' % max_snat)
+        assert max_snat >= last_tested, \
+               'failed to scale %d snat per vrouter' % last_tested
