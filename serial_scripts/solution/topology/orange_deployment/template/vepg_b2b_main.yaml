@@ -768,9 +768,8 @@ resources:
       availability_zone: kernel-computes
       config_drive: 'true'
       user_data_format: RAW
-      personality: { /config/junos-config/configuration.txt: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vrp31_config.txt } }
       flavor: VRP-NODE 
-      image: VRP-IMAGE 
+      image: VRP31-IMAGE 
       name: EPG-B2B-VRP-31
       networks:
       - port: {get_resource: vmi_vrp-31_fxp0}
@@ -890,9 +889,8 @@ resources:
       availability_zone: kernel-computes
       config_drive: 'true'
       user_data_format: RAW
-      personality: { /config/junos-config/configuration.txt: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vrp32_config.txt } }
       flavor: VRP-NODE 
-      image: VRP-IMAGE 
+      image: VRP32-IMAGE 
       name: EPG-B2B-VRP-32
       networks:
       - port: {get_resource: vmi_vrp-32_fxp0}
@@ -1017,10 +1015,8 @@ resources:
       availability_zone: kernel-computes
       config_drive: 'true'
       user_data_format: RAW
-      personality: { /config/junos-config/configuration.txt: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo1_config.txt },
-                     /config/junos-config/commit_config.sh: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo1_commit.sh } }
       flavor: VSFO-CP-NODE
-      image: VSFO-CP-IMAGE
+      image: VSFO-CP1-IMAGE
       name: EPG-B2B-VSFO-1
       networks:
       - port: {get_resource: vmi_vsfo-1_fxp0}
@@ -1678,10 +1674,8 @@ resources:
       availability_zone: kernel-computes
       config_drive: 'true'
       user_data_format: RAW
-      personality: { /config/junos-config/configuration.txt: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo2_config.txt },
-                     /config/junos-config/commit_config.sh: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo2_commit.sh } }
       flavor: VSFO-CP-NODE
-      image: VSFO-CP-IMAGE
+      image: VSFO-CP2-IMAGE
       name: EPG-B2B-VSFO-2
       networks:
       - port: {get_resource: vmi_vsfo-2_fxp0}
@@ -2342,10 +2336,8 @@ resources:
       availability_zone: dpdk-computes
       config_drive: 'true'
       user_data_format: RAW
-      personality: { /config/junos-config/configuration.txt: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo3_config.txt },
-                     /config/junos-config/commit_config.sh: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo3_commit.sh } }
       flavor: VSFO-UP-NODE
-      image: VSFO-UP-IMAGE
+      image: VSFO-UP3-IMAGE
       name: EPG-B2B-VSFO-3
       networks:
       - port: {get_resource: vmi_vsfo-3_fxp0}
@@ -2895,10 +2887,8 @@ resources:
       availability_zone: dpdk-computes
       config_drive: 'true'
       user_data_format: RAW
-      personality: { /config/junos-config/configuration.txt: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo4_config.txt },
-                     /config/junos-config/commit_config.sh: { get_file: /contrail-test/serial_scripts/solution/topology/orange_deployment/vsrx_config/vsfo4_commit.sh } }
       flavor: VSFO-UP-NODE
-      image: VSFO-UP-IMAGE
+      image: VSFO-UP4-IMAGE
       name: EPG-B2B-VSFO-4
       networks:
       - port: {get_resource: vmi_vsfo-4_fxp0}

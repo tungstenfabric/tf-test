@@ -93,9 +93,12 @@ class OrangeSolutionTest(BaseSolutionsTest):
         cls.quota_stack.setUp()
 
     #Image Upload.
-        cls.vrp_image = cls.nova_h.get_image('VRP-IMAGE')
-        cls.vsfo_cp_image = cls.nova_h.get_image('VSFO-CP-IMAGE')
-        cls.vsfo_up_image = cls.nova_h.get_image('VSFO-UP-IMAGE')
+        cls.vrp31_image = cls.nova_h.get_image('VRP31-IMAGE')
+        cls.vrp32_image = cls.nova_h.get_image('VRP32-IMAGE')
+        cls.vsfo_cp1_image = cls.nova_h.get_image('VSFO-CP1-IMAGE')
+        cls.vsfo_cp2_image = cls.nova_h.get_image('VSFO-CP2-IMAGE')
+        cls.vsfo_up3_image = cls.nova_h.get_image('VSFO-UP3-IMAGE')
+        cls.vsfo_up4_image = cls.nova_h.get_image('VSFO-UP4-IMAGE')
 
     #Flavor Create.
         cls.flavors_template_file=cls.deploy_path+"template/flavors.yaml"
@@ -293,43 +296,6 @@ class OrangeSolutionTest(BaseSolutionsTest):
         cls.vrp_31 = vrp_31
         cls.vrp_32 = vrp_32
 
-    # Copy scale config files and apply config if scaled setup.
-        if 'orange' in cls.deploy_path:
-            for i in range(1, cls.NB_VSFO_CP_NODES + cls.NB_VSFO_UP_NODES+1):
-                cls.vsfo_fix[i].vm_password='contrail123'
-                file_name=cls.deploy_path+'vsrx_config/'+\
-                    cls.vsfo_fix[i].vm_name.split('B2B-')[1].lower()+\
-                    '_config.txt'
-                cmd='sshpass -p \'%s\'' %(cls.vsfo_fix[i].vm_password)
-                cmd=cmd+' scp -o StrictHostKeyChecking=no %s heat-admin@%s:/tmp/'\
-                    %(file_name, cls.vsfo_fix[i].vm_node_ip)
-                op=os.system(cmd)
-                if op is not 0:
-                    cls.logger.error("Failed to copy vsrx config file %s to %s"\
-                        %(file_name, cls.vsfo_fix[i].vm_node_ip))
-                file_name='/tmp/'+cls.vsfo_fix[i].vm_name.split('B2B-')[1].lower()+\
-                          '_config.txt'
-                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
-                     sshpass -p \'%s\' scp -o StrictHostKeyChecking=no -o \
-                     UserKnownHostsFile=/dev/null %s root@%s:/tmp/'\
-                     %(cls.vsfo_fix[i].vm_password, cls.vsfo_fix[i].vm_node_ip,
-                       cls.vsfo_fix[i].vm_password, file_name,
-                       cls.vsfo_fix[i].local_ip)
-                op=os.system(cmd)
-                if op is not 0:
-                    cls.logger.error("Failed to copy vsrx config file %s to %s"\
-                        %(file_name, cls.vsfo_fix[i].local_ip))
-                cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
-                     sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no -o \
-                     UserKnownHostsFile=/dev/null \
-                     root@%s \'sh /config/junos-config/commit_config.sh\' '\
-                     %(cls.vsfo_fix[i].vm_password, cls.vsfo_fix[i].vm_node_ip,
-                       cls.vsfo_fix[i].vm_password, cls.vsfo_fix[i].local_ip)
-                op=os.popen(cmd).read()
-                if 'commit complete' not in op:
-                    cls.logger.error("Failed to commit vsrx config on %s"\
-                        %(cls.vsfo_fix[i].vm_name))
-
     # Create BGPaaS stacks.
         #Define variables for template file, env file, bgpaas stack and
         #bfd_health_check_uuid
@@ -490,8 +456,9 @@ class OrangeSolutionTest(BaseSolutionsTest):
         #get ge-0/0/0.0 i/f ip of each vm
         for i in range(0, self.NB_VSFO_CP_NODES + self.NB_VSFO_UP_NODES+2):
             cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o \
-                   UserKnownHostsFile=/dev/null -J \
-                   \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s \
+                   UserKnownHostsFile=/dev/null \
+                   \"%s@%s\"  sshpass -p contrail123 ssh -o StrictHostKeyChecking=no \
+                   -o UserKnownHostsFile=/dev/null root@%s \
                    \"ifconfig | grep 192.3.1 | cut -d ' ' -f 4 | cut -d = -f 2\""\
                    %(self.inputs.host_data[vm_fix_list[i].vm_node_ip]['username'] ,
                      vm_fix_list[i].vm_node_ip,vm_fix_list[i].local_ip)
@@ -504,8 +471,9 @@ class OrangeSolutionTest(BaseSolutionsTest):
             #loop to perform ping
             for j in range(i+1, self.NB_VSFO_CP_NODES + self.NB_VSFO_UP_NODES+2):
                 cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o \
-                       UserKnownHostsFile=/dev/null -J \
-                       \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null \
+                       UserKnownHostsFile=/dev/null \
+                       \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no \
+                       -o UserKnownHostsFile=/dev/null \
                        root@%s  \"ping -c 3 %s\""\
                        %(self.inputs.host_data[vm_fix_list[i].vm_node_ip]['username'] ,
                          vm_fix_list[i].vm_node_ip,vm_fix_list[i].local_ip,ips_list[j])
@@ -595,8 +563,9 @@ class OrangeSolutionTest(BaseSolutionsTest):
         for i in range(self.NB_VSFO_CP_NODES+1 ,self.NB_VSFO_CP_NODES +\
                         self.NB_VSFO_UP_NODES+1):
             cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o \
-                   UserKnownHostsFile=/dev/null -J \
-                   \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s \
+                   UserKnownHostsFile=/dev/null \
+                   \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no \
+                   -o UserKnownHostsFile=/dev/null root@%s \
                    \"ifconfig | grep 192.3.1 | cut -d ' ' -f 4 | cut -d = -f 2\""\
                    %(self.inputs.host_data[self.vsfo_fix[i].vm_node_ip]['username'] ,
                    self.vsfo_fix[i].vm_node_ip,self.vsfo_fix[i].local_ip)
@@ -610,8 +579,9 @@ class OrangeSolutionTest(BaseSolutionsTest):
         for i in range(self.NB_VSFO_CP_NODES+1 ,self.NB_VSFO_CP_NODES +\
                         self.NB_VSFO_UP_NODES):
             cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o \
-                   UserKnownHostsFile=/dev/null -J \
-                   \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null \
+                   UserKnownHostsFile=/dev/null \
+                   \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no \
+                   -o UserKnownHostsFile=/dev/null \
                    root@%s  \"ping -c 3 -s 8910 -d %s\""\
                    %(self.inputs.host_data[self.vsfo_fix[j].vm_node_ip]['username'] ,
                    self.vsfo_fix[j].vm_node_ip,self.vsfo_fix[j].local_ip,ips_list[k])
@@ -924,7 +894,7 @@ class OrangeSolutionTest(BaseSolutionsTest):
                     if 'ACTIVE' in output:
                         break
                     time.sleep(3)
-            time.sleep(CONVERGENCE_TIME)
+            time.sleep(14*CONVERGENCE_TIME)
             exp_bfd=self.NB_VSFO_UP_CNIF*self.NB_APN
             exp_bgp=self.NB_VSFO_UP_CNNIC*self.NB_VSFO_UP_CNIF*self.NB_APN
             for i in range(20):
@@ -982,10 +952,10 @@ class OrangeSolutionTest(BaseSolutionsTest):
                 self.logger.error("Failed reboot VSRX from cli!")
                 continue
             time.sleep(VSRX_RESTART)
-            time.sleep(CONVERGENCE_TIME)
+            time.sleep(4*CONVERGENCE_TIME)
             assert self.verify_ospf_session_state()
             assert self.verify_bgp_session_state()
-            assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_bgpaas_session_ctrlnode()
         assert self.verify_route_count()
 
         return True
@@ -1008,23 +978,24 @@ class OrangeSolutionTest(BaseSolutionsTest):
             cmd='ssh -o StrictHostKeyChecking=no -o \
                  UserKnownHostsFile=/dev/null \
                  heat-admin@%s \
-                 \'sudo virsh list | grep running | cut -d \" \" -f2\' '\
+                 \'sudo podman exec -it nova_libvirt virsh list | grep running | cut -d \" \" -f2\' '\
                  %(vm_fix.vm_node_ip)
             output = os.popen(cmd).read()
             cmd='ssh -o StrictHostKeyChecking=no -o \
                  UserKnownHostsFile=/dev/null \
                  heat-admin@%s \
-                 \'sudo virsh reboot %s\' '\
+                 \'sudo podman exec -it nova_libvirt virsh reboot %s\' '\
                  %(vm_fix.vm_node_ip, int(output))
             output = os.popen(cmd).read()
             if 'being rebooted' not in output:
                 self.logger.error("Failed to reboot instance through virsh!")
                 continue
             time.sleep(VSRX_RESTART)
-            time.sleep(CONVERGENCE_TIME)
-            assert self.verify_ospf_session_state()
+            time.sleep(4*CONVERGENCE_TIME)
             assert self.verify_bgp_session_state()
-            assert self.verify_bgpaas_session_ctrlnode()
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
         assert self.verify_route_count()
 
         return True
@@ -1086,18 +1057,18 @@ class OrangeSolutionTest(BaseSolutionsTest):
         assert self.verify_bgp_session_state()
         assert self.verify_route_count()
         for i in range(0, self.vr_restart):
-            for node in self.inputs.compute_ips:
-                self.inputs.restart_service('contrail-vrouter-agent', [node],
-                                            container='agent')
-                cluster_status, error_nodes = ContrailStatusChecker(
+            node=random.choice(self.inputs.dpdk_ips)
+            self.inputs.restart_service('contrail-vrouter-agent', [node],
+                                        container='agent')
+            cluster_status, error_nodes = ContrailStatusChecker(
                 ).wait_till_contrail_cluster_stable(nodes=[node])
-                assert cluster_status, 'Hash of error nodes and services : %s' % (
-                    error_nodes)
+            assert cluster_status, 'Hash of error nodes and services : %s' % (
+                error_nodes)
             time.sleep(10*CONVERGENCE_TIME)
-            assert self.verify_ospf_session_state()
             assert self.verify_bgp_session_state()
-            assert self.verify_route_count()
-
+        assert self.verify_route_count()
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
         return True
     # end test_12_vrouter_restart
 
@@ -1121,40 +1092,28 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert cluster_status, 'Hash of error nodes and services : %s' % (
                     error_nodes)
 
-        #get undercloud host-name
-        file_name=self.deploy_path+'testcase_12_13/'+'ipa.sh'
-        cmd='sshpass -p \'%s\''%(self.inputs.password)
-        cmd=cmd+' scp -o StrictHostKeyChecking=no %s heat-admin@%s:/tmp/' \
-             %(file_name, controller_ip)
-        op=os.system(cmd)
-        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
-             heat-admin@%s \'sh /tmp/ipa.sh\' ' \
-             %(self.inputs.password, controller_ip)
-        op=os.popen(cmd).read()
-        output=op.replace("\n","")
-        host=output.replace(" ","")
-        
         #login to undercloud and reboot dpdk computes
         for i in range(0, self.dpdk_restart):
             self.logger.info("#### Starting Reboot of DPDK computes ####")
-            cmd='sshpass -p \'contrail123\' ssh -o StrictHostKeyChecking=no \
-                 stack@%s \'source /home/stack/stackrc; \
-                 rm -f output_dpdk > /dev/null; openstack server list | \
-                 grep compute-dpdk | cut -d \" \" -f 2 >> output_dpdk; \
-                 while read line; do openstack reboot --wait $line; \
-                 done < output_dpdk\'' %(host)
-            os.system(cmd)
+            node_ip=random.choice(self.inputs.dpdk_ips)
+            cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                 heat-admin@%s \'sudo reboot\' '\
+                 %(self.inputs.password, node_ip)
+            op=os.popen(cmd).read()
+            time.sleep(VSRX_RESTART)
 
-            for node in self.inputs.compute_ips:
+            for node in self.inputs.dpdk_ips:
                 cluster_status, error_nodes = ContrailStatusChecker(
                 ).wait_till_contrail_cluster_stable(nodes=[node])
                 assert cluster_status, 'Hash of error nodes and services : %s' % (
                     error_nodes)
 
-            time.sleep(4*CONVERGENCE_TIME)
-            assert self.verify_ospf_session_state()
+            time.sleep(8*CONVERGENCE_TIME)
             assert self.verify_bgp_session_state()
-            assert self.verify_bgpaas_session_ctrlnode()
+
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
         assert self.verify_route_count()
         return True
     # end test_13_restart_dpdk_compute_hosting_vsfoup
@@ -1172,7 +1131,6 @@ class OrangeSolutionTest(BaseSolutionsTest):
         assert self.verify_bgp_session_state()
         assert self.verify_route_count()
         assert self.verify_bgpaas_session_ctrlnode()
-        controller_ip=random.choice(self.inputs.openstack_ips)
 
         for node in self.inputs.compute_ips:
             cluster_status, error_nodes = ContrailStatusChecker(
@@ -1180,28 +1138,18 @@ class OrangeSolutionTest(BaseSolutionsTest):
             assert cluster_status, 'Hash of error nodes and services : %s' % (
                     error_nodes)
 
-        #get undercloud host-name
-        file_name=self.deploy_path+'testcase_12_13/'+'ipa.sh'
-        cmd='sshpass -p \'%s\''%(self.inputs.password)
-        cmd=cmd+' scp -o StrictHostKeyChecking=no %s heat-admin@%s:/tmp/' \
-                  %(file_name, controller_ip)
-        op=os.system(cmd)
-        cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no heat-admin@%s \
-             \'sh /tmp/ipa.sh\' ' %(self.inputs.password, controller_ip)
-        op=os.popen(cmd).read()
-        output=op.replace("\n","")
-        host=output.replace(" ","")
-
+        nova_compute_ips=[]
+        nova_compute_ips=list(set(self.inputs.compute_ips) - \
+                              set(self.inputs.dpdk_ips))
         #login to undercloud and reboot kernel computes
         for i in range(0, self.kernel_restart):
             self.logger.info("#### Starting Reboot of KERNEL computes ####")
-            cmd='sshpass -p \'contrail123\' ssh -o StrictHostKeyChecking=no \
-                 stack@%s \'source /home/stack/stackrc; \
-                 rm -f output_kernel > /dev/null; openstack server list | \
-                 grep novacompute | cut -d \" \" -f 2 >> output_kernel; \
-                 while read line; do openstack server reboot --wait $line; \
-                 done < output_kernel\'' %(host)
-            os.system(cmd)
+            node_ip=random.choice(nova_compute_ips)
+            cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
+                 heat-admin@%s \'sudo reboot\' '\
+                 %(self.inputs.password, node_ip)
+            op=os.popen(cmd).read()
+            time.sleep(VSRX_RESTART)
 
             for node in self.inputs.compute_ips:
                 cluster_status, error_nodes = ContrailStatusChecker(
@@ -1209,10 +1157,12 @@ class OrangeSolutionTest(BaseSolutionsTest):
                 assert cluster_status, 'Hash of error nodes and services : %s' % (
                     error_nodes)
 
-            time.sleep(4*CONVERGENCE_TIME)
-            assert self.verify_ospf_session_state()
+            time.sleep(8*CONVERGENCE_TIME)
             assert self.verify_bgp_session_state()
-            assert self.verify_bgpaas_session_ctrlnode()
+
+        assert self.verify_ospf_session_state()
+        assert self.verify_bgp_session_state()
+        assert self.verify_bgpaas_session_ctrlnode()
         assert self.verify_route_count()
         return True
     # end test_14_restart_kernel_compute_hosting_vsfocp

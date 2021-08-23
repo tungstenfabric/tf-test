@@ -36,7 +36,7 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
 
         self.logger.info("Validate OSPF session.")
 
-        cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show ospf neighbor\" | grep -c Full" %(self.inputs.host_data[vrp_31.vm_node_ip]['username'] ,vrp_31.vm_node_ip,vrp_31.local_ip)
+        cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show ospf neighbor\" | grep -c Full" %(self.inputs.host_data[vrp_31.vm_node_ip]['username'] ,vrp_31.vm_node_ip,vrp_31.local_ip)
         op = os.popen(cmd).read()
         vrp_31_ospf = int(re.match(r'\d',op).group())
         EXP_SESS=((self.NB_VSFO_CP_NODES + self.NB_VSFO_UP_NODES + 1))
@@ -64,11 +64,11 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
         for i in range(1,self.NB_VSFO_CP_NODES+1):
 
             self.logger.info("BGP and BFD sessions for %s :-" %vsfo_fix[i].vm_name)
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep -c Establ" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep -c Establ" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
             op = os.popen(cmd).read()
             vsfo_cp_session = int(re.match(r'\d+',op).group())
 
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bfd session\" | grep ge-0/0 | grep -c Up" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bfd session\" | grep ge-0/0 | grep -c Up" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
             op = os.popen(cmd).read()
             vsfo_cp_bfd_session = int(re.match(r'\d+',op).group())
 
@@ -94,11 +94,11 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
         for i in range(self.NB_VSFO_CP_NODES+1 ,self.NB_VSFO_CP_NODES + self.NB_VSFO_UP_NODES+1):
 
             self.logger.info("BGP and BFD sessions for %s :-" %vsfo_fix[i].vm_name)
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep -c Establ" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep -c Establ" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
             op = os.popen(cmd).read()
             vsfo_up_session = int(re.match(r'\d+',op).group())
 
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bfd session\" | grep ge-0/0 | grep -c Up" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bfd session\" | grep ge-0/0 | grep -c Up" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
             op = os.popen(cmd).read()
             vsfo_up_bfd_session = int(re.match(r'\d+',op).group())
 
@@ -135,11 +135,11 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
                 peer = ele[0]
                 vpn = ele[1]
 
-                cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show route advertising-protocol bgp %s\" | grep -c \"/\" " %(self.inputs.host_data[vsfo_fix.vm_node_ip]['username'] ,vsfo_fix.vm_node_ip,vsfo_fix.local_ip,peer)
+                cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show route advertising-protocol bgp %s\" | grep -c \"/\" " %(self.inputs.host_data[vsfo_fix.vm_node_ip]['username'] ,vsfo_fix.vm_node_ip,vsfo_fix.local_ip,peer)
                 op = os.popen(cmd).read()
                 routes_adv = int(re.match(r'\d+',op).group())
 
-                cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show route receive-protocol bgp %s table %s.inet.0\" | grep -c \"/\" " %(self.inputs.host_data[vsfo_fix.vm_node_ip]['username'] ,vsfo_fix.vm_node_ip,vsfo_fix.local_ip,peer,vpn)
+                cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show route receive-protocol bgp %s table %s.inet.0\" | grep -c \"/\" " %(self.inputs.host_data[vsfo_fix.vm_node_ip]['username'] ,vsfo_fix.vm_node_ip,vsfo_fix.local_ip,peer,vpn)
                 op = os.popen(cmd).read()
 
                 routes_rec = int(re.match(r'\d+',op).group())
@@ -170,7 +170,7 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
 
             self.logger.info("Validate routes for RADIUS session.")
 
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|radius_\|sig_\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep radius_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|radius_\|sig_\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep radius_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
 
             output = os.popen(cmd).read()
             good = self.get_route_count(output,vsfo_fix[i],EXP_ADV,EXP_RCV)
@@ -185,7 +185,7 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
 
             self.logger.info("Validate routes for Sig session.")
 
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|radius_\|sig_\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep sig_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|radius_\|sig_\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep sig_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
 
             output = os.popen(cmd).read()
             good = self.get_route_count(output,vsfo_fix[i],EXP_ADV,EXP_RCV)
@@ -207,7 +207,7 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
 
             self.logger.info("Validate routes for APN session.")
 
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|cn_.*_vpn\|apn_.*_vpn\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep apn_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|cn_.*_vpn\|apn_.*_vpn\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep apn_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
 
             output = os.popen(cmd).read()
             good = self.get_route_count(output,vsfo_fix[i],EXP_ADV,EXP_RCV)
@@ -223,7 +223,7 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
 
             self.logger.info("Validate routes for CN session.")
 
-            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -J \"%s@%s\"  -o GlobalKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|cn_.*_vpn\|apn_.*_vpn\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep cn_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
+            cmd = "sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \"%s@%s\" sshpass -p contrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s  \"cli\" \"show bgp summary\" | grep \"Establ\|cn_.*_vpn\|apn_.*_vpn\"| awk '{ print $1 }'| sed 'N;s/\\n/ /' |  sed 's/.inet.0://g' | sed 's/ /;/g' | grep cn_" %(self.inputs.host_data[vsfo_fix[i].vm_node_ip]['username'] ,vsfo_fix[i].vm_node_ip,vsfo_fix[i].local_ip)
 
             output = os.popen(cmd).read()
             good = self.get_route_count(output,vsfo_fix[i],EXP_ADV,EXP_RCV)
@@ -248,10 +248,8 @@ class BaseSolutionsTest(test_v1.BaseTestCase_v1):
         vsfo_fix = self.vsfo_fix
         self.logger.info("Validate bgpas sessions on control node.")
 
-        EXP_S = (self.NB_VSFO_UP_NODES * ((((self.NB_VSFO_CP_SIGIF + \
-                 self.NB_APN_RADIUS + 1) * self.NB_VSFO_CP_EXT_NIC )
-          )  + (( ((self.NB_VSFO_UP_CNNIC * self.NB_VSFO_UP_CNIF) + (
-          self.NB_VSFO_UP_EXT_NIC - self.NB_VSFO_UP_CNNIC) * self.NB_APN) ))))
+        EXP_S = (self.NB_VSFO_UP_NODES * ((self.NB_VSFO_UP_CNNIC * self.NB_VSFO_UP_CNIF) + (
+          self.NB_VSFO_UP_EXT_NIC - self.NB_VSFO_UP_CNNIC) * self.NB_APN))
 
         bgpasUpSession=0
         for user_planes in range(self.NB_VSFO_CP_NODES+1,\

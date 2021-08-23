@@ -56,6 +56,9 @@ CI_IMAGES = [DEFAULT_CI_IMAGE, DEFAULT_CI_SVC_IMAGE]
 OPENSHIFT_CONFIG_FILE = '/root/.kube/config'
 K8S_CONFIG_FILE = '/etc/kubernetes/admin.conf'
 
+#Set RHOSP_16 env to True for rhosp-16 deployments to use podman.
+DOCKER='podman' if bool(os.getenv('RHOSP_16',False)) == True else 'docker'
+
 # License: PSF License 2.0
 # Copyright (c) 2003-2005 by Peter Astrand <astrand@lysator.liu.se>
 # https://hg.python.org/cpython/file/d37f963394aa/Lib/subprocess.py
@@ -802,7 +805,7 @@ class TestInputs(with_metaclass(Singleton, object)):
     # end get_os_version
 
     def get_active_containers(self, host):
-        cmd = "docker ps -f status=running --format {{.Names}} 2>/dev/null"
+        cmd = DOCKER + " ps -f status=running --format {{.Names}} 2>/dev/null"
         output = self.run_cmd_on_server(host, cmd, as_sudo=True)
         containers = [x.strip('\r') for x in output.split('\n')]
         return containers
@@ -831,7 +834,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         host_dict['containers'] = {}
         if  host_dict.get('type', None) == 'esxi':
             return
-        cmd = 'docker ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner\|placement" | awk \'{print $NF}\''
+        cmd = DOCKER + ' ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner\|placement" | awk \'{print $NF}\''
         output = self.run_cmd_on_server(host_dict['host_ip'], cmd, as_sudo=True)
         # If not a docker cluster, return
         if not output:
@@ -1339,7 +1342,7 @@ class ContrailTestInit(object):
 
     def is_container_up(self, host, service):
         container = self.host_data[host]['containers'][service]
-        cmd = "docker ps -f name=%s -f status=running 2>/dev/null"%container
+        cmd = DOCKER + " ps -f name=%s -f status=running 2>/dev/null"%container
         for i in range(3):
             output = self.run_cmd_on_server(host, cmd, as_sudo=True)
             if not output or 'Up' not in output:
@@ -1362,8 +1365,8 @@ class ContrailTestInit(object):
         yml_file_str = '-f %s'%yml_file if yml_file else ''
         for host in hosts:
             cmd = 'cd %s ;'%pods_dir
-            down_cmd = cmd + 'docker-compose %s down'%yml_file_str
-            up_cmd = cmd + 'docker-compose %s up -d'%yml_file_str
+            down_cmd = cmd + DOCKER + '-compose %s down'%yml_file_str
+            up_cmd = cmd + DOCKER + '-compose %s up -d'%yml_file_str
             self.logger.info('Running %s on %s' %(down_cmd, host))
             self.run_cmd_on_server(host, down_cmd, pty=True, as_sudo=True)
             self.logger.info('Running %s on %s' %(up_cmd, host))
@@ -1386,7 +1389,7 @@ class ContrailTestInit(object):
                     self.logger.info('Unable to find %s container on %s'%(container, host))
                     continue
                 timeout = '' if event == 'start' else '-t 60'
-                issue_cmd = 'docker %s %s %s' % (event, cntr, timeout)
+                issue_cmd = DOCKER + ' %s %s %s' % (event, cntr, timeout)
                 self.logger.info('Running %s on %s' %
                                  (issue_cmd, self.host_data[host]['name']))
                 self.run_cmd_on_server(host_ip, issue_cmd, username, password, pty=True, as_sudo=True)
@@ -1694,7 +1697,7 @@ class ContrailTestInit(object):
             'DEFAULT', 'mvpn_ipv4_enable=1')
         '''
 
-        issue_cmd = 'docker cp %s:/%s .' % (container_name, file_name)
+        issue_cmd = DOCKER + ' cp %s:/%s .' % (container_name, file_name)
         username = self.host_data[node_ip]['username']
         password = self.host_data[node_ip]['password']
 
@@ -1735,13 +1738,13 @@ class ContrailTestInit(object):
             self.run_cmd_on_server(node_ip, issue_cmd, username, password, pty=True,
                                     as_sudo=True)
 
-        issue_cmd = 'docker cp %s %s:/%s' % (local_file, container_name,
+        issue_cmd = DOCKER + ' cp %s %s:/%s' % (local_file, container_name,
             file_name)
         self.logger.info('Running %s on %s' % (issue_cmd, node_ip))
         self.run_cmd_on_server(node_ip, issue_cmd, username, password, pty=True,
                                     as_sudo=True)
         if restart_container:
-            issue_cmd = 'docker restart %s -t 60' % (container_name)
+            issue_cmd = DOCKER + ' restart %s -t 60' % (container_name)
             self.logger.info('Running %s on %s' % (issue_cmd, node_ip))
             self.run_cmd_on_server(node_ip, issue_cmd, username, password, pty=True,
                                         as_sudo=True)
