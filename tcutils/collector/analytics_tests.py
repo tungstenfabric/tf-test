@@ -263,6 +263,8 @@ class AnalyticsVerification(fixtures.Fixture):
         '''
         connobj = self.get_connection_dict(
             collector, gen, module, node_type, instance)
+        if not connobj:
+            return None
         return connobj['collector_name']
 
     def get_all_generator_links(self, module=None):
@@ -518,6 +520,9 @@ class AnalyticsVerification(fixtures.Fixture):
             peers = []
             collector = self.get_collector_of_gen(
                 self.inputs.collector_ips[0], compute_host, 'contrail-vrouter-agent', 'Compute')
+            if not collector:
+                self.logger.debug("can't get collector's generator")
+                return False
             collector_ip = self.inputs.get_service_ip(collector, 'analytics')
             self.ops_compute_obj = self.ops_inspect[
                 collector_ip].get_ops_vrouter(vrouter=compute_host)
@@ -560,6 +565,9 @@ class AnalyticsVerification(fixtures.Fixture):
             return False
         collector = self.get_collector_of_gen(
             self.inputs.collector_ips[0], vrouter, 'contrail-vrouter-agent', 'Compute')
+        if not collector:
+            self.logger.debug("can't get collector's generator")
+            return False
         collector_ip = self.inputs.get_service_ip(collector, 'analytics')
         self.vrouter_ops_obj = self.ops_inspect[
             collector_ip].get_ops_vrouter(vrouter=vrouter)
@@ -623,6 +631,9 @@ class AnalyticsVerification(fixtures.Fixture):
             return False
         collector = self.get_collector_of_gen(
             self.inputs.collector_ips[0], vrouter, 'contrail-vrouter-agent', 'Compute')
+        if not collector:
+            self.logger.debug("can't get collector's generator")
+            return False
         collector_ip = self.inputs.get_service_ip(collector, 'analytics')
         self.vrouter_ops_obj = self.ops_inspect[
             collector_ip].get_ops_vrouter(vrouter=vrouter)
@@ -680,6 +691,9 @@ class AnalyticsVerification(fixtures.Fixture):
         '''flowType=active_flows,aged_flows,total_flows'''
         collector = self.get_collector_of_gen(
             self.inputs.collector_ips[0], vrouter, 'contrail-vrouter-agent', 'Compute')
+        if not collector:
+            self.logger.critical("can't get collector's generator")
+            return -1
         collector_ip = self.inputs.get_service_ip(collector, 'analytics')
         self.vrouter_ops_obj = self.ops_inspect[
             collector_ip].get_ops_vrouter(vrouter=vrouter)
@@ -699,6 +713,9 @@ class AnalyticsVerification(fixtures.Fixture):
         for compute_host in self.compute_hosts:
             collector = self.get_collector_of_gen(
                 self.inputs.collector_ips[0], compute_host, 'contrail-vrouter-agent', 'Compute')
+            if not collector:
+                self.logger.debug("can't get collector's generator")
+                continue
             collector_ip = self.inputs.get_service_ip(collector, 'analytics')
             self.vrouter_ops_obj = self.ops_inspect[
                 collector_ip].get_ops_vrouter(vrouter=compute_host)
@@ -717,6 +734,9 @@ class AnalyticsVerification(fixtures.Fixture):
         for compute_host in self.compute_hosts:
             collector = self.get_collector_of_gen(
                 self.inputs.collector_ips[0], compute_host, 'contrail-vrouter-agent', 'Compute')
+            if not collector:
+                self.logger.debug("can't get collector's generator")
+                continue
             collector_ip = self.inputs.get_service_ip(collector, 'analytics')
             self.vrouter_ops_obj = self.ops_inspect[
                 collector_ip].get_ops_vrouter(vrouter=compute_host)
@@ -751,6 +771,9 @@ class AnalyticsVerification(fixtures.Fixture):
         '''
         collector = self.get_collector_of_gen(
             self.inputs.collector_ips[0], vrouter, 'contrail-vrouter-agent', 'Compute')
+        if not collector:
+            self.logger.critical("can't get collector's generator")
+            return None
         collector_ip = self.inputs.get_service_ip(collector, 'analytics')
         self.vrouter_ops_obj = self.ops_inspect[
             collector_ip].get_ops_vrouter(vrouter=vrouter)
