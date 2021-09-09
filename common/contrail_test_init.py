@@ -713,6 +713,9 @@ class TestInputs(with_metaclass(Singleton, object)):
             self.control_node_vrf_scale = scale_conf.get('control_node_vrf_scale')
             self.compute_node_vrf_scale = scale_conf.get('compute_node_vrf_scale')
             self.compute_node_snat_scale= scale_conf.get('compute_node_snat_scale')
+            self.config_node_lr_scale = scale_conf.get('config_node_lr_scale')
+            self.config_node_vn_per_lr_scale = scale_conf.get('config_node_vn_per_lr_scale')
+            self.config_node_subnet_vn_per_lr_scale = scale_conf.get('config_node_subnet_vn_per_lr_scale')
             self.vm_scale = scale_conf.get('vm_scale')
 
         self._parse_fabric(test_configs.get('fabric'))
