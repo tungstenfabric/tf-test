@@ -700,6 +700,10 @@ class TestInputs(with_metaclass(Singleton, object)):
         if 'scale_config' in test_configs:
             scale_conf = test_configs['scale_config']
             self.compute_node_snat_scale= scale_conf.get('compute_node_snat_scale')
+            self.config_node_lr_scale = scale_conf.get('config_node_lr_scale')
+            self.config_node_vn_per_lr_scale = scale_conf.get('config_node_vn_per_lr_scale')
+            self.config_node_subnet_vn_per_lr_scale = scale_conf.get('config_node_subnet_vn_per_lr_scale')
+            self.vm_scale = scale_conf.get('vm_scale')
 
         self._parse_fabric(test_configs.get('fabric'))
         # If no explicit amqp servers are configured, it will be cfgm ips
