@@ -24,8 +24,12 @@ import time
 import glob
 from scripts.analytics.test_analytics import AnalyticsTestSanity
 import pdb
+#Set RHOSP_16 env to True for rhosp-16 deployments to use podman.
+DOCKER='podman' if bool(os.getenv('RHOSP_16',False)) == True else 'docker'
+
 VSRX_RESTART=int(540) #it takes 9min for 400+ ge sub-interfaces to come up.
 CONVERGENCE_TIME=int(90)
+NETWORK_RESTART_TIME=int(120)
 
 class OrangeSolutionTest(BaseSolutionsTest):
 
@@ -978,14 +982,14 @@ class OrangeSolutionTest(BaseSolutionsTest):
             cmd='ssh -o StrictHostKeyChecking=no -o \
                  UserKnownHostsFile=/dev/null \
                  heat-admin@%s \
-                 \'sudo podman exec -it nova_libvirt virsh list | grep running | cut -d \" \" -f2\' '\
-                 %(vm_fix.vm_node_ip)
+                 \'sudo %s exec -it nova_libvirt virsh list | grep running | cut -d \" \" -f2\' '\
+                 %(vm_fix.vm_node_ip, DOCKER)
             output = os.popen(cmd).read()
             cmd='ssh -o StrictHostKeyChecking=no -o \
                  UserKnownHostsFile=/dev/null \
                  heat-admin@%s \
-                 \'sudo podman exec -it nova_libvirt virsh reboot %s\' '\
-                 %(vm_fix.vm_node_ip, int(output))
+                 \'sudo %s exec -it nova_libvirt virsh reboot %s\' '\
+                 %(vm_fix.vm_node_ip, int(output, DOCKER))
             output = os.popen(cmd).read()
             if 'being rebooted' not in output:
                 self.logger.error("Failed to reboot instance through virsh!")
@@ -1203,17 +1207,12 @@ class OrangeSolutionTest(BaseSolutionsTest):
             self.logger.info("Performing network Restart on DPDK computes")
             for i in range(len(dpdk_ip)):
                 cmd='sshpass -p \'%s\' ssh -o StrictHostKeyChecking=no \
-                     heat-admin@%s \'sudo ifconfig vhost0 down; \
+                     heat-admin@%s \'sudo %s stop contrail_vrouter_agent contrail-vrouter-agent-dpdk; \
+                     sudo ifdown vhost0; \
                      sudo systemctl restart network\'' \
-                     %(self.inputs.password, dpdk_ip[i])
+                     %(self.inputs.password, dpdk_ip[i], DOCKER)
                 os.system(cmd)
-
-            for node in self.inputs.compute_ips:
-                cluster_status, error_nodes = ContrailStatusChecker(
-                ).wait_till_contrail_cluster_stable(nodes=[node])
-                assert cluster_status, 'Hash of error nodes and services : %s' % (
-                    error_nodes)
-
+            time.sleep(NETWORK_RESTART_TIME)
             time.sleep(VSRX_RESTART)
             time.sleep(2*CONVERGENCE_TIME)
             assert self.verify_ospf_session_state()
