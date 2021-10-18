@@ -85,3 +85,25 @@ class TestVirtualNetwork(BaseNeutronTest):
         assert net_rsp['network'][
             'admin_state_up'], 'Failed to update admin_state_up'
         assert vn1_vm1_fixture.ping_with_certainty(vn1_vm2_fixture.vm_ip)
+
+    @preposttest_wrapper
+    def test_virtual_network_mtu(self):
+        ''' Launch a vn , add the mtu value to vn
+            verify in network response , api server
+        '''
+        result = True
+        vn1_name = get_random_name('vn1')
+        vn1_subnet_cidr = get_random_cidr()
+        vn1_subnets = [{'cidr': vn1_subnet_cidr}]
+        vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
+        body = {'mtu': "1600"}
+        net_dict = {'network': body}
+        net_rsp = self.quantum_h.update_network(
+            vn1_fixture.vn_id,
+            net_dict)
+        assert net_rsp['network'][
+            'mtu'] == 1600, 'Failed mtu value has been updated'
+        vn_dict = self.api_s_inspect.get_cs_vn_by_id(
+            vn_id=vn1_fixture.vn_id, refresh=True)
+        assert vn_dict[
+            'virtual-network']['mtu'] == 1600, 'New value of mtu is not reflected in API Server'
