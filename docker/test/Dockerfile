@@ -16,8 +16,8 @@ COPY ./ /contrail-test/
 RUN /etc/yum.repos.d/prepare_repos.sh && \
     yum install -y python-contrail python3-contrail && \
     yum clean all -y && rm -rf /var/cache/yum && \
-    pip install  -r /indirect_requirements.txt -r /requirements.txt && \
-    pip3 install -r /indirect_requirements3.txt -r /requirements.txt -r /requirements3.txt && \
+    python2 -m pip install  -r /indirect_requirements.txt -r /requirements.txt && \
+    python3 -m pip install -r /indirect_requirements3.txt -r /requirements.txt -r /requirements3.txt && \
     rm -rf /etc/yum.repos.d && \
     mv /etc/yum.repos.d.orig /etc/yum.repos.d && \
     mkdir -p /contrail-test/images
