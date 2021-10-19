@@ -352,3 +352,17 @@ echo "Hello World.  The time is now $(date -R)!" | tee /tmp/output.txt
 
         assert result, "Generic Link local verification failed "
     # end test_generic_link_local_service
+
+    @preposttest_wrapper
+    def test_mtu_update(self):
+        vn_name = get_random_name('vn')
+        vn_subnets = [get_random_cidr()]
+        vn_obj = self.create_vn(vn_name, vn_subnets, option='contrail')
+        mtu = vn_obj.set_mtu_value()
+        mtu_value = vn_obj.get_mtu()
+        assert mtu_value == mtu, (
+            "MTU Value Not updated, "
+            "set mtu and retrieved mtu value %s, %s are respectively" % (
+                mtu, mtu_value))
+        vn_obj.cleanUp()
+        self.logger.info('mtu value update test case passed..ok')

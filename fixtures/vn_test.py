@@ -1349,6 +1349,29 @@ class VNFixture(fixtures.Fixture):
         return None
     # end get_vxlan_id
 
+    def set_mtu_value(self, mtu=None):
+        if not mtu:
+            mtu = self.mtu
+
+        self.logger.debug('Updating mtu value of VN %s to %s' % (
+            self.vn_fq_name, mtu))
+        vnc_lib = self.vnc_lib_h
+        vn_obj = vnc_lib.virtual_network_read(id=self.uuid)
+        vn_properties_obj = vn_obj.get_virtual_network_properties() \
+            or  VirtualNetworkType()
+        vn_properties_obj.set_mtu(1800)
+        vn_obj.set_virtual_network_properties(vn_properties_obj)
+        vnc_lib.virtual_network_update(vn_obj)
+        return vn_properties_obj.mtu
+
+    # end set_mtu_value
+
+    def get_mtu(self):
+        vn_obj = self.vnc_lib_h.virtual_network_read(id=self.uuid)
+        vn_prop_obj = vn_obj.get_virtual_network_properties()
+        return vn_prop_obj.mtu
+    # end get_mtu
+
 
     def set_address_allocation_mode(self, address_allocation_mode=None):
         if not address_allocation_mode:
