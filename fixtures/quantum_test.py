@@ -79,6 +79,7 @@ class QuantumHelper(object):
             vn_subnets=None,
             ipam_fq_name=None,
             shared=False,
+            mtu=None,
             router_external=False,
             enable_dhcp = True,
             sriov_enable = False,
@@ -93,6 +94,8 @@ class QuantumHelper(object):
             net_req['name'] = vn_name
             if shared:
                 net_req['shared'] = shared
+            if mtu:
+                net_req['mtu']=mtu
             if router_external:
                 net_req['router:external'] = router_external
             if sriov_enable:

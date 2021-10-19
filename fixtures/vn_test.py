@@ -47,7 +47,7 @@ class VNFixture(fixtures.Fixture):
     def __init__(self, connections, inputs=None, vn_name=None, policy_objs=[],
                  subnets=[], router_asn='64512', project_name=None,
                  rt_number=None, ipam_fq_name=None, option='quantum',
-                 forwarding_mode=None, vxlan_id=None, shared=False,
+                 forwarding_mode=None, vxlan_id=None, shared=False,mtu=None,
                  router_external=False, clean_up=True,
                  af=None, empty_vn=False, enable_dhcp=True,
                  dhcp_option_list=None, disable_gateway=False,dns_nameservers_list=None,
@@ -96,6 +96,7 @@ class VNFixture(fixtures.Fixture):
         self.option = option
         self.forwarding_mode = forwarding_mode
         self.vxlan_id = vxlan_id
+        self.mtu = mtu
         self.shared = shared
         self.router_external = router_external
         self.clean_up = clean_up
@@ -307,6 +308,7 @@ class VNFixture(fixtures.Fixture):
                                                 self.vn_subnets,
                                                 ipam_fq_name=self.ipam_fq_name,
                                                 shared=self.shared,
+                                                mtu=self.mtu,
                                                 router_external=self.router_external,
                                                 enable_dhcp=self.enable_dhcp,
                                                 sriov_enable=self.sriov_enable,
