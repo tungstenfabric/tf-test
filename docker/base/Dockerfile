@@ -20,7 +20,7 @@ RUN \
     curl --retry 3 --retry-delay 10 ${SITE_MIRROR:-"https://bootstrap.pypa.io"}/pip/2.7/get-pip.py | python2 - 'pip==20.1' && \
     yum install -y unzip vim tcpdump ant git ipmitool gcc python-devel \
       patch sshpass bzip2 wget sudo pexpect ant-junit libXpm libXrender \
-      gtk2 nss GConf2 google-chrome-stable firefox openssl \
+      gtk2 nss GConf2 google-chrome-stable-94.0.4606.71-1.x86_64 firefox openssl \
       python3 python3-devel && \
     pip install -r /indirect_requirements.txt -r /requirements.txt && \
     pip3 install -r /indirect_requirements3.txt -r /requirements3.txt && \
