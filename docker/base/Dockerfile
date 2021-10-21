@@ -25,9 +25,9 @@ RUN \
     wget -nv -c --tries=3 -O /tmp/get-pip.py ${SITE_MIRROR:-"https://bootstrap.pypa.io"}/pip/2.7/get-pip.py && \
     python2 /tmp/get-pip.py 'pip==20.1' && \
     yum install -y python3 python3-devel && \
-    url=$(yumdownloader --urls google-chrome-stable | grep "^http.*google-chrome-stable" | head -1) && \
-    wget -nv -c --tries=10 -O google-chrome-stable.rpm $url && \
-    yum install -y ./google-chrome-stable.rpm && \
+    url=$(yumdownloader --urls google-chrome-stable-94.0.4606.71-1.x86_64 | grep "^http.*google-chrome-stable-94.0.4606.71-1.x86_64" | head -1) && \
+    wget -nv -c --tries=10 -O google-chrome-stable-94.0.4606.71-1.x86_64.rpm $url && \
+    yum install -y ./google-chrome-stable-94.0.4606.71-1.x86_64.rpm && \
     python2 -m pip install -r /indirect_requirements.txt -r /requirements.txt && \
     python3 -m pip install -r /indirect_requirements3.txt -r /requirements3.txt && \
     yum clean all -y && \
