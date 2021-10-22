@@ -24,9 +24,9 @@ RUN \
       patch sshpass bzip2 wget sudo pexpect ant-junit libXpm libXrender \
       gtk2 nss GConf2 firefox openssl \
       python3 python3-devel && \
-    url=$(yumdownloader --urls google-chrome-stable | grep "^http.*google-chrome-stable" | head -1) && \
-    wget -nv -c --tries=10 -O google-chrome-stable.rpm $url && \
-    yum install -y ./google-chrome-stable.rpm && \
+    url=$(yumdownloader --urls google-chrome-stable-94.0.4606.71-1.x86_64 | grep "^http.*google-chrome-stable-94.0.4606.71-1.x86_64" | head -1) && \
+    wget -nv -c --tries=10 -O google-chrome-stable-94.0.4606.71-1.x86_64.rpm $url && \
+    yum install -y ./google-chrome-stable-94.0.4606.71-1.x86_64.rpm && \
     pip install -r /indirect_requirements.txt -r /requirements.txt && \
     pip3 install -r /indirect_requirements3.txt -r /requirements3.txt && \
     yum clean all -y && \
