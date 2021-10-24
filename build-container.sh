@@ -8,8 +8,11 @@ CONTRAIL_REPO=""
 OPENSTACK_REPO=""
 TAG=""
 
+LINUX_ID=$(awk -F"=" '/^ID=/{print $2}' /etc/os-release | tr -d '"')
+LINUX_VER_ID=$(awk -F"=" '/^VERSION_ID=/{print $2}' /etc/os-release | tr -d '"')
+
 #SITE_MIRROR is an URL to the root of cache. This code will look for the files inside predefined folder
-[ -z "${SITE_MIRROR+x}" ] || SITE_MIRROR="${SITE_MIRROR}/external-web-cache"
+[ -z "${SITE_MIRROR}" ] || SITE_MIRROR="${SITE_MIRROR}/external-web-cache"
 
 download_pkg () {
     local pkg=$1
@@ -30,33 +33,36 @@ download_pkg () {
 }
 
 docker_build_test_sku () {
-  local dir=${1%/}
-  local name=$2
-  local tag=$3
-  local build_arg_opts=''
-  local dockerfile=${dir}'/Dockerfile'
-  docker_ver=$(sudo docker -v | awk -F' ' '{print $3}' | sed 's/,//g')
-  if [[ "$docker_ver" < '17.06' ]] ; then
-    cat $dockerfile | sed \
-      -e 's/\(^ARG REGISTRY_SERVER=.*\)/#\1/' \
-      -e "s|\$REGISTRY_SERVER|${REGISTRY_SERVER}|g" \
-      -e 's/\(^ARG BASE_TAG=.*\)/#\1/' \
-      -e "s/\$BASE_TAG/$BASE_TAG/g" \
-      > ${dockerfile}.nofromargs
-    dockerfile="${dockerfile}.nofromargs"
-  else
-    build_arg_opts+=" --build-arg REGISTRY_SERVER=${REGISTRY_SERVER}"
-    build_arg_opts+=" --build-arg BASE_TAG=${BASE_TAG}"
-  fi
-  build_arg_opts+=" --build-arg SKU=${SKU}"
-  build_arg_opts+=" --build-arg CONTRAIL_REPO=${CONTRAIL_REPO}"
-  build_arg_opts+=" --build-arg OPENSTACK_REPO=${OPENSTACK_REPO}"
-  build_arg_opts+=" --build-arg DOCKERFILE_DIR=${dir}"
-  build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
-
-  echo "Building test container ${name}:${tag} with opts ${build_arg_opts}"
-  sudo docker build --network host -t ${name}:${tag} ${build_arg_opts} -f $dockerfile . || exit 1
-  echo "Built test container ${name}:${tag}"
+    local dir=${1%/}
+    local name=$2
+    local tag=$3
+    local build_arg_opts='--network host'
+    local dockerfile=${dir}'/Dockerfile'
+    docker_ver=$(sudo docker -v | awk -F' ' '{print $3}' | sed 's/,//g')
+    if [[ "$docker_ver" < '17.06' ]] ; then
+        cat $dockerfile | sed \
+        -e 's/\(^ARG REGISTRY_SERVER=.*\)/#\1/' \
+        -e "s|\$REGISTRY_SERVER|${REGISTRY_SERVER}|g" \
+        -e 's/\(^ARG BASE_TAG=.*\)/#\1/' \
+        -e "s/\$BASE_TAG/$BASE_TAG/g" \
+        > ${dockerfile}.nofromargs
+        dockerfile="${dockerfile}.nofromargs"
+    else
+        build_arg_opts+=" --build-arg REGISTRY_SERVER=${REGISTRY_SERVER}"
+        build_arg_opts+=" --build-arg BASE_TAG=${BASE_TAG}"
+    fi
+    build_arg_opts+=" --build-arg SKU=${SKU}"
+    build_arg_opts+=" --build-arg CONTRAIL_REPO=${CONTRAIL_REPO}"
+    build_arg_opts+=" --build-arg OPENSTACK_REPO=${OPENSTACK_REPO}"
+    build_arg_opts+=" --build-arg DOCKERFILE_DIR=${dir}"
+    [ -z "$SITE_MIRROR" ] || build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
+    if [[ "$LINUX_ID" == 'rhel' && "${LINUX_VER_ID//.[0-9]*/}" == '8' ]] ; then
+        # podman case
+        build_arg_opts+=' -v /etc/resolv.conf:/etc/resolv.conf:ro'
+    fi
+    echo "Building test container ${name}:${tag} with opts ${build_arg_opts}"
+    sudo docker build ${build_arg_opts} -t ${name}:${tag} -f $dockerfile . || exit 1
+    echo "Built test container ${name}:${tag}"
 }
 
 docker_build_test () {
@@ -158,8 +164,14 @@ EOF
         echo "TAG(--tag) is unspecified. using latest"; echo
         TAG=latest
     fi
-    echo "Building base container"
-    sudo docker build --network host --build-arg SITE_MIRROR=${SITE_MIRROR} -t contrail-test-base:$TAG docker/base || exit 1
+    local build_arg_opts="--network host"
+    [ -z "$SITE_MIRROR" ] || build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
+    if [[ "$LINUX_ID" == 'rhel' && "${LINUX_VER_ID//.[0-9]*/}" == '8' ]] ; then
+        # podman case
+        build_arg_opts+=' -v /etc/resolv.conf:/etc/resolv.conf:ro'
+    fi
+    echo "Building base container (build_arg_opts=$build_arg_opts)"
+    sudo docker build $build_arg_opts -t contrail-test-base:$TAG docker/base || exit 1
     if [[ -n $REGISTRY_SERVER ]]; then
         sudo docker tag contrail-test-base:$TAG $REGISTRY_SERVER/contrail-test-base:$TAG
     fi
