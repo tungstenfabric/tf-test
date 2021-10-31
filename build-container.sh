@@ -38,7 +38,7 @@ docker_build_test_sku () {
     local tag=$3
     local build_arg_opts='--network host'
     local dockerfile=${dir}'/Dockerfile'
-    docker_ver=$(sudo docker -v | awk -F' ' '{print $3}' | sed 's/,//g')
+    local docker_ver=$(sudo docker -v | awk -F' ' '{print $3}' | sed 's/,//g')
     if [[ "$docker_ver" < '17.06' ]] ; then
         cat $dockerfile | sed \
         -e 's/\(^ARG REGISTRY_SERVER=.*\)/#\1/' \
@@ -58,9 +58,14 @@ docker_build_test_sku () {
     [ -z "$SITE_MIRROR" ] || build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
     if [[ "$LINUX_ID" == 'rhel' && "${LINUX_VER_ID//.[0-9]*/}" == '8' ]] ; then
         # podman case
+        build_arg_opts+=' --cap-add=all --security-opt label=disable  --security-opt seccomp=unconfined'
         build_arg_opts+=' -v /etc/resolv.conf:/etc/resolv.conf:ro'
+        # to make posible use subscription inside container run from container in podman
+        if [ -e /run/secrets/etc-pki-entitlement ] ; then
+            build_arg_opts+=' -v /run/secrets/etc-pki-entitlement:/run/secrets/etc-pki-entitlement:ro'
+        fi
     fi
-    echo "Building test container ${name}:${tag} with opts ${build_arg_opts}"
+    echo "Building test container ${name}:${tag} (sudo docker build ${build_arg_opts} -t ${name}:${tag} -f $dockerfile .)"
     sudo docker build ${build_arg_opts} -t ${name}:${tag} -f $dockerfile . || exit 1
     echo "Built test container ${name}:${tag}"
 }
@@ -164,14 +169,50 @@ EOF
         echo "TAG(--tag) is unspecified. using latest"; echo
         TAG=latest
     fi
+    local dockerfile='docker/base/Dockerfile'
     local build_arg_opts="--network host"
-    [ -z "$SITE_MIRROR" ] || build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
+    if [[ -n "$LINUX_DISTR" && -n "$LINUX_DISTR_VER" ]] ; then
+        local docker_ver=$(sudo docker -v | awk -F' ' '{print $3}' | sed 's/,//g')
+        if [[ "$docker_ver" < '17.06' ]] ; then
+            cat $dockerfile | sed \
+                -e "s|^FROM \$LINUX_DISTR:\$LINUX_DISTR_VER|FROM $LINUX_DISTR:$LINUX_DISTR_VER|" \
+                > ${dockerfile}.nofromargs
+            dockerfile="${dockerfile}.nofromargs"
+        else
+            build_arg_opts+=" --build-arg LINUX_DISTR=${LINUX_DISTR}"
+            build_arg_opts+=" --build-arg LINUX_DISTR_VER=${LINUX_DISTR_VER}"
+        fi
+    fi
+    if [[ -z "$SITE_MIRROR" ]] ; then
+        build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
+    fi
     if [[ "$LINUX_ID" == 'rhel' && "${LINUX_VER_ID//.[0-9]*/}" == '8' ]] ; then
         # podman case
+        build_arg_opts+=' --cap-add=all --security-opt label=disable  --security-opt seccomp=unconfined'
         build_arg_opts+=' -v /etc/resolv.conf:/etc/resolv.conf:ro'
+        # to make posible use subscription inside container run from container in podman
+        if [ -e /run/secrets/etc-pki-entitlement ] ; then
+            build_arg_opts+=' -v /run/secrets/etc-pki-entitlement:/run/secrets/etc-pki-entitlement:ro'
+        fi
+        if [[ -z "${RHEL_HOST_REPOS+x}" ]] ; then
+            RHEL_HOST_REPOS=${RHEL_HOST_REPOS:-}
+            RHEL_HOST_REPOS+=",rhel-8-for-x86_64-baseos-rpms"
+            RHEL_HOST_REPOS+=",rhel-8-for-x86_64-appstream-rpms"
+            RHEL_HOST_REPOS+=",rhel-8-for-x86_64-appstream-debug-rpms"
+            RHEL_HOST_REPOS+=",codeready-builder-for-rhel-8-x86_64-rpms"
+            RHEL_HOST_REPOS+=",openstack-16.2-for-rhel-8-x86_64-rpms"
+            RHEL_HOST_REPOS+=",ansible-2-for-rhel-8-x86_64-rpms"
+            RHEL_HOST_REPOS+=",rhocp-4.6-for-rhel-8-x86_64-rpms"
+        fi
+        export YUM_ENABLE_REPOS+=",${RHEL_HOST_REPOS}"
+        YUM_ENABLE_REPOS="${YUM_ENABLE_REPOS##,}"
+        YUM_ENABLE_REPOS="${YUM_ENABLE_REPOS%%,}"
+        if [ -n "$YUM_ENABLE_REPOS" ] ; then
+            build_arg_opts+=" --build-arg YUM_ENABLE_REPOS=\"$YUM_ENABLE_REPOS\""
+        fi
     fi
-    echo "Building base container (build_arg_opts=$build_arg_opts)"
-    sudo docker build $build_arg_opts -t contrail-test-base:$TAG docker/base || exit 1
+    echo "Building base container (docker build $build_arg_opts -t contrail-test-base:$TAG -f $dockerfile docker/base)"
+    sudo docker build $build_arg_opts -t contrail-test-base:$TAG -f $dockerfile docker/base || exit 1
     if [[ -n $REGISTRY_SERVER ]]; then
         sudo docker tag contrail-test-base:$TAG $REGISTRY_SERVER/contrail-test-base:$TAG
     fi
