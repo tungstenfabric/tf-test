@@ -2,9 +2,6 @@ FROM centos:7.4.1708
 
 ARG SITE_MIRROR
 
-# Setup Chrome Repo
-COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
-
 # back up mirrors before overwriting
 RUN cp -r /etc/yum.repos.d /etc/yum.repos.d.orig
 
@@ -20,14 +17,10 @@ RUN \
     curl --retry 3 --retry-delay 10 ${SITE_MIRROR:-"https://bootstrap.pypa.io"}/pip/2.7/get-pip.py | python2 - 'pip==20.1' && \
     yum install -y unzip vim tcpdump ant git ipmitool gcc python-devel \
       patch sshpass bzip2 wget sudo pexpect ant-junit libXpm libXrender \
-      gtk2 nss GConf2 google-chrome-stable-94.0.4606.71-1.x86_64 firefox openssl \
-      python3 python3-devel && \
+      gtk2 nss GConf2 openssl python3 python3-devel && \
     pip install -r /indirect_requirements.txt -r /requirements.txt && \
     pip3 install -r /indirect_requirements3.txt -r /requirements3.txt && \
     yum clean all -y && \
     rm -rf /var/cache/yum && \
     rm -rf /etc/yum.repos.d && \
-    mv /etc/yum.repos.d.orig /etc/yum.repos.d && \
-    wget -nv -c --tries=3 ${SITE_MIRROR:-"http://chromedriver.storage.googleapis.com"}/2.34/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && cp ./chromedriver /usr/bin/ && \
-    chmod ugo+rx /usr/bin/chromedriver
+    mv /etc/yum.repos.d.orig /etc/yum.repos.d
