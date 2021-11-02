@@ -16,6 +16,9 @@ COPY ./ /contrail-test/
 RUN /etc/yum.repos.d/prepare_repos.sh && \
     yum install -y python-contrail python3-contrail && \
     yum clean all -y && rm -rf /var/cache/yum && \
+    if [[ "$ID" == 'centos' ]] ; then \
+      python2 -m pip install -r /indirect_requirements_centos.txt ; \
+    fi && \
     python2 -m pip install  -r /indirect_requirements.txt -r /requirements.txt && \
     python3 -m pip install -r /indirect_requirements3.txt -r /requirements.txt -r /requirements3.txt && \
     rm -rf /etc/yum.repos.d && \

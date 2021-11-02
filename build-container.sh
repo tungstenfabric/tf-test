@@ -172,15 +172,17 @@ EOF
     local dockerfile='docker/base/Dockerfile'
     local build_arg_opts="--network host"
     if [[ -n "$LINUX_DISTR" && -n "$LINUX_DISTR_VER" ]] ; then
-        local docker_ver=$(sudo docker -v | awk -F' ' '{print $3}' | sed 's/,//g')
-        if [[ "$docker_ver" < '17.06' ]] ; then
-            cat $dockerfile | sed \
-                -e "s|^FROM \$LINUX_DISTR:\$LINUX_DISTR_VER|FROM $LINUX_DISTR:$LINUX_DISTR_VER|" \
-                > ${dockerfile}.nofromargs
-            dockerfile="${dockerfile}.nofromargs"
-        else
-            build_arg_opts+=" --build-arg LINUX_DISTR=${LINUX_DISTR}"
-            build_arg_opts+=" --build-arg LINUX_DISTR_VER=${LINUX_DISTR_VER}"
+        if [[ "$LINUX_DISTR" =~ 'ubi8' ]] ; then
+            local docker_ver=$(sudo docker -v | awk -F' ' '{print $3}' | sed 's/,//g')
+            if [[ "$docker_ver" < '17.06' ]] ; then
+                cat $dockerfile | sed \
+                    -e "s|^FROM \$LINUX_DISTR:\$LINUX_DISTR_VER|FROM $LINUX_DISTR:$LINUX_DISTR_VER|" \
+                    > ${dockerfile}.nofromargs
+                dockerfile="${dockerfile}.nofromargs"
+            else
+                build_arg_opts+=" --build-arg LINUX_DISTR=${LINUX_DISTR}"
+                build_arg_opts+=" --build-arg LINUX_DISTR_VER=${LINUX_DISTR_VER}"
+            fi
         fi
     fi
     if [[ -z "$SITE_MIRROR" ]] ; then

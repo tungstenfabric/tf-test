@@ -32,13 +32,13 @@ RUN \
     fi && \
     yum install -y unzip vim tcpdump ant git ipmitool gcc python2-devel \
       patch sshpass bzip2 wget sudo ant-junit libXpm libXrender \
-      gtk2 nss GConf2 openssl && \
+      gtk2 nss GConf2 openssl libev c-ares && \
     wget -nv -c --tries=3 -O /tmp/get-pip.py ${SITE_MIRROR:-"https://bootstrap.pypa.io"}/pip/2.7/get-pip.py && \
     python2 /tmp/get-pip.py 'pip==20.1' && \
-    yum install -y python3 python3-devel && \
     if [[ "$ID" == 'centos' ]] ; then \
       python2 -m pip install -r /indirect_requirements_centos.txt ; \
     fi && \
+    yum install -y python3 python3-devel && \
     python2 -m pip install -r /indirect_requirements.txt -r /requirements.txt && \
     python3 -m pip install -r /indirect_requirements3.txt -r /requirements3.txt && \
     yum clean all -y && \
