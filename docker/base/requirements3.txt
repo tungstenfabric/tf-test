@@ -8,7 +8,7 @@ scp==0.13.2
 PyYAML==5.4
 urllib3==1.25.8
 requests==2.22.0
-jinja2==2.10.3
+jinja2==2.11.3
 eventlet==0.25.1
 ncclient==0.6.6
 discover==0.4.0

@@ -6,7 +6,7 @@ cryptography==2.8
 easyprocess==0.2.10
 enum34==1.1.10 ; python_version < '3'
 idna==2.9
-jinja2==2.11.1
+jinja2==2.11.3
 lxml==4.5.0
 markupsafe==1.1.1
 netaddr==0.7.19
