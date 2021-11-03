@@ -3321,14 +3321,30 @@ class TestMacIpLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseHC, StaticRo
             vm1_node_ip, "docker restart vrouter_vrouter-agent_1")
         time.sleep(120)
 
-        # from vm1 to mac4 intf
-        assert self.vm1_fixture.ping_to_ip(self.vm4_macvlan_ip.split('/')[0])
+        ### This is required because sometimes the Metadata IP of the VM gets changed due to restart of vRouter
+
+        assert self.vm1_fixture.wait_till_vm_up()
+        assert self.vm4_fixture.wait_till_vm_up()
+
+        ### This is a False Ping, because due to restart of vRouter, 
+        # sometime ARP table get flush and ping fails, this is just to populate ARP table.
+
+        time.sleep(20)
+        self.vm1_fixture.ping_to_ip(
+            self.vm4_macvlan_ip.split('/')[0], count='10', netns="testns")
+        self.vm1_fixture.ping_to_ip(
+            self.vm4_macvlan_ip.split('/')[0], count='10', netns="testns")
+        self.vm4_fixture.ping_to_ip(
+            self.vm1_macvlan_ip.split('/')[0], count='10', netns="testns")
+
+        # Ping Test between VMs
+        assert self.vm1_fixture.ping_to_ip(self.vm4_fixture.vm_ip)
         # ping from macvlan1 intf on vm1 to macvlan intf on vm4
         assert self.vm1_fixture.ping_to_ip(
-            self.vm4_macvlan_ip.split('/')[0], intf="macvlan1")
+            self.vm4_macvlan_ip.split('/')[0], netns="testns")
         # ping from macvlan1 intf on vm4 to macvlan intf on vm1
         assert self.vm4_fixture.ping_to_ip(
-            self.vm1_macvlan_ip.split('/')[0], intf="macvlan1")
+            self.vm1_macvlan_ip.split('/')[0], netns="testns")
 
         # Test ping Between VMs over Secondary IPs inside NETNS After vRouter Restart
         self.logger.info("Test ping Between VMs over Secondary IPs inside NETNS")
