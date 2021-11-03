@@ -15,7 +15,7 @@ future==0.18.2
 google-auth==1.11.2
 idna==2.9
 ipaddress==1.0.23 ; python_version == '2.7'
-jinja2==2.11.1
+jinja2==2.11.3
 junos-eznc==2.3.0
 jxmlease==1.0.1
 kubernetes==11.0.0
