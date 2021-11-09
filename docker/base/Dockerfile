@@ -18,7 +18,6 @@ COPY pip.conf /etc/
 # 1. install most packages from pypi and only then python-Fabric
 RUN \
     source /etc/os-release && \
-    echo "el${VERSION_ID//\.*/}" > /etc/yum/vars/tpcrelease && \
     if [[ "$ID" == 'rhel' && "$VERSION_ID" == '8.4' ]] ; then \
       YUM_ENABLE_REPOS=$(echo $YUM_ENABLE_REPOS | tr -d '"') && \
       if [[ -n "$YUM_ENABLE_REPOS" ]] ; then \
