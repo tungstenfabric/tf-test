@@ -58,6 +58,7 @@ docker_build_test_sku () {
     [ -z "$SITE_MIRROR" ] || build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
     if [[ "$LINUX_ID" == 'rhel' && "${LINUX_VER_ID//.[0-9]*/}" == '8' ]] ; then
         # podman case
+        build_arg_opts+=' --format docker'
         build_arg_opts+=' --cap-add=all --security-opt label=disable  --security-opt seccomp=unconfined'
         build_arg_opts+=' -v /etc/resolv.conf:/etc/resolv.conf:ro'
         # to make posible use subscription inside container run from container in podman
@@ -190,6 +191,7 @@ EOF
     fi
     if [[ "$LINUX_ID" == 'rhel' && "${LINUX_VER_ID//.[0-9]*/}" == '8' ]] ; then
         # podman case
+        build_arg_opts+=' --format docker'
         build_arg_opts+=' --cap-add=all --security-opt label=disable  --security-opt seccomp=unconfined'
         build_arg_opts+=' -v /etc/resolv.conf:/etc/resolv.conf:ro'
         # to make posible use subscription inside container run from container in podman
@@ -204,7 +206,6 @@ EOF
             RHEL_HOST_REPOS+=",codeready-builder-for-rhel-8-x86_64-rpms"
             RHEL_HOST_REPOS+=",openstack-16.2-for-rhel-8-x86_64-rpms"
             RHEL_HOST_REPOS+=",ansible-2-for-rhel-8-x86_64-rpms"
-            RHEL_HOST_REPOS+=",rhocp-4.6-for-rhel-8-x86_64-rpms"
         fi
         export YUM_ENABLE_REPOS+=",${RHEL_HOST_REPOS}"
         YUM_ENABLE_REPOS="${YUM_ENABLE_REPOS##,}"
