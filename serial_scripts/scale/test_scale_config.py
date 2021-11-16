@@ -198,7 +198,7 @@ class TestScaleConfig(GenericTestBase):
         scale_number = 100000
         scaled_np_rules = 0
         restart_services = ['api-server','schema']
-        while scaled_nps_rules < scale_number :
+        while scaled_np_rules < scale_number :
             n_policies = 100
             n_process = 1
             n_policy_rules = 1000
@@ -238,7 +238,7 @@ class TestScaleConfig(GenericTestBase):
             n_process = 25
             cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
                     --n_fips %s --vnc  --n_process %s --project admin"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_vns, n_process)
+                                                       n_fips, n_process)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -249,7 +249,7 @@ class TestScaleConfig(GenericTestBase):
             scaled_fips = fips
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
-        total_fips = self.verify_scale_objects(object_type=fips)
+        total_fips = self.verify_scale_objects(object_type='fips')
         assert (total_fips/scale_number)*100 < 90, 'Not able to scale expected number of fips'
         self.logger.info('Total fips scaled successfully')
 
