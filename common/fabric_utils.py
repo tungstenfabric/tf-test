@@ -13,8 +13,8 @@ from tcutils.verification_util import elem2dict
 from collections import defaultdict
 import time
 
-NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k',
-                 'juniper-qfx5k', 'juniper-qfx5k-lean', 'juniper-srx']
+NODE_PROFILES = ['juniper-mx', 'juniper-qfx10k', 'juniper-qfx5120', 'juniper-qfx5220',
+                 'juniper-qfx5k', 'juniper-qfx5k-lean', 'juniper-qfx10k-lean', 'juniper-srx']
 VALID_OVERLAY_ROLES = ['dc-gateway', 'crb-access', 'dci-gateway',
                        'ar-client', 'crb-gateway', 'erb-ucast-gateway',
                        'crb-mcast-gateway', 'ar-replicator','route-reflector', 'collapsed-spine']
