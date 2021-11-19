@@ -16,7 +16,15 @@ class TestFabricGDO(BaseFabricTest):
     enterprise_style = False
     @preposttest_wrapper
     def test_fabric_gdo_hardware(self):
-        self.get_chassis_gdo_info(self.inputs.fabrics[0])
+        self.get_chassis_gdo_info(self.inputs.fabrics[0], 'show_chassis_info_template', 'chassis_detail', gdo_type="chassis hardware")
+
+    @preposttest_wrapper
+    def test_fabric_gdo_hardware_detail(self):
+        self.get_chassis_gdo_info(self.inputs.fabrics[0], 'show_chassis_info_template', 'chassis_detail', gdo_type="chassis hardware detail")
+
+    @preposttest_wrapper
+    def test_fabric_gdo_hardware_clei_models(self):
+        self.get_chassis_gdo_info(self.inputs.fabrics[0], 'show_chassis_info_template', 'chassis_detail', gdo_type="chassis hardware clei-models")
 
     @preposttest_wrapper
     def test_fabric_gdo_alarms(self):
