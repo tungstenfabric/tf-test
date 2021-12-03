@@ -441,3 +441,21 @@ class PodFixture(fixtures.Fixture):
                return item["ips"]
         assert  False , "FAILED..!!could not find the network attachment definition hence asserting"
     #get_pod_ip
+
+    def run_cmd_on_pod_with_tty(self, cmd, mode='api', shell=None, container=None, tty=True):
+        if not shell:
+            shell = self._shell_arg
+        if mode == 'api':
+            output = self.k8s_client.exec_cmd_on_pod(self.name, cmd,
+                                                         container=container,
+                                                         namespace=self.namespace,
+                                                         shell=shell,
+                                                         tty=tty)
+        else:
+            output = self.run_kubectl_cmd_on_master(self.name, cmd, shell,
+                                                    container=container)
+        self.logger.debug('[Pod %s] Cmd: %s, Output: %s' % (self.name,
+                                                            cmd, output))
+        return output
+    # run_cmd_on_pod_with_tty
+
