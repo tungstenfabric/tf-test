@@ -23,6 +23,7 @@ from common.connections import ContrailConnections
 from common import create_public_vn
 from vn_test import VNFixture
 import gevent
+import os
 
 class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
 
@@ -44,6 +45,14 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         cls.logger = cls.connections.logger
         cls.setup_namespace_isolation = False
         cls.setup_custom_isolation = False
+        if (os.environ.get('TEST_TAGS') == 'openshift_1'):
+            cls.security_context = 'securityContext'
+            cls.image_pull_policy = 'imagePullPolicy'
+            cls.node_selector = 'nodeSelector'
+        else:
+            cls.security_context = 'security_context'
+            cls.image_pull_policy = 'image_pull_policy'
+            cls.node_selector = 'node_selector'
         cls.public_vn = create_public_vn.PublicVn(connections=cls.connections,
                                                   public_vn=cls.inputs.public_vn,
                                                   public_tenant=cls.inputs.admin_tenant,
@@ -128,7 +137,6 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             metadata=metadata,
             spec=spec))
     # end setup_http_service
-
     def setup_ssh_service(self,
                            name=None,
                            namespace='default',
@@ -286,7 +294,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                         labels=None,
                         spec=None,
                         custom_isolation = False,
-			compute_node_selector = None,
+                        compute_node_selector = None,
                         fq_network_name = {}):
         '''
         Noticed that nginx continues to listen on port 80 even if target port
@@ -344,19 +352,24 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                           fq_network_name = {},
                           compute_node_selector=None):
         metadata = metadata or {}
+        container_port=80
         spec = spec or {}
         labels = labels or {}
         name = name or get_random_name('ssh-webserver')
         spec = spec or {
             'containers': [
                 {'image': 'mmumshad/ubuntu-ssh-enabled',
-                 'image_pull_policy': 'IfNotPresent',
+                 self.image_pull_policy: 'IfNotPresent',
+                 self.security_context: {"privileged": True, 'capabilities': {'add': ['SYS_ADMIN', 'NET_ADMIN', 'NET_RAW']}},
+                 'ports': [
+                     {'container_port': int(container_port)}
+		 ],
                  }
             ],
             'restart_policy': 'Always',
         }
         if compute_node_selector:
-           spec['node_selector'] = compute_node_selector
+           spec[self.node_selector] = compute_node_selector
 
         return self.setup_pod(name=name,
                               namespace=namespace,
@@ -385,13 +398,13 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             'containers': [
                 {'image': 'rsalian/centos-sshpass',
                  'command': ['sleep', '1000000'],
-                 'image_pull_policy': 'IfNotPresent',
+                 self.image_pull_policy: 'IfNotPresent',
                  }
             ],
             'restart_policy': 'Always',
         }
         if compute_node_selector:
-           spec['node_selector'] = compute_node_selector
+           spec[self.node_selector] = compute_node_selector
 
         return self.setup_pod(name=name,
                               namespace=namespace,
@@ -453,10 +466,10 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                 {'image': ((self.inputs.test_docker_registry + 'library/ubuntu-upstart') if self.inputs.test_docker_registry is not None else 'ubuntu-upstart'),
                  'command': ['sleep', '1000000'],
                  'image_pull_policy': 'IfNotPresent',
-                 }
+                }
             ],
             'restart_policy': 'Always',
-        }
+        }    
         return self.setup_pod(name=name,
                               namespace=namespace,
                               metadata=metadata,
@@ -1040,7 +1053,6 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         return obj
     # end setup_deployment
 
-
     def setup_nginx_deployment(self,
                                name=None,
                                namespace='default',
@@ -1064,6 +1076,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         template_spec = template_spec or {
             'containers': [
                 {'image': ((self.inputs.test_docker_registry + 'nginx') if self.inputs.test_docker_registry is not None else 'nginx'),
+                 self.image_pull_policy: 'IfNotPresent',
                  'ports': [
                      {'container_port': int(container_port)}
                  ],
@@ -1086,7 +1099,8 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                                      namespace=namespace,
                                      metadata=metadata,
                                      spec=spec)
-    # end setup_nginx_deployment
+
+        # end setup_nginx_deployment
 
     def setup_ssh_webserver_deployment(self,
                                name=None,
@@ -1111,7 +1125,8 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         template_spec = template_spec or {
             'containers': [
                 {'image': 'mmumshad/ubuntu-ssh-enabled',
-                 'image_pull_policy': 'IfNotPresent',
+                 self.image_pull_policy: 'IfNotPresent',
+                 self.security_context: {"privileged": True},
                  'ports': [
                      {'container_port': int(container_port)}
                  ],
@@ -1148,6 +1163,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         self.inputs.restart_service('contrail-kube-manager', ips,
                                      container='contrail-kube-manager',
                                      verify_service=True)
+
         time.sleep(30)#wait time to stabilize the cluster
     # end restart_kube_manager
 
@@ -1168,7 +1184,6 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                                      container='agent',
                                      verify_service=True)
     # end restart_vrouter_agent
-
     def restart_contrail_control(self, ips=None):
         '''
         Restarts vrouter agent
@@ -1311,7 +1326,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         vn_name = vn_name or get_random_name('vn_test')
         return self.useFixture(VNFixture(
                                         connections=connections,
-					project_name=project_name,
+                                        project_name=project_name,
                                         inputs=inputs,
                                         vn_name=vn_name,
                                         option=option))
@@ -1439,7 +1454,6 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         password = self.inputs.host_data[self.inputs.cfgm_ip]['password']
         docker_username = 'JNPR-CSRXFieldUser12'
         docker_password = 'd2VbRJ8xPhSUAwzo7Lym'
-        #import pdb;pdb.set_trace()
         cmd = "kubectl create secret docker-registry %s " \
               "--docker-server=hub.juniper.net/security " \
               "--docker-username=%s --docker-password=%s" %(pullsecret , docker_username ,docker_password)
@@ -1635,7 +1649,6 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             self.logger.error("Pod {} is not in Running or Succeeded state".format(pod.metadata.name))
             return False
         return True
-
     @retry(delay=2, tries=10)
     def validate_scp(self, pod, ip, expectation=True, port=22):
         """
@@ -1683,9 +1696,11 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                     "root@%s:/usr/bin/python3.5 /tmp/" % (port, ip)
         if not pod:
             with settings(warn_only=True):
+                if (os.environ['TEST_TAGS'] == 'openshift_1'):
+                   cmd = "scp -l 1 -i ~/.ssh/helper_rsa core@%s:/usr/bin/podman /tmp/ > /dev/null 2>&1 &" %(ip)
                 output = local(cmd, capture=True)
         else:
-            output = pod.run_cmd_on_pod(cmd)
+            output = pod.run_cmd_on_pod_with_tty(cmd, tty=False)
     # end do_scp
 
     @retry(delay=2, tries=10)
@@ -1721,18 +1736,18 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             assert service_ip in output, ("Flow not present for %s" %service_ip)
             if 'E:' in output:
                 ecmp_index = output.split('E:')[1].split(',')[0]
-                self.logger.info("Ecmp flow present for %s" %service_ip)
+                self.logger.info("Ecmp index for flow %s is %s" %(service_ip, ecmp_index))
                 return ecmp_index
         return -1
 
     def get_ecmp_flow_index(self, compute_ip_list, service_ip, client_ip, port=22):
-        cmd = "contrail-tools flow --match %s:%s,%s | grep '<=>' | awk '{print $1}'"\
+        cmd = "contrail-tools flow --match %s:%s,%s | grep '<=>'"\
                                 %(service_ip, port, client_ip)
         for compute_ip in compute_ip_list:
             output = self.inputs.run_cmd_on_server(compute_ip, cmd)
             if (output and self.validate_ecmp_flow(compute_ip_list, service_ip, client_ip)):
                 flow_index = output.split("<=>")[0]
-                self.logger.info("Flow index for %s is %s" %(service_ip, flow_index))
+                self.logger.info("Flow index for flow %s is %s" %(service_ip, flow_index))
                 return flow_index
         return -1
 
