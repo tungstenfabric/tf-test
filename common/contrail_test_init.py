@@ -1303,6 +1303,7 @@ class ContrailTestInit(object):
                'contrail-webui-middleware': 'webui-middleware',
                'contrail-collector': 'collector',
                'contrail-analytics-api': 'analytics-api',
+               'contrail-analytics-alarmgen': 'alarmgen',
                'contrail-query-engine': 'query-engine',
                'contrail-analytics-nodemgr': 'analytics-nodemgr',
                'contrail-snmp-collector': 'snmp-collector',
