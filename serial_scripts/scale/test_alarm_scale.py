@@ -41,8 +41,11 @@ class TestScaleAlarm(GenericTestBase):
         n_vns = scale_number
         n_process = 1
         cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                --n_vns %s --vnc  --n_process %s --project %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                    n_vns, n_process, project_name)
+                --n_vns %s --vnc  --n_process %s --project %s \
+                --admin_username %s --admin_password %s --username %s --password %s"%(
+                self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0], n_vns, n_process, project_name,
+                self.inputs.admin_username, self.inputs.admin_password, self.connections.username,
+                self.connections.password)
         try:
             output= subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError:
@@ -52,7 +55,7 @@ class TestScaleAlarm(GenericTestBase):
         self.check_alarms(scale_number)
         assert self.inputs.verify_state()
         for service in restart_services:
-            self.inputs.restart_containers(self.inputs.collector_ips, service)
+            self.inputs.restart_container(self.inputs.collector_ips, service)
         self.delete_vns(vns)
         self.logger.info('Total alarms scaled successfully')
 
