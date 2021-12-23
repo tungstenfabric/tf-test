@@ -601,7 +601,6 @@ class VerifySecGroup(BaseVrouterTest):
                         rule['remote_ip_prefix'] == '0.0.0.0/0' or \
                         rule['remote_group_id'] == secgrp_id)) or \
                     (af == 'v6' and (rule['ethertype'] == 'IPv6' or \
-                        rule['remote_group_id'] == secgrp_id or \
                         rule['remote_ip_prefix'] == '::/0'))) and \
                    (rule['protocol'] == 'any' or rule['protocol'] == proto):
                     rule_uuid = rule['id']

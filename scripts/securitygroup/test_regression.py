@@ -1567,61 +1567,40 @@ class SecurityGroupRegressionTests8(BaseSGTest, VerifySecGroup, ConfigPolicy):
         src_vn_fix = config_topo['vn'][topo_obj.vn_of_vm[src_vm_name]]
         dst_vn_fix = config_topo['vn'][topo_obj.vn_of_vm[dst_vm_name]]
 
-        # start traffic
-        assert self.send_nc_traffic(
-            src_vm_fix, dst_vm_fix, port, port, 'udp')
         if self.inputs.get_af() == 'v4':
+            # Start-Stop-Verify TCP traffic flow vs SG rule uuid.
             traffic_obj_tcp = BaseTraffic.factory(proto='tcp')
             assert traffic_obj_tcp
             assert traffic_obj_tcp.start(src_vm_fix, dst_vm_fix,
                 'tcp', port, port)
+            sg_name = topo_obj.sg_list[1]
+            secgrp_id = get_secgrp_id_from_name(
+                self.connections,
+                ':'.join([self.connections.domain_name,
+                    self.inputs.project_name,
+                    sg_name]))
+            tcp_flow=False
+            for trial in range(5):
+                try:
+                    assert self.verify_flow_to_sg_rule_mapping(
+                        src_vm_fix, dst_vm_fix, src_vn_fix,
+                        dst_vn_fix, secgrp_id, 'tcp', port)
+                    tcp_flow=True
+                    break
+                except Exception as e:
+                    self.logger.exception("Got exception as %s"%(e))
+                    tcp_flow=False
+                    sleep(10)
+            assert tcp_flow, "FAILED to match sec grp rule uuid to flow uuid"
+            sent, recv = traffic_obj_tcp.stop()
+
+            # ICMP traffic flow vs SG rule uuid.
             if sys.version_info > (3,0):
                 assert src_vm_fix.ping_with_certainty(dst_vm_fix.vm_ip, expectation=True)
             else:
                 sender_icmp, receiver_icmp = self.start_traffic_scapy(
                     src_vm_fix, dst_vm_fix, 'icmp', port, port, payload="payload")
-
-        sg_name = topo_obj.sg_list[0]
-        secgrp_id = get_secgrp_id_from_name(
-            self.connections,
-            ':'.join([self.connections.domain_name,
-                      self.inputs.project_name,
-                      sg_name]))
-
-        assert self.verify_flow_to_sg_rule_mapping(
-            src_vm_fix,
-            dst_vm_fix,
-            src_vn_fix,
-            dst_vn_fix,
-            secgrp_id,
-            'udp',
-            port)
-
-        sg_name = topo_obj.sg_list[1]
-        secgrp_id = get_secgrp_id_from_name(
-            self.connections,
-            ':'.join([self.connections.domain_name,
-                      self.inputs.project_name,
-                      sg_name]))
-
-        if self.inputs.get_af() == 'v4':
-            assert self.verify_flow_to_sg_rule_mapping(
-                src_vm_fix,
-                dst_vm_fix,
-                src_vn_fix,
-                dst_vn_fix,
-                secgrp_id,
-                'tcp',
-                port)
-
             port = 0
-            sg_name = topo_obj.sg_list[0]
-            secgrp_id = get_secgrp_id_from_name(
-                self.connections,
-                ':'.join([self.connections.domain_name,
-                          self.inputs.project_name,
-                          sg_name]))
-
             if sys.version_info < (3,0):
                 assert self.verify_flow_to_sg_rule_mapping(
                     src_vm_fix,
@@ -1632,9 +1611,29 @@ class SecurityGroupRegressionTests8(BaseSGTest, VerifySecGroup, ConfigPolicy):
                     'icmp',
                     port)
 
-            sent, recv = traffic_obj_tcp.stop()
             if sys.version_info < (3,0):
                 sent, recv = self.stop_traffic_scapy(sender_icmp, receiver_icmp)
+
+        # start udp traffic
+        port = 10000
+        assert self.send_nc_traffic(
+            src_vm_fix, dst_vm_fix, port, port, 'udp')
+
+        sg_name = topo_obj.sg_list[0]
+        secgrp_id = get_secgrp_id_from_name(
+            self.connections,
+            ':'.join([self.connections.domain_name,
+                self.inputs.project_name,
+                sg_name]))
+
+        assert self.verify_flow_to_sg_rule_mapping(
+            src_vm_fix,
+            dst_vm_fix,
+            src_vn_fix,
+            dst_vn_fix,
+            secgrp_id,
+            'udp',
+            port)
 
         return True
     # end test_flow_to_sg_rule_mapping_multiple_rules
