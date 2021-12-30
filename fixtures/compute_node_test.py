@@ -222,7 +222,7 @@ class ComputeNodeFixture(fixtures.Fixture):
         max_flows = 'max_vm_flows=' + str(max_vm_flows)
         self.inputs.add_knob_to_container(self.ip, self.container, 'FLOWS', \
                                           max_flows, restart_container=True, \
-                                          file_name='entrypoint.sh')
+                                          file_name='actions.sh')
         cmd = 'docker cp %s:/%s %s' %(self.container, self.agent_conf_file, \
                                         self.agent_conf_file)
         self.inputs.run_cmd_on_server(self.ip, cmd, self.username, self.password)

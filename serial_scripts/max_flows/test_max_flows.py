@@ -40,7 +40,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
     def waiting_for_flow_timeout(self):
         self.logger.info("Sleeping for flow timeout (%d seconds)..." % (self.DEFAULT_FLOW_TIMEOUT))
-        time.sleep(self.DEFAULT_FLOW_TIMEOUT)
+        time.sleep(self.DEFAULT_FLOW_TIMEOUT + 10)
         self.logger.info("Sleeping for flow timeout (%d seconds)...Completed" % (self.DEFAULT_FLOW_TIMEOUT))
 
     @preposttest_wrapper
@@ -106,7 +106,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi_fixtures = self.setup_vmis(vn_fixtures, vmi=vmi)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
@@ -422,7 +422,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
@@ -843,7 +843,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
@@ -1011,7 +1011,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
 
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
@@ -1193,7 +1193,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi_fixtures = self.setup_vmis(vn_fixtures, vmi=vmi)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
 
@@ -1249,13 +1249,14 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi_fixtures_3 = self.setup_vmis(vn_fixtures, vmi=vmi_3)
 
         # Create VMs
-        vm_fixtures_3 = self.setup_vms(vn_fixtures, vmi_fixtures_3, vm=vm_3, image_name='ubuntu-traffic')
+        vm_fixtures_3 = self.setup_vms(vn_fixtures, vmi_fixtures_3, vm=vm_3, image_name='ubuntu-traffic-py3')
         vm13_fix = vm_fixtures_3['vm13']
 
         vm13_vrouter_fixture = ComputeNodeFixture(self.connections, vm13_fix.vm_node_ip)
 
         self.logger.info("Sleeping for dns/metadata flows to timeout 180 seconds...")
         self.waiting_for_flow_timeout()
+        time.sleep(120)
 
 # Verify Max_flows functionality on VN level
         #import pdb; pdb.set_trace()
@@ -1337,7 +1338,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
 
@@ -1541,7 +1542,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi11_fix.set_max_flows(max_flows=vmi11_max_flows)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
 
@@ -1767,7 +1768,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
@@ -2036,7 +2037,7 @@ class TestMaxFlows(VerifyMaxFlows, BaseMaxFlowsTest):
         vmi13_fix.set_max_flows(max_flows=vmi13_max_flows)
 
         # Create VMs
-        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic')
+        vm_fixtures = self.setup_vms(vn_fixtures, vmi_fixtures, vm=vm, image_name='ubuntu-traffic-py3')
         vm11_fix = vm_fixtures['vm11']
         vm12_fix = vm_fixtures['vm12']
         vm13_fix = vm_fixtures['vm13']
