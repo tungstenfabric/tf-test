@@ -62,7 +62,7 @@ class BaseFwaaSTest(BaseFirewallTest):
             ip_version=ip_version)
         rules = list(map(lambda x: {'uuid': x.uuid}, [icmp_fwr, tcp_fwr, udp_fwr]))
         fwp = self.create_fw_policy(rules=rules)
-        fwg = self.create_fw_group(vm_fixtures=self.vms.values(),
+        fwg = self.create_fw_group(vm_fixtures=list(self.vms.values()),
                                    ingress_policy=fwp, egress_policy=fwp)
         # Validate list firewall groups
         assert fwg.uuid in [group['id'] for group in
@@ -75,7 +75,7 @@ class BaseFwaaSTest(BaseFirewallTest):
         assert icmp_fwr.uuid in fw_rules
         assert tcp_fwr.uuid in fw_rules
         assert udp_fwr.uuid in fw_rules
-        assert self.check_vms_booted(self.vms.itervalues(), do_assert=False)
+        assert self.check_vms_booted(list(self.vms.values()), do_assert=False)
 
         # Validating TCP and UDP flows matching allow and implicit deny
         self._verify_traffic(self.vms['hr_web'], self.vms['hr_logic'],
@@ -551,7 +551,7 @@ class TestFwaas(BaseFwaaSTest):
             self.connections.project_id)
         admin_quota_dict = self.admin_connections.quantum_h.show_quota(
             self.admin_connections.project_id)
-        for obj, limit in quota_dict.iteritems():
+        for obj, limit in quota_dict.items():
             assert limit == quota_show_dict['quota'][obj], 'Failed to update quota for %s'%obj
             assert limit != admin_quota_dict['quota'][obj], \
                 'Update on Project1 quota shouldnt be reflected on other projects'
