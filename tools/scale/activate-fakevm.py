@@ -3,8 +3,6 @@ import argparse
 import os
 import time
 from fabric.api import *
-from common.contrail_services import *
-
 
 class ActivateScaleVMTest(object):
     def __init__ (self, args):
@@ -84,13 +82,10 @@ class ActivateScaleVMTest(object):
             sudo("docker exec -it %s rm -rf %s*" % (self.container(compute), self.file))
 
     def container(self, compute):
-        containers = get_contrail_services_map(self).get('agent')
-        for container in containers:
-            with settings(host_string='%s@%s' % (self.username, compute),
+        with settings(host_string='%s@%s' % (self.username, compute),
                       password=self.password, warn_only=True):
-                container = sudo("docker ps -a| grep agent | awk '{print $NF}'")
-        if container:
-            return container
+            container = sudo("docker ps -a| grep agent | awk '{print $NF}'")
+        return container
 
 
 
