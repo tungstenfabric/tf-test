@@ -249,6 +249,13 @@ class TestFlowScale(GenericTestBase):
         assert abs(flow_count - flow_count_list[flow_len -
                                                 1]) < 50, 'Flow count fluctuating'
         mem_len = len(self.mem_usg)
+        diff = [j-i for i, j in zip(self.mem_usg[:-1], self.mem_usg[1:])]
+        avg = sum(diff) / len(diff)
+        self.min_mem_usg = min(diff)
+        self.tolerance = avg * 0.01
+        self.logger.info('DIFF: %s AND AVG: %s' % (diff, avg))
+        self.logger.info('Min memory usage: %s' % self.min_mem_usg)
+        self.logger.info('Flow to memory usage: %s' % self.flow_mem_usage)
         assert abs(mem - self.mem_usg[mem_len-1]
                    ) < self.tolerance, 'Memory usage of vrouter fluctuating'
         self.flow_mem_usage[flow_count] = mem
@@ -370,13 +377,6 @@ class TestFlowScale(GenericTestBase):
             self.watch_for_fluctuations(flow_count_list)
             self.logger.info('Sleep for 10m')
             time.sleep(10 * 60)
-
-        diff = [j-i for i, j in zip(self.mem_usg[:-1], self.mem_usg[1:])]
-        avg = sum(diff) / len(diff)
-        self.min_mem_usg = min(diff)
-        self.logger.info('DIFF: %s AND AVG: %s' % (diff, avg))
-        self.logger.info('Min memory usage: %s' % self.min_mem_usg)
-        self.logger.info('Flow to memory usage: %s' % self.flow_mem_usage)
 
 
 if __name__ == '__main__':
