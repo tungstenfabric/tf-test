@@ -19,6 +19,22 @@ class TestFlowScale(GenericTestBase):
         flow_entries = 1024 * 1024 * 6
         cls.flow_timeout = 120
         cls.set_flow_entries_and_age_timeout(flow_entries, cls.flow_timeout)
+        cls.start_tools_container()
+
+    @classmethod
+    def start_tools_container(cls):
+        for compute in cls.compute_fixtures:
+            cfg = cls.inputs.contrail_configs
+            image = "%s/contrail-tools:%s" % (cfg['CONTAINER_REGISTRY'],
+                                              cfg['CONTRAIL_VERSION'])
+            cmd = "docker run -id --entrypoint bash "
+            cmd += " --name tools "
+            cmd += "-v /etc/contrail:/etc/contrail:ro -v /etc/hosts:/etc/hosts:ro "
+            cmd += "-v /etc/localtime:/etc/localtime:ro -v /var/run:/var/run "
+            cmd += "-v /dev:/dev -v /var/lib/containers:/var/lib/containers "
+            cmd += "--pid host --net host --privileged "
+            cmd += image
+            compute.execute_cmd(cmd, container=None)
 
     @classmethod
     def tearDownClass(cls):
