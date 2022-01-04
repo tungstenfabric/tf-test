@@ -33,7 +33,7 @@ class TestVrfScale(GenericTestBase):
         n_vns = self.inputs.control_node_vrf_scale
         n_vms = 1
         cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
-                --n_vns %s --vnc  --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
+                --n_vns %s --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
                                                        n_vns, n_vms)
         try:
             output= subprocess.check_output(cmd, shell=True)
@@ -41,9 +41,10 @@ class TestVrfScale(GenericTestBase):
         except subprocess.CalledProcessError:
             pass
         
+        host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
         cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
-                --password %s"%(self.inputs.cfgm_ips[1], self.inputs.cfgm_username[0],
-                                                       self.inputs.cfgm_password[0])
+                --password %s"%(self.inputs.cfgm_ips[1], host_data['username'],
+                                host_data['password'])
         try:
             output= subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError:
@@ -53,7 +54,7 @@ class TestVrfScale(GenericTestBase):
         assert self.inputs.verify_state()
         scaled_vns = scaled_vns + vns
         for service in restart_services:
-            self.inputs.restart_containers(self.inputs.cfgm_ips, service)
+            self.inputs.restart_service(service, self.inputs.cfgm_ips)
         total_vns = self.verify_scale_objects(object_type='vn')
         total_vrf = self.verify_scale_objects(object_type='vrf')
         assert (total_vrf/scale_number)*100 < 90, 'Not able to scale expected number of VRFs'
@@ -77,16 +78,17 @@ class TestVrfScale(GenericTestBase):
         n_vns = self.inputs.compute_node_vrf_scale
         n_vms = 1
         cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
-                --n_vns %s --vnc  --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
+                --n_vns %s --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
                                                        n_vns, n_vms)
         try:
             output= subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError:
             pass
         
+        host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
         cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
-                --password %s"%(self.inputs.cfgm_ips[1], self.inputs.cfgm_username[0],
-                                                       self.inputs.cfgm_password[0])
+                --password %s"%(self.inputs.cfgm_ips[1], host_data['username'],
+                                host_data['password'])
         try:
             output= subprocess.check_output(cmd, shell=True)
             self.logger.info(output)
@@ -97,7 +99,7 @@ class TestVrfScale(GenericTestBase):
         assert self.inputs.verify_state()
         scaled_vns = scaled_vns + vns
         for service in restart_services:
-            self.inputs.restart_containers(self.inputs.cfgm_ips, service)
+            self.inputs.restart_service(service, self.inputs.cfgm_ips)
         total_vns = self.verify_scale_objects(object_type='vn')
         total_vrf = self.verify_scale_objects(object_type='vrf')
         assert (total_vrf/scale_number)*100 < 90, 'Not able to scale expected number of VRFs'
@@ -120,16 +122,17 @@ class TestVrfScale(GenericTestBase):
         n_vns = 1
         n_vms = self.inputs.vm_scale
         cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
-                --n_vns %s --vnc  --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
+                --n_vns %s --n_vms %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
                                                        n_vns, n_vms)
         try:
             output= subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError:
             pass
         
+        host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
         cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
-                --password %s"%(self.inputs.cfgm_ips[1], self.inputs.cfgm_username[0],
-                                                       self.inputs.cfgm_password[0])
+                --password %s"%(self.inputs.cfgm_ips[1], host_data['username'],
+                                host_data['password'])
         try:
             output= subprocess.check_output(cmd, shell=True)
             self.logger.info(output)
@@ -140,7 +143,7 @@ class TestVrfScale(GenericTestBase):
         assert self.inputs.verify_state()
         scaled_vns = scaled_vns + vns
         for service in restart_services:
-            self.inputs.restart_containers(self.inputs.cfgm_ips, service)
+            self.inputs.restart_service(service, self.inputs.cfgm_ips)
         total_vns = self.verify_scale_objects(object_type='vn')
         total_vrf = self.verify_scale_objects(object_type='vrf')
         assert (total_vrf/scale_number)*100 < 90, 'Not able to scale expected number of VMs'
