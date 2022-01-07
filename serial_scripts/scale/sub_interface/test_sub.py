@@ -43,7 +43,7 @@ class TestSubInterfaceScale(GenericTestBase):
     def vnc_check(cls):
         actual_vmis = cls.vnc_lib.virtual_machine_interface_read(
             id=cls.port_uuid).virtual_machine_interface_refs
-        assert actual_vmis == cls.num, 'Desired number is not equal to actual number Created'
+        assert len(actual_vmis) == cls.num, 'Desired number is not equal to actual number Created'
 
     @classmethod
     def setup_port(cls):
