@@ -225,6 +225,61 @@ _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP = {
     'analytics-zookeeper': ['contrail_analytics_zookeeper'],
 }
 
+# Separate container names for Operator deployer
+_CONTRAIL_SERVICES_OPERATOR_CONTAINER_MAP = {
+    # Vrouter
+    'vrouter-nodemgr': ['contrail_vrouter_agent_nodemgr'],
+    'agent': ['contrail_vrouter_agent'],
+    # Control
+    'control': ['k8s_control_control1-control'],
+    'named': ['k8s_named_control1-control'],
+    'dns': ['k8s_dns_control1-control'],
+    'control-nodemgr': ['k8s_nodemanager_control1-control'],
+    # Analytics Alarm
+    'alarmgen': ['k8s_analytics-alarm-gen_analyticsalarm1-analyticsalarm'],
+    'analytics-alarm-nodemgr': ['k8s_nodemanager_analyticsalarm1-analyticsalarm'],
+    'kafka': ['kafka_analyticsalarm1-analyticsalarm'],
+    # Analytics Database
+    'analytics-cassandra': ['k8s_cassandra_analyticsdb1-cassandra'],
+    'analyticsdb-nodemgr': ['k8s_nodemanager_analyticsdb1-cassandra'],
+    'query-engine': ['k8s_queryengine_queryengine1-queryengine'],
+    # Analytics
+    'analytics-api': ['k8s_analyticsapi_analytics1-analytics'],
+    'collector': ['k8s_collector_analytics1-analytics'],
+    'analytics-nodemgr': ['k8s_nodemanager_analytics1-analytics'],
+    # Config Database
+    'config-cassandra': ['k8s_cassandra_configdb1-cassandra'],
+    'config-rabbitmq': ['k8s_rabbitmq_rabbitmq1-rabbitmq'],
+    'config-zookeeper': ['k8s_zookeeper_zookeeper1-zookeeper'],
+    'configdb-nodemgr': ['k8s_nodemanager_configdb1-cassandra'],
+    # WebUI
+    'webui': ['k8s_webuiweb_webui1-webui'],
+    'webui-middleware': ['k8s_webuijob_webui1-webui'],
+    # Analytics SNMP
+    'snmp-collector': ['k8s_analytics-snmp-collector_analyticssnmp1-analyticssnmp'],
+    'snmp-topology': ['k8s_analytics-snmp-topology_analyticssnmp1-analyticssnmp'],
+    'analytics-snmp-nodemgr': ['k8s_nodemanager_analyticssnmp1-analyticssnmp'],
+    # Config
+    'api-server': ['k8s_api_config1-config'],
+    'schema': ['k8s_schematransformer_config1-config'],
+    'svc-monitor': ['k8s_servicemonitor_config1-config'],
+    'device-manager': ['k8s_devicemanager_config1-config'],
+    'config-nodemgr': ['k8s_nodemanager_config1-config'],
+    # missing-entries
+    'agent-dpdk': ['contrail-vrouter-agent-dpdk'],
+    'nova': ['nova_api'],
+    'nova-compute': ['nova_compute'],
+    'nova-conductor': ['nova_conductor'],
+    'nova-scheduler': ['nova_scheduler'],
+    'glance': ['glance_api'],
+    'haproxy': ['haproxy'],
+    'keystone': ['keystone'],
+    'neutron': ['neutron_api'],
+    'mysql': ['clustercheck'],
+    'redis': ['k8s_redis_redis1-redis'],
+    'stunnel': ['k8s_stunnel_redis1-redis'],
+}
+
 CONTRAIL_PODS_SERVICES_MAP = {
     'vrouter': ['vrouter-nodemgr', 'agent'],
     'control': ['control-nodemgr',
@@ -299,5 +354,7 @@ def get_contrail_services_map(inputs):
         return _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP
     elif inputs.deployer == 'helm':
         return _CONTRAIL_SERVICES_HELM_CONTAINER_MAP
+    elif inputs.deployer == 'operator':
+        return _CONTRAIL_SERVICES_OPERATOR_CONTAINER_MAP
     else:
         return _CONTRAIL_SERVICES_CONTAINER_MAP

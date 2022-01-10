@@ -845,7 +845,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         containers = [x.strip('\r') for x in output.split('\n')]
 
         containers = [x for x in containers if 'k8s_POD' not in x]
-        nodemgr_cntrs = [x for x in containers if 'nodemgr' in x]
+        nodemgr_cntrs = [x for x in containers if 'nodemgr' in x or 'nodemanager' in x]
         containers = set(containers) - set(nodemgr_cntrs)
 
         # Observed in Openshift scenario, recent container-name changes causing issue picking wrong container which is down/inactive after fail-over
