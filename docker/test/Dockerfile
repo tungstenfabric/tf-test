@@ -13,7 +13,9 @@ RUN cp -r /etc/yum.repos.d /etc/yum.repos.d.orig && \
 COPY $DOCKERFILE_DIR/*.repo $DOCKERFILE_DIR/prepare_repos.sh /etc/yum.repos.d/
 COPY ./ /contrail-test/
 
+# install bash curl and other rpm for upgrade to versions without vulnerabilities
 RUN /etc/yum.repos.d/prepare_repos.sh && \
+    yum install -y bash curl expat gobject-introspection libxml2 procps-ng yum-utils && \
     yum install -y python-contrail python3-contrail && \
     yum clean all -y && rm -rf /var/cache/yum && \
     if [[ "$ID" == 'centos' ]] ; then \
