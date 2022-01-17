@@ -186,7 +186,7 @@ EOF
             fi
         fi
     fi
-    if [[ -z "$SITE_MIRROR" ]] ; then
+    if [[ -n "$SITE_MIRROR" ]] ; then
         build_arg_opts+=" --build-arg SITE_MIRROR=${SITE_MIRROR}"
     fi
     if [[ "$LINUX_ID" == 'rhel' && "${LINUX_VER_ID//.[0-9]*/}" == '8' ]] ; then
@@ -198,7 +198,8 @@ EOF
         if [ -e /run/secrets/etc-pki-entitlement ] ; then
             build_arg_opts+=' -v /run/secrets/etc-pki-entitlement:/run/secrets/etc-pki-entitlement:ro'
         fi
-        if [[ -z "${RHEL_HOST_REPOS+x}" ]] ; then
+        #We set default only for undefined RHEL_HOST_REPOS (use empty RHEL_HOST_REPOS for local mirrors)
+        if [[ -z ${RHEL_HOST_REPOS+x} ]] ; then
             RHEL_HOST_REPOS=${RHEL_HOST_REPOS:-}
             RHEL_HOST_REPOS+=",rhel-8-for-x86_64-baseos-rpms"
             RHEL_HOST_REPOS+=",rhel-8-for-x86_64-appstream-rpms"
