@@ -402,8 +402,8 @@ class VerifySvcChain(ConfigSvcChain):
         st_fixture = ret_dict.get('st_fixture')
         si_fixture = ret_dict.get('si_fixture')
         evpn = ret_dict.get('evpn')
-        left_vm_vmi = kwargs['left_vm_fixture'].vmi_ids.values()[0]
-        right_vm_vmi = kwargs['right_vm_fixture'].vmi_ids.values()[0]
+        left_vm_vmi = list(kwargs['left_vm_fixture'].vmi_ids.values())[0]
+        right_vm_vmi = list(kwargs['right_vm_fixture'].vmi_ids.values())[0]
         if 'packet_mode' in kwargs and kwargs['packet_mode']:
             self.vnc_h.disable_policy_on_vmi(left_vm_vmi)
             self.vnc_h.disable_policy_on_vmi(right_vm_vmi)
@@ -516,8 +516,8 @@ class VerifySvcChain(ConfigSvcChain):
         st_fixture = ret_dict.get('st_fixture')
         si_fixture = ret_dict.get('si_fixture')
         evpn = ret_dict.get('evpn')
-        left_vm_vmi = kwargs['left_vm_fixture'].vmi_ids.values()[0]
-        right_vm_vmi = kwargs['right_vm_fixture'].vmi_ids.values()[0]
+        left_vm_vmi = list(kwargs['left_vm_fixture'].vmi_ids.values())[0]
+        right_vm_vmi = list(kwargs['right_vm_fixture'].vmi_ids.values())[0]
         if 'packet_mode' in kwargs and kwargs['packet_mode']:
             self.vnc_h.disable_policy_on_vmi(left_vm_vmi)
             self.vnc_h.disable_policy_on_vmi(right_vm_vmi)
@@ -646,8 +646,8 @@ class VerifySvcChain(ConfigSvcChain):
         st_fixture = ret_dict.get('st_fixture')
         si_fixture = ret_dict.get('si_fixture')
         evpn = ret_dict.get('evpn')
-        left_vm_vmi = kwargs['left_vm_fixture'].vmi_ids.values()[0]
-        right_vm_vmi = kwargs['right_vm_fixture'].vmi_ids.values()[0]
+        left_vm_vmi = list(kwargs['left_vm_fixture'].vmi_ids.values())[0]
+        right_vm_vmi = list(kwargs['right_vm_fixture'].vmi_ids.values())[0]
         #self.vnc_h.disable_policy_on_vmi(left_vm_vmi)
         #self.vnc_h.disable_policy_on_vmi(right_vm_vmi)
         #for svm in ret_dict.get('svm_fixtures'):
@@ -666,8 +666,8 @@ class VerifySvcChain(ConfigSvcChain):
             'mirror_vm2',  vn_fix=mirror_vn_fix, image_name='ubuntu')
         mirror_vm1_fix.wait_till_vm_is_up()
         mirror_vm2_fix.wait_till_vm_is_up()
-        port1_obj = self.vnc_lib.virtual_machine_interface_read(id=mirror_vm1_fix.vmi_ids.values()[0])
-        port2_obj = self.vnc_lib.virtual_machine_interface_read(id=mirror_vm2_fix.vmi_ids.values()[0])
+        port1_obj = self.vnc_lib.virtual_machine_interface_read(id=list(mirror_vm1_fix.vmi_ids.values())[0])
+        port2_obj = self.vnc_lib.virtual_machine_interface_read(id=list(mirror_vm2_fix.vmi_ids.values())[0])
         for vn_subnet in ret_dict.get('left_vn_fixture').vn_subnets:
             if vn_subnet['ip_version'] == '4':
                 vIP = get_an_ip(vn_subnet['cidr'], offset=20)

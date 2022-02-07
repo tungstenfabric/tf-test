@@ -85,7 +85,7 @@ class Iperf3(object):
         cmd = 'cat %s | grep -E "[0-9]+\/[0-9]+" | tail -1' %self.log_file
         time.sleep(10)
         output = self.server_vm_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=True)
-        match_obj = re.search('([0-9\.]+)%', output.values()[0])
+        match_obj = re.search('([0-9\.]+)%', list(output.values())[0])
         return match_obj.group(1)
 
     def stop(self):
@@ -126,10 +126,10 @@ class Iperf3(object):
         result = self.client_vm_fixture.run_cmd_on_vm(
             cmds=['pidof iperf3'],
             raw=True)
-        if result.values()[0]:
+        if list(result.values())[0]:
             self.logger.debug('iperf3 is active on %s, PID: %s' % (
                               self.client_vm_fixture,
-                              result.values()[0]))
+                              list(result.values())[0]))
             return True
         else:
             self.logger.debug('PID of iperf not found to be running'
