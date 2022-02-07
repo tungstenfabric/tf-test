@@ -7,6 +7,7 @@ from tcutils.util import get_an_ip
 from vnc_api.vnc_api import BadRequest
 
 class TestFirewallBasic(FirewallBasic):
+
     @preposttest_wrapper
     def test_local_scope(self):
         '''
@@ -606,6 +607,7 @@ class TestFirewallBasic(FirewallBasic):
              sport=1111, dport=8004)
 
 class TestFirewall_1(BaseFirewallTest_1):
+
     @preposttest_wrapper
     def test_unidirection_rule(self):
         '''
@@ -630,6 +632,7 @@ class TestFirewall_1(BaseFirewallTest_1):
         self.verify_traffic(self.vms['hr_logic'], self.vms['hr_web'],
                            'tcp', sport=8005, dport=1112)
 
+    @preposttest_wrapper
     def test_floating_ip(self):
         SCOPE1 = 'global'; SCOPE2 = 'global'
         fvn = self.create_vn()
@@ -684,6 +687,8 @@ class TestFirewall_1(BaseFirewallTest_1):
             'tcp', sport=1112, dport=8007, expectation=True)
 
 class TestFirewall_2(BaseFirewallTest_1):
+
+    @preposttest_wrapper
     def test_subinterface(self):
         SCOPE1 = 'local'; SCOPE2 = 'local'
         self._create_objects(SCOPE1, SCOPE2)
@@ -757,7 +762,10 @@ class TestFirewall_2(BaseFirewallTest_1):
         self._verify_ping(self.vms['hr_web'], self.vms['hr_logic'], self.vms['hr_db'])
 
 class TestFirewall_3(BaseFirewallTest_1):
+
     image_name = 'ubuntu-keepalive'
+
+    @preposttest_wrapper
     def test_allowed_address_pair(self):
         SCOPE1 = 'global'; SCOPE2 = 'global'
         self._create_objects(SCOPE1, SCOPE2)
@@ -791,6 +799,7 @@ class TestFirewall_3(BaseFirewallTest_1):
             'udp', sport=1112, dport=8085, fip_ip=vIP, expectation=False)
 
 class TestFirewallDraft_1(FirewallDraftBasic):
+
     @preposttest_wrapper
     def test_global_draft_mode(self):
         SCOPE1 = 'global'; SCOPE2 = 'global'
@@ -802,6 +811,7 @@ class TestFirewallDraft_1(FirewallDraftBasic):
         self._test_draft_mode(SCOPE1, SCOPE2)
 
 class TestFirewallDraftMisc(BaseFirewallTest):
+
     @preposttest_wrapper
     def test_misc_draft_mode_1(self):
         SCOPE1 = 'local'; SCOPE2 = 'global'
@@ -884,6 +894,14 @@ class TestFirewallDraftMisc(BaseFirewallTest):
         self.perform_cleanup(fwr)
         self.perform_cleanup(sg)
         self.validate_draft({'deleted': [sg, fwr]}, SCOPE1, SCOPE2)
+        try:
+            fwr.update(service_groups=[sg.uuid])
+        except BadRequest:
+            self.logger.info(
+                'exception seen on reference to delete pending resource')
+            self.discard(SCOPE1, SCOPE2)
+        else:
+            assert False, 'no exception on reference to delete pending resource'
         fwr.update(service_groups=[sg.uuid])
         sg.add_services([('tcp', (0,65535), (8010, 8020))])
         self.validate_draft({'updated': [fwr, sg]}, SCOPE1, SCOPE2)
