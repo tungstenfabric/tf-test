@@ -362,6 +362,7 @@ class BaseFirewallTest(BaseNeutronTest):
         # so disassociate from default FWG before associating to new FWG
         if ports and kwargs.get('name') != 'default':
             self.default_fwg.delete_ports(ports)
+            self.sleep(10)
         fixture = self.useFixture(FirewallGroupFixture(connections=connections,
                                ingress_policy_id=ingress_policy_id,
                                egress_policy_id=egress_policy_id,
