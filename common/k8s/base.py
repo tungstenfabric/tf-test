@@ -1678,29 +1678,32 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             ret_val = False
         return ret_val == expectation
     # end validate_scp
-
-    def do_scp(self, pod, ip, port=22, limit_rate=False):
+    def do_scp(self, pod, ip, port=22, limit_rate=False, old_count=0,session_count=1):
         """
         This function will copy python3.5 binary from server pod to client pod
         If limit rate is set true then copy will be done very slowly at 1B/s.
         This will allow us to have flow for longer time so that scale up/down
         can be tested and we can verify that flow is not deleted.
         """
-        if limit_rate:
-            cmd = "sshpass -p Passw0rd scp -l 1 -o StrictHostKeyChecking=no "\
-                    "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
-                    "root@%s:/usr/bin/python3.5 /tmp/ > /dev/null 2>&1 &" %(port, ip)
-        else:
-            cmd = "sshpass -p Passw0rd scp -o StrictHostKeyChecking=no "\
-                    "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
-                    "root@%s:/usr/bin/python3.5 /tmp/" % (port, ip)
-        if not pod:
-            with settings(warn_only=True):
-                if (os.environ['TEST_TAGS'] == 'openshift_1'):
-                   cmd = "scp -l 1 -i ~/.ssh/helper_rsa core@%s:/usr/bin/podman /tmp/ > /dev/null 2>&1 &" %(ip)
-                output = local(cmd, capture=True)
-        else:
-            output = pod.run_cmd_on_pod_with_tty(cmd, tty=False)
+        ## added for loop for count
+        for val in range(old_count,session_count):
+            val = get_random_name()
+            if limit_rate:
+                cmd = "sshpass -p Passw0rd scp -l 1 -o StrictHostKeyChecking=no "\
+                        "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
+                        "root@%s:/usr/bin/python3.5 /tmp/%s > /dev/null 2>&1 &" %(port, ip, val)
+            else:
+                cmd = "sshpass -p Passw0rd scp -o StrictHostKeyChecking=no "\
+                        "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
+                        "root@%s:/usr/bin/python3.5 /tmp/%s" % (port, ip, val)
+            if not pod:
+                with settings(warn_only=True):
+                    ##New changes .get and count
+                    if (os.environ.get('TEST_TAGS') == 'openshift_1'):
+                       cmd = "scp -l 1 -i ~/.ssh/helper_rsa core@%s:/usr/bin/podman /tmp/ > /dev/null 2>&1 &" %(ip,val)
+                    output = local(cmd, capture=True)
+            else:
+                output = pod.run_cmd_on_pod_with_tty(cmd, tty=False)
     # end do_scp
 
     @retry(delay=2, tries=10)
@@ -1738,16 +1741,105 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                 ecmp_index = output.split('E:')[1].split(',')[0]
                 self.logger.info("Ecmp index for flow %s is %s" %(service_ip, ecmp_index))
                 return ecmp_index
-        return -1
-
+        return None
     def get_ecmp_flow_index(self, compute_ip_list, service_ip, client_ip, port=22):
         cmd = "contrail-tools flow --match %s:%s,%s | grep '<=>'"\
                                 %(service_ip, port, client_ip)
+        flow_index_list = []
         for compute_ip in compute_ip_list:
             output = self.inputs.run_cmd_on_server(compute_ip, cmd)
-            if (output and self.validate_ecmp_flow(compute_ip_list, service_ip, client_ip)):
-                flow_index = output.split("<=>")[0]
-                self.logger.info("Flow index for flow %s is %s" %(service_ip, flow_index))
-                return flow_index
-        return -1
+
+            for line in output.split("\n"):
+                if (line and self.validate_ecmp_flow(compute_ip_list, service_ip, client_ip)):
+                    flow_index = line.split("<=>")[0].strip()
+                    self.logger.info("Flow index for flow %s is %s" %(service_ip, flow_index))
+                    flow_index_list.append(flow_index)
+        return flow_index_list
+    def get_flow_stats(self, compute_ip_list, service_ip, flow_index):
+        cmd = "contrail-tools flow --get %s | grep 'Flow Statistics:'"\
+                                %(flow_index)
+
+        for compute_ip in compute_ip_list:
+            output = self.inputs.run_cmd_on_server(compute_ip, cmd)
+
+            if output:
+               flow_sent = output.split("Statistics:")[1].split("/")[0].strip()
+               flow_rcvd = output.split("Statistics:")[1].split("/")[1].split(",")[0].strip()
+               self.logger.info("Comp ip :%s flow-index :%s ,sent: %s recv: %s" %(compute_ip,flow_index, flow_sent, flow_rcvd))
+               return (flow_sent,flow_rcvd)
+        assert False,'flow  %s is not active in any compute' % (flow_index)  
+
+    def get_ecmp_flow_count(self, compute_ip_list, service_ip, client_ip, port=22):
+        cmd = "contrail-tools flow --match %s:%s,%s | grep '<=>'"\
+                                %(service_ip, port, client_ip)
+        count = 0
+        for compute_ip in compute_ip_list:
+
+            output = self.inputs.run_cmd_on_server(compute_ip, cmd)
+            if output:
+               count += len(re.findall("<=>",output))
+        return count
+    def get_list_of_pods(self, compute_ip_list, pod_count, namespace=''):
+        pod_dict = {}
+        if namespace:
+           assert self.validate_pod_count(pod_count,namespace),"Expected pods are not same as actual pods"
+           dict_t = {}
+           for index in range(pod_count):
+               dict_t.update({self.connections.k8s_client.get_pods(namespace).items[index].status.pod_ip:0})
+               pod_dict[self.connections.k8s_client.get_pods(namespace).items[index].status.host_ip] = dict_t
+
+        else:
+           dict_t = {}
+           for index in range(pod_count):
+               dict_t.update({self.connections.k8s_client.get_pods(namespace).items[index].status.pod_ip:0})
+               pod_dict[self.connections.k8s_client.get_pods(namespace).items[index].status.host_ip] = dict_t
+        return pod_dict
+
+    def get_per_pod_flows(self,compute_ip_list,pod_dict,client_ip,port=22):
+        for comp_ip,pod_ip_dict in pod_dict.items():
+            for pod_ip in pod_ip_dict:
+                count = 0
+                cmd = "contrail-tools flow --match %s:%s,%s | grep '<=>'"\
+                                %(pod_ip, port, client_ip)
+                output = self.inputs.run_cmd_on_server(comp_ip, cmd)
+                if output:
+                   count += len(re.findall("<=>",output))
+                   pod_ip_dict[pod_ip] += count
+        return pod_dict
+    def compare_pod_flow_dict(self,old_pod_flows,new_pod_flows):
+
+        for comp_ip,pod_ip_dict in new_pod_flows.items():
+            for pod_ip,flow_count in pod_ip_dict.items():
+                assert old_pod_flows[comp_ip][pod_ip] == flow_count ,\
+                "Comp_ip:%s for pod %s expected flows %s, present flows %s" %(comp_ip, pod_ip,old_pod_flows[comp_ip][pod_ip],flow_count)
+        return True
+    @retry(delay=3, tries=10)
+    def validate_pod_count(self, pod_count, namespace='default'):
+        if len(self.connections.k8s_client.get_pods(namespace).items) == pod_count:
+           self.logger.info("Pod count is as expected,Expected :%s, Actual :%s" \
+           %(pod_count,len(self.connections.k8s_client.get_pods(namespace).items)))
+           return True
+        else:
+            self.logger.error("Pod count is not as expected,Expected :%s, Actual :%s" \
+            %(pod_count,len(self.connections.k8s_client.get_pods(namespace).items)))
+
+    def kill_ssh(self, pod):
+        cmd = "ps auxww | grep 'ssh -x'"
+        if not pod:
+            output = local(cmd, capture=True)
+            for line in output.split("\n"):
+                if "grep" not in line:
+                   cmd1 = "kill -9 %s" %line.split()[1]
+                   local(cmd1, capture=True)
+        else:
+            output = pod.run_cmd_on_pod_with_tty(cmd, tty=False)
+            for line in output.split("\n"):
+                if "grep" not in line:
+                   cmd1 = "kill -9 %s" %line.split()[1]
+                   local(cmd1, capture=True)
+
+
+
+
+
 
