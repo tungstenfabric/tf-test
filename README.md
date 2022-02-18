@@ -48,17 +48,6 @@ orchestrator independent packages like testr, chrome, wget, git etal and
 test container has orchestrator and sku specific packages on top of base.
 
 One can also custom build base and test containers
-#### To build base test container
-```
-    $> ./build-container.sh base -h
-       Build base container
-
-       Usage: ./build-container.sh base
-         -h|--help                     Print help message
-         --registry-server REGISTRY_SERVER Docker registry hosting the base test container, specify if the image needs to be pushed
-         --tag             TAG           Docker container tag, default to sku
-    $> ./build-container.sh base --registry-server opencontrailnightly/ --tag ocata-bld-1
-```
 #### To build test container
 ```
     $> ./build-container.sh test -h
