@@ -173,6 +173,43 @@ _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP = {
     'webui-middleware': ['webui_job_1'],
     'redis': ['redis_redis_1'],
 }
+_CONTRAIL_SERVICES_JUJU_CONTAINERD_MAP = {
+    # Vrouter
+    'agent': ['vrouter-vrouter-agent'],
+    'vrouter-nodemgr': ['vrouter-nodemgr'],
+    # Control
+    'control': ['control-control'],
+    'named': ['control-named'],
+    'dns': ['control-dns'],
+    'control-nodemgr': ['control-nodemgr'],
+    # Config
+    'api-server': ['configapi-api', 'config_api-api'],
+    'schema': ['configapi-schema', 'config_api-schema'],
+    'svc-monitor': ['configapi-svcmonitor', 'config_api-svcmonitor'],
+    'device-manager': ['configapi-devicemgr', 'config_api-devicemgr'],
+    'config-nodemgr': ['configapi-nodemgr', 'config_api-nodemgr'],
+    # Config Database
+    'config-cassandra': ['configdatabase-cassandra', 'config_database-cassandra'],
+    'config-rabbitmq': ['configdatabase-rabbitmq', 'config_database-rabbitmq'],
+    'config-zookeeper': ['configdatabase-zookeeper', 'config_database-zookeeper'],
+    # Analytics Database
+    'analytics-cassandra': ['analyticsdatabase-cassandra', 'analytics_database-cassandra'],
+    'analyticsdb-nodemgr': ['analyticsdatabase-nodemgr', 'analytics_database-nodemgr'],
+    'query-engine': ['analyticsdatabase-query-engine', 'analytics_database-query-engine'],
+    # Analytics
+    'analytics-nodemgr': ['analytics-nodemgr'],
+    'analytics-api': ['analytics-api'],
+    'collector': ['analytics-collector'],
+    'snmp-collector': ['analyticssnmp-snmp-collector', 'analytics_snmp-snmp-collector'],
+    'snmp-topology': ['analyticssnmp-topology', 'analytics_snmp-topology'],
+    'alarmgen': ['analyticsalarm-alarm-gen', 'analytics_alarm-alarm-gen'],
+    'contrail-kube-manager': ['contrailkubernetesmaster-kubemanager',
+                              'contrail-kubernetes-master-kubemanager'],
+    # WebUI
+    'webui': ['webui-web'],
+    'webui-middleware': ['webui-job'],
+    'redis': ['redis-redis'],
+}
 
 # Separate container names for RHOSP deployer
 _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP = {
@@ -349,7 +386,11 @@ def get_contrail_services_map(inputs):
     if inputs.deployer == 'openshift':
         return _CONTRAIL_SERVICES_OPENSHIFT_CONTAINER_MAP
     elif inputs.deployer == 'juju':
-        return _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP
+        if inputs.container_runtime == 'containerd':
+            return _CONTRAIL_SERVICES_JUJU_CONTAINERD_MAP
+        else:
+            return _CONTRAIL_SERVICES_JUJU_CONTAINER_MAP
+        
     elif inputs.deployer == 'rhosp':
         return _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP
     elif inputs.deployer == 'helm':

@@ -32,6 +32,7 @@ from tempfile import NamedTemporaryFile
 import re
 from common import log_orig as contrail_logging
 from common.contrail_services import *
+from common.container_cli_wrapper import get_container_cli_wrapper
 
 import subprocess
 from collections import namedtuple
@@ -562,6 +563,9 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.juju_server = test_configs.get('juju_server')
         self.test_docker_registry = test_configs.get('test_docker_registry')
 
+        # need to get container cli early, since parse_topo uses it to get containers
+        self.container_runtime = test_configs.get('container_runtime')
+        self.container_tool = get_container_cli_wrapper(self)
         self.parse_topo()
         if self.deployer != 'contrail_command':
             self.command_server_ip = None
@@ -808,10 +812,7 @@ class TestInputs(with_metaclass(Singleton, object)):
     # end get_os_version
 
     def get_active_containers(self, host):
-        cmd = DOCKER + " ps -f status=running --format {{.Names}} 2>/dev/null"
-        output = self.run_cmd_on_server(host, cmd, as_sudo=True)
-        containers = [x.strip('\r') for x in output.split('\n')]
-        return containers
+        return self.container_tool.get_active_containers(host)
 
     @property
     def is_ironic_enabled(self):
@@ -837,12 +838,11 @@ class TestInputs(with_metaclass(Singleton, object)):
         host_dict['containers'] = {}
         if  host_dict.get('type', None) == 'esxi':
             return
-        cmd = DOCKER + ' ps -a 2>/dev/null | grep -v "/pause\|/usr/bin/pod\|nova_api_\|contrail.*init\|init.*contrail\|provisioner\|placement" | awk \'{print $NF}\''
-        output = self.run_cmd_on_server(host_dict['host_ip'], cmd, as_sudo=True)
-        # If not a docker cluster, return
-        if not output:
-            return
-        containers = [x.strip('\r') for x in output.split('\n')]
+        containers = self.container_tool.get_all_containers(
+                        host_dict['host_ip'],
+                        filter_exprs=["/pause", "/usr/bin/pod", "nova_api_",
+                                      "contrail.*init", "init.*contrail",
+                                       "provisioner", "placement"])
 
         containers = [x for x in containers if 'k8s_POD' not in x]
         nodemgr_cntrs = [x for x in containers if 'nodemgr' in x or 'nodemanager' in x]
@@ -1344,17 +1344,14 @@ class ContrailTestInit(object):
         '''
         return self.host_data[host].get('containers', {}).get(service)
 
+    @retry(delay=3, tries=3)
     def is_container_up(self, host, service):
         container = self.host_data[host]['containers'][service]
-        cmd = DOCKER + " ps -f name=%s -f status=running 2>/dev/null"%container
-        for i in range(3):
-            output = self.run_cmd_on_server(host, cmd, as_sudo=True)
-            if not output or 'Up' not in output:
-                self.logger.warn('Container %s is not up on host %s'%(container, host))
-                return False
-            time.sleep(3)
-        self.logger.debug('Container %s is up on host %s'%(container, host))
-        return True
+        if not self.container_tool.is_container_up(host, container):
+            self.logger.warn('Container %s is not up on host %s' % (container,
+                                                                    host))
+            return False
+        self.logger.debug('Container %s is up on host %s' % (container, host))
 
     @property
     def is_microservices_env(self):
@@ -1366,15 +1363,9 @@ class ContrailTestInit(object):
     def relaunch_container(self, hosts, pod):
         pods_dir = ANSIBLE_DEPLOYER_PODS_DIR[pod]
         yml_file = ANSIBLE_DEPLOYER_PODS_YML_FILE.get(pod)
-        yml_file_str = '-f %s'%yml_file if yml_file else ''
         for host in hosts:
-            cmd = 'cd %s ;'%pods_dir
-            down_cmd = cmd + DOCKER + '-compose %s down'%yml_file_str
-            up_cmd = cmd + DOCKER + '-compose %s up -d'%yml_file_str
-            self.logger.info('Running %s on %s' %(down_cmd, host))
-            self.run_cmd_on_server(host, down_cmd, pty=True, as_sudo=True)
-            self.logger.info('Running %s on %s' %(up_cmd, host))
-            self.run_cmd_on_server(host, up_cmd, pty=True, as_sudo=True)
+            self.logger.info('relaunch %s on %s' % (pod, host))
+            self.container_tool.recompose_services(host, pods_dir, yml_file)
 
     def _action_on_container(self, hosts, event, container, services=None, verify_service=True, timeout=60):
         containers = set()
@@ -1392,11 +1383,7 @@ class ContrailTestInit(object):
                 if not cntr:
                     self.logger.info('Unable to find %s container on %s'%(container, host))
                     continue
-                timeout = '' if event == 'start' else '-t 60'
-                issue_cmd = DOCKER + ' %s %s %s' % (event, cntr, timeout)
-                self.logger.info('Running %s on %s' %
-                                 (issue_cmd, self.host_data[host]['name']))
-                self.run_cmd_on_server(host_ip, issue_cmd, username, password, pty=True, as_sudo=True)
+                self.container_tool.action_on_container(host, event, cntr, timeout)
                 if verify_service:
                     if 'stop' in event:
                         service_status = self.verify_service_down(host_ip, container)[0]
@@ -1701,13 +1688,9 @@ class ContrailTestInit(object):
             'DEFAULT', 'mvpn_ipv4_enable=1')
         '''
 
-        issue_cmd = DOCKER + ' cp %s:/%s .' % (container_name, file_name)
+        self.container_tool.copy_out(node_ip, container_name, file_name, dst_path='.')
         username = self.host_data[node_ip]['username']
         password = self.host_data[node_ip]['password']
-
-        self.logger.info('Running %s on %s' % (issue_cmd, node_ip))
-        self.run_cmd_on_server(node_ip, issue_cmd, username, password, pty=True,
-                                    as_sudo=True)
 
         knob_list = [knob] if not isinstance(knob, list) else knob
         local_file = file_name.split('/')[-1]
@@ -1742,16 +1725,11 @@ class ContrailTestInit(object):
             self.run_cmd_on_server(node_ip, issue_cmd, username, password, pty=True,
                                     as_sudo=True)
 
-        issue_cmd = DOCKER + ' cp %s %s:/%s' % (local_file, container_name,
-            file_name)
-        self.logger.info('Running %s on %s' % (issue_cmd, node_ip))
-        self.run_cmd_on_server(node_ip, issue_cmd, username, password, pty=True,
-                                    as_sudo=True)
+        self.container_tool.copy_in(node_ip, container_name, local_file,
+                                    dst_path=file_name)
         if restart_container:
-            issue_cmd = DOCKER + ' restart %s -t 60' % (container_name)
-            self.logger.info('Running %s on %s' % (issue_cmd, node_ip))
-            self.run_cmd_on_server(node_ip, issue_cmd, username, password, pty=True,
-                                        as_sudo=True)
+            self.container_tool.action_on_container(node_ip, 'restart',
+                                                    container_name, 60)
 
     # end _add_knob_to_container
 
