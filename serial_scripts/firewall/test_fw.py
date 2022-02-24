@@ -167,9 +167,9 @@ class TestFirewallBasic(FirewallBasic):
                              service_groups=[self.sg_icmp.uuid],
                              source=site_ep, destination=site_ep)
         # Insert with lowest seq no
-        rules = [{'uuid': new_fwr.uuid, 'seq_no': 10}, {'uuid': new_fwr_2.uuid, 'seq_no': 11}]
-        self.fwp_eng.add_firewall_rules(rules=rules)
-        self.addCleanup(self.fwp_eng.remove_firewall_rules, rules)
+        rules1 = [{'uuid': new_fwr.uuid, 'seq_no': 10}, {'uuid': new_fwr_2.uuid, 'seq_no': 11}]
+        self.fwp_eng.add_firewall_rules(rules=rules1)
+        self.addCleanup(self.fwp_eng.remove_firewall_rules, rules1)
         self._verify_ping(self.vms['eng_web'], self.vms['eng_logic'],
                           self.vms['eng_db'], exp=False)
         self.verify_traffic(self.vms['eng_web'], self.vms['eng_logic'], 'tcp',
@@ -178,31 +178,35 @@ class TestFirewallBasic(FirewallBasic):
                             sport=1111, dport=8009, expectation=True)
         self._verify_ping(self.vms['hr_web'], self.vms['hr_logic'], self.vms['hr_db'])
         # Delete rule
-        self.fwp_eng.remove_firewall_rules(rules)
+        self.fwp_eng.remove_firewall_rules(rules1)
+        self.remove_from_cleanups(self.fwp_eng.remove_firewall_rules, rules1)
         self._verify_ping(self.vms['eng_web'], self.vms['eng_logic'], self.vms['eng_db'])
         self.verify_traffic(self.vms['eng_web'], self.vms['eng_logic'], 'tcp',
                             sport=1111, dport=8005)
         # Insert between icmp and tcp
-        rules = [{'uuid': new_fwr.uuid, 'seq_no': 25}, {'uuid': new_fwr_2.uuid, 'seq_no': 26}]
-        self.fwp_eng.add_firewall_rules(rules=rules)
+        rules2 = [{'uuid': new_fwr.uuid, 'seq_no': 25}, {'uuid': new_fwr_2.uuid, 'seq_no': 26}]
+        self.fwp_eng.add_firewall_rules(rules=rules2)
+        self.addCleanup(self.fwp_eng.remove_firewall_rules, rules2)
         self._verify_ping(self.vms['eng_web'], self.vms['eng_logic'], self.vms['eng_db'])
         self.verify_traffic(self.vms['eng_web'], self.vms['eng_logic'], 'tcp',
                             sport=1111, dport=8005, expectation=False)
         self.verify_traffic(self.vms['eng_web'], self.vms['eng_logic'], 'tcp',
                             sport=1111, dport=8007, expectation=True)
         # Insert at the end
-        rules = [{'uuid': new_fwr.uuid, 'seq_no': 99}, {'uuid': new_fwr_2.uuid, 'seq_no': 98}]
-        self.fwp_eng.add_firewall_rules(rules=rules)
+        rules3 = [{'uuid': new_fwr.uuid, 'seq_no': 99}, {'uuid': new_fwr_2.uuid, 'seq_no': 98}]
+        self.fwp_eng.add_firewall_rules(rules=rules3)
+        self.addCleanup(self.fwp_eng.remove_firewall_rules, rules3)
         self._verify_ping(self.vms['eng_web'], self.vms['eng_logic'], self.vms['eng_db'])
         self._verify_traffic(self.vms['eng_web'], self.vms['eng_logic'],
                              self.vms['eng_db'], dport=8005)
         # Delete all FW Rules
-        rules = [{'uuid': self.fwr_icmp.uuid, 'seq_no': 20},
-                 {'uuid': self.fwr_eng_tcp.uuid, 'seq_no': 30},
-                 {'uuid': self.fwr_eng_udp.uuid, 'seq_no': 40},
-                 {'uuid': new_fwr_2.uuid, 'seq_no': 98},
-                 {'uuid': new_fwr.uuid, 'seq_no': 99}]
-        self.fwp_eng.remove_firewall_rules(rules)
+        rules4 = [{'uuid': self.fwr_icmp.uuid, 'seq_no': 20},
+                  {'uuid': self.fwr_eng_tcp.uuid, 'seq_no': 30},
+                  {'uuid': self.fwr_eng_udp.uuid, 'seq_no': 40},
+                  {'uuid': new_fwr_2.uuid, 'seq_no': 98},
+                  {'uuid': new_fwr.uuid, 'seq_no': 99}]
+        self.fwp_eng.remove_firewall_rules(rules4)
+        self.addCleanup(self.fwp_eng.add_firewall_rules, rules4)
         self._verify_ping(self.vms['eng_web'], self.vms['eng_logic'],
                           self.vms['eng_db'], exp=False)
         self.verify_traffic(self.vms['eng_web'], self.vms['eng_logic'], 'tcp',
@@ -560,6 +564,7 @@ class TestFirewallBasic(FirewallBasic):
         sg1 = self.create_security_group(rules=[sg_rule])
         default_sg = self.get_default_sg()
         self.vms['eng_db'].remove_security_group(default_sg.uuid)
+        self.addCleanup(self.vms['eng_db'].add_security_group, default_sg.uuid)
         # Apply SG to HR DB
         self.vms['eng_db'].add_security_group(sg1.uuid)
         self.addCleanup(self.vms['eng_db'].remove_security_group, sg1.uuid)
@@ -584,6 +589,10 @@ class TestFirewallBasic(FirewallBasic):
                          dst_vn=eng_vn, action='pass')
         nwp = self.create_policy(rules=[nwp_rule1, nwp_rule2, nwp_rule3])
         self.apply_policy(nwp, [self.vns['hr'], self.vns['eng']])
+        self.addCleanup(self.vns['hr'].bind_policies,
+                        [self.policys['hr_eng'].policy_fq_name])
+        self.addCleanup(self.vns['eng'].bind_policies,
+                        [self.policys['hr_eng'].policy_fq_name])
         # ICMP Traffic from eng db to hr db should fail
         self._verify_ping(self.vms['eng_db'], self.vms['hr_db'], exp=False)
         self._verify_ping(self.vms['eng_web'], self.vms['eng_logic'])

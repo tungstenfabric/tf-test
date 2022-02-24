@@ -545,6 +545,13 @@ class TestFwaas(BaseFwaaSTest):
 
     @preposttest_wrapper
     def test_fwaas_objects_quota(self):
+        quota = self.connections.quantum_h.show_quota(
+                    self.connections.project_id)
+        quota_restore = {
+            'firewall_group': quota['quota']['firewall_group'],
+            'firewall_policy': quota['quota']['firewall_policy'],
+            'firewall_rule': quota['quota']['firewall_rule'],
+            }
         quota_dict = {
             'firewall_group': 5,
             'firewall_policy': 5,
@@ -553,6 +560,8 @@ class TestFwaas(BaseFwaaSTest):
         quota_rsp = self.connections.quantum_h.update_quota(
             self.connections.project_id,
             quota_dict)
+        self.addCleanup(self.connections.quantum_h.update_quota,
+            self.connections.project_id, quota_restore)
         quota_show_dict = self.connections.quantum_h.show_quota(
             self.connections.project_id)
         admin_quota_dict = self.admin_connections.quantum_h.show_quota(
