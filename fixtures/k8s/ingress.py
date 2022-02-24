@@ -31,7 +31,7 @@ class IngressFixture(fixtures.Fixture):
         self.rules = [] if rules is None else rules
         self.tls = [] if tls is None else tls
         self.default_backend = {} if default_backend is None else default_backend
-        self.v1_beta_h = self.k8s_client.v1_beta_h
+        self.v1_networking = self.k8s_client.v1_networking
         self.connections = connections
 
         self.verify_is_run = False
@@ -95,8 +95,7 @@ class IngressFixture(fixtures.Fixture):
 
     def read(self):
         try:
-            self.obj = self.v1_beta_h.read_namespaced_ingress(
-                self.name, self.namespace)
+            self.obj = self.v1_networking.read_namespaced_ingress(self.name, self.namespace)
             self._populate_attr()
             if self.already_exists is None:
                 self.already_exists = True

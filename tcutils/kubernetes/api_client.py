@@ -55,9 +55,7 @@ class Client(object):
         self.res_v1_obj_h = client.CustomObjectsApi(api_client)
         self.v1_h = client.CoreV1Api(api_client)
         self.v1_h.read_namespace('default')
-        self.v1_beta_h = client.ExtensionsV1beta1Api(api_client)
         self.v1_networking = client.NetworkingV1Api(api_client)
-        self.apps_v1_beta1_h = client.AppsV1beta1Api(api_client)
         self.apps_v1_h = client.AppsV1Api(api_client)
 
     def create_namespace(self, name, isolation=False, ip_fabric_forwarding=False,
@@ -93,15 +91,17 @@ class Client(object):
             return client.V1ObjectMeta(**mdata_dict)
 
     def _get_ingress_backend(self, backend_dict={}):
-        return client.V1beta1IngressBackend(
-            backend_dict.get('service_name'),
-            backend_dict.get('service_port', 80))
+        port = client.V1ServiceBackendPort(
+            number=backend_dict.get('service_port', 80))
+        servicename=backend_dict.get('service_name')
+        service = client.V1IngressServiceBackend(name=servicename, port=port)
+        return client.V1IngressBackend(service=service)
 
     def _get_ingress_path(self, http):
         paths = http.get('paths', [])
         path_objs = []
         for path_dict in paths:
-            path_obj = client.V1beta1HTTPIngressPath(
+            path_obj = client.V1HTTPIngressPath(
                 backend=self._get_ingress_backend(
                     path_dict.get('backend')),
                 path=path_dict.get('path'))
@@ -112,9 +112,9 @@ class Client(object):
     def _get_ingress_rules(self, rules):
         ing_rules = []
         for rule in rules:
-            rule_obj = client.V1beta1IngressRule(
+            rule_obj = client.V1IngressRule(
                 host=rule.get('host'),
-                http=client.V1beta1HTTPIngressRuleValue(
+                http=client.V1HTTPIngressRuleValue(
                     paths=self._get_ingress_path(rule.get('http'))))
 
             ing_rules.append(rule_obj)
@@ -145,25 +145,25 @@ class Client(object):
         metadata_obj = self._get_metadata(metadata)
         if name:
             metadata_obj.name = name
-        spec['backend'] = self._get_ingress_backend(
+        spec['default_backend'] = self._get_ingress_backend(
             default_backend or spec.get('backend', {}))
+        spec.pop('backend', None)
 
         spec['rules'] = self._get_ingress_rules(rules or spec.get('rules', []))
 
         spec['tls'] = self._get_ingress_tls(tls)
-        spec_obj = client.V1beta1IngressSpec(**spec)
-        body = client.V1beta1Ingress(
-            metadata=metadata_obj,
-            spec=spec_obj)
+
+        spec_obj = client.V1IngressSpec(**spec)
+        body = client.V1Ingress(metadata=metadata_obj,spec=spec_obj)
         self.logger.info('Creating Ingress %s' % (metadata_obj.name))
-        resp = self.v1_beta_h.create_namespaced_ingress(namespace, body)
+        resp = self.v1_networking.create_namespaced_ingress(namespace, body)
         return resp
     # end create_ingress
 
     def _get_ingress_tls(self, tls):
         tls_obj = []
         for tls_name in tls:
-            tls_obj.append(client.V1beta1IngressTLS(secret_name=tls_name))
+            tls_obj.append(client.V1IngressTLS(secret_name=tls_name))
         return tls_obj
     # end _get_ingress_tls
 
@@ -172,7 +172,7 @@ class Client(object):
                        name):
         self.logger.info('Deleting Ingress : %s' % (name))
         body = client.V1DeleteOptions()
-        return self.v1_beta_h.delete_namespaced_ingress(name, namespace, body)
+        return self.v1_networking.delete_namespaced_ingress(name, namespace)
     # end delete_ingress
 
     def _get_label_selector(self, match_labels={}, match_expressions=[]):
@@ -423,9 +423,7 @@ class Client(object):
         '''
         body = client.V1DeleteOptions()
         self.logger.info('Deleting pod %s:%s' % (namespace, name))
-        return self.v1_h.delete_namespaced_pod(name, namespace, body,
-                                               grace_period_seconds=grace_period_seconds,
-                                               orphan_dependents=orphan_dependents)
+        return self.v1_h.delete_namespaced_pod(name, namespace)
 
     def read_pod(self, name, namespace='default'):
         '''
@@ -532,12 +530,11 @@ class Client(object):
         if tls is None: it will be disabled
         '''
         tls = tls or []
-        ing_obj = self.v1_beta_h.read_namespaced_ingress(name, namespace)
+        ing_obj = self.v1_networking.read_namespaced_ingress(name, namespace)
         ing_obj.spec.tls = self._get_ingress_tls(tls)
         self._wa_client_bug_18_for_ingress(ing_obj)
 
-        return self.v1_beta_h.patch_namespaced_ingress(
-            ing_obj.metadata.name, namespace, ing_obj)
+        return self.v1_networking.patch_namespaced_ingress(ing_obj.metadata.name, namespace, ing_obj)
     # end set_ingress_tls
 
     def set_pod_label(self, namespace, pod_name, label_dict):
@@ -636,25 +633,22 @@ class Client(object):
             metadata=metadata_obj,
             spec=spec_obj)
         self.logger.info('Creating Deployment %s' % (metadata_obj.name))
-        resp = self.apps_v1_beta1_h.create_namespaced_deployment(namespace, body)
+        resp = self.v1_networking.create_namespaced_deployment(namespace, body)
         return resp
     # end create_deployment
 
     def delete_deployment(self, namespace, name):
         self.logger.info('Deleting Deployment : %s' % (name))
         body = client.V1DeleteOptions()
-        return self.apps_v1_beta1_h.delete_namespaced_deployment(
-            name, namespace, body, orphan_dependents=False)
+        return self.v1_networking.delete_namespaced_deployment(name, namespace)
     # end delete_deployment
 
     def set_deployment_replicas(self, namespace, deployment, count=0):
         self.logger.info('Setting replicas of deployment %s to %s' % (
             deployment, count))
-        dep_obj = self.v1_beta_h.read_namespaced_deployment(deployment,
-                                                            namespace)
+        dep_obj = self.v1_networking.read_namespaced_deployment(deployment, namespace)
         dep_obj.spec.replicas = count
-        return self.v1_beta_h.patch_namespaced_deployment(
-            deployment, namespace, dep_obj)
+        return self.v1_networking.patch_namespaced_deployment(deployment, namespace, dep_obj)
         time.sleep(10)
     # end set_deployment_replicas
 
@@ -663,7 +657,7 @@ class Client(object):
             rs_objs = self.apps_v1_h.list_namespaced_replica_set(namespace)
         except ApiException as e:
             try:
-                rs_objs = self.v1_beta_h.list_namespaced_replica_set(namespace)
+                rs_objs = self.v1_networking.list_namespaced_replica_set(namespace)
             except ApiException as e:
                 self.logger.debug('ReplicaSet not present')
         finally:
@@ -720,9 +714,7 @@ class Client(object):
         for rs_obj in rs_objs:
             name = rs_obj.metadata.name
             self.wait_till_pod_cleanup(namespace, name)
-            self.v1_beta_h.delete_namespaced_replica_set(
-                name, namespace, body,
-                orphan_dependents=False)
+            self.v1_networking.delete_namespaced_replica_set(name, namespace)
     # end delete_replica_set
 
     def set_service_isolation(self, namespace, enable=True):
@@ -878,7 +870,7 @@ class Client(object):
             metadata=metadata_obj,
             spec=spec_obj)
         self.logger.info('Creating DaemonSet %s' % (metadata_obj.name))
-        resp = self.v1_beta_h.create_namespaced_daemon_set(namespace, body, pretty='true')
+        resp = self.v1_networking.create_namespaced_daemon_set(namespace, body, pretty='true')
         return resp
 
     # read the spec of te deamonset object
