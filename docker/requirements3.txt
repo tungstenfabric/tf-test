@@ -24,7 +24,7 @@ dnspython==1.16.0
 dogpile.cache==0.9.0
 dpkt==1.9.2
 easyprocess==0.2.10
-eventlet==0.25.1
+eventlet==0.31.0
 extras==1.0.0
 # TODO: move to fabric-2.5.0
 # Fabric3
