@@ -564,7 +564,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.test_docker_registry = test_configs.get('test_docker_registry')
 
         # need to get container cli early, since parse_topo uses it to get containers
-        self.container_runtime = test_configs.get('container_runtime')
+        self.container_runtime = test_configs.get('container_runtime', 'docker')
         self.container_tool = get_container_cli_wrapper(self)
         self.parse_topo()
         if self.deployer != 'contrail_command':
