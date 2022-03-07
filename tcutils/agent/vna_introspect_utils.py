@@ -664,6 +664,13 @@ l[0]={'protocol': '1', 'stats_bytes': '222180', 'stats_packets': '2645', 'setup_
                     for sg in e.xpath('./list/VmIntfSgUuid/sg_uuid'):
                         pp.append(sg.text)
                     p[e.tag] = pp
+                elif e.tag == 'mac_ip_list':
+                    p[e.tag] = []
+                    for mc in e.xpath('./list/LearntMacIpSandeshList/ip_addr'):
+                        pp = {}
+                        for ee in e.xpath('./list/LearntMacIpSandeshList/mac_addr'):
+                            pp[mc.text] = ee.text
+                        p[e.tag].append(pp)
                 else:
                     p[e.tag] = e.text
             ret_list.append(p)
