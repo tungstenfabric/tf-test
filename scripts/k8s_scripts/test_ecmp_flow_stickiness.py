@@ -798,3 +798,228 @@ class TestEcmpFlowStickiness(BaseK8sTest):
                                 service.cluster_ip, client_pod.pod_ip) == False)
         self.logger.info("test_ecmp_to_non_ecmp passed")
     # end test_ecmp_to_non_ecmp
+    @skip_because(mx_gw = False,min_nodes=3)
+    @preposttest_wrapper
+    def test_flows_with_scale(self):
+        ''' Create 3 load balancer services.
+            Each service have  1 pods as backends initially.
+            Make sure the services are up and pods are up.
+            Verify scp to pods 
+            Initiate 3 tcp session to each lb service from same client.
+            Verify the sessions,flow tables, ecmp flag should not be on.
+            Make note of flow indexes and, stats, nh index ,ecmp flag.
+            Scale up to 6 pods per service.
+            ecmp flag should set now.
+            flow index might change here  either non-ecmp to ecmp and viceversa.
+            Scale up by another two pods per service
+            check for --ecmp to ecmp flow index and other parameters should not change.
+            Increase the node of sessions to 15 sessions per service
+            Changes should not seen in existing flows.
+            New flows should create with ecmp flag.
+            Add one more pod to the service to make it as scale up operation again
+            And there should not be any change in the existing flow entries
+            scale  down to  6 pods per service,
+            possibility of flows gets terminated and no cores should be observed.
+            scale down to 1 pod per service, no cores should be observed.
+        '''
+        label_list = [{'a': 'lb_svc1'},{'b':'lb_svc2'},{'c':'lb_svc3'}]
+        replicas = min(len(self.inputs.compute_ips), len(label_list.keys()))
+        namespace = self.setup_namespace()
+        assert namespace.verify_on_setup(),"Namespace is not Up"
+        service_list = []
+        dep_list = []
+        session_count = 0
+        self.logger.info("Create 3 LoadBalancer services")
+        
+        for i in range(len(label_list)):
+
+            service_obj = self.setup_ssh_service(namespace=namespace.name, \
+                                     labels=label_list[i], type='LoadBalancer')
+            service_list.append(service_obj)
+            assert service_obj.verify_on_setup(),"Failed to create load balencer service"
+            dep_obj = self.setup_ssh_webserver_deployment(namespace=namespace.name, \
+                                    replicas=replicas, pod_labels=label_list[i])
+            dep_list.append(dep_obj)
+            assert dep_obj.verify_on_setup(),"Failed to crate Deployment object for label : %s" %(label_list[i])
+       
+        for svc in service_list:
+            assert self.validate_scp(None, svc.external_ips[0]),"Failed to establish tcp session"
+            # do scp from both clients, scale up, scp should not break.
+            old_scp_count = session_count
+            session_count +=1
+            self.do_scp(None, svc.external_ips[0],old_count=old_scp_count,session_count=session_count)
+        for svc in service_list:
+            assert (self.validate_ecmp_flow(self.inputs.compute_ips, \
+                         svc.external_ips[0], self.inputs.k8s_master_ip)==False),"ECMP flag should not get set"
+        
+        self.logger.info("scale up the number of pods to 2 per compute")
+        new_replicas = len(self.inputs.compute_ips)*2
+        for dep_obj in dep_list:
+            dep_obj.set_replicas(new_replicas)
+            assert dep_obj.verify_on_setup(),"Failed to crate Deployment object"
+        for svc in service_list:
+            svc.old_session_count = self.get_ecmp_flow_count(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            self.logger.info("Initiate 3 tcp session per service")
+            assert self.validate_scp(None, svc.external_ips[0]),"Failed to establish tcp session"
+            # do scp from both clients, scale up, scp should not break.
+            old_scp_count = session_count
+            session_count +=3
+            self.do_scp(None, svc.external_ips[0], limit_rate=True, \
+                                    old_count=old_scp_count,session_count=session_count)
+            self.logger.info("Sleep before checking the new flow stats")
+            time.sleep(5)
+            svc.flow_index = self.get_ecmp_flow_index(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            svc.flow_stats = {index:self.get_flow_stats(self.inputs.compute_ips, \
+                         svc.external_ips[0],index) for index in svc.flow_index}
+            svc.new_session_count = self.get_ecmp_flow_count(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            assert (svc.new_session_count - svc.old_session_count) == 3, \
+                        "3 TCP sessions per service are not created as expedted"
+        self.logger.info("Scale the number of pods from 2 to 4 per computes")
+        new_replicas += 2
+        for dep_obj in dep_list:
+            dep_obj.set_replicas(new_replicas)
+            assert dep_obj.verify_on_setup(),"Failed to crate Deployment object"
+        self.logger.info("Sleep before checking the new flow stats")
+        time.sleep(5)
+        for svc in service_list:
+            svc.new_flow_index = self.get_ecmp_flow_index(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            svc.new_flow_stats = {index:self.get_flow_stats(self.inputs.compute_ips, \
+                     svc.external_ips[0],index) for index in svc.new_flow_index}
+            svc.new_session_count = self.get_ecmp_flow_count(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+
+        self.logger.info("Verifying the flow index and stats after \
+                                             scaling up the pods")
+        for svc in service_list:
+            if True in [ True for indx in svc.flow_index \
+                                        if indx not in svc.new_flow_index]:
+                assert False,"Few old flows are terminated..!"
+            for index,stats in svc.flow_stats.items():
+                send,recv = stats
+                new_send,new_recv = svc.new_flow_stats[index]
+                if int(send) >= int(new_send) or int(recv) >= int(new_recv):
+                   assert False,"Send and recv stats for flow is not increasing"
+                   self.logger.info("Send and recv stats for flow is \
+                                                         increasing as expeted")
+        self.logger.info("Initiate 10 new ssh sessions per service")
+        for svc in service_list:
+            svc.old_session_count = svc.new_session_count
+            assert self.validate_scp(None, svc.external_ips[0]),"Failed to establish tcp session"
+            # do scp from both clients, scale up, scp should not break.
+            old_scp_count = session_count
+            session_count +=10
+            self.do_scp(None, svc.external_ips[0], \
+                    limit_rate=True,old_count=old_scp_count,session_count=session_count)
+            self.logger.info("Initiate 10 new ssh sessions per service")
+            time.sleep(5)
+            svc.new_flow_index = self.get_ecmp_flow_index(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            svc.new_flow_stats = {index:self.get_flow_stats(self.inputs.compute_ips, \
+                     svc.external_ips[0],index) for index in svc.new_flow_index}
+            svc.new_session_count = self.get_ecmp_flow_count(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            assert (svc.new_session_count - svc.old_session_count) == 10, \
+                                   "10 TCP sessions are not created as expedted"
+            #assert svc.new_session_count == 10,"10 TCP sessions are not created as expedted"
+        for svc in service_list:
+            if True in [ True for indx in svc.flow_index \
+                                             if indx not in svc.new_flow_index]:
+                assert False,"Few old flows are terminated..!"
+            for index,stats in svc.flow_stats.items():
+                send,recv = stats
+                new_send,new_recv = svc.new_flow_stats[index]
+                if int(send) >= int(new_send) or int(recv) >= int(new_recv):
+                   assert False,"Send and recv stats for flow is not increasing"
+                   self.logger.info("Send and recv stats for \
+                                                 flow is increasing as expeted")
+            svc.flow_index = svc.new_flow_index
+            svc.flow_stats = svc.new_flow_stats
+        
+        self.logger.info("Full scale, 16 pods per compute")
+        new_replicas = len(self.inputs.compute_ips)*10
+        for dep_obj in dep_list:
+            dep_obj.set_replicas(new_replicas)
+            assert dep_obj.verify_on_setup(),"Failed to crate Deployment object"
+        self.logger.info("Sleep before checking the new flow stats")
+        time.sleep(10)
+        for svc in service_list:
+            svc.new_flow_index = self.get_ecmp_flow_index(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            svc.new_flow_stats = {index:self.get_flow_stats(self.inputs.compute_ips, \
+                     svc.external_ips[0],index) for index in svc.new_flow_index}
+            assert self.validate_ecmp_flow(self.inputs.compute_ips, \
+            svc.external_ips[0], self.inputs.k8s_master_ip),"ECMP flag should get set"
+            svc.new_session_count = self.get_ecmp_flow_count(self.inputs.compute_ips, \
+                                 svc.external_ips[0], self.inputs.k8s_master_ip)
+            assert (svc.new_session_count - svc.old_session_count) == 10, \
+                          "10 TCP sessions are expected, but few are terminated"
+        self.logger.info("Verifying the flow index and stats after scaling \
+                                                               up the pods")
+        for svc in service_list:
+            if True in [ True for indx in svc.flow_index \
+                                             if indx not in svc.new_flow_index]:
+                assert False,"Few old flows are terminated..!"
+            for index,stats in svc.flow_stats.items():
+                send,recv = stats
+                new_send,new_recv = svc.new_flow_stats[index]
+                if int(send) >= int(new_send) or int(recv) >= int(new_recv):
+                   assert False,"Send and recv stats for flow is not increasing"
+                   self.logger.info("Send and recv stats for flow is \
+                                                         increasing as expeted")
+        self.logger.info("Deleting all existing ssh sessions and initiated new ones")
+        self.kill_ssh(None) 
+        time.sleep(10)
+        for svc in service_list:
+            svc.old_session_count = svc.new_session_count
+            assert self.validate_scp(None, svc.external_ips[0]),"Failed to establish tcp session"
+            # do scp from both clients, scale up, scp should not break.
+            old_scp_count = session_count
+            session_count +=10
+            self.do_scp(None, svc.external_ips[0], \
+                    limit_rate=True,old_count=old_scp_count,session_count=session_count)
+            self.logger.info("Initiate 10 new ssh sessions per service")
+            time.sleep(10)
+
+        pod_ip_dict = self.get_list_of_pods(self.inputs.compute_ips,len(service_list)*new_replicas,namespace.name)
+        self.logger.info("Waiting to fetch per pod flow count...") 
+        per_pod_flows = self.get_per_pod_flows(self.inputs.compute_ips,pod_ip_dict,self.inputs.k8s_master_ip)
+        new_replicas = len(self.inputs.compute_ips)*6
+        for dep_obj in dep_list:
+            dep_obj.set_replicas(new_replicas)
+            assert dep_obj.verify_on_setup(),"Failed to crate Deployment object"
+        #self.logger.info("Sleep before getting pod Up")
+        #time.sleep(10)
+        pod_ip_dict = self.get_list_of_pods(self.inputs.compute_ips,len(service_list)*new_replicas,namespace.name)
+        self.logger.info("Waiting to fetch per pod flow count...")
+        per_pod_new_flows = self.get_per_pod_flows(self.inputs.compute_ips,pod_ip_dict,self.inputs.k8s_master_ip)
+        for svc in service_list:
+            assert self.validate_ecmp_flow(self.inputs.compute_ips,\
+            svc.external_ips[0], self.inputs.k8s_master_ip),"ECMP flag should get set"
+       
+        assert self.compare_pod_flow_dict(per_pod_flows,per_pod_new_flows),"After scale down to 6 pods per svc, few old flows are terminated"
+        
+
+        self.logger.info("Scale down the pods to 1 per service")
+        pod_ip_dict = self.get_list_of_pods(self.inputs.compute_ips,len(service_list)*new_replicas,namespace.name)
+        self.logger.info("Waiting to fetch per pod flow count...")
+        per_pod_flows = self.get_per_pod_flows(self.inputs.compute_ips,pod_ip_dict,self.inputs.k8s_master_ip)
+        new_replicas = len(self.inputs.compute_ips)*1
+        for dep_obj in dep_list:
+            dep_obj.set_replicas(new_replicas)
+            assert dep_obj.verify_on_setup(),"Failed to crate Deployment object"
+        self.logger.info("Sleep before getting per pod flow count")
+        time.sleep(10)
+        pod_ip_dict = self.get_list_of_pods(self.inputs.compute_ips,len(service_list)*new_replicas,namespace.name)
+        self.logger.info("Waiting to fetch per pod new flow count...")
+        per_pod_new_flows = self.get_per_pod_flows(self.inputs.compute_ips,pod_ip_dict,self.inputs.k8s_master_ip)
+
+        for svc in service_list:
+
+            assert (self.validate_ecmp_flow(self.inputs.compute_ips,svc.external_ips[0], \
+            self.inputs.k8s_master_ip)==False),"ECMP flag should not get set"
+        assert self.compare_pod_flow_dict(per_pod_flows,per_pod_new_flows),"After scale down to 1 pod per svc, few old flows are terminated"
+        
