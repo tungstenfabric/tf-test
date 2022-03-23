@@ -43,7 +43,7 @@ class TestDpdkBondStatus(BaseVrouterTest):
     #end check_phy_interface_status
 
     def dpdk_bond_status(self,compute_ip):
-        """ 
+        """
            1- check physical interface status on all compute nodes
            2- bring-down vhost interface
            3- bring-down and bring-up bond interface
@@ -52,35 +52,33 @@ class TestDpdkBondStatus(BaseVrouterTest):
         """
         self.check_phy_interface_status(compute_ip)
         self.logger.info("Stoping vrouter agent and dpdk containers")
-        dpdk_docker = self.inputs.run_cmd_on_server(compute_ip,\
-                "docker stop vrouter_vrouter-agent-dpdk_1")
-        self.logger.info(dpdk_docker)
-        agent_docker = self.inputs.run_cmd_on_server(compute_ip,\
-                "docker stop vrouter_vrouter-agent_1")
-        self.logger.info(agent_docker)
+        self.inputs.stop_service('contrail-vrouter-agent-dpdk',
+                [compute_ip], container='agent-dpdk')
+        self.inputs.stop_service('contrail-vrouter-agent',
+                [compute_ip], container='agent')
+        self.addCleanup(self.inputs.start_service, 'contrail-vrouter-agent-dpdk', [compute_ip], container='agent-dpdk', verify_service=False)
+        self.addCleanup(self.inputs.start_service, 'contrail-vrouter-agent', [compute_ip], container='agent')
         self.inputs.run_cmd_on_server(compute_ip,\
                 "ifdown vhost0")
         self.logger.info("Bringing down bond interface")
+        self.addCleanup(self.inputs.run_cmd_on_server, compute_ip,"ifup vhost0")
         nmcli_output = self.inputs.run_cmd_on_server(compute_ip,\
                 "nmcli connection down bond0")
         nmcli_output =  self.inputs.run_cmd_on_server(compute_ip,\
                 "nmcli connection up bond0")
         self.logger.info(nmcli_output)
         self.logger.info("starting the containers")
-        docker_output =  self.inputs.run_cmd_on_server(compute_ip,\
-                "docker start vrouter_vrouter-agent_1")
-        self.logger.info(docker_output)
-        docker_output = self.inputs.run_cmd_on_server(compute_ip,\
-                "docker start vrouter_vrouter-agent-dpdk_1")
-        self.logger.info(docker_output)
-        self.inputs.run_cmd_on_server(compute_ip, "ifup vhost0")
+        self.inputs.start_service('contrail-vrouter-agent-dpdk',
+                [compute_ip], container='agent-dpdk', verify_service=False)
+        self.inputs.start_service('contrail-vrouter-agent',
+                [compute_ip], container='agent')
         cluster_status, error_nodes = ContrailStatusChecker(self.inputs
-                ).wait_till_contrail_cluster_stable(compute_ip, tries=20)
+                ).wait_till_contrail_cluster_stable(compute_ip, refresh=True)
         assert cluster_status, 'error nodes and services:%s' % (error_nodes)
         self.check_phy_interface_status(compute_ip)
         return True
     #end dpdk_bond_status
-        
+
     @test.attr(type=['sanity', 'vcenter_compute', 'dev_reg'])
     @preposttest_wrapper
     @skip_because(dpdk_cluster=False)

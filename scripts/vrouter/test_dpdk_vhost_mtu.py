@@ -6,6 +6,7 @@ import os
 from common.vrouter.base import BaseVrouterTest
 from tcutils.wrappers import preposttest_wrapper
 from tcutils.contrail_status_check import ContrailStatusChecker 
+from tcutils.util import skip_because
 from common.contrail_services import *
 import test
 
@@ -42,7 +43,7 @@ class TestMtu(BaseVrouterTest):
                 self.logger.info(out1)
             else:
                 self.logger.info("vhost mtu is 9000")
-        
+
         out = self.inputs.run_cmd_on_server(compute_ip, cmd)
         assert out, "no output of ifconfig vhost command"
         if "vhost0" and "UP" not in out:
@@ -51,37 +52,30 @@ class TestMtu(BaseVrouterTest):
             if not "mtu 9000" in out:
                 assert out, "Error while setting mtu to 9000"
             self.logger.info(out)
-        docker_output = self.inputs.run_cmd_on_server(compute_ip,\
-            "docker stop vrouter_vrouter-agent-dpdk_1")
-        self.logger.info("docker output status: " + docker_output)
-        docker_output = self.inputs.run_cmd_on_server(compute_ip,\
-            "docker stop vrouter_vrouter-agent_1")
-        self.logger.info("docker output status: " + docker_output)
-        resp = self.inputs.run_cmd_on_server(compute_ip,\
-            "ifdown vhost0")
+
+        self.inputs.stop_service('contrail-vrouter-agent-dpdk', [compute_ip], container='agent-dpdk')
+        self.inputs.stop_service('contrail-vrouter-agent', [compute_ip], container='agent')
+        self.addCleanup(self.inputs.start_service, 'contrail-vrouter-agent-dpdk', [compute_ip], container='agent-dpdk', verify_service=False)
+        self.addCleanup(self.inputs.start_service, 'contrail-vrouter-agent', [compute_ip], container='agent')
+        resp = self.inputs.run_cmd_on_server(compute_ip, "ifdown vhost0")
+        self.addCleanup(self.inputs.run_cmd_on_server, compute_ip, "ifup vhost0")
         self.logger.info(resp)
-        docker_output1 = self.inputs.run_cmd_on_server(compute_ip,\
-            "docker start vrouter_vrouter-agent_1")
-        self.logger.info("docker output status: " + docker_output1)
-        docker_output1 = self.inputs.run_cmd_on_server(compute_ip,\
-            "docker start vrouter_vrouter-agent-dpdk_1")
-        self.logger.info("docker output status: " + docker_output1)
-        resp1 = self.inputs.run_cmd_on_server(compute_ip,\
-            "ifup vhost0")
-        self.logger.info(resp1)
+        self.inputs.start_service('contrail-vrouter-agent-dpdk', [compute_ip], container='agent-dpdk', verify_service=False)
+        self.inputs.start_service('contrail-vrouter-agent', [compute_ip], container='agent')
         cluster_status, error_nodes = ContrailStatusChecker(self.inputs
-                ).wait_till_contrail_cluster_stable(compute_ip, tries=20)
+                ).wait_till_contrail_cluster_stable(compute_ip, refresh=True)
         assert cluster_status, 'error nodes and services:%s' % (error_nodes)
         out = self.inputs.run_cmd_on_server(compute_ip, cmd)
         assert out, "no output of ifconfig vhost command"
         if "vhost0" and "UP" not in out:
            assert out, "vhost is not UP"
         self.logger.info(out)
-        return True       
-    #end configure_vhost_mtu_and_verify 
+        return True
+    #end configure_vhost_mtu_and_verify
 
     @test.attr(type=['sanity', 'vcenter_compute', 'dev_reg'])
     @preposttest_wrapper
+    @skip_because(dpdk_cluster=False)
     def test_mtu_config(self):
         ''' test mtu config on computes '''
         vn_fixtures = self.create_vns(count=1)
@@ -97,6 +91,7 @@ class TestMtu(BaseVrouterTest):
         assert client_fixtures[0].ping_with_certainty(server_fixtures[0].vm_ip, expectation=True), "ping failed"
         compute_ip = client_fixtures[0].vm_node_ip
         self.configure_vhost_mtu_and_verify(compute_ip)
+        client_fixtures[0].get_local_ip(refresh=True)
         assert client_fixtures[0].ping_with_certainty(server_fixtures[0].vm_ip, expectation=True), "ping failed"
         return True
      #end test_mtu_config
