@@ -19,21 +19,26 @@ class TestScaleConfig(GenericTestBase):
     @preposttest_wrapper
     def test_vn_scaling(self):
         '''
-        1.scale vns to 20k in a batch of 5k vns each and timeit
+        1.scale vns to 22k in a batch of 5k vns each and timeit
         2.Verify creation after each batch creation
         3.Verify contrail-status
         4.At the end of creation restart api-server,schema
         5.Verify contrail-status
         '''
-        scale_number = 20000
+        scale_number = 22000
         scaled_vns = 0
         restart_services = ['api-server','schema']
         while scaled_vns < scale_number:
-            n_vns = 200
-            n_process = 25
-            cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                    --n_vns %s --vnc  --n_process %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_vns, n_process)
+            n_vns = 20
+            n_process = 2
+            cmd = "python tools/scale/scale_config.py --api_server_ip %s \
+                   --keystone_ip %s --n_vns %s --vnc --n_process %s \
+                   --project %s --admin_username %s --admin_password %s \
+                   --username %s --password %s"%(self.inputs.cfgm_ips[0],
+                   self.inputs.external_vip, n_vns, n_process,
+                   self.inputs.admin_tenant, self.inputs.admin_username,
+                   self.inputs.admin_password, self.inputs.admin_username,
+                   self.inputs.admin_password)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -45,7 +50,7 @@ class TestScaleConfig(GenericTestBase):
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_vns = self.verify_scale_objects(object_type='vns')
-        assert (total_vns/scale_number)*100 < 90, 'Not able to scale expected number of Vns'
+        assert total_vns >= scale_number, 'Not able to scale expected number of Vns'
         self.logger.info('Total Vns scaled successfully')
         
         
@@ -53,22 +58,27 @@ class TestScaleConfig(GenericTestBase):
     @preposttest_wrapper
     def test_port_scaling(self):
         '''
-        1. scale ports to 200k in batch of 50k ports each and timeit
+        1. scale ports to 250k in batch of 50k ports each and timeit
         2.Verify creation after each batch creation
         3.Verify contrail-status
         4.At the end of batch creation restart api-server,schema
         5.Verify contrail-status
         '''
-        scale_number = 200000
+        scale_number = 250000
         scaled_ports = 0
         restart_services = ['api-server','schema']
         while scaled_ports < scale_number :
             n_ports = 200
             n_process = 25
             n_vns = 10
-            cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                    --n_vns %s --vnc  --n_process %s --n_ports %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_vns, n_process, n_ports)
+            cmd = "python tools/scale/scale_config.py --api_server_ip %s \
+                   --keystone_ip %s --n_vns %s --vnc --n_process %s --n_ports %s \
+                   --project %s --admin_username %s --admin_password %s \
+                   --username %s --password %s"%(self.inputs.cfgm_ips[0],
+                   self.inputs.external_vip, n_vns, n_process, n_ports,
+                   self.inputs.admin_tenant, self.inputs.admin_username,
+                   self.inputs.admin_password, self.inputs.admin_username,
+                   self.inputs.admin_password)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -80,7 +90,7 @@ class TestScaleConfig(GenericTestBase):
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_ports = self.verify_scale_objects(object_type='ports')
-        assert (total_ports/scale_number)*100 < 90, 'Not able to scale expected number of ports'
+        assert total_ports >= scale_number, 'Not able to scale expected number of ports'
         self.logger.info('Total ports scaled successfully')
     
     @test.attr(type=['scale_sg'])
@@ -100,9 +110,14 @@ class TestScaleConfig(GenericTestBase):
             n_sgs = 500
             n_process = 40
             n_sg_rules = 1
-            cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                    --n_sgs %s --vnc  --n_process %s --n_sg_rules %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_sgs, n_process, n_sg_rules)
+            cmd = "python tools/scale/scale_config.py --api_server_ip %s \
+                   --keystone_ip %s --n_sgs %s --vnc --n_process %s --n_sg_rules %s \
+                   --project %s --admin_username %s --admin_password %s \
+                   --username %s --password %s"%(self.inputs.cfgm_ips[0],
+                   self.inputs.external_vip, n_sgs, n_process, n_sg_rules,
+                   self.inputs.admin_tenant, self.inputs.admin_username,
+                   self.inputs.admin_password, self.inputs.admin_username,
+                   self.inputs.admin_password)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -114,7 +129,7 @@ class TestScaleConfig(GenericTestBase):
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_sgs = self.verify_scale_objects(object_type='sgs')
-        assert (total_sgs/scale_number)*100 < 90, 'Not able to scale expected number of sgs'
+        assert total_sgs >= scale_number, 'Not able to scale expected number of sgs'
         self.logger.info('Total sgs scaled successfully')
     
     @test.attr(type=['scale_sg_rules'])
@@ -130,13 +145,18 @@ class TestScaleConfig(GenericTestBase):
         scale_number = 200000
         scaled_sgs_rules = 0
         restart_services = ['api-server','schema']
-        while scaled_sgs < scale_number :
+        while scaled_sgs_rules < scale_number :
             n_sgs = 10
             n_process = 30
             n_sg_rules = 200
-            cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                    --n_sgs %s --vnc  --n_process %s --n_sg_rules %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_sgs, n_process, n_sg_rules)
+            cmd = "python tools/scale/scale_config.py --api_server_ip %s \
+                   --keystone_ip %s --n_sgs %s --vnc --n_process %s --n_sg_rules %s \
+                   --project %s --admin_username %s --admin_password %s \
+                   --username %s --password %s"%(self.inputs.cfgm_ips[0],
+                   self.inputs.external_vip, n_sgs, n_process, n_sg_rules,
+                   self.inputs.admin_tenant, self.inputs.admin_username,
+                   self.inputs.admin_password, self.inputs.admin_username,
+                   self.inputs.admin_password)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -148,7 +168,7 @@ class TestScaleConfig(GenericTestBase):
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_sgs_rules = self.verify_scale_objects(object_type='sg_rules')
-        assert (total_sgs_rules/scale_number)*100 < 90, 'Not able to scale expected number of sgs_rules'
+        assert total_sgs_rules >= scale_number, 'Not able to scale expected number of sgs_rules'
         self.logger.info('Total sgs_rules scaled successfully')
     
     @test.attr(type=['scale_np'])
@@ -168,9 +188,14 @@ class TestScaleConfig(GenericTestBase):
             n_policies = 1000
             n_process = 50
             n_policy_rules = 1
-            cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                    --n_policies %s --vnc  --n_process %s --n_policy_rules %s"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_policies, n_process, n_policy_rules)
+            cmd = "python tools/scale/scale_config.py --api_server_ip %s \
+                   --keystone_ip %s --n_policies %s --vnc --n_process %s --n_policy_rules %s \
+                   --project %s --admin_username %s --admin_password %s \
+                   --username %s --password %s"%(self.inputs.cfgm_ips[0],
+                   self.inputs.external_vip, n_policies, n_process, n_policy_rules,
+                   self.inputs.admin_tenant, self.inputs.admin_username,
+                   self.inputs.admin_password, self.inputs.admin_username,
+                   self.inputs.admin_password)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -182,7 +207,7 @@ class TestScaleConfig(GenericTestBase):
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_nps = self.verify_scale_objects(object_type='nps')
-        assert (total_nps/scale_number)*100 < 90, 'Not able to scale expected number of network policies'
+        assert total_nps >= scale_number, 'Not able to scale expected number of network policies'
         self.logger.info('Total network policies scaled successfully')
     
     @test.attr(type=['scale_np_rules'])
@@ -198,13 +223,18 @@ class TestScaleConfig(GenericTestBase):
         scale_number = 100000
         scaled_np_rules = 0
         restart_services = ['api-server','schema']
-        while scaled_nps_rules < scale_number :
+        while scaled_np_rules < scale_number :
             n_policies = 100
             n_process = 1
             n_policy_rules = 1000
-            cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                    --n_policies %s --vnc  --n_process %s --n_policy_rules %s --project admin"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_policies, n_process, n_policy_rules)
+            cmd = "python tools/scale/scale_config.py --api_server_ip %s \
+                   --keystone_ip %s --n_policies %s --vnc --n_process %s --n_policy_rules %s \
+                   --project %s --admin_username %s --admin_password %s \
+                   --username %s --password %s"%(self.inputs.cfgm_ips[0],
+                   self.inputs.external_vip, n_policies, n_process, n_policy_rules,
+                   self.inputs.admin_tenant, self.inputs.admin_username,
+                   self.inputs.admin_password, self.inputs.admin_username,
+                   self.inputs.admin_password)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -216,7 +246,7 @@ class TestScaleConfig(GenericTestBase):
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
         total_np_rules = self.verify_scale_objects(object_type='np_rules')
-        assert (total_np_rules/scale_number)*100 < 90, 'Not able to scale expected number of network policies rules'
+        assert total_np_rules >= scale_number, 'Not able to scale expected number of network policies rules'
         self.logger.info('Total network policies rules scaled successfully')
     
     
@@ -236,9 +266,14 @@ class TestScaleConfig(GenericTestBase):
         while scaled_fips < scale_number :
             n_fips = 800
             n_process = 25
-            cmd = "python tools/scale/scale_config.py --api_server_ip %s --keystone_ip %s \
-                    --n_fips %s --vnc  --n_process %s --project admin"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
-                                                       n_vns, n_process)
+            cmd = "python tools/scale/scale_config.py --api_server_ip %s \
+                   --keystone_ip %s --n_fips %s --vnc --n_process %s  \
+                   --project %s --admin_username %s --admin_password %s \
+                   --username %s --password %s"%(self.inputs.cfgm_ips[0],
+                   self.inputs.external_vip, n_fips, n_process,
+                   self.inputs.admin_tenant, self.inputs.admin_username,
+                   self.inputs.admin_password, self.inputs.admin_username,
+                   self.inputs.admin_password)
             try:
                 output= subprocess.check_output(cmd, shell=True)
             except subprocess.CalledProcessError:
@@ -249,8 +284,8 @@ class TestScaleConfig(GenericTestBase):
             scaled_fips = fips
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
-        total_fips = self.verify_scale_objects(object_type=fips)
-        assert (total_fips/scale_number)*100 < 90, 'Not able to scale expected number of fips'
+        total_fips = self.verify_scale_objects(object_type='fips')
+        assert total_fips >= scale_number, 'Not able to scale expected number of fips'
         self.logger.info('Total fips scaled successfully')
 
     def verify_scale_objects(self, object_type='vns'):
