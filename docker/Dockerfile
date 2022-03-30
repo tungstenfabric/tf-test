@@ -23,6 +23,8 @@ RUN \
       yum module enable -y javapackages-tools ; \
     fi && \
     source /functions.sh && \
+    yum update -y -x "redhat-release*" -x "coreutils*" && \
+    yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical && \
     yum install -y unzip vim tcpdump ant git ipmitool \
       patch bzip2 sudo ant-junit libXpm libXrender \
       gtk2 GConf2 gcc-c++ && \
