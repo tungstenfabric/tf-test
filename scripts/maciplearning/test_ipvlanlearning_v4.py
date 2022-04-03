@@ -99,6 +99,12 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.vm2_fixture.run_cmd_on_vm(cmds)
         self.vm3_fixture.run_cmd_on_vm(cmds)
         self.vm4_fixture.run_cmd_on_vm(cmds)
+        
+        self.delete_crpd_network(self.vm1_fixture, name='ipvlannet')
+        self.delete_crpd_network(self.vm2_fixture, name='ipvlannet')
+        self.delete_crpd_network(self.vm3_fixture, name='ipvlannet')
+        self.delete_crpd_network(self.vm4_fixture, name='ipvlannet')
+        
         rules = [
             {
                 'direction': '<>', 'simple_action': 'pass',
@@ -137,12 +143,6 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         assert self.vm2_fixture.ping_to_ip(self.vm4_fixture.vm_ip)
         # Between V3 <==> VM4
         assert self.vm3_fixture.ping_to_ip(self.vm4_fixture.vm_ip)
-       
-
-        self.vm1_eth0_ip = self.get_intf_address('eth0', self.vm1_fixture)
-        self.vm2_eth0_ip = self.get_intf_address('eth0', self.vm2_fixture)
-        self.vm3_eth0_ip = self.get_intf_address('eth0', self.vm3_fixture)
-        self.vm4_eth0_ip = self.get_intf_address('eth0', self.vm4_fixture)
         
         mac_cmd = ["ifconfig eth0 | grep ether | awk '{ print $2 }'"]
         self.vm1_mac_addr = list(
@@ -153,7 +153,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
             self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
         self.vm4_mac_addr = list(
             self.vm4_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        
+
         #try:
         #    self.inputs.run_cmd_on_server(self.vm1_fixture.vm_node_ip, "contrail-tools")
         #    self.inputs.run_cmd_on_server(self.vm2_fixture.vm_node_ip, "contrail-tools")
@@ -500,7 +500,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -510,7 +510,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM2")
         intf_details = self.agent_inspect[vm2_node_ip].get_vna_intf_details(self.vm2_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM2")
         for l in mac_ip_list:
@@ -649,7 +649,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -659,7 +659,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM3")
         intf_details = self.agent_inspect[vm3_node_ip].get_vna_intf_details(self.vm3_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -808,7 +808,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -818,7 +818,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM4")
         intf_details = self.agent_inspect[vm4_node_ip].get_vna_intf_details(self.vm4_fixture.tap_intf[self.vn2_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -828,7 +828,6 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end test_ipvlan_inter_vn_inter_compute_l2_mode
         
-    @test.attr(type=['sanity'])
     @preposttest_wrapper
     def test_ipvlan_inter_vn_intra_compute_l2_mode(self):
         '''
@@ -967,7 +966,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM3")
         intf_details = self.agent_inspect[vm3_node_ip].get_vna_intf_details(self.vm3_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -977,7 +976,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM4")
         intf_details = self.agent_inspect[vm4_node_ip].get_vna_intf_details(self.vm4_fixture.tap_intf[self.vn2_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -1126,7 +1125,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -1136,7 +1135,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM4")
         intf_details = self.agent_inspect[vm4_node_ip].get_vna_intf_details(self.vm4_fixture.tap_intf[self.vn2_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -1165,7 +1164,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                3. Verify that All the learned MAC are same as VMI MAC
                4. No Crash is observed.
         NOTE: Tcpdump utility must be installed on the computes.
-        Maintainer : vgarnepudi@juniper.net
+        Maintainer : manasd@juniper.net
         '''
         
         subnet = self.vn1_fixture.get_subnets()[0]['cidr'] 
@@ -1268,7 +1267,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                3. Verify that All the learned MAC are same as VMI MAC
                4. No Crash is observed.
         NOTE: Tcpdump utility must be installed on the computes.
-        Maintainer : vgarnepudi@juniper.net
+        Maintainer : manasd@juniper.net
         '''
         self.vm1_fixture.disable_interface_policy()
         self.vm2_fixture.disable_interface_policy()
@@ -1383,7 +1382,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -1393,7 +1392,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM2")
         intf_details = self.agent_inspect[vm2_node_ip].get_vna_intf_details(self.vm2_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -1404,7 +1403,6 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
     # end test_ipvlan_inter_vn_inter_compute_l2_mode
     
         
-    @test.attr(type=['sanity'])
     @preposttest_wrapper
     def test_ipvlan_intra_vn_inter_compute_l2l3_mode(self):
         '''
@@ -1422,7 +1420,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                3. Verify that All the learned MAC are same as VMI MAC
                4. No Crash is observed.
         NOTE: Tcpdump utility must be installed on the computes.
-        Maintainer : vgarnepudi@juniper.net
+        Maintainer : manasd@juniper.net
         '''
         self.vm1_fixture.disable_interface_policy()
         self.vm3_fixture.disable_interface_policy()
@@ -1537,7 +1535,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -1547,7 +1545,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM3")
         intf_details = self.agent_inspect[vm3_node_ip].get_vna_intf_details(self.vm3_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -1575,7 +1573,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                3. Verify that All the learned MAC are same as VMI MAC
                4. No Crash is observed.
         NOTE: Tcpdump utility must be installed on the computes.
-        Maintainer : vgarnepudi@juniper.net
+        Maintainer : manasd@juniper.net
         '''
         self.vm1_fixture.disable_interface_policy()
         self.vm4_fixture.disable_interface_policy()
@@ -1593,14 +1591,14 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         
         for i in range(number_of_container):
             container_name.append("crpd"+str(i))
-            ip1 = get_an_ip(subnet, offset=10+i)
+            ip1 = get_an_ip(subnet1, offset=10+i)
             container_ip1.append(ip1)
-            loip1 = get_an_ip(subnet, offset=100+i)
+            loip1 = get_an_ip(subnet1, offset=100+i)
             lo_ip1.append(loip1)
             
-            ip2 = get_an_ip(subnet, offset=30+i)
+            ip2 = get_an_ip(subnet2, offset=30+i)
             container_ip2.append(ip2)
-            loip2 = get_an_ip(subnet, offset=130+i)
+            loip2 = get_an_ip(subnet2, offset=130+i)
             lo_ip2.append(loip2)
         
         self.vn1_fixture.add_forwarding_mode(
@@ -1701,7 +1699,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -1711,7 +1709,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM4")
         intf_details = self.agent_inspect[vm4_node_ip].get_vna_intf_details(self.vm4_fixture.tap_intf[self.vn2_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -1737,7 +1735,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                1. Verify BFD session is up and IPvlan is learnt.
                2. No Crash is observed.
         NOTE: Tcpdump utility must be installed on the computes.
-        Maintainer : vgarnepudi@juniper.net
+        Maintainer : manasd@juniper.net
         '''
         self.vm3_fixture.disable_interface_policy()
         self.vm4_fixture.disable_interface_policy()
@@ -1755,14 +1753,14 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         
         for i in range(number_of_container):
             container_name.append("crpd"+str(i))
-            ip1 = get_an_ip(subnet, offset=10+i)
+            ip1 = get_an_ip(subnet1, offset=10+i)
             container_ip1.append(ip1)
-            loip1 = get_an_ip(subnet, offset=100+i)
+            loip1 = get_an_ip(subnet1, offset=100+i)
             lo_ip1.append(loip1)
             
-            ip2 = get_an_ip(subnet, offset=30+i)
+            ip2 = get_an_ip(subnet2, offset=30+i)
             container_ip2.append(ip2)
-            loip2 = get_an_ip(subnet, offset=130+i)
+            loip2 = get_an_ip(subnet2, offset=130+i)
             lo_ip2.append(loip2)
         
         self.vn1_fixture.add_forwarding_mode(
@@ -1822,7 +1820,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
             assert state == "Up", "BFD state is not up on container %s on VM %s" % (container_name[i], self.vm4_fixture)
                     
         for i in range(number_of_container):
-            assert self.ping_from_crpd_container(self.vm1_fixture, container_ip2[i], count='10', container_name=container_name[i]), "Ping Fails from Container"
+            assert self.ping_from_crpd_container(self.vm3_fixture, container_ip2[i], count='10', container_name=container_name[i]), "Ping Fails from Container"
   
         vm3_node_ip = self.vm3_fixture.vm_node_ip
         vm4_node_ip = self.vm4_fixture.vm_node_ip
@@ -1863,7 +1861,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
         intf_details = self.agent_inspect[vm3_node_ip].get_vna_intf_details(self.vm3_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
         for l in mac_ip_list:
@@ -1873,7 +1871,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM4")
         intf_details = self.agent_inspect[vm4_node_ip].get_vna_intf_details(self.vm4_fixture.tap_intf[self.vn2_fixture.vn_fq_name]['name'])
         mac_ip_list = intf_details[0].get("mac_ip_list")
-        assert len(mac_ip_list) == number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
         
         self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
         for l in mac_ip_list:
@@ -2542,6 +2540,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         assert not bgpaas_fixture.verify_in_control_node(	
             bgpaas_vm1), 'BGPaaS Session should not be seen in the control-node after deleting vmi'	
     #end test
+
     @preposttest_wrapper
     def test_ipvlan_move_ip_across_computes_l2(self):
         '''
@@ -2563,121 +2562,135 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                2.flow should be deleted on compute1 and added on compute 2
         Maintainer : vgarnepudi@juniper.net
         '''
-        vm5_name = get_random_name('vm5')
-        vm5_fixture = self.create_vm(
-        vn_fixture=self.vn2_fixture,
-        image_name='ubuntu',
-        vm_name=vm5_name,
-        node_name=self.node2)
-        assert vm5_fixture.wait_till_vm_is_up()
-        cmds_vm2 = ['ip link add ipvlan1 link ens3 type ipvlan mode l2',
-                    'ip link set dev ipvlan1 up',
-                    'ip addr add %s/26 dev ipvlan1' % self.vm2_ipvlan_ip.split('/')[0]]
-        self.vm2_fixture.run_cmd_on_vm(cmds_vm2, as_sudo=True)
-        mac_cmd = ['ifconfig ipvlan1 | grep ether | awk \'{ print $2 }\'']
-        vm2_ipvlan_mac_addr = list(
-            self.vm2_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        # from vm5 to mac2 intf
-        assert vm5_fixture.ping_to_ip(self.vm2_ipvlan_ip.split('/')[0])
-        # checking evpn table
-        vm5_node_ip = vm5_fixture.vm_node_ip
-        vm5_vrf_id = self.get_vrf_id(self.vn2_fixture, vm5_fixture)
-        evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-            vm5_vrf_id,
-            vxlanid=self.vn2_vxlan_id,
-            mac=vm2_ipvlan_mac_addr,
-            ip=self.vm2_ipvlan_ip)['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm2_ipvlan_mac_addr + \
-            "-" + self.vm2_ipvlan_ip, "Mac route for ipvlan1 is absent in EVPN table. "
-        # checking bridge table
-        peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-            vm5_vrf_id, mac=vm2_ipvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-        # checking if ipvlan2 is present in vm3 inet table
-        inspect_h = self.agent_inspect[vm5_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm5_vrf_id,
-            ip=self.vm2_ipvlan_ip.split("/")[0])
-        assert route, ('No route seen in inet table for %s' %
-                       (self.vm2_ipvlan_ip.split("/")[0]))
-        vm5_mpls_label = route['routes'][0]['path_list'][0]['label']
-        # checking if ipvlan2 is present in vm3 Vrouter inet table
-        route = self.get_vrouter_route(self.vm2_ipvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
-        assert route, ('No route seen in vrouter for %s' %
-                       (self.vm2_ipvlan_ip))
-        # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
-            self.vm2_ipvlan_ip, int(vm5_vrf_id))
-        output = self.inputs.run_cmd_on_server(
-            vm5_node_ip, stitched_mac_cmd).split("(")[0]
-        assert EUI(output, dialect=mac_unix_expanded) == EUI(
-            vm2_ipvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
-        cmd = ['ip link set dev ipvlan1 down']
-        self.vm2_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        cmds_vm3 = ['ip link add ipvlan1 link ens3 type ipvlan mode l2',
-                    'ip link set dev ipvlan1 up',
-                    'ip addr add %s/26 dev ipvlan1' % self.vm2_ipvlan_ip.split('/')[0]]
-        self.vm3_fixture.run_cmd_on_vm(cmds_vm3, as_sudo=True)
-        mac_cmd = ['ifconfig ipvlan1 | grep ether | awk \'{ print $2 }\'']
-        vm3_ipvlan_mac_addr = list(
-            self.vm3_fixture.run_cmd_on_vm(mac_cmd).values())[0]
-        # deleting ip in arp cache to improve the time in which arp gets
-        # updated
-        cmd = ['arp -d %s' % (self.vm2_ipvlan_ip.split('/')[0])]
-        vm5_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        time.sleep(30)
-        assert vm5_fixture.ping_to_ip(self.vm2_ipvlan_ip.split('/')[0])
-        # checking evpn table
-        evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-            vm5_vrf_id,
-            vxlanid=self.vn2_vxlan_id,
-            mac=vm3_ipvlan_mac_addr,
-            ip=self.vm2_ipvlan_ip)['mac']
-        assert evpn_route == str(self.vn2_vxlan_id) + "-" + vm3_ipvlan_mac_addr + \
-            "-" + self.vm2_ipvlan_ip, "Mac route for ipvlan1 is absent in EVPN table. "
-        # checking if route for ipvlan2 is deleted from vm5 evpn table
-        try:
-            evpn_route = self.agent_inspect[vm5_node_ip].get_vna_evpn_route(
-                vm5_vrf_id,
-                vxlanid=self.vn2_vxlan_id,
-                mac=vm2_ipvlan_mac_addr,
-                ip=self.vm2_ipvlan_ip)['mac']
-        except TypeError:
-            evpn_route = None
-        assert not evpn_route, "Mac route for ipvlan5 is present in EVPN table. "
-        # checking bridge table
-        peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-            vm5_vrf_id, mac=vm3_ipvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-        # checking if route for ipvlan2 is not deleted from vm5 bridge table, as parent exists
-        peer = self.agent_inspect[vm5_node_ip].get_vna_layer2_route(
-            vm5_vrf_id, mac=vm2_ipvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer, "MAC1 bridge route is not present"
-        # checking if route for ipvlan3 is present in vm5 inet table
-        route = inspect_h.get_vna_route(
-            vrf_id=vm5_vrf_id,
-            ip=self.vm2_ipvlan_ip.split("/")[0])
-        assert route, ('No route seen in inet table for %s' %
-                       (self.vm2_ipvlan_ip.split("/")[0]))
-        assert vm5_mpls_label != route['routes'][0]['path_list'][0]['label'], "Mpls label has not changed."
-        assert route['routes'][0]['path_list'][0]['nh']['type'] == 'tunnel', "Nh type is not tunnel."
-        # checking if route for ipvlan3 is present vm5 Vrouter inet table
-        route = self.get_vrouter_route(self.vm2_ipvlan_ip,
-                                       vn_fixture=self.vn2_fixture,
-                                       inspect_h=inspect_h)
-        assert route, ('No route seen in vrouter for %s' %
-                       (self.vm2_ipvlan_ip))
-        # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
-            self.vm2_ipvlan_ip, int(vm5_vrf_id))
-        output = self.inputs.run_cmd_on_server(
-            vm5_node_ip, stitched_mac_cmd).split("(")[0]
-        assert EUI(output, dialect=mac_unix_expanded) == EUI(
-            vm3_ipvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
+        self.vm1_fixture.disable_interface_policy()
+        self.vm3_fixture.disable_interface_policy()
+                
+        subnet = self.vn1_fixture.get_subnets()[0]['cidr'] 
+        gw_ip = self.vn1_fixture.get_subnets()[0]['gateway_ip']
+        
+        container_name = []
+        container_ip1 = []
+        lo_ip1 = []
+        number_of_container = 5
+        
+        for i in range(number_of_container):
+            container_name.append("crpd"+str(i))
+            ip1 = get_an_ip(subnet, offset=10+i)
+            container_ip1.append(ip1)
+            loip1 = get_an_ip(subnet, offset=100+i)
+            lo_ip1.append(loip1)
+        
+        self.vn1_fixture.set_mac_ip_learning()
+        self.create_crpd_network(self.vm1_fixture, subnet, gw_ip, ipvlan_mode='l2')
+        self.create_crpd_network(self.vm3_fixture, subnet, gw_ip, ipvlan_mode='l2')
+        
+        for i in range(number_of_container):
+            self.create_crpd_container(self.vm1_fixture, container_ip=container_ip1[i] , container_name=container_name[i])
+                
+        # creating BFD health check
+        shc_fixture = self.create_hc(
+            hc_type='vn-ip-list',
+           probe_type='BFD',
+            target_ip_list={
+                'ip_address': container_ip1})
+        self.attach_shc_to_vn(shc_fixture, self.vn1_fixture)
+        self.addCleanup(self.detach_shc_from_vn, shc_fixture, self.vn1_fixture)
+        
+        for i in range(number_of_container):
+            self.config_bfd_on_crpd(self.vm1_fixture,
+                                    gw_ip=gw_ip,
+                                    lo_ip=lo_ip1[i],
+                                    container_name=container_name[i],
+                                    containerIP=container_ip1[i])
+        
+        result = self.check_bfd_packets(self.vm1_fixture, self.vn1_fixture)
+        assert result, "BFD packets are not seen on %s" % self.vm1_name
+             
+        for i in range(number_of_container):
+            state = self.get_bfd_state_crpd(self.vm1_fixture, container_name=container_name[i])
+            assert state == "Up", "BFD state is not up on container %son VM %s" % (container_name[i], self.vm1_fixture)
+
+        vm1_node_ip = self.vm1_fixture.vm_node_ip
+        vm3_node_ip = self.vm3_fixture.vm_node_ip
+        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
+        vm3_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm3_fixture)
+        vn1_vxlan_id = self.vn1_fixture.get_vxlan_id()
+        
+        # checking evpn table for target mac-ip
+        self.logger.info("checking evpn table for target IPvLAN MAC/IP")
+        for i in range(number_of_container):
+            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
+                vm1_vrf_id,
+                vxlanid=vn1_vxlan_id,
+                mac=self.vm1_mac_addr,
+                ip=container_ip1[i] + "/32")['mac']
+            assert evpn_route == str(vn1_vxlan_id) + "-" + self.vm1_mac_addr + "-" + container_ip1[i] + "/32", "Mac route for container_ip is absent in EVPN table. "
+            # checking if route for target_ip is in crpd_vm inet table route
+            inspect_h = self.agent_inspect[vm1_node_ip]
+            route = inspect_h.get_vna_route(
+                vrf_id=vm1_vrf_id,
+                ip=container_ip1[i])
+            assert route, ('Route seen in inet table for %s' % container_ip1[i])
+            
+        self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
+        intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
+        mac_ip_list = intf_details[0].get("mac_ip_list")
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        
+        self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
+        for l in mac_ip_list:
+            for mac in l.values():
+                assert mac == self.vm1_mac_addr, "Learned MAC is not same as VMI MAC for Container for VM1" 
+        
+        for i in range(number_of_container):
+            self.delete_crpd_container(self.vm1_fixture, container_name=container_name[i])
+            
+        for i in range(number_of_container):            
+            self.create_crpd_container(self.vm3_fixture, container_ip=container_ip1[i] , container_name=container_name[i])
+                        
+        for i in range(number_of_container):            
+            self.config_bfd_on_crpd(self.vm3_fixture,
+                                    gw_ip=gw_ip,
+                                    lo_ip=lo_ip1[i],
+                                    container_name=container_name[i],
+                                    containerIP=container_ip1[i])
+        
+        result = self.check_bfd_packets(self.vm3_fixture, self.vn1_fixture)
+        assert result, "BFD packets are not seen on %s" % self.vm3_name
+             
+        for i in range(number_of_container):
+            state = self.get_bfd_state_crpd(self.vm3_fixture, container_name=container_name[i])
+            assert state == "Up", "BFD state is not up on container %s on VM %s" % (container_name[i], self.vm3_fixture)
+        
+        # checking evpn table for target mac-ip
+        self.logger.info("checking evpn table for target IPvLAN MAC/IP")
+        for i in range(number_of_container):
+            evpn_route = self.agent_inspect[vm3_node_ip].get_vna_evpn_route(
+                vm3_vrf_id,
+                vxlanid=vn1_vxlan_id,
+                mac=self.vm3_mac_addr,
+                ip=container_ip1[i] + "/32")['mac']
+            assert evpn_route == str(vn1_vxlan_id) + "-" + self.vm3_mac_addr + "-" + container_ip1[i] + "/32", "Mac route for container_ip is absent in EVPN table. "
+            # checking if route for target_ip is in crpd_vm inet table route
+            inspect_h = self.agent_inspect[vm3_node_ip]
+            route = inspect_h.get_vna_route(
+                vrf_id=vm3_vrf_id,
+                ip=container_ip1[i])
+            assert route, ('Route not seen in inet table for %s' % container_ip1[i])
+
+        self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM3")
+        intf_details = self.agent_inspect[vm3_node_ip].get_vna_intf_details(self.vm3_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
+        mac_ip_list = intf_details[0].get("mac_ip_list")
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        
+        self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
+        for l in mac_ip_list:
+            for mac in l.values():
+                assert mac == self.vm3_mac_addr, "Learned MAC is not same as VMI MAC for Container for VM2"    
+        
+
         return True
-    # end test_ipvlan_move_ip_across_computes_l2    
+
     @preposttest_wrapper
     def test_ipvlan_static_route_table_inter_vn_inter_compute(self):
         '''
@@ -2694,110 +2707,155 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                1. Health Check for the target ips should be working with out any issues and route entries should updated according to the MAC/ip bindings after did the vmi flap on computes
                2. existing mac/ip binding should reflect  in bfd sessions and the corresponding route tables  
         Maintainer : vgarnepudi@juniper.net
-        '''
+        '''   
         self.vm1_fixture.disable_interface_policy()
         self.vm4_fixture.disable_interface_policy()
-        cmds_vm1 = ['ip link add ipvlan1 link ens3 type ipvlan mode l2',
-                    'ip netns add testns',
-                    'ip link set ipvlan1 netns testns',
-                    'ip netns exec testns ip addr add %s dev ipvlan1' % (self.vm1_ipvlan_ip.split('/')[0] + "/26"),
-                    'ip netns exec testns ip link set ipvlan1 up',
-                    'ip netns exec testns ip addr add 192.168.1.3/24 dev ipvlan1']
-        cmds_vm4 = ['ip link add ipvlan1 link ens3 type ipvlan mode l2',
-                    'ip netns add testns',
-                    'ip link set ipvlan1 netns testns',
-                    'ip netns exec testns ip addr add %s dev ipvlan1' % (self.vm4_ipvlan_ip.split('/')[0] + "/26"),
-                    'ip netns exec testns ip link set ipvlan1 up',
-                    'ip netns exec testns ip addr add 192.168.1.4/24 dev ipvlan1']
-        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
+        subnet1 = self.vn1_fixture.get_subnets()[0]['cidr'] 
+        gw_ip1 = self.vn1_fixture.get_subnets()[0]['gateway_ip']
+        subnet2 = self.vn2_fixture.get_subnets()[0]['cidr'] 
+        gw_ip2 = self.vn2_fixture.get_subnets()[0]['gateway_ip']
+        
+        container_name = []
+        container_ip1 = []
+        container_ip2 = []
+        lo_ip1 = []
+        lo_ip2 = []
+        number_of_container = 5
+        
+        for i in range(number_of_container):
+            container_name.append("crpd"+str(i))
+            ip1 = get_an_ip(subnet1, offset=10+i)
+            container_ip1.append(ip1)
+            loip1 = get_an_ip(subnet1, offset=100+i)
+            lo_ip1.append(loip1)
+            
+            ip2 = get_an_ip(subnet2, offset=30+i)
+            container_ip2.append(ip2)
+            loip2 = get_an_ip(subnet2, offset=130+i)
+            lo_ip2.append(loip2)
+        
+        self.vn1_fixture.set_mac_ip_learning()
+        self.vn2_fixture.set_mac_ip_learning()
+        self.create_crpd_network(self.vm1_fixture, subnet1, gw_ip1, ipvlan_mode='l2')
+        self.create_crpd_network(self.vm4_fixture, subnet2, gw_ip2, ipvlan_mode='l2')
+        
+        for i in range(number_of_container):
+            self.create_crpd_container(self.vm1_fixture, container_ip=container_ip1[i] , container_name=container_name[i])
+            self.create_crpd_container(self.vm4_fixture, container_ip=container_ip2[i] , container_name=container_name[i])
+                
+        # creating BFD health check
+        shc_fixture = self.create_hc(
+            hc_type='vn-ip-list',
+           probe_type='BFD',
+            target_ip_list={
+                'ip_address': container_ip1})
+        self.attach_shc_to_vn(shc_fixture, self.vn1_fixture)
+        self.addCleanup(self.detach_shc_from_vn, shc_fixture, self.vn1_fixture)
+        
+        shc_fixture = self.create_hc(
+            hc_type='vn-ip-list',
+           probe_type='BFD',
+            target_ip_list={
+                'ip_address': container_ip2})
+        self.attach_shc_to_vn(shc_fixture, self.vn2_fixture)
+        self.addCleanup(self.detach_shc_from_vn, shc_fixture, self.vn2_fixture)
+        
+        for i in range(number_of_container):
+            self.config_bfd_on_crpd(self.vm1_fixture,
+                                    gw_ip=gw_ip1,
+                                    lo_ip=lo_ip1[i],
+                                    container_name=container_name[i],
+                                    containerIP=container_ip1[i])
+            
+            self.config_bfd_on_crpd(self.vm4_fixture,
+                                    gw_ip=gw_ip2,
+                                    lo_ip=lo_ip2[i],
+                                    container_name=container_name[i],
+                                    containerIP=container_ip2[i])
+        
+        result = self.check_bfd_packets(self.vm1_fixture, self.vn1_fixture)
+        assert result, "BFD packets are not seen on %s" % self.vm1_name
+        
+        result = self.check_bfd_packets(self.vm4_fixture, self.vn2_fixture)
+        assert result, "BFD packets are not seen on %s" % self.vm4_name
+             
+        for i in range(number_of_container):
+            state = self.get_bfd_state_crpd(self.vm1_fixture, container_name=container_name[i])
+            assert state == "Up", "BFD state is not up on container %son VM %s" % (container_name[i], self.vm1_fixture)
+    
+            state = self.get_bfd_state_crpd(self.vm4_fixture, container_name=container_name[i])
+            assert state == "Up", "BFD state is not up on container %s on VM %s" % (container_name[i], self.vm4_fixture)
+                    
+        for i in range(number_of_container):
+            assert self.ping_from_crpd_container(self.vm1_fixture, container_ip2[i], count='10', container_name=container_name[i]), "Ping Fails from Container"
+  
+        vm1_node_ip = self.vm1_fixture.vm_node_ip
+        vm4_node_ip = self.vm4_fixture.vm_node_ip
+        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
+        vm4_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm4_fixture)
+        vn1_vxlan_id = self.vn1_fixture.get_vxlan_id()
+        vn2_vxlan_id = self.vn2_fixture.get_vxlan_id()
         vn1_uuid = self.vn1_fixture.uuid
         vn2_uuid = self.vn2_fixture.uuid
      
         # Create Network Static route and attach to the VN  
-        self.create_and_add_network_static_table_to_vn(prefix="192.168.1.3/32", next_hop=self.vm1_ipvlan_ip.split('/')[0], vn_uuid=vn1_uuid)
-        self.create_and_add_network_static_table_to_vn(prefix="192.168.1.4/32", next_hop=self.vm4_ipvlan_ip.split('/')[0], vn_uuid=vn1_uuid)
-        mac_cmd = ['ip netns exec testns ifconfig ipvlan1 | grep ether | awk \'{ print $2 }\'']
-        vm1_ipvlan_mac_addr = list(
-            self.vm1_fixture.run_cmd_on_vm(mac_cmd, as_sudo=True).values())[0]
-        vm4_ipvlan_mac_addr = list(
-            self.vm4_fixture.run_cmd_on_vm(mac_cmd, as_sudo=True).values())[0]
-        # Ping Test between VMs
-        assert self.vm1_fixture.ping_to_ip(self.vm4_fixture.vm_ip)
+        for i in range(number_of_container):
+            self.create_and_add_network_static_table_to_vn(prefix="192.168.1.3/32", next_hop=container_ip1[i], vn_uuid=vn1_uuid)
+            self.create_and_add_network_static_table_to_vn(prefix="192.168.1.4/32", next_hop=container_ip2[i], vn_uuid=vn1_uuid)
         
-        # ping from ipvlan1 intf on vm1 to ipvlan intf on vm4
-        assert self.vm1_fixture.ping_to_ip(
-            self.vm4_ipvlan_ip.split('/')[0], netns="testns")
-        # ping from ipvlan1 intf on vm4 to ipvlan intf on vm1
-        assert self.vm4_fixture.ping_to_ip(
-            self.vm1_ipvlan_ip.split('/')[0], netns="testns")
-        # Test ping Between VMs over Secondary IPs inside NETNS
-        self.logger.info("Test ping Between VMs over Secondary IPs inside NETNS")
-        assert self.vm4_fixture.ping_to_ip("192.168.1.3", netns="testns")
+        # checking evpn table for target mac-ip
+        self.logger.info("checking evpn table for target IPvLAN MAC/IP")
+        for i in range(number_of_container):
+            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
+                vm1_vrf_id,
+                vxlanid=vn1_vxlan_id,
+                mac=self.vm1_mac_addr,
+                ip=container_ip1[i] + "/32")['mac']
+            assert evpn_route == str(vn1_vxlan_id) + "-" + self.vm1_mac_addr + "-" + container_ip1[i] + "/32", "Mac route for container_ip is absent in EVPN table. "
+            # checking if route for target_ip is in crpd_vm inet table route
+            inspect_h = self.agent_inspect[vm1_node_ip]
+            route = inspect_h.get_vna_route(
+                vrf_id=vm1_vrf_id,
+                ip=container_ip1[i])
+            assert route, ('Route seen in inet table for %s' % container_ip1[i])
+            
+            evpn_route = self.agent_inspect[vm4_node_ip].get_vna_evpn_route(
+                vm4_vrf_id,
+                vxlanid=vn2_vxlan_id,
+                mac=self.vm4_mac_addr,
+                ip=container_ip2[i] + "/32")['mac']
+            assert evpn_route == str(vn2_vxlan_id) + "-" + self.vm4_mac_addr + "-" + container_ip2[i] + "/32", "Mac route for container_ip is absent in EVPN table. "
+            # checking if route for target_ip is in crpd_vm inet table route
+            inspect_h = self.agent_inspect[vm4_node_ip]
+            route = inspect_h.get_vna_route(
+                vrf_id=vm4_vrf_id,
+                ip=container_ip2[i])
+            assert route, ('Route seen in inet table for %s' % container_ip2[i])
         
-        # checking evpn table
-        vm1_node_ip = self.vm1_fixture.vm_node_ip
-        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
-        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-            vm1_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm4_ipvlan_mac_addr,
-            ip=self.vm4_ipvlan_ip)['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_ipvlan_mac_addr + \
-            "-" + self.vm4_ipvlan_ip, "Mac route is absent in EVPN table. "
-        # 0 ip should also be present
-        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-            vm1_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm4_ipvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_ipvlan_mac_addr + \
-            "-" + "0.0.0.0/32", "Mac route is absent in EVPN table. "
-        # checking bridge table
-        peer = self.agent_inspect[vm1_node_ip].get_vna_layer2_route(
-            vm1_vrf_id, mac=vm4_ipvlan_mac_addr)['routes'][0]['path_list'][0]['peer']
-        assert peer == "EVPN", "Peer is not EVPN."
-        # checking if vm4_ipvlan_ip is present in vm1 agent inet table
-        inspect_h = self.agent_inspect[vm1_node_ip]
-        route = inspect_h.get_vna_route(
-            vrf_id=vm1_vrf_id,
-            ip=self.vm4_ipvlan_ip.split("/")[0])
-        assert route, ('No route seen in agent inet table for %s' %
-                       (self.vm4_ipvlan_ip.split("/")[0]))
-        # checking if vm4_ipvlan_ip is present in vm1 vrouter inet table
-        route = self.get_vrouter_route(self.vm4_ipvlan_ip,
-                                       vn_fixture=self.vn1_fixture,
-                                       inspect_h=inspect_h)
-        assert route, ('No route seen in vrouter for %s' %
-                       (self.vm4_ipvlan_ip))
-        nh_id = self.inputs.run_cmd_on_server(
-            vm1_node_ip,
-            "contrail-tools rt --dump %s | grep %s | awk '{print $5}' " %
-            (vm1_vrf_id,
-             route['prefix'] +
-                "/" +
-                route['prefix_len']))
-        nh_type = self.inputs.run_cmd_on_server(
-            vm1_node_ip,
-            "contrail-tools  nh --get %s | grep Type | awk {'print $2'}" %
-            nh_id).split(":")[1]
-        assert nh_type == "Encap", "Nh type is not Encap."
-        encap_data = self.inputs.run_cmd_on_server(
-            vm1_node_ip, r"contrail-tools  nh --get %s | grep Encap\ Data" % nh_id).split(":")[1][1:18]
-        assert vm4_ipvlan_mac_addr.replace(
-            ":", " ") == encap_data, "Mac of ipvlan intf on vm4 is not present in encap data."
-        # checking stitched MAC addr
-        stitched_mac_cmd = 'contrail-tools rt --get %s --vrf %d | awk \'{print $6}\'| grep \':\'' % (
-            self.vm4_ipvlan_ip, int(vm1_vrf_id))
-        output = self.inputs.run_cmd_on_server(
-            vm1_node_ip, stitched_mac_cmd).split("(")[0]
-        assert EUI(output, dialect=mac_unix_expanded) == EUI(
-            vm4_ipvlan_mac_addr, dialect=mac_unix_expanded), "Stitched mac address is invalid."
-        cmd = ['ip netns delete testns']
-        self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
+        self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
+        intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
+        mac_ip_list = intf_details[0].get("mac_ip_list")
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        
+        self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
+        for l in mac_ip_list:
+            for mac in l.values():
+                assert mac == self.vm1_mac_addr, "Learned MAC is not same as VMI MAC for Container for VM1"
+                
+        self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM4")
+        intf_details = self.agent_inspect[vm4_node_ip].get_vna_intf_details(self.vm4_fixture.tap_intf[self.vn2_fixture.vn_fq_name]['name'])
+        mac_ip_list = intf_details[0].get("mac_ip_list")
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        
+        self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
+        for l in mac_ip_list:
+            for mac in l.values():
+                assert mac == self.vm4_mac_addr, "Learned MAC is not same as VMI MAC for Container for VM2"
+                
         return True
     # End of test_ipvlan_static_route_table_inter_vn_inter_compute
+    
+    @skip_because(mx_gw = False)
     @preposttest_wrapper
     def test_ipvlan_learn_route_on_controller_extend_to_MX(self):
         '''
@@ -2814,62 +2872,148 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         '''
         self.vm1_fixture.disable_interface_policy()
         self.vm4_fixture.disable_interface_policy()
-        cmds_vm1 = ['ip link add ipvlan1 link ens3 type ipvlan mode l2',
-                    'ip netns add testns',
-                    'ip link set ipvlan1 netns testns',
-                    'ip netns exec testns ip addr add %s dev ipvlan1' % (self.vm1_ipvlan_ip.split('/')[0] + "/26"),
-                    'ip netns exec testns ip link set ipvlan1 up',
-                    'ip netns exec testns ip addr add 192.168.1.3/24 dev ipvlan1']
-        cmds_vm4 = ['ip link add ipvlan1 link ens3 type ipvlan mode l2',
-                    'ip netns add testns',
-                    'ip link set ipvlan1 netns testns',
-                    'ip netns exec testns ip addr add %s dev ipvlan1' % (self.vm4_ipvlan_ip.split('/')[0] + "/26"),
-                    'ip netns exec testns ip link set ipvlan1 up',
-                    'ip netns exec testns ip addr add 192.168.1.4/24 dev ipvlan1']
-        self.vm1_fixture.run_cmd_on_vm(cmds_vm1, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmds_vm4, as_sudo=True)
+        subnet1 = self.vn1_fixture.get_subnets()[0]['cidr'] 
+        gw_ip1 = self.vn1_fixture.get_subnets()[0]['gateway_ip']
+        subnet2 = self.vn2_fixture.get_subnets()[0]['cidr'] 
+        gw_ip2 = self.vn2_fixture.get_subnets()[0]['gateway_ip']
+        
+        container_name = []
+        container_ip1 = []
+        container_ip2 = []
+        lo_ip1 = []
+        lo_ip2 = []
+        number_of_container = 5
+        
+        for i in range(number_of_container):
+            container_name.append("crpd"+str(i))
+            ip1 = get_an_ip(subnet1, offset=10+i)
+            container_ip1.append(ip1)
+            loip1 = get_an_ip(subnet1, offset=100+i)
+            lo_ip1.append(loip1)
+            
+            ip2 = get_an_ip(subnet2, offset=30+i)
+            container_ip2.append(ip2)
+            loip2 = get_an_ip(subnet2, offset=130+i)
+            lo_ip2.append(loip2)
+        
+        self.vn1_fixture.set_mac_ip_learning()
+        self.vn2_fixture.set_mac_ip_learning()
+        self.create_crpd_network(self.vm1_fixture, subnet1, gw_ip1, ipvlan_mode='l2')
+        self.create_crpd_network(self.vm4_fixture, subnet2, gw_ip2, ipvlan_mode='l2')
+        
+        for i in range(number_of_container):
+            self.create_crpd_container(self.vm1_fixture, container_ip=container_ip1[i] , container_name=container_name[i])
+            self.create_crpd_container(self.vm4_fixture, container_ip=container_ip2[i] , container_name=container_name[i])
+                
+        # creating BFD health check
+        shc_fixture = self.create_hc(
+            hc_type='vn-ip-list',
+           probe_type='BFD',
+            target_ip_list={
+                'ip_address': container_ip1})
+        self.attach_shc_to_vn(shc_fixture, self.vn1_fixture)
+        self.addCleanup(self.detach_shc_from_vn, shc_fixture, self.vn1_fixture)
+        
+        shc_fixture = self.create_hc(
+            hc_type='vn-ip-list',
+           probe_type='BFD',
+            target_ip_list={
+                'ip_address': container_ip2})
+        self.attach_shc_to_vn(shc_fixture, self.vn2_fixture)
+        self.addCleanup(self.detach_shc_from_vn, shc_fixture, self.vn2_fixture)
+        
+        for i in range(number_of_container):
+            self.config_bfd_on_crpd(self.vm1_fixture,
+                                    gw_ip=gw_ip1,
+                                    lo_ip=lo_ip1[i],
+                                    container_name=container_name[i],
+                                    containerIP=container_ip1[i])
+            
+            self.config_bfd_on_crpd(self.vm4_fixture,
+                                    gw_ip=gw_ip2,
+                                    lo_ip=lo_ip2[i],
+                                    container_name=container_name[i],
+                                    containerIP=container_ip2[i])
+        
+        result = self.check_bfd_packets(self.vm1_fixture, self.vn1_fixture)
+        assert result, "BFD packets are not seen on %s" % self.vm1_name
+        
+        result = self.check_bfd_packets(self.vm4_fixture, self.vn2_fixture)
+        assert result, "BFD packets are not seen on %s" % self.vm4_name
+             
+        for i in range(number_of_container):
+            state = self.get_bfd_state_crpd(self.vm1_fixture, container_name=container_name[i])
+            assert state == "Up", "BFD state is not up on container %son VM %s" % (container_name[i], self.vm1_fixture)
+    
+            state = self.get_bfd_state_crpd(self.vm4_fixture, container_name=container_name[i])
+            assert state == "Up", "BFD state is not up on container %s on VM %s" % (container_name[i], self.vm4_fixture)
+                    
+        for i in range(number_of_container):
+            assert self.ping_from_crpd_container(self.vm1_fixture, container_ip2[i], count='10', container_name=container_name[i]), "Ping Fails from Container"
+  
+        vm1_node_ip = self.vm1_fixture.vm_node_ip
+        vm4_node_ip = self.vm4_fixture.vm_node_ip
+        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
+        vm4_vrf_id = self.get_vrf_id(self.vn2_fixture, self.vm4_fixture)
+        vn1_vxlan_id = self.vn1_fixture.get_vxlan_id()
+        vn2_vxlan_id = self.vn2_fixture.get_vxlan_id()
         vn1_uuid = self.vn1_fixture.uuid
         vn2_uuid = self.vn2_fixture.uuid
      
         # Create Network Static route and attach to the VN  
-        self.create_and_add_network_static_table_to_vn(prefix="192.168.1.3/32", next_hop=self.vm1_ipvlan_ip.split('/')[0], vn_uuid=vn1_uuid)
-        self.create_and_add_network_static_table_to_vn(prefix="192.168.1.4/32", next_hop=self.vm4_ipvlan_ip.split('/')[0], vn_uuid=vn1_uuid)
-        mac_cmd = ['ip netns exec testns ifconfig ipvlan1 | grep ether | awk \'{ print $2 }\'']
-        vm1_ipvlan_mac_addr = list(
-            self.vm1_fixture.run_cmd_on_vm(mac_cmd, as_sudo=True).values())[0]
-        vm4_ipvlan_mac_addr = list(
-            self.vm4_fixture.run_cmd_on_vm(mac_cmd, as_sudo=True).values())[0]
-        # Ping Test between VMs
-        assert self.vm1_fixture.ping_to_ip(self.vm4_fixture.vm_ip)
+        for i in range(number_of_container):
+            self.create_and_add_network_static_table_to_vn(prefix="192.168.1.3/32", next_hop=container_ip1[i], vn_uuid=vn1_uuid)
+            self.create_and_add_network_static_table_to_vn(prefix="192.168.1.4/32", next_hop=container_ip2[i], vn_uuid=vn1_uuid)
         
-        # ping from ipvlan1 intf on vm1 to ipvlan intf on vm4
-        assert self.vm1_fixture.ping_to_ip(
-            self.vm4_ipvlan_ip.split('/')[0], netns="testns")
-        # ping from ipvlan1 intf on vm4 to ipvlan intf on vm1
-        assert self.vm4_fixture.ping_to_ip(
-            self.vm1_ipvlan_ip.split('/')[0], netns="testns")
-        # Test ping Between VMs over Secondary IPs inside NETNS
-        self.logger.info("Test ping Between VMs over Secondary IPs inside NETNS")
-        assert self.vm4_fixture.ping_to_ip("192.168.1.3", netns="testns")
+        # checking evpn table for target mac-ip
+        self.logger.info("checking evpn table for target IPvLAN MAC/IP")
+        for i in range(number_of_container):
+            evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
+                vm1_vrf_id,
+                vxlanid=vn1_vxlan_id,
+                mac=self.vm1_mac_addr,
+                ip=container_ip1[i] + "/32")['mac']
+            assert evpn_route == str(vn1_vxlan_id) + "-" + self.vm1_mac_addr + "-" + container_ip1[i] + "/32", "Mac route for container_ip is absent in EVPN table. "
+            # checking if route for target_ip is in crpd_vm inet table route
+            inspect_h = self.agent_inspect[vm1_node_ip]
+            route = inspect_h.get_vna_route(
+                vrf_id=vm1_vrf_id,
+                ip=container_ip1[i])
+            assert route, ('Route seen in inet table for %s' % container_ip1[i])
+            
+            evpn_route = self.agent_inspect[vm4_node_ip].get_vna_evpn_route(
+                vm4_vrf_id,
+                vxlanid=vn2_vxlan_id,
+                mac=self.vm4_mac_addr,
+                ip=container_ip2[i] + "/32")['mac']
+            assert evpn_route == str(vn2_vxlan_id) + "-" + self.vm4_mac_addr + "-" + container_ip2[i] + "/32", "Mac route for container_ip is absent in EVPN table. "
+            # checking if route for target_ip is in crpd_vm inet table route
+            inspect_h = self.agent_inspect[vm4_node_ip]
+            route = inspect_h.get_vna_route(
+                vrf_id=vm4_vrf_id,
+                ip=container_ip2[i])
+            assert route, ('Route seen in inet table for %s' % container_ip2[i])
         
-        # checking evpn table
-        vm1_node_ip = self.vm1_fixture.vm_node_ip
-        vm1_vrf_id = self.get_vrf_id(self.vn1_fixture, self.vm1_fixture)
-        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-            vm1_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm4_ipvlan_mac_addr,
-            ip=self.vm4_ipvlan_ip)['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_ipvlan_mac_addr + \
-            "-" + self.vm4_ipvlan_ip, "Mac route is absent in EVPN table. "
-        # 0 ip should also be present
-        evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
-            vm1_vrf_id,
-            vxlanid=self.vn1_vxlan_id,
-            mac=vm4_ipvlan_mac_addr,
-            ip="0.0.0.0/32")['mac']
-        assert evpn_route == str(self.vn1_vxlan_id) + "-" + vm4_ipvlan_mac_addr + \
-            "-" + "0.0.0.0/32", "Mac route is absent in EVPN table. "
+        self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM1")
+        intf_details = self.agent_inspect[vm1_node_ip].get_vna_intf_details(self.vm1_fixture.tap_intf[self.vn1_fixture.vn_fq_name]['name'])
+        mac_ip_list = intf_details[0].get("mac_ip_list")
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM1"
+        
+        self.logger.info("Checking Learned MAC is same as VMI MAC for VM1")
+        for l in mac_ip_list:
+            for mac in l.values():
+                assert mac == self.vm1_mac_addr, "Learned MAC is not same as VMI MAC for Container for VM1"
+                
+        self.logger.info("Checking Number of MAC-IP Entries for TAP Interface of VM4")
+        intf_details = self.agent_inspect[vm4_node_ip].get_vna_intf_details(self.vm4_fixture.tap_intf[self.vn2_fixture.vn_fq_name]['name'])
+        mac_ip_list = intf_details[0].get("mac_ip_list")
+        assert len(mac_ip_list) >= number_of_container, "Number of MAC-IP List is Not correct as Expected for VM3"
+        
+        self.logger.info("Checking Learned MAC is same as VMI MAC for VM3")
+        for l in mac_ip_list:
+            for mac in l.values():
+                assert mac == self.vm4_mac_addr, "Learned MAC is not same as VMI MAC for Container for VM2"
+                
         self.logger.info("loginng into MX and verifying exported routes")	
         router_params = list(self.inputs.physical_routers_data.values())[0]	
         mx_ip=router_params['mgmt_ip']	
@@ -2886,9 +3030,8 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                 break	
             else:	
                 assert False, "Route: %s not seen in MX" % exp_route
-        cmd = ['ip netns delete testns']
-        self.vm1_fixture.run_cmd_on_vm(cmd, as_sudo=True)
-        self.vm4_fixture.run_cmd_on_vm(cmd, as_sudo=True)
+
         return True
     # End of test_ipvlan_learn_route_on_controller_extend_to_MX
+
 
