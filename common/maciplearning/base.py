@@ -31,14 +31,22 @@ class BaseMacIpLearningTest(GenericTestBase):
             output = pod.run_cmd_on_vm(cmd)
             ip6 = re.search(
                  r'inet6\s+addr\s*:\s*(\S*)',
-                 output['ifconfig eth0 | grep Global'])
+                 output["ifconfig " + intf + " | grep Global"])
+            if not ip6:
+                ip6 = re.search(
+                    r'inet6\s*(\S*)',
+                    output["ifconfig " + intf + " | grep Global"])
             ip6_addr = ip6.group(1)
             return ip6_addr
         cmd = ["ifconfig " + intf + " | grep inet"]
         output = pod.run_cmd_on_vm(cmd)
         ip = re.search(
             r'inet\s+addr\s*:\s*(\d+.\d+.\d+.\d+)',
-            output['ifconfig eth0 | grep inet'])
+            output["ifconfig " + intf + " | grep inet"])
+        if not ip:
+            ip = re.search(
+                r'inet\s*(\d+.\d+.\d+.\d+)',
+                output["ifconfig " + intf + " | grep inet"])
         ip_addr = ip.group(1)
         return ip_addr
     # end get_intf_address
@@ -201,7 +209,23 @@ class BaseMacIpLearningTest(GenericTestBase):
         out = vm.run_cmd_on_vm(cmd2, as_sudo=True)
 
     # End create_crpd_container
-    
+
+    def delete_crpd_container(
+            self,
+            vm,
+            container_name='crpd01'):
+        '''
+        Delete cRPD Container
+        '''
+        cmd2 = ['docker container rm -f %s' % container_name]
+        out = vm.run_cmd_on_vm(cmd2, as_sudo=True)
+
+        cmds = ['sudo docker volume rm %s-config &&'
+                'sudo docker volume rm %s-varlog' % (container_name, container_name)]
+        vm.run_cmd_on_vm(cmds, as_sudo=True)
+
+    # End create_crpd_container   
+ 
     def create_crpd_network(
             self,
             vm,
@@ -220,7 +244,20 @@ class BaseMacIpLearningTest(GenericTestBase):
         out = vm.run_cmd_on_vm(cmd1, as_sudo=True)
 
     # End create_crpd_network
-      
+     
+    def delete_crpd_network(
+            self,
+            vm,
+            name='ipvlannet'):
+        '''
+        Create cRPD Network
+        '''
+        cmd1 = ['docker network rm %s' % (name)]
+
+        out = vm.run_cmd_on_vm(cmd1, as_sudo=True)
+
+    # End create_crpd_network
+ 
     def get_bfd_state_crpd(
             self,
             vm,
