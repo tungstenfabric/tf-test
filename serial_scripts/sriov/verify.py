@@ -226,6 +226,10 @@ class VerifySriovCases(object):
         self.remove_from_cleanups(vm_fixture_list[3])
         assert vm_fixture_list[3].verify_vm_not_in_orchestrator()
 
+        #Preventing race condition (supposedly with openstack system)
+        self.logger.info('Sleeping 30 sec')
+        time.sleep(30)
+
         self.logger.info(
                 'VM launch should be successful now  on compute %s. Max number of VF utilized' % (compute_1))
         vm1_sriov_ip=self.ip_increment(vm1_sriov_ip,1)
