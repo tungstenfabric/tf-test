@@ -16,6 +16,8 @@ import control_node
 from common.bgpaas.base import BaseBGPaaS
 from serial_scripts.bgpaas.base import LocalASBase
 from tcutils.util import skip_because,retry
+from common.device_connection import NetconfConnection
+import control_node
 
 cluster_use_local_asn = False
 
@@ -1357,3 +1359,127 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
                  'dst_addresses': [{'subnet': {'ip_prefix': '0.0.0.0', 'ip_prefix_len': 0}}], 'rule_uuid': uuid_2}, ]
         self.connections.orch.set_security_group_rules(
             sg_id=sg_obj.uuid, sg_entries=secgrp_rules)
+
+    def reset_bgp_router_asn(self, bgp_router_id, router_asn):
+        phy_router_obj = self.connections.vnc_lib.bgp_router_read(
+            id=bgp_router_id)
+        params = phy_router_obj.get_bgp_router_parameters()
+        params.set_autonomous_system(router_asn)
+        phy_router_obj.set_bgp_router_parameters(params)
+        self.connections.vnc_lib.bgp_router_update(phy_router_obj)
+
+        return True
+    # end reset_controll_node_router_asn
+
+    def reset_controll_node_router_asn(self, bgp_router_id, router_asn):
+        phy_router_obj = self.connections.vnc_lib.bgp_router_read(
+            id=bgp_router_id)
+        params = phy_router_obj.get_bgp_router_parameters()
+        params.set_local_autonomous_system(router_asn)
+        phy_router_obj.set_bgp_router_parameters(params)
+        self.connections.vnc_lib.bgp_router_update(phy_router_obj)
+
+        return True
+    # end reset_controll_node_router_asn
+
+    def reset_physical_router_asn(self, mx_ip, bgp_group, asn):
+
+        cmds = []
+        cmds.append("set protocols bgp group %s peer-as %s" % (bgp_group,
+                     asn))
+        cmds.append("set protocols bgp group %s local-as %s" % (bgp_group,
+                     asn))
+        mx_handle = NetconfConnection(host=mx_ip)
+        mx_handle.connect()
+        cli_output = mx_handle.config(stmts=cmds, ignore_errors=False,
+                                      timeout=120)
+        mx_handle.disconnect()
+
+        return True
+    # end reset_physical_router_asn
+
+    @preposttest_wrapper
+    def test_cem_22457_router_asn_reset(self):
+
+        new_router_asn = random.randrange(60000, 64000)
+        router_name = self.inputs.ext_routers[0][0]
+        router_params = self.inputs.physical_routers_data[router_name]
+        assert 'bgp_protocol_group' in router_params, "bgp_protocol_group needs \
+                to be specified in physical_routers parameters in input file!!!"
+        bgp_group = router_params['bgp_protocol_group']
+        existing_mx_asn=router_params['asn']
+        mx_ip=router_params['control_ip']
+
+        cmds = []
+        cmds.append("set protocols bgp group %s peer-as %s" % (bgp_group,
+                     new_router_asn))
+        cmds.append("set protocols bgp group %s local-as %s" % (bgp_group,
+                     new_router_asn))
+
+        # Configure MX.
+        fq_name = [u'default-domain', u'default-project',
+                   u'ip-fabric', u'__default__', u'%s' % router_name]
+        bgp_obj = self.connections.vnc_lib.bgp_router_read(fq_name=fq_name)
+        router_params = bgp_obj.get_bgp_router_parameters()
+        existing_asn = router_params.get_autonomous_system()
+        router_params.set_autonomous_system(new_router_asn)
+        bgp_obj.set_bgp_router_parameters(router_params)
+        self.connections.vnc_lib.bgp_router_update(bgp_obj)
+        self.addCleanup(self.reset_bgp_router_asn,
+                        bgp_router_id=bgp_obj.uuid,
+                        router_asn=existing_asn)
+
+        mx_handle = NetconfConnection(host=mx_ip)
+        mx_handle.connect()
+        cli_output = mx_handle.config(stmts=cmds, ignore_errors=False,
+                                      timeout=120)
+        mx_handle.disconnect()
+        self.addCleanup(self.reset_physical_router_asn,
+                        mx_ip=mx_ip,
+                        bgp_group=bgp_group,
+                        asn=existing_mx_asn)
+
+        # Configure control nodes.
+        for i, ctrl_node_name in enumerate(self.inputs.bgp_names):
+            ctrl_node_ip = self.inputs.host_data[ctrl_node_name]['control-ip']
+            #ctrl_node_host_ip = self.inputs.host_data[ctrl_node_name]['host_ip']
+            ctrl_fixture = self.useFixture(
+                control_node.CNFixture(
+                    connections=self.connections,
+                    inputs=self.inputs,
+                    router_name=ctrl_node_name,
+                    router_ip=ctrl_node_ip
+                ))
+            if ctrl_fixture.already_present:
+                fq_name = [u'default-domain', u'default-project',
+                           u'ip-fabric', u'__default__', u'%s' % ctrl_node_name]
+                bgp_obj = self.connections.vnc_lib.bgp_router_read(
+                    fq_name=fq_name)
+                router_params = bgp_obj.get_bgp_router_parameters()
+                #existing_asn = router_params.get_autonomous_system()
+                existing_local_asn = router_params.get_local_autonomous_system()
+                router_params.set_local_autonomous_system(new_router_asn)
+                bgp_obj.set_bgp_router_parameters(router_params)
+                self.connections.vnc_lib.bgp_router_update(bgp_obj)
+                self.addCleanup(self.reset_controll_node_router_asn,
+                                bgp_router_id=bgp_obj.uuid,
+                                router_asn=existing_local_asn)
+
+        # Restart control nodes and test.
+        for i in range(20):
+            for each_ctl in self.inputs.bgp_ips:
+                self.inputs.restart_service('contrail-control', [each_ctl],
+                                            container='control')
+            time.sleep(10)
+            for each_ctl in self.inputs.bgp_ips:
+                cn_bgp_entry=self.connections.get_control_node_inspect_handle(
+                                 each_ctl).get_cn_bgp_neigh_entry(encoding='BGP')
+                est_mx_peer=[elem for elem in cn_bgp_entry if ((
+                             elem['router_type'] == 'router') and
+                             (elem['state'] == 'Established'))]
+                assert len(est_mx_peer) != 0, "BFP peering with router,\
+                       not in established state after asn change and control restart."
+
+        return True
+    # end test_cem_22457_router_asn_reset
+
