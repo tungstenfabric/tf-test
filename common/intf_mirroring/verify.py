@@ -251,6 +251,14 @@ class VerifyIntfMirror(VerifySvcMirror):
         compute_nodes  = self.get_compute_nodes(1, 0, 0)
         return self.verify_intf_mirroring(compute_nodes, [0, 1, 1], sub_intf, ipv6=ipv6)
 
+    def verify_intf_mirroring_src_on_cn1_vn1_analyzer_on_cn2_vn2(self):
+        """Validate no duplicate mirrored traffic and NH ID is seen on analyser tap
+           when using dynamic NH without Juniper Header -- CEM 8760 fix verification.
+           analyzer vm and src vm on different CN, src in vn1 and analyzer in vn2
+        """
+        compute_nodes  = self.get_compute_nodes(0, 0, 1)
+        return self.verify_cem_8760(compute_nodes)#, sub_intf, ipv6=ipv6)
+
     def create_sub_intf(self, vn_fix_uuid, intf_type, mac_address=None):
 
         vlan = self.vlan
@@ -613,6 +621,145 @@ class VerifyIntfMirror(VerifySvcMirror):
 
         return result
     # end verify_intf_mirroring
+
+    def verify_cem_8760(self, compute_nodes, nic_mirror=False,
+        header=1, nh_mode='dynamic'):
+
+        result = True
+        src_compute = compute_nodes[0]
+        analyzer_compute = compute_nodes[2]
+
+        image_name = 'ubuntu-traffic'
+
+        vn1_subnets = [get_random_cidr(af=self.inputs.get_af())]
+        vn2_subnets = [get_random_cidr(af=self.inputs.get_af())]
+
+        vn1_fq_name = self.connections.domain_name +":" \
+                      + self.inputs.project_name + \
+                      ":" + get_random_name("vn1")
+        vn2_fq_name = self.connections.domain_name +":" \
+                      + self.inputs.project_name + \
+                      ":" + get_random_name("vn2")
+
+        vn1_name = vn1_fq_name.split(':')[2]
+        vn2_name = vn2_fq_name.split(':')[2]
+
+        self.vn1_fixture = self.config_vn(vn1_name, vn1_subnets)
+        self.vn2_fixture = self.config_vn(vn2_name, vn2_subnets)
+
+        src_vn_fixture = self.vn1_fixture
+        src_vn_fq_name = vn1_fq_name
+        src_vn_name = vn1_fq_name.split(':')[2]
+
+        analyzer_vn_fixture = self.vn2_fixture
+        analyzer_vn_fq_name = vn2_fq_name
+        analyzer_vn_name = vn2_fq_name.split(':')[2]
+
+        src_vm_name = get_random_name("src_vm")
+        analyzer_vm_name = get_random_name("analyzer_vm")
+
+        src_fq_name = self.connections.domain_name +":" \
+                      + self.inputs.project_name + \
+                      ":" + src_vm_name
+        analyzer_fq_name = self.connections.domain_name +":" \
+                           + self.inputs.project_name + \
+                           ":" + analyzer_vm_name
+        routing_instance = analyzer_vn_fq_name + ':' + analyzer_vn_name
+
+        src_port_ids, analyzer_port_ids = [], []
+
+        src_vn_objs = [src_vn_fixture.obj]
+        analyzer_vn_objs = [analyzer_vn_fixture.obj]
+
+        src_vm_fixture = self.create_vm(vn_objs=src_vn_objs, vm_name=src_vm_name,
+            image_name=image_name, node_name=src_compute, port_ids=src_port_ids)
+
+        analyzer_vm_fixture = self.create_vm(vn_objs=analyzer_vn_objs,
+            vm_name=analyzer_vm_name, image_name=image_name,
+            node_name=analyzer_compute, port_ids=analyzer_port_ids)
+
+        assert src_vm_fixture.verify_on_setup()
+        assert analyzer_vm_fixture.verify_on_setup()
+
+        self.nova_h.wait_till_vm_is_up(src_vm_fixture.vm_obj)
+        self.nova_h.wait_till_vm_is_up(analyzer_vm_fixture.vm_obj)
+
+        src_vm_ip = src_vm_fixture.get_vm_ips(src_vn_fq_name)[0]
+        analyzer_vm_ip = analyzer_vm_fixture.get_vm_ips(analyzer_vn_fq_name)[0]
+        analyzer_vm_mac = analyzer_vm_fixture.get_mac_addr_from_config(
+                              )[analyzer_vn_fq_name]
+        self.logger.info("Compute/VM: SRC: %s / %s, => ANALYZER: %s / %s" %
+            (src_compute, src_vm_ip, analyzer_compute, analyzer_vm_ip))
+
+        # Enable mirroring on the analyzer virtual network.
+        vn_properties = {"mirror_destination": True}
+        vn_fix_update = self.vnc_lib.virtual_network_read(
+                            id = analyzer_vn_fixture.uuid)
+        vn_fix_update.set_virtual_network_properties(vn_properties)
+        self.vnc_lib.virtual_network_update(vn_fix_update)
+
+        # Enable mirroring on source port of source VM.
+        vnc = src_vm_fixture.vnc_lib_h
+        src_port = src_vm_fixture.get_tap_intf_of_vm()[0]
+        src_port_obj = vnc.virtual_machine_interface_read(id=src_port['uuid'])
+        prop_obj = VirtualMachineInterfacePropertiesType()
+        mirror_to = MirrorActionType(analyzer_name='cem-8760', encapsulation=None,
+                        analyzer_ip_address=analyzer_vm_ip, juniper_header = False,
+                        nh_mode='dynamic', routing_instance=routing_instance,
+                        analyzer_mac_address = analyzer_vm_mac)
+        interface_mirror = InterfaceMirrorType('both', mirror_to)
+        prop_obj.set_interface_mirror(interface_mirror)
+        src_port_obj.set_virtual_machine_interface_properties(prop_obj)
+        src_port_obj = vnc.virtual_machine_interface_update(src_port_obj)
+
+        # Enable/Disable packet mode/Policy (earlier flag) and
+        # Ping dns from src VM and check mirrored icmp packets.
+        vnc = analyzer_vm_fixture.vnc_lib_h
+        analyzer_port = analyzer_vm_fixture.get_tap_intf_of_vm()[0]
+        analyzer_port_obj = vnc.virtual_machine_interface_read(
+                                id=analyzer_port['uuid'])
+        dst_ip = src_vn_fixture.get_dns_ip()
+        filters = '\'(icmp[0]=0 and src host %s)\'' % (dst_ip)
+        enable_pkt_mode=False
+        vm_fix_pcap_pid_files = []
+        exp_count=3
+        for i in range(20):
+            enable_pkt_mode = True if i%2 == 0 else False
+            analyzer_port_obj.set_virtual_machine_interface_disable_policy(
+                bool(enable_pkt_mode))
+            vnc.virtual_machine_interface_update(analyzer_port_obj)
+            vm_fix_pcap_pid_files = start_tcpdump_for_vm_intf(self, [analyzer_vm_fixture],
+                                analyzer_vn_fq_name, filters=filters, pcap_on_vm=True)
+            assert src_vm_fixture.ping_with_certainty(dst_ip, count=exp_count,
+                       expectation=True)
+            sleep(5)
+            if not verify_tcpdump_count(self, session=None, pcap=None,
+                       exp_count=exp_count, mac=None, raw_count=False,
+                       exact_match=True, vm_fix_pcap_pid_files=vm_fix_pcap_pid_files,
+                       svm=False, grep_string=None):
+                log.error("\n\n Duplicate packates seen in packet capture of\
+                           mirrored, packets from source VN. There can be a\
+                           potential duplicate NH ID.\n\n")
+                result=False
+                break
+
+        #Check for duplicate NH.
+        cmd = "contrail-tools mirror --dump | grep VNI -A2 "
+        cmd = cmd + "| grep -v VNI | grep -v '\\-\\-\\-\\-'"
+        vni_id = self.inputs.run_cmd_on_server(src_vm_fixture.vm_node_ip, cmd)
+        vni_id = vni_id.split()[3] if len(vni_id.split())==5 else vni_id.split()[2]
+        cmd = "contrail-tools vxlan --get %s | grep NextHop -A2" % vni_id
+        cmd = cmd + "| grep -v NextHop | grep -v '\\-\\-\\-\\-'"
+        nh_id = self.inputs.run_cmd_on_server(analyzer_vm_fixture.vm_node_ip, cmd)
+        nh_id = nh_id.split()[1]
+        cmd = "contrail-tools nh --get 34 | grep 'Sub NH'"
+        nh_ids = self.inputs.run_cmd_on_server(analyzer_vm_fixture.vm_node_ip, cmd)
+        if len(nh_ids.split()) > 3:
+            log.error("\n\n Duplicate NH IDs observed for the VMI of the source VM.")
+            log.error("\n\n Duplicate NH IDs: %s" % nh_ids)
+            result=False
+        return result
+    # end verify_cem_8760
 
     #when no header is specified, this routine has to be called to add "mirroring" to vn properties
     def add_vn_mirror_properties(self):
