@@ -465,6 +465,13 @@ class TestIntfMirror(BaseIntfMirrorTest, VerifyIntfMirror):
         """
         return self.verify_intf_mirroring_src_on_cn2_vn1_dst_on_cn1_vn2_analyzer_on_cn1_vn2(sub_intf=True)
 
+    @preposttest_wrapper
+    def test_intf_mirror_with_dynamic_NH_without_juniper_header_cem8760(self):
+        """Validate no duplicate mirrored traffic and NH ID is seen on analyser tap
+           when using dynamic NH without Juniper Header -- CEM 8760 fix verification.
+           analyzer vm and src vm on different CN, src in vn1 and analyzer in vn2
+        """
+        return self.verify_intf_mirroring_src_on_cn1_vn1_analyzer_on_cn2_vn2()
 
 if __name__ == '__main__':
     unittest.main()
