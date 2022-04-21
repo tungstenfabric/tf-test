@@ -83,7 +83,7 @@ class TestSubnets(BaseNeutronTest):
         Create a VN with subnet having a dns-nameserver
         Create a VM using that subnet
         Check the resolv.conf in the VM
-
+        Update and check again
         '''
         vn1_name = get_random_name('vn1')
         vn1_subnets = [get_random_cidr()]
@@ -91,35 +91,54 @@ class TestSubnets(BaseNeutronTest):
         vn1_default_dns = get_an_ip(vn1_subnets[0], 2)
         dns1_ip = '8.8.8.8'
         dns2_ip = '4.4.4.4'
-        vn1_subnets = [{'cidr': vn1_subnets[0],
-                        'dns_nameservers': [dns1_ip, dns2_ip]
-                        }]
+        vn1_subnets = [{'cidr': vn1_subnets[0]}]
         vn1_vm1_name = get_random_name('vn1-vm1')
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
         vm1_fixture = self.create_vm(vn1_fixture, vn1_vm1_name)
         assert vm1_fixture.wait_till_vm_is_up()
-        output = vm1_fixture.run_cmd_on_vm(['cat /etc/resolv.conf'])
-        resolv_output = list(output.values())[0]
+        cmd = 'cat /etc/resolv.conf | grep nameserver | cut -d \' \' -f 2'
+        output = vm1_fixture.run_cmd_on_vm([cmd])
+        resolv_output = ''
+        for op_val in output.values():
+            resolv_output = resolv_output + op_val
+        assert vn1_default_dns in resolv_output, 'DNS Server IP %s not seen in '\
+            'resolv.conf of the VM' % (vn1_default_dns)
+        self.logger.info('DNS Server IPs are seen in resolv.conf of the VM')
+
+        self.logger.info('Updating the subnet to add new dns servers')
+        vn1_subnet_dict = {'dns_nameservers': [dns1_ip, dns2_ip]}
+        vn1_fixture.update_subnet(vn1_fixture.vn_subnet_objs[0]['id'],
+                                  vn1_subnet_dict)
+        vm1_fixture.reboot()
+        assert vm1_fixture.wait_till_vm_is_up(refresh=True)
+        time.sleep(5)
+        output = vm1_fixture.run_cmd_on_vm([cmd])
+        resolv_output = ''
+        for op_val in output.values():
+            resolv_output = resolv_output + op_val
         assert dns1_ip in resolv_output, 'DNS Server IP %s not seen in '\
             'resolv.conf of the VM' % (dns1_ip)
         assert dns2_ip in resolv_output, 'DNS Server IP %s not seen in '\
             'resolv.conf of the VM' % (dns2_ip)
         self.logger.info('DNS Server IPs are seen in resolv.conf of the VM')
 
-        self.logger.info('Updating the subnet to remove the dns servers')
-        vn1_subnet_dict = {'dns_nameservers': []}
+        self.logger.info('Updating the subnet to remove the dns servers and\
+                          revert it to default DNS Server.')
+        vn1_subnet_dict = {'dns_nameservers': [vn1_default_dns]}
         vn1_fixture.update_subnet(vn1_fixture.vn_subnet_objs[0]['id'],
                                   vn1_subnet_dict)
         vm1_fixture.reboot()
         assert vm1_fixture.wait_till_vm_is_up(refresh=True)
         time.sleep(5)
-        output = vm1_fixture.run_cmd_on_vm(['cat /etc/resolv.conf'])
-        dns_output = list(output.values())[0]
-        assert dns1_ip not in dns_output, 'DNS Server IP %s still seen '\
+        output = vm1_fixture.run_cmd_on_vm([cmd])
+        resolv_output = ''
+        for op_val in output.values():
+            resolv_output = resolv_output + op_val
+        assert dns1_ip not in resolv_output, 'DNS Server IP %s still seen '\
             ' in resolv.conf of the VM' % (dns1_ip)
-        assert dns2_ip not in dns_output, 'DNS Server IP %s still seen '\
+        assert dns2_ip not in resolv_output, 'DNS Server IP %s still seen '\
             ' in resolv.conf of the VM' % (dns2_ip)
-        assert vn1_default_dns in dns_output, 'Default DNS Server %s is missing in the '\
+        assert vn1_default_dns in resolv_output, 'DNS Server IP %s not seen in '\
             'resolv.conf of the VM' % (vn1_default_dns)
         self.logger.info('resolv.conf in VM has the default DNS Server..OK')
     # end test_dns_nameservers
