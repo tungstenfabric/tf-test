@@ -545,7 +545,6 @@ class VerifyIntfMirror(VerifySvcMirror):
                 if get_af_type(addr.get('subnet_cidr')) in ['v6', 'dual']:
                    analyzer_mask = addr.get('subnet_cidr').split('/')[1]
                    break
-            #import pdb;pdb.set_trace()
         src_vm_fixture = self.create_vm(vn_objs=src_vn_objs, vm_name=src_vm_name,
             image_name=image_name, node_name=src_compute, port_ids=src_port_ids)
 
@@ -632,7 +631,6 @@ class VerifyIntfMirror(VerifySvcMirror):
         analyzer_compute = compute_nodes[2]
 
         image_name = 'ubuntu-traffic'
-
         vn1_subnets = [get_random_cidr(af=self.inputs.get_af())]
         vn2_subnets = [get_random_cidr(af=self.inputs.get_af())]
 
@@ -690,8 +688,14 @@ class VerifyIntfMirror(VerifySvcMirror):
         analyzer_vm_ip = analyzer_vm_fixture.get_vm_ips(analyzer_vn_fq_name)[0]
         analyzer_vm_mac = analyzer_vm_fixture.get_mac_addr_from_config(
                               )[analyzer_vn_fq_name]
-        self.logger.info("Compute/VM: SRC: %s / %s, => ANALYZER: %s / %s" %
+        self.logger.info("\nCompute/VM: SRC: %s / %s, => ANALYZER: %s / %s\n" %
             (src_compute, src_vm_ip, analyzer_compute, analyzer_vm_ip))
+
+        # Make sure contrail-tools container is pulled and commands
+        # can be executed with contrail-tools.
+        cmd = "contrail-tools flow -l"
+        for compute in self.inputs.compute_ips:
+            self.inputs.run_cmd_on_server(compute, cmd)
 
         # Enable mirroring on the analyzer virtual network.
         vn_properties = {"mirror_destination": True}
@@ -732,6 +736,7 @@ class VerifyIntfMirror(VerifySvcMirror):
             vnc.virtual_machine_interface_update(analyzer_port_obj)
             vm_fix_pcap_pid_files = start_tcpdump_for_vm_intf(self, [analyzer_vm_fixture],
                                 analyzer_vn_fq_name, filters=filters, pcap_on_vm=True)
+            sleep(5)
             assert src_vm_fixture.ping_with_certainty(dst_ip, count=exp_count,
                        expectation=True)
             sleep(5)
@@ -739,9 +744,9 @@ class VerifyIntfMirror(VerifySvcMirror):
                        exp_count=exp_count, mac=None, raw_count=False,
                        exact_match=True, vm_fix_pcap_pid_files=vm_fix_pcap_pid_files,
                        svm=False, grep_string=None):
-                log.error("\n\n Duplicate packates seen in packet capture of\
-                           mirrored, packets from source VN. There can be a\
-                           potential duplicate NH ID.\n\n")
+                self.logger.error("\n Duplicate packates seen in packet capture of\
+                           \n mirrored, packets from source VN. There can be a\
+                           \n potential duplicate NH ID.\n\n")
                 result=False
                 break
 
@@ -754,11 +759,11 @@ class VerifyIntfMirror(VerifySvcMirror):
         cmd = cmd + "| grep -v NextHop | grep -v '\\-\\-\\-\\-'"
         nh_id = self.inputs.run_cmd_on_server(analyzer_vm_fixture.vm_node_ip, cmd)
         nh_id = nh_id.split()[1]
-        cmd = "contrail-tools nh --get 34 | grep 'Sub NH'"
+        cmd = "contrail-tools nh --get %s | grep 'Sub NH'" % nh_id
         nh_ids = self.inputs.run_cmd_on_server(analyzer_vm_fixture.vm_node_ip, cmd)
         if len(nh_ids.split()) > 3:
-            log.error("\n\n Duplicate NH IDs observed for the VMI of the source VM.")
-            log.error("\n\n Duplicate NH IDs: %s" % nh_ids)
+            self.logger.error("\n Duplicate NH IDs observed for the VMI of the source VM.")
+            self.logger.error("\n Duplicate NH IDs: %s" % nh_ids)
             result=False
         return result
     # end verify_cem_8760
