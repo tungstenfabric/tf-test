@@ -62,7 +62,10 @@ class NovaHelper(object):
         self.zone = inputs.availability_zone
         # 1265563 keypair name can only be alphanumeric. Fixed in icehouse
         self.key = 'ctest_' + self.project_name + self.username + key
-        self.images_info = parse_cfg_file('configs/images.cfg')
+        if self.inputs.l3mh_cidr:
+            self.images_info = parse_cfg_file('configs/rhosp_images.cfg')
+        else:
+            self.images_info = parse_cfg_file('configs/images.cfg')
         self.flavor_info = parse_cfg_file('configs/flavors.cfg')
         self.hypervisor_type = os.environ.get('HYPERVISOR_TYPE') \
             if 'HYPERVISOR_TYPE' in os.environ \

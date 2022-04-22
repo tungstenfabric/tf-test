@@ -328,6 +328,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.tor = {}
         self.tor_hosts_data = {}
         self.physical_routers_data = {}
+        self.l3mh_routers_data = {}
         self.vcenter_compute_ips= []
         self.qos_queue = []
         self.qos_queue_pg_properties = []
@@ -667,6 +668,7 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.data_sw_compute_bond_interface = test_configs.get('data_sw_compute_bond_interface')
 
         self.physical_routers_data = test_configs.get('physical_routers',{})
+        self.l3mh_routers_data = test_configs.get('l3mh_routers',{})
         self.bms_data = test_configs.get('bms',{})
         self.bms_lcm_config = test_configs.get('bms_lcm_config',{})
 
