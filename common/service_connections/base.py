@@ -56,7 +56,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
             section = "REDIS"
             option = "redis_uve_list"
         client_conf_file = client_process + ".conf"
-        cmd_set = "openstack-config --get /etc/contrail/" + client_conf_file
+        cmd_set = "crudini --get /etc/contrail/" + client_conf_file
         cmd = cmd_set + " " + section + " " + option
         if client_role == "agent":
             node_ip = self.inputs.compute_control_ips[0]
@@ -280,7 +280,7 @@ class BaseServiceConnectionsTest(GenericTestBase):
         '''
         config_file = 'entrypoint.sh'
         client_conf_file = client_process + ".conf"
-        cmd_set = "openstack-config --get /etc/contrail/" + client_conf_file
+        cmd_set = "crudini --get /etc/contrail/" + client_conf_file
         cmd = cmd_set + " " + section + " " + option
 
         if client_role == "agent":
