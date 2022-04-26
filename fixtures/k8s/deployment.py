@@ -26,7 +26,6 @@ class DeploymentFixture(fixtures.Fixture):
         self.vnc_api_h = connections.vnc_lib
         self.metadata = {} if metadata is None else metadata
         self.spec = {} if spec is None else spec
-        self.v1_beta_h = self.k8s_client.v1_beta_h
 
         self.already_exists = None
 
@@ -65,16 +64,8 @@ class DeploymentFixture(fixtures.Fixture):
                 self.already_exists = True
             return self.obj
         except ApiException as e:
-            try:
-                self.obj = self.v1_beta_h.read_namespaced_deployment(
-                    self.name, self.namespace)
-                self._populate_attr()
-                if self.already_exists is None:
-                    self.already_exists = True
-                return self.obj
-            except ApiException as e:
-                self.logger.debug('Deployment %s not present' % (self.name))
-            return None
+            self.logger.debug('Deployment %s not present' % (self.name))
+        return None
     # end read
 
     def create(self):
