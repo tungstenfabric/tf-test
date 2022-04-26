@@ -104,7 +104,7 @@ class Client(object):
             path_obj = client.V1HTTPIngressPath(
                 backend=self._get_ingress_backend(
                     path_dict.get('backend')),
-                path=path_dict.get('path'))
+                path=path_dict.get('path'),path_type=path_dict.get('pathType'))
             path_objs.append(path_obj)
         return path_objs
     # end _get_ingress_path
@@ -514,13 +514,13 @@ class Client(object):
         '''
         default_backend = obj.spec.backend
         if default_backend:
-            default_backend.service_port = int(default_backend.service_port)
+            default_backend.service_port = int(default_backend.service.port.number)
         if obj.spec.rules:
             for rule in obj.spec.rules:
                 if not rule or not rule.http or rule.http.paths:
                     continue
                 for path in rule.http.paths:
-                    path.backend.service_port = int(path.backend.service_port)
+                    path.backend.service_port = int(path.backend.service.port.number)
         return obj
     # end _wa_client_bug_18_for_ingress
 
@@ -561,13 +561,9 @@ class Client(object):
         if label_selector:
             return client.V1LabelSelector(match_labels=label_selector.get('match_labels'))
 
-    def _get_rollback_config(self, rollback_to=None):
-        if rollback_to:
-            return client.AppsV1beta1RollbackConfig(rollback_to)
-
     def _get_r_u_deployment(self, rolling_update):
         if rolling_update:
-            return client.AppsV1beta1RollingUpdateDeployment(
+            return client.V1RollingUpdateDeployment(
                 max_surge=rolling_update.get('max_surge'),
                 max_unavailable=rolling_update.get('max_unavailable'))
 
@@ -596,18 +592,18 @@ class Client(object):
         paused = spec_dict.get('paused')
         progress_deadline_seconds = spec_dict.get('progress_deadline_seconds')
         revision_history_limit = spec_dict.get('revision_history_limit')
-        rollback_to = self._get_rollback_config(spec_dict.get('rollback_to'))
         strategy = self._get_deploment_strategy(spec_dict.get('strategy'))
+        selector = self._get_label_selector(**spec_dict['selector'])
         template = self._get_pod_template(spec_dict.get('template'))
 
-        spec_obj = client.AppsV1beta1DeploymentSpec(
+        spec_obj = client.V1DeploymentSpec(
             min_ready_seconds=min_ready_seconds,
             paused=paused,
             progress_deadline_seconds=progress_deadline_seconds,
             replicas=replicas,
             revision_history_limit=revision_history_limit,
-            rollback_to=rollback_to,
             strategy=strategy,
+            selector=selector,
             template=template)
         return spec_obj
     # end _get_deployment_spec
@@ -629,26 +625,26 @@ class Client(object):
             metadata_obj.name = name
 
         spec_obj = self._get_deployment_spec(spec)
-        body = client.AppsV1beta1Deployment(
+        body = client.V1Deployment(
             metadata=metadata_obj,
             spec=spec_obj)
         self.logger.info('Creating Deployment %s' % (metadata_obj.name))
-        resp = self.v1_networking.create_namespaced_deployment(namespace, body)
+        resp = self.apps_v1_h.create_namespaced_deployment(namespace, body)
         return resp
     # end create_deployment
 
     def delete_deployment(self, namespace, name):
         self.logger.info('Deleting Deployment : %s' % (name))
         body = client.V1DeleteOptions()
-        return self.v1_networking.delete_namespaced_deployment(name, namespace)
+        return self.apps_v1_h.delete_namespaced_deployment(name, namespace)
     # end delete_deployment
 
     def set_deployment_replicas(self, namespace, deployment, count=0):
         self.logger.info('Setting replicas of deployment %s to %s' % (
             deployment, count))
-        dep_obj = self.v1_networking.read_namespaced_deployment(deployment, namespace)
+        dep_obj = self.apps_v1_h.read_namespaced_deployment(deployment, namespace)
         dep_obj.spec.replicas = count
-        return self.v1_networking.patch_namespaced_deployment(deployment, namespace, dep_obj)
+        return self.apps_v1_h.patch_namespaced_deployment(deployment, namespace, dep_obj)
         time.sleep(10)
     # end set_deployment_replicas
 
@@ -714,7 +710,7 @@ class Client(object):
         for rs_obj in rs_objs:
             name = rs_obj.metadata.name
             self.wait_till_pod_cleanup(namespace, name)
-            self.v1_networking.delete_namespaced_replica_set(name, namespace)
+            self.apps_v1_h.delete_namespaced_replica_set(name, namespace)
     # end delete_replica_set
 
     def set_service_isolation(self, namespace, enable=True):
@@ -866,11 +862,11 @@ class Client(object):
             metadata_obj.name = name
 
         spec_obj = self._get_daemonset_spec(spec)
-        body = client.V1beta1DaemonSet(
+        body = client.V1DaemonSet(
             metadata=metadata_obj,
             spec=spec_obj)
         self.logger.info('Creating DaemonSet %s' % (metadata_obj.name))
-        resp = self.v1_networking.create_namespaced_daemon_set(namespace, body, pretty='true')
+        resp = self.apps_v1_h.create_namespaced_daemon_set(namespace, body, pretty='true')
         return resp
 
     # read the spec of te deamonset object
@@ -882,7 +878,7 @@ class Client(object):
             return None
         selector = self._get_label_selector(spec_dict.get('selector'))
         template = self._get_pod_template(spec_dict.get('template'))
-        spec_obj = client.V1beta1DaemonSetSpec(
+        spec_obj = client.V1DaemonSetSpec(
             selector=selector,
             template=template)
         return spec_obj
