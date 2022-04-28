@@ -1,3 +1,5 @@
+import random
+
 class DockerWrapper:
 
     def __init__(self, inputs):
@@ -28,6 +30,11 @@ class DockerWrapper:
         output = self.inputs.run_cmd_on_server(host, cmd, as_sudo=True)
         return 'Up' in output
 
+    def action_on_service(self, host, event, service):
+        issue_cmd = 'service %s %s' % (service, event)
+        self.logger.info('%s %s.service on %s - %s %s' %(event, service, self.host_data[host]['name'],issue_cmd, 'on '+container if container else 'host'))
+        self.run_cmd_on_server(host, issue_cmd, username, password, pty=True, container=container)
+
     def action_on_container(self, host, event, container_name, timeout):
         timeout = '-t %s' % timeout if timeout else ''
         timeout = '' if event == 'start' else timeout
@@ -52,6 +59,23 @@ class DockerWrapper:
         self.inputs.run_cmd_on_server(host, down_cmd, pty=True, as_sudo=True)
         self.inputs.run_cmd_on_server(host, up_cmd, pty=True, as_sudo=True)
 
+    def run_cmd_on_container(self, cmd, host, container,
+                             pty=True,
+                             detach=None,
+                             shell_prefix='/bin/bash -c '):
+        cntr = self.inputs.host_data[host].get('containers', {}).get(container)
+        args = ' -d ' if detach else ''
+        args += ' --privileged '
+        args += ' -it ' if pty else ''
+        args += cntr
+        cntr_cmd = self.tool + ' exec ' + args
+        if shell_prefix:
+            exec_cmd = '%s %s \'%s\'' % (cntr_cmd, shell_prefix, cmd)
+        else:
+            exec_cmd = '%s %s' % (cntr_cmd, cmd)
+        return self.inputs.run_cmd_on_server(host, exec_cmd, pty=pty, as_sudo=True)
+
+
 class PodmanWrapper(DockerWrapper):
 
     def __init__(self, inputs):
@@ -65,8 +89,6 @@ class CtrWrapper:
         self.inputs = inputs
 
     def get_active_containers(self, host):
-        #TODO 
-#        cmd = "ctr task ls 2>/dev/null | grep RUNNING"
         cmd = "ctr task ls | grep RUNNING | cut -f 1 -d ' ' "
         output = self.inputs.run_cmd_on_server(host, cmd, as_sudo=True)
         containers = [x.strip('\r') for x in output.split('\n')]
@@ -77,41 +99,55 @@ class CtrWrapper:
             filter_cmd = ' | grep -v "%s" ' % '\|'.join(filter_exprs)
         else:
             filter_cmd = ''
-        #TODO
-#        cmd = "ctr task ls 2>/dev/null | cut -f 1 -d ' ' " + filter_cmd
         cmd = "ctr task ls | cut -f 1 -d ' ' " + filter_cmd
         output = self.inputs.run_cmd_on_server(host, cmd, as_sudo=True)
         containers = [x.strip('\r') for x in output.split('\n')]
         return containers
 
     def is_container_up(self, host, container_name):
-        #TODO
         cmd = "ctr task ls 2>/dev/null | grep RUNNING | grep " + container_name
         output = self.inputs.run_cmd_on_server(host, cmd, as_sudo=True)
         return 'RUNNING' in output
 
     def action_on_container(self, host, event, container_name, timeout):
-        #TODO
-        raise Exception('unimplemented')
+        timeout = '-t %s' % timeout if timeout else ''
+        timeout = '' if event == 'start' else timeout
+        cmd = 'systemctl' + ' %s %s' % (event, container_name)
+        self.inputs.run_cmd_on_server(host, cmd, pty=True, as_sudo=True)
+
+    def action_on_service(self, host, event, service):
+        cmd = 'systemctl' + ' %s %s' % (event, service)
+        self.inputs.run_cmd_on_server(host, cmd, pty=True, as_sudo=True)
 
     def copy_out(self, host, container_name, src_path, dst_path='.'):
-        #TODO
         raise Exception('unimplemented')
 
     def copy_in(self, host, container_name, src_path, dst_path='/'):
-        #TODO
         raise Exception('unimplemented')
 
     def recompose_services(self, host, yml_dir, yml_file=None):
-        #TODO
         raise Exception('unimplemented')
+
+    def run_cmd_on_container(self, cmd, host, container,
+                             pty=True,
+                             detach=None,
+                             shell_prefix='/bin/bash -c '):
+        cntr = self.inputs.host_data[host].get('containers', {}).get(container)
+        cntr_cmd = 'ctr task exec '
+        cntr_cmd += ' -d ' if detach else ''
+        cntr_cmd += ' -t ' if pty else ''
+        cntr_cmd += ' --exec-id %s ' % random.randint(10, 100)
+        cntr_cmd += cntr
+        if shell_prefix:
+            exec_cmd = '%s %s \'%s\'' % (cntr_cmd, shell_prefix, cmd)
+        else:
+            exec_cmd = '%s %s' % (cntr_cmd, cmd)
+        return self.inputs.run_cmd_on_server(host, exec_cmd, pty=pty, as_sudo=True)
+
 
 def get_container_cli_wrapper(inputs):
     container_runtime = inputs.container_runtime
 
-    #TODO: remove
-    #set "contrail_cli: podman" under "test_configuration" input yaml. 
-    #Set RHOSP_16 env to True for rhosp-16 deployments to use podman.
     import os
     if bool(os.getenv('RHOSP_16',False)) == True:
         container_runtime ='podman'
