@@ -167,7 +167,7 @@ class TestFabricSNATRestarts(BaseK8sTest):
                                                                               ip_fabric_forwarding=True)
         self.verify_ping_between_pods_across_namespaces_and_public_network(client1, client2,
                                                                            client3, client4)
-        self.inputs.restart_service(service_name = "docker",
+        self.inputs.restart_service(service_name = "containerd",
                                             host_ips = self.inputs.k8s_slave_ips)
         time.sleep(60) # Wait timer for all contrail service to come up.
         self.verify_ping_between_pods_across_namespaces_and_public_network(client1, client2,

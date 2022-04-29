@@ -213,6 +213,7 @@ class TestFabricFWD(BaseK8sTest):
         }
         spec.update({
             'replicas': replicas,
+            'selector': { 'match_labels': labels },
             'template': {
                 'metadata': template_metadata,
                 'spec': template_spec
@@ -271,6 +272,7 @@ class TestFabricFWD(BaseK8sTest):
         #spec.update({'replicas': replicas})
         spec.update({
             'replicas': replicas,
+            'selector': { 'match_labels': labels },
             'template': {
                 'metadata': template_metadata,
                 'spec': template_spec
