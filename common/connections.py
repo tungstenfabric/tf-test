@@ -333,8 +333,7 @@ class ContrailConnections(object):
         for km_ip in self.inputs.kube_manager_ips:
             #contrail-status would increase run time hence netstat approach
             cmd = 'netstat -antp | grep :%s | grep LISTEN' % self.inputs.k8s_port
-            if 'LISTEN' in self.inputs.run_cmd_on_server(km_ip, cmd,
-                                container='contrail-kube-manager'):
+            if 'LISTEN' in self.inputs.container_tool.run_cmd_on_container(cmd,  km_ip, 'contrail-kube-manager'):
                 self._kube_manager_inspect = KubeManagerInspect(km_ip,
                                         logger=self.logger,
                                         args=self.inputs,

@@ -1435,12 +1435,7 @@ class ContrailTestInit(object):
             for host in host_ips or self.host_ips:
                 username = self.host_data[host]['username']
                 password = self.host_data[host]['password']
-                issue_cmd = 'service %s %s' % (service, event)
-                self.logger.info('%s %s.service on %s - %s %s' %
-                                 (event, service, self.host_data[host]['name'],
-                                  issue_cmd, 'on '+container if container else 'host'))
-                self.run_cmd_on_server(
-                    host, issue_cmd, username, password, pty=True, container=container)
+                self.container_tool.action_on_service(host, event, service)
                 if verify_service and (event == 'restart'):
                     assert self.verify_service_state(host, service=service_name)[0] ,\
                                "Service Restart failed for %s" % (service_name)
