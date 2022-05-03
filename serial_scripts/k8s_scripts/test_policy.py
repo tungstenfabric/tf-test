@@ -650,7 +650,7 @@ class TestNetworkPolicyRestart(BaseK8sTest):
         policy1 = self.create_update_policy_common(pod_list_ns1, pod_list_ns2, pod_list_ns3)
         assert policy1.verify_on_setup()
         # Restart POD used as PodSelector in the rule
-        self.inputs.restart_service(service_name = "containerd",
+        self.inputs.restart_service(service_name = "docker",
                                             host_ips = self.inputs.k8s_slave_ips)
         time.sleep(60) # Wait timer for all contrail service to come up.
         # ToDo : Replace this wait with contrail Status check once it is available
@@ -685,7 +685,7 @@ class TestNetworkPolicyRestart(BaseK8sTest):
         policy1 = self.create_update_policy_common(pod_list_ns1, pod_list_ns2, pod_list_ns3)
         assert policy1.verify_on_setup()
         # Restart POD used as PodSelector in the rule
-        self.inputs.restart_service(service_name = "snap.kubelet.daemon.service",
+        self.inputs.restart_service(service_name = "kubelet",
                                             host_ips = self.inputs.k8s_slave_ips)
         time.sleep(30) # Wait timer for all kubernetes pods to stablise.
         # Verify that policy works fine after restart

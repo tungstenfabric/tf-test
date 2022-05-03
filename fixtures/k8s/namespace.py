@@ -73,7 +73,8 @@ class NamespaceFixture(fixtures.Fixture):
         project = None
         m = None
         cmd = 'grep "^[ \t]*cluster_project" /etc/contrail/contrail-kubernetes.conf'
-        cp_line= self.inputs.container_tool.run_cmd_on_container(cmd, self.inputs.kube_manager_ips[0], container='contrail-kube-manager')
+        cp_line = self.inputs.run_cmd_on_server(self.inputs.kube_manager_ips[0],
+                cmd, container='contrail-kube-manager')
         if 'cluster_project' in cp_line:
             m = re.match('[ ]*cluster_project.*?=[ ]*(.*)?', cp_line)
             if m:
