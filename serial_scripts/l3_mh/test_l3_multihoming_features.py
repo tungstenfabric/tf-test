@@ -508,13 +508,6 @@ class TestSerialL3MultihomingFeatures(
             "Create VN, enable FABRIC SNAT and verify its routing instance")
         vn_fixture = self.create_vn_enable_fabric_snat()
 
-        test_vm1 = self.create_vm(vn_fixture, get_random_name('test_vm1'),
-                                  image_name='ubuntu')
-        test_vm2 = self.create_vm(vn_fixture, get_random_name('test_vm2'),
-                                  image_name='ubuntu')
-        assert test_vm1.wait_till_vm_is_up()
-        assert test_vm2.wait_till_vm_is_up()
-
     def feature_check(self):
         destport = random.randint(1000, 60000)
         baseport = random.randint(1000, 60000)
@@ -608,6 +601,23 @@ class TestSerialL3MultihomingFeatures(
                 "Configured Encap Priority order is matching with expected order. Configured: %s ,Expected: %s" %
                 (configured_encap_list, encap_list))
 
+    def leaf_static_route(self, addremove=True):
+
+        for i in range(len(list(self.inputs.l3mh_routers_data.values()))):
+            router_params = list(self.inputs.l3mh_routers_data.values())[i]
+            cmd = []
+            if router_params['role'] == 'leaf1':
+                if addremove == True:
+                    cmd.append('set routing-options static route %s/32 next-hop %s' %(router_params['static1_route'], router_params['static1_hop']))
+                    cmd.append('set routing-options static route %s/32 next-hop %s' %(router_params['static2_route'], router_params['static2_hop']))
+                else:
+                    cmd.append('delete routing-options static route %s/32' %router_params['static1_route'])
+                    cmd.append('delete routing-options static route %s/32' %router_params['static2_route'])
+
+                mx_handle = NetconfConnection(host=router_params['mgmt_ip'])
+                mx_handle.connect()
+                cli_output = mx_handle.config(stmts=cmd, timeout=120)
+
     @test.attr(type=['l3mh_regression'])
     @preposttest_wrapper
     def test_l3mh_multi_dimensional(self):
@@ -632,16 +642,20 @@ class TestSerialL3MultihomingFeatures(
         # ping test from vm1 to vm2, inter vn inter compute
         assert self.vm1_fixture.ping_with_certainty(self.vm2_fixture.vm_ip)
 
+        self.logger.info('Restarting the physical interface now')
+
         # Restart physical interfaces
         inspect_h = self.agent_inspect[self.vm2_fixture.vm_node_ip]
         physical_intf_list = inspect_h.get_vna_interface_by_type('eth')
         cmd = 'ifdown %s; sleep 10' % (physical_intf_list[0])
         self.inputs.run_cmd_on_server(self.vm2_fixture.vm_node_ip, cmd)
 
-        cmd = 'ifup %s; sleep 10' % (physical_intf_list[0])
-        self.inputs.run_cmd_on_server(self.vm2_fixture.vm_node_ip, cmd)
+        self.leaf_static_route(addremove=False)
 
         assert self.vm1_fixture.ping_with_certainty(self.vm2_fixture.vm_ip)
+        cmd = 'ifup %s; sleep 10' % (physical_intf_list[0])
+        self.inputs.run_cmd_on_server(self.vm2_fixture.vm_node_ip, cmd)
+        self.leaf_static_route(addremove=True)
 
     # end test_bgpaas_l3mh
 
@@ -651,19 +665,7 @@ class TestSerialL3MultihomingFeatures(
         '''
             verify that interface mirroring works
         '''
-        self.node1 = []
-        self.node2 = []
-        for host in self.inputs.compute_ips:
-            if self.inputs.host_data[host]['roles'].get(
-                    'vrouter').get('AGENT_MODE'):
-                if 'dpdk' in self.inputs.host_data[host]['roles'].get(
-                        'vrouter').get('AGENT_MODE'):
-                    self.node1.append(self.inputs.host_data[host]['name'])
-            else:
-                self.node2.append(self.inputs.host_data[host]['name'])
-
-        compute_nodes = [self.node2[0],self.node2[0],self.node2[0]]
-        self.verify_intf_mirroring(compute_nodes, [0, 0, 0], sub_intf=False, ipv6=False)
+        self.verify_intf_mirroring_src_on_cn1_vn1_dst_on_cn1_vn1_analyzer_on_cn1_vn2()
 
     @test.attr(type=['l3mh_regression'])
     @preposttest_wrapper
@@ -711,9 +713,9 @@ class TestSerialL3MultihomingFeatures(
               }
 
         # Setup VNs, VMs as per user configuration
-        ret_dict = self.setup_gw_less_fwd(vn=vn, vmi=vmi, vm=vm)
-        vn_fixtures = ret_dict['vn_fixtures']
-        vm_fixtures = ret_dict['vm_fixtures']
+        #ret_dict = self.setup_gw_less_fwd(vn=vn, vmi=vmi, vm=vm)
+        #vn_fixtures = ret_dict['vn_fixtures']
+        #vm_fixtures = ret_dict['vm_fixtures']
 
         # Verify Gateway less forward functionality. As IP Fabric forwarding
         # is enabled on vn1, traffic should go through underlay between VMs
@@ -727,15 +729,20 @@ class TestSerialL3MultihomingFeatures(
                     'vrouter').get('AGENT_MODE'):
                 if 'dpdk' in self.inputs.host_data[host]['roles'].get(
                         'vrouter').get('AGENT_MODE'):
-                    self.node1.append(self.inputs.host_data[host]['name'])
+                    self.node1.append(self.inputs.host_data[host]['host_ip'])
             else:
-                self.node2.append(self.inputs.host_data[host]['name'])
-
+                self.node2.append(self.inputs.host_data[host]['host_ip'])
         self.inputs.restart_service(
-            'contrail-vrouter-agent', [self.node1[0]], container='agent')
+            'contrail-vrouter-agent', [self.node1[0]], container='contrail-vrouter-agent')
         cluster_status, error_nodes = ContrailStatusChecker(
         ).wait_till_contrail_cluster_stable(nodes=[self.node1[0]])
         assert cluster_status, 'Hash of error nodes and services : %s' % (
             error_nodes)
 
-    # end test_l3mh_fabric_forwarding
+        self.inputs.restart_service(
+            'contrail-vrouter-agent', [self.node2[0]], container='contrail-vrouter-agent')
+        cluster_status, error_nodes = ContrailStatusChecker(
+        ).wait_till_contrail_cluster_stable(nodes=[self.node2[0]])
+        assert cluster_status, 'Hash of error nodes and services : %s' % (
+            error_nodes)
+    # end test_restart_l3mh
