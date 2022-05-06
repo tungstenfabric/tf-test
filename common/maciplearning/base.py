@@ -68,10 +68,13 @@ class BaseMacIpLearningTest(GenericTestBase):
     # end detach_shc_from_vn
 
     def check_bfd_packets(self, vm, vn):
-        interface = vm.tap_intf[vn.vn_fq_name]['name']
+        tap_interface = vm.tap_intf[vn.vn_fq_name]['name']
         ip = self.inputs.host_data[vm.vm_node_ip]['host_ip']
+        cmd1 = "sudo vif --list | grep %s"  % (tap_interface)
         session = ssh(ip,self.inputs.host_data[ip]['username'],self.inputs.host_data[ip]['password'])
-        cmd = "sudo timeout 30 tcpdump -nei %s ip | grep BFD" % (interface)
+        output, err = execute_cmd_out(session, cmd1, self.logger)
+        interface = output.split()[0]
+        cmd = "sudo contrail-tools timeout 30 vifdump -i %s | grep BFD" % (interface)
         self.logger.info("Starting tcpdump to capture the BFD packets on %s in server %s" % (interface, ip))
         out, err = execute_cmd_out(session, cmd, self.logger)
         result = False

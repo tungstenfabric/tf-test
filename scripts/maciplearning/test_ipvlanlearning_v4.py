@@ -925,7 +925,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
             assert state == "Up", "BFD state is not up on container %s on VM %s" % (container_name[i], self.vm4_fixture)
                     
         for i in range(number_of_container):
-            assert self.ping_from_crpd_container(self.vm1_fixture, container_ip2[i], count='10', container_name=container_name[i]), "Ping Fails from Container"
+            assert self.ping_from_crpd_container(self.vm3_fixture, container_ip2[i], count='10', container_name=container_name[i]), "Ping Fails from Container"
   
         vm3_node_ip = self.vm3_fixture.vm_node_ip
         vm4_node_ip = self.vm4_fixture.vm_node_ip
