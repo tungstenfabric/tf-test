@@ -1545,6 +1545,7 @@ class TestBGPaaS(BaseBGPaaS):
         assert 'up' in op['birdc show protocols bfd1'], 'BFD session not UP'
 
         self.detach_vmi_from_bgpaas(bgp_vm_port, bgpaas_fixture)
+        time.sleep(10)
         assert not bgpaas_fixture.verify_in_control_node(
             bgpaas_vm), 'BGPaaS Session should not be seen in the control-node after deleting vmi'
         self.attach_vmi_to_bgpaas(bgp_vm_port, bgpaas_fixture)
