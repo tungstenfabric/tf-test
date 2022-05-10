@@ -1707,7 +1707,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
     # end do_scp
 
     @retry(delay=2, tries=10)
-    def validate_ssh(self, pod=None, expectation=True):
+    def verify_scp(self, pod=None, expectation=True):
         """
         Verify that ssh connection is not broken
         """
@@ -1718,8 +1718,8 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                 output = local(cmd, capture=True)
         else:
             output = pod.run_cmd_on_pod(cmd)
-        return expectation == ('ssh -x' in output)
-    # end validate_ssh
+        return expectation == ('scp -l' in output)
+    # end varify_scp
 
     def validate_ecmp_flow(self, compute_ip_list, service_ip, client_ip, port=22):
         cmd = "contrail-tools flow --match %s:%s,%s" %(service_ip, port, client_ip)
