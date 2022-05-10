@@ -67,7 +67,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
 
         self.do_scp(client_pod, service.cluster_ip, limit_rate=True)
 
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
 
@@ -90,12 +90,12 @@ class TestEcmpFlowStickiness(BaseK8sTest):
                                 service.cluster_ip, client_pod.pod_ip)
         assert flow_index == self.get_ecmp_flow_index(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         self.logger.info("Scp connection is not broken")
 
         # delete a pod and verify that scp should not fail
         pod4.delete()
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         self.logger.info("Scp connection is not broken")
         # ecmp_index and flow_index should not change
         assert ecmp_index == self.get_ecmp_index(self.inputs.compute_ips,
@@ -140,7 +140,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         assert self.validate_scp(client_pod, service.cluster_ip)
 
         self.do_scp(client_pod, service.cluster_ip, limit_rate=True)
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
 
@@ -158,7 +158,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         assert pod4.verify_on_setup()
         assert pod3.verify_on_setup()
         assert pod5.verify_on_setup()
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
         # ecmp_index and flow_index should not change
@@ -170,7 +170,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
 
         # delete a pod and verify that scp should not fail
         pod4.delete()
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         self.logger.info("Scp connection is not broken")
         self.logger.info("test_ecmp_remote_scale_up_down passed")
     # end test_ecmp_remote_scale_up_down
@@ -204,7 +204,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         # validate Service Nodeport functionality
         for compute in self.cn_list:
             self.do_scp(None, compute, port=service.nodePort, limit_rate=True)
-            assert self.validate_ssh()
+            assert self.verify_scp()
 
         pod4 = self.setup_ssh_webserver_pod(namespace=namespace.name, \
                 labels=labels)
@@ -214,7 +214,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         assert pod5.verify_on_setup()
 
         for compute in self.cn_list:
-            assert self.validate_ssh()
+            assert self.verify_scp()
         self.logger.info("Scp connection is not broken")
 
         # scale down and verify scp is working
@@ -222,7 +222,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         pod4.delete()
 
         for compute in self.cn_list:
-            assert self.validate_ssh()
+            assert self.verify_scp()
         self.logger.info("Scp connection is not broken")
         self.logger.info("test_ecmp_remote_nodeport_service passed")
     # end test_ecmp_remote_nodeport_service
@@ -294,8 +294,8 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         assert pod5.verify_on_setup()
 
         # check if scp is running
-        assert self.validate_ssh(client_pod1)
-        assert self.validate_ssh(client_pod2)
+        assert self.verify_scp(client_pod1)
+        assert self.verify_scp(client_pod2)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod1.pod_ip)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
@@ -360,7 +360,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
 
         # do scp from both clients, scale up, scp should not break.
         self.do_scp(None, service.external_ips[0], limit_rate=True)
-        assert self.validate_ssh(None, True)
+        assert self.verify_scp(None, True)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.external_ips[0], self.inputs.k8s_master_ip)
         assert self.get_ecmp_index(self.inputs.compute_ips,
@@ -372,7 +372,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         pod6 = self.setup_ssh_webserver_pod(namespace=namespace.name, \
                 labels=labels, compute_node_selector=compute_selector_2)
         # check if scp is running
-        assert self.validate_ssh(None, True)
+        assert self.verify_scp(None, True)
         self.logger.info("Scp connections are not broken")
         self.logger.info("test_ecmp_remote_scale_up_down_external_ip passed")
     # end test_ecmp_remote_scale_up_down_external_ip
@@ -425,7 +425,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
                                 service.cluster_ip, client_pod.pod_ip)
 
         # scale up to 10 pods and verify that scp is working
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         for i in range(0, 8):
             pod = self.setup_ssh_webserver_pod(namespace=namespace.name, \
                     labels=labels, compute_node_selector=compute_selector_2)
@@ -436,7 +436,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
             assert pod.verify_on_setup()
 
         # check scp is running
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert ecmp_index == self.get_ecmp_index(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
         assert flow_index == self.get_ecmp_flow_index(self.inputs.compute_ips,
@@ -447,7 +447,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
             pod.delete()
 
         # check scp is running
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert ecmp_index == self.get_ecmp_index(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
         self.logger.info("test_ecmp_remote_scale_up_to_10_and_down_to_2 passed")
@@ -623,7 +623,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         # scp/ssh should work from client2 because of network-policy
         assert self.validate_scp(client_pod2, service.cluster_ip)
         self.do_scp(client_pod2, service.cluster_ip, limit_rate=True)
-        assert self.validate_ssh(client_pod2)
+        assert self.verify_scp(client_pod2)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod2.pod_ip)
 
@@ -641,7 +641,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         assert pod5.verify_on_setup()
         assert pod6.verify_on_setup()
 
-        assert self.validate_ssh(client_pod2)
+        assert self.verify_scp(client_pod2)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod2.pod_ip)
         # ecmp_index and flow_index should not change
@@ -653,7 +653,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         # delete pods and verify that scp should not fail
         pod5.delete()
         pod6.delete()
-        assert self.validate_ssh(client_pod2)
+        assert self.verify_scp(client_pod2)
         self.logger.info("Scp connection is not broken")
         # ecmp_index and flow_index should not change
         assert ecmp_index == self.get_ecmp_index(self.inputs.compute_ips,
@@ -685,7 +685,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         self.validate_scp(client_pod, service.cluster_ip)
         # do scp, scale up and verify that scp doesn't fail
         self.do_scp(client_pod, service.cluster_ip, limit_rate=True)
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
         ecmp_index = self.get_ecmp_index(self.inputs.compute_ips,
@@ -696,7 +696,7 @@ class TestEcmpFlowStickiness(BaseK8sTest):
         # scale up deployment
         dep_1.set_replicas(new_replicas)
         assert dep_1.verify_on_setup()
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert ecmp_index == self.get_ecmp_index(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
         assert flow_index == self.get_ecmp_flow_index(self.inputs.compute_ips,
@@ -786,14 +786,14 @@ class TestEcmpFlowStickiness(BaseK8sTest):
 
         # do scp and check that the flow should have ecmp index
         self.do_scp(client_pod, service.cluster_ip, limit_rate=True)
-        assert self.validate_ssh(client_pod)
+        assert self.verify_scp(client_pod)
         assert self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip)
 
 
         # scale down, do scp and check that scp is broken
         pod2.delete()
-        assert self.validate_ssh(client_pod, False)
+        assert self.verify_scp(client_pod, False)
         assert (self.validate_ecmp_flow(self.inputs.compute_ips,
                                 service.cluster_ip, client_pod.pod_ip) == False)
         self.logger.info("test_ecmp_to_non_ecmp passed")
