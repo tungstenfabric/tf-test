@@ -354,7 +354,7 @@ protocol kernel {{
         persist;                # Don't remove routes on bird shutdown
         scan time 20;           # Scan kernel routing table every 20 seconds
         import all;             # Default is import all
-        export all;             # Default is export none
+        #export all;             # Default is export none
 }}
 protocol direct {{
     interface "eth*";
@@ -366,7 +366,7 @@ protocol bgp bgp_1{{
         {neighbor_info_str};
         {export_filter}
         multihop;
-        export all;
+        #export all;
         hold time {hold_time};
         bfd on;
         source address {local_ip};
@@ -388,7 +388,7 @@ protocol bgp bgp_2{{
         {neighbor_info_str};
         {export_filter}
         multihop;
-        export all;
+        #export all;
         hold time {hold_time};
         bfd on;
         source address {local_ip};
