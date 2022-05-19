@@ -49,7 +49,7 @@ class VNFixture(fixtures.Fixture):
                  rt_number=None, ipam_fq_name=None, option='quantum',
                  forwarding_mode=None, vxlan_id=None, shared=False,
                  router_external=False, clean_up=True,
-                 af=None, empty_vn=False, enable_dhcp=True,
+                 af=None, af6_only=False, empty_vn=False, enable_dhcp=True,
                  dhcp_option_list=None, disable_gateway=False,dns_nameservers_list=None,
                  uuid=None, sriov_enable=False, sriov_vlan=None,
                  sriov_provider_network=None,ecmp_hash=None,max_flows=None,*args,**kwargs):
@@ -71,16 +71,16 @@ class VNFixture(fixtures.Fixture):
         self.ipam_fq_name = ipam_fq_name or NetworkIpam().get_fq_name()
         self.policy_objs = self.convert_policy_objs_vnc_to_neutron(policy_objs)
         self.af = self.get_af_from_subnet(subnets=subnets) or af or self.inputs.get_af()
-        if self.inputs.get_af() == 'v6' and self.af == 'v4':
+        if self.inputs.get_af() == 'v6' and self.af == 'v4' and af6_only==False:
             raise v4OnlyTestException("Skipping Test. v4 specific testcase")
         #Forcing v4 subnet creation incase of v6. Reqd for ssh to host
-        if ('v6' in self.af) or ('dual' == self.inputs.get_af()):
+        if (('v6' in self.af) or ('dual' == self.inputs.get_af())) and (af6_only==False):
             self.af = 'dual'
         if isinstance(self.orchestrator,VcenterOrchestrator)  and subnets and (len(subnets) != 1):
            raise Exception('vcenter: Multiple subnets not supported')
         if not subnets and not empty_vn:
             subnets = get_random_cidrs(stack=self.af)
-        if subnets and self.get_af_from_subnet(subnets=subnets) == 'v6':
+        if subnets and self.get_af_from_subnet(subnets=subnets) == 'v6' and af6_only==False:
             subnets.extend(get_random_cidrs(stack='v4'))
         #Force add v6 subnet for dual stack testing when only v4 subnet is passed
         if self.af == 'dual' and subnets and self.get_af_from_subnet(subnets=subnets) == 'v4':
