@@ -3193,6 +3193,153 @@ class TestBasicIPv6VMVNx(TestBasicVMVNx):
     def test_sctp_traffic_between_vm(self):
         super(TestBasicIPv6VMVNx, self).test_sctp_traffic_between_vm()
 
+    @skip_because(min_nodes=2)
+    @preposttest_wrapper
+    def test_dhcp_for_ipv6(self):
+
+        '''
+        Description: Test to validate dhcp is working for IPv6. This is to validate
+                     a bug filled by Orange OLN - CEM-25980
+        Test steps:
+                1. Create 3 subnets S1(IPv4), S2(IPv6) and S3(IPv6).
+                2. Create 3 VNs VN1(S1), VN2(S2) and VN3(S3).
+                3. Create 2 VMs srcvm(VN1 and VN2) and dstvm(VN3).
+                4. Check srcvm gets IP from VN2 on one interface.
+                5. Check dstvm gets IP from VN3 on one interface.
+                6. Check vif interfaces are assigned with IPv6 addresses from VN2 
+                   and VN3 on srcvm and dstvm host.
+                7. Create policy p1 to connect/allow VN2 to VN3.
+                8. Check ping6 goes through from srcvm to dstvm.
+        Pass criteria: Step no 4,5,6 and 8 should pass.
+        '''
+
+        # get network for subnets.
+        S1 = [get_random_cidr(mask='24',af='v4')]
+        S2 = [get_random_cidr(mask='64',af='v6')]
+        S3 = [get_random_cidr(mask='64',af='v6')]
+
+        # create VNs
+        vn1_name = get_random_name("vn1")
+        vn1_fixture = self.useFixture(VNFixture(project_name=self.inputs.project_name,
+                          connections=self.connections, inputs=self.inputs,
+                          vn_name=vn1_name, subnets=S1, af6_only=True))
+        assert vn1_fixture.verify_on_setup()
+
+        vn2_name = get_random_name("vn2")
+        vn2_fixture = self.useFixture(VNFixture(project_name=self.inputs.project_name,
+                          connections=self.connections, inputs=self.inputs,
+                          vn_name=vn2_name, subnets=S2, af6_only=True))
+        assert vn2_fixture.verify_on_setup()
+
+        vn3_name = get_random_name("vn3")
+        vn3_fixture = self.useFixture(VNFixture(project_name=self.inputs.project_name,
+                          connections=self.connections, inputs=self.inputs,
+                          vn_name=vn3_name, subnets=S3, af6_only=True))
+        assert vn3_fixture.verify_on_setup()
+
+        # create and attach policy to allow traffic from vn2 to vn3.
+        rules = [
+            {
+                'direction': '>', 'simple_action': 'pass',
+                'protocol': 'any', 'src_ports': 'any',
+                'dst_ports': 'any',
+                'source_network': vn2_name,
+                'dest_network': vn3_name,
+            },
+            {
+                'direction': '<>', 'simple_action': 'pass',
+                'protocol': 'any', 'src_ports': 'any',
+                'dst_ports': 'any',
+                'source_network': vn3_name,
+                'dest_network': vn2_name,
+            },
+        ]
+
+        policy1_name = get_random_name("policy1_name")
+        policy1_fixture = self.useFixture(
+            PolicyFixture(
+                policy_name=policy1_name,
+                rules_list=rules,
+                inputs=self.inputs,
+                connections=self.connections))
+
+        vn2_fixture.bind_policies([policy1_fixture.policy_fq_name])
+        vn3_fixture.bind_policies([policy1_fixture.policy_fq_name])
+
+        # get 2 different computes.
+        src_compute=self.inputs.compute_names[0]
+        dst_compute=self.inputs.compute_names[1]
+
+        # create VMs
+        srcvm_vn_objs = [vn1_fixture.obj, vn2_fixture.obj]
+        srcvm_fixture = self.useFixture(VMFixture(project_name=self.inputs.project_name,
+                            connections=self.connections, vn_objs=srcvm_vn_objs,
+                            vm_name=get_random_name("srcvm"), image_name='ubuntu',
+                            node_name=src_compute))
+
+        dstvm_fixture = self.useFixture(VMFixture(project_name=self.inputs.project_name,
+                            connections=self.connections, vn_obj=vn3_fixture.obj,
+                            vm_name=get_random_name("dstvm"), image_name='ubuntu',
+                            node_name=dst_compute))
+
+        assert srcvm_fixture.verify_vm_launched()
+        assert dstvm_fixture.verify_vm_launched()
+
+        # Verify vif's get the ipv6 address.
+        srcvif_id = 0
+        dstvif_id = 0
+        for intf in srcvm_fixture.get_tap_intf_of_vm():
+            if len(intf['ip6_addr']) > 2:
+                srcvif_id = intf['mdata_ip_addr'].split('.')[3]
+        for intf in dstvm_fixture.get_tap_intf_of_vm():
+            if len(intf['ip6_addr']) > 2:
+                dstvif_id = intf['mdata_ip_addr'].split('.')[3]
+
+        cmd = 'sudo vif --list | grep vif0/%s -a6 | grep IP6addr' % srcvif_id
+        ip6_addr = self.inputs.run_cmd_on_server(srcvm_fixture.vm_node_ip, cmd)
+        assert srcvm_fixture.vm_ip in ip6_addr,\
+            "Source VM ipv6 address missing from vif interface."
+        self.logger.info("Vif of Src VM has been assigned the expected v6 address.")
+
+        cmd = 'sudo vif --list | grep vif0/%s -a6 | grep IP6addr' % dstvif_id
+        ip6_addr = self.inputs.run_cmd_on_server(dstvm_fixture.vm_node_ip, cmd)
+        assert dstvm_fixture.vm_ip in ip6_addr,\
+            "Destination VM ipv6 address missing from vif interface."
+        self.logger.info("Vif of Dest VM has been assigned the expected v6 address.")
+
+        # ping6 to the destination VM v6 address.
+        self.logger.info("**************************************")
+        self.logger.info("1st trial to get ssh handle to VM.")
+        for trial in range(4):
+            try:
+                assert srcvm_fixture.wait_for_ssh_on_vm()
+            except:
+                self.logger.info("**************************************")
+                self.logger.info("%s trial to get ssh handle to VM." % str(trial+2))
+                continue
+            else:
+                break
+
+        for trial in range(24):
+            try:
+                assert srcvm_fixture.ping_to_ipv6(dstvm_fixture.vm_ip),\
+                    "Ping to IP %s from VM %s FAILED!!!" % (
+                    dstvm_fixture.vm_ip, srcvm_fixture.vm_name)
+                sleep(5)
+            except:
+                continue
+            else:
+                break
+
+        for i in range(20):
+            assert srcvm_fixture.ping_to_ipv6(dstvm_fixture.vm_ip),\
+                "Ping to v6 address of destination VM FAILED!!!"
+            sleep(5)
+        self.logger.info("No packet drops seen while pinging v6 Dest VM address.")
+
+        return True
+    # end test_dhcp_for_ipv6
+
 class TestBasicIPv6VMVN(test_vm_basic.TestBasicVMVN):
     @classmethod
     def setUpClass(cls):
