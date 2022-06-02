@@ -32,7 +32,9 @@ fabric3==1.14.post1
 # fabric==2.5.0
 fixtures==3.0.0
 future==0.18.2
-gevent==1.4.0
+# gevent 1.4.0 doesnt work with paramiko in latest ubi8
+# (ssh connection hangs and faile don timeout https://contrail-jws.atlassian.net/browse/CEM-27366)
+gevent==1.5.0
 google-auth==1.11.2
 greenlet==0.4.15 ; platform_python_implementation == 'CPython'
 idna==2.8
