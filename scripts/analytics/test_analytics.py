@@ -6,6 +6,7 @@
 # Set the env variable PARAMS_FILE to point to your ini file. Else it will try to pick params.ini in PWD
 #
 from analytics import base
+from .base import AnalyticsBaseTest
 import os
 import time
 import fixtures
