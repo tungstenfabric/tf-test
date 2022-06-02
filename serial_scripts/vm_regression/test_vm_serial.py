@@ -253,7 +253,10 @@ class TestBasicVMVN0(BaseVnVmTest):
         for compute_ip in self.inputs.compute_ips:
             self.inputs.start_service('contrail-vrouter-agent', [compute_ip],
                                       container='agent')
-        vm2_fixture.wait_till_vm_is_up()
+        #need to reboot vm after agent restart, otherwise vn is not captured in agent
+        cmd_to_reboot_vm = ['sudo reboot']
+        vm2_fixture.run_cmd_on_vm(cmds=[cmd])
+        vm2_fixture.wait_till_vm_boots()
         self.logger.info('vm2 is up now as expected')
         assert vm2_fixture.verify_on_setup()
 

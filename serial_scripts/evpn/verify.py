@@ -986,7 +986,7 @@ class VerifyEvpnCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn4_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sshpass',
                 vm_name=vn_l2_vm1_name,
                 node_name=compute_2))
         vn_l2_vm2_fixture = self.useFixture(
@@ -996,7 +996,7 @@ class VerifyEvpnCases(object):
                 vn_objs=[
                     vn3_fixture.obj,
                     vn4_fixture.obj],
-                image_name='ubuntu',
+                image_name='ubuntu-sshpass',
                 vm_name=vn_l2_vm2_name,
                 node_name=compute_3))
 
@@ -1076,7 +1076,9 @@ class VerifyEvpnCases(object):
                 as_sudo=True, timeout=60)
             # Scp file from EVPN_VN_L2_VM1 to EVPN_VN_L2_VM2 using
             # EVPN_VN_L2_VM2 vm's eth1 interface ip
-            vn_l2_vm1_fixture.scp_file_to_vm(filename, vm_ip=dest_vm_ip)
+            cmd = '''timeout 40 sshpass -p "ubuntu" scp -o StrictHostKeyCheckingg
+            =no %s ubuntu@%s:''' % (filename, dest_vm_ip)
+            vn_l2_vm1_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=True)
             vn_l2_vm1_fixture.run_cmd_on_vm(cmds=['sync'], as_sudo=True, timeout=60)
             # Verify if file size is same in destination vm
             out_dict = vn_l2_vm2_fixture.run_cmd_on_vm(
