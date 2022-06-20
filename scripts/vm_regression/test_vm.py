@@ -2595,9 +2595,9 @@ class TestBasicVMVN9(BaseVnVmTest):
         # format: service_name: link_local_service_ip, address_port,
         # fabric_address
         service_info = {
-            'cfgm_server': ['169.254.169.245', '22', self.inputs.cfgm_ips[0]],
+            'cfgm_server': ['169.254.169.245', '22', self.inputs.host_data[cfgm_ip]['host_data_ip']],
             'build_server': ['169.254.169.246', '80', 'ftp.vim.org'],
-            'web_server': ['169.254.169.247', '80', '174.143.194.225']
+            'web_server': ['169.254.169.247', '80', '10.204.217.158']
         }
         vn_obj = self.useFixture(
             VNFixture(
@@ -2685,7 +2685,7 @@ class TestBasicVMVN9(BaseVnVmTest):
                 sleep(20) #wait before attempting download
                 image_name = 'vim-7.3.tar.bz2'
                 cmd = 'wget ' + \
-                    'http://%s/pub/vim/unix/' % service_info[service][2] + image_name
+                    'http://%s/pub/vim/unix/' % service_info[service][0] + image_name
                 vm_fixture.run_cmd_on_vm(cmds=[cmd], timeout=200)
                 result = vm_fixture.return_output_cmd_dict[cmd]
                 result = self.trim_command_output_from_vm(result)
