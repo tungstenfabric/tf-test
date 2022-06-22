@@ -147,7 +147,7 @@ class Ping(object):
         search2 = '''rtt min/avg/max/mdev = (\S+)\/(\S+)\/(\S+)\/(\S+) '''
         search2_alt = ''' min/avg/max = (\S+)\/(\S+)\/(\S+) '''
 
-        cmds = ['cat %s' %(result_file),
+        cmds = ['tail -10 %s' %(result_file),
                 'cat %s' %(self.log_file)]
         result = self.sender_vm_fixture.run_cmd_on_vm(cmds, timeout=300)
 
