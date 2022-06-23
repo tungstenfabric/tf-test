@@ -1,245 +1,274 @@
-from builtins import str
-from builtins import range
-import test_v1
-import fixtures
-from common import isolated_creds
-
-import vnc_api_test
-from vnc_api.vnc_api import *
-import random
-import socket
+from common.base import GenericTestBase
+import os
+import sys
 import time
-from netaddr import *
-from tcutils.util import retry, get_random_mac, get_random_name
-from tcutils.tcpdump_utils import *
-from fabric.api import run
-from floating_ip import *
-from contrailapi import ContrailVncApi
-from common.base import GenericTestBase
-from common.base import GenericTestBase
-from common.vrouter.base import BaseVrouterTest
-from common.servicechain.config import ConfigSvcChain
-from fabric.context_managers import settings, hide
-from tcutils.util import safe_run, safe_sudo
-from tcutils.commands import ssh, execute_cmd, execute_cmd_out
-from router_fixture import LogicalRouterFixture
-import copy
-import re
-from common.neutron.base import BaseNeutronTest
-from common.fabric_utils import FabricUtils
-from lif_fixture import LogicalInterfaceFixture
-from bms_fixture import BMSFixture
-from vm_test import VMFixture
 from compute_node_test import ComputeNodeFixture
+from tcutils.traffic_utils.scapy_traffic_gen import ScapyTraffic
+trafficdir = os.path.join(os.path.dirname(__file__), '../../tcutils/pkgs/Traffic')
+sys.path.append(trafficdir)
+from traffic.core.stream import Stream
+from traffic.core.profile import StandardProfile
+from traffic.core.helpers import Host, Sender, Receiver
 
+DEFAULT_SRC_PORT = 1500
+DEFAULT_DST_PORT_START = 10001
 
-
-class BaseMaxFlowsTest(BaseVrouterTest):
+class BaseMaxFlowsTest(GenericTestBase):
 
     @classmethod
     def setUpClass(cls, flow_timeout=80):
-        super(BaseVrouterTest, cls).setUpClass()
-        cls.vnc_lib_fixture = cls.connections.vnc_lib_fixture
-        cls.vnc_h = cls.vnc_lib_fixture.vnc_h
-        cls.vnc_lib= cls.connections.vnc_lib
-        cls.agent_inspect= cls.connections.agent_inspect
-        cls.cn_inspect= cls.connections.cn_inspect
-        cls.analytics_obj=cls.connections.analytics_obj
-        cls.api_s_inspect = cls.connections.api_server_inspect
+        super(BaseMaxFlowsTest, cls).setUpClass()
         cls.orch = cls.connections.orch
-        cls.compute_fixtures = []
-        for name, ip in cls.connections.inputs.compute_info.items():
-            cls.compute_fixtures.append(ComputeNodeFixture(cls.connections, ip))
+        cls.computes = {}
+        for ip in cls.inputs.compute_ips:
+            cls.computes[ip] = ComputeNodeFixture(cls.connections, ip)
 
         try:
-            cls.set_flow_timeout(cls.compute_fixtures, flow_timeout)
+            cls.set_flow_timeout(flow_timeout)
         except:
-            cls.cleanup_flow_timeout(cls.compute_fixtures)
+            cls.cleanup_flow_timeout()
             raise
-
-    #end setUpClass
 
     @classmethod
     def tearDownClass(cls):
         cls.cleanup_flow_timeout()
-        super(BaseVrouterTest, cls).tearDownClass()
-
-    #end tearDownClass
+        super(BaseMaxFlowsTest, cls).tearDownClass()
 
     @classmethod
-    def set_flow_timeout(cls, compute_fixtures, flow_timeout=80):
-        for cmp_fix in compute_fixtures:
+    def set_flow_timeout(cls, flow_timeout):
+        for cmp_fix in cls.computes.values():
+            cls.logger.info('setting flow timeout %d on %s' % (flow_timeout,
+                            cmp_fix.ip))
             cmp_fix.set_flow_aging_time(flow_timeout)
         return True
 
     @classmethod
-    def cleanup_flow_timeout(cls, compute_fixtures=None):
-        if compute_fixtures is None:
-            compute_fixtures = cls.compute_fixtures
-        for cmp_fix in compute_fixtures:
-            cmp_fix.set_flow_aging_time(cmp_fix.default_values['DEFAULT']['flow_cache_timeout'])
+    def cleanup_flow_timeout(cls):
+        for cmp_fix in cls.computes.values():
+            flow_timeout = cmp_fix.default_values['DEFAULT']['flow_cache_timeout']
+            cls.logger.info('reset flow timeout %d on %s' % (flow_timeout,
+                            cmp_fix.ip))
+            cmp_fix.set_flow_aging_time(flow_timeout)
         return True
-
-
-    def update_encap_priority(self, encaps):
-        self.addCleanup(self.set_encap_priority, encaps=self.get_encap_priority())
-        return self.set_encap_priority(encaps)
-
-    def setup_vns(self, vn=None):
-        '''Setup VN
-           Input vn format:
-                vn = {'count':1,
-                    'vn1':{'subnet':'10.10.10.0/24', 'ip_fabric':True,},
-                    }
-
-                vn = {'count':1,
-                       'vn1':{
-                            'address_allocation_mode':'flat-subnet-only',
-                            'ip_fabric':True,
-                            'ipam_fq_name': 'default-domain:default-project:ipam0'
-                          },
-                    }
-        '''
-        vn_count = vn['count'] if vn else 0
-        vn_fixtures = {} # Hash to store VN fixtures
-        for i in range(0,vn_count):
-            vn_id = 'vn'+str(i+1)
-            address_allocation_mode = vn[vn_id].get(
-                'address_allocation_mode', 'user-defined-subnet-only')
-            if address_allocation_mode == "flat-subnet-only":
-                ipam_fq_name = vn[vn_id].get('ipam_fq_name', None)
-                vn_fixture = self.create_vn(
-                    vn_name=vn_id,
-                    address_allocation_mode = address_allocation_mode,
-                    forwarding_mode ="l3",
-                   ipam_fq_name = ipam_fq_name, option='contrail')
-
-            else:
-                vn_subnet = vn[vn_id].get('subnet',None)
-                vn_fixture = self.create_vn(vn_name=vn_id,
-                                            vn_subnets=[vn_subnet])
-
-            ip_fabric = vn[vn_id].get('ip_fabric',False)
-            if ip_fabric:
-                ip_fab_vn_obj = self.get_ip_fab_vn()
-                assert vn_fixture.set_ip_fabric_provider_nw(ip_fab_vn_obj)
-
-            vn_fixtures[vn_id] = vn_fixture
-
-        return vn_fixtures
-
-    def setup_vmis(self, vn_fixtures, vmi=None):
-        '''Setup VMIs
-        Input vmi format:
-            vmi = {'count':2,
-                   'vmi1':{'vn': 'vn1'},
-                   'vmi2':{'vn': 'vn1'},
-                  }
-        '''
-        if vmi is None:
-            vmi = {}
-        vmi_count = vmi.pop('count', 0)
-        vmi_fixtures = {} # Hash to store VMI fixtures
-        vmi_keys = [each_key for each_key in vmi if re.match(r'vmi\d+',each_key)]
-        for each_vmi in vmi_keys:
-            vmi_id = each_vmi
-            vmi_vn = vmi[vmi_id]['vn']
-            vn_fixture = vn_fixtures[vmi_vn]
-            vmi_fixture = self.setup_vmi(vn_fixture.uuid)
-            if vmi[vmi_id].get('vip'):
-                vIP = vmi[vmi_id]['vip']
-                mode = vmi[vmi_id].get('mode', 'active-standby')
-                self.config_aap(vmi_fixture, vIP, mac=vmi_fixture.mac_address,
-                                aap_mode='active-active', contrail_api=True)
-
-            vmi_fixtures[vmi_id] = vmi_fixture
-
-        return vmi_fixtures
-
-    def setup_vms(self, vn_fixtures, vmi_fixtures, vm=None, **kwargs):
-        '''Setup VMs
-        Input vm format:
-            vm = {'count':2, 'launch_mode':'distribute',
-                  'vm1':{'vn':['vn1'], 'vmi':['vmi1'], 'userdata':{
-                    'vlan': str(vmi['vmi3']['vlan'])} },
-                  'vm2':{'vn':['vn1'], 'vmi':['vmi2'], 'userdata':{
-                    'vlan': str(vmi['vmi4']['vlan'])} }
-                }
-            launch_mode can be distribute or non-distribute
-        '''
-        if vm is None:
-            vm = {}
-        vm_count = vm.pop('count',0)
-        image_name = kwargs.get('image_name','cirros')
-        launch_mode = vm.get('launch_mode','default')
-        vm_fixtures = {} # Hash to store VM fixtures
-
-        compute_nodes = self.orch.get_hosts()
-        compute_nodes_len = len(compute_nodes)
-        index = random.randint(0,compute_nodes_len-1)
-        vm_index = 0
-        vm_keys = [each_key for each_key in vm if re.match(r'vm\d+',each_key)]
-        for each_vm in vm_keys:
-            vm_id = each_vm
-            vn_list = vm[vm_id]['vn']
-            vmi_list = vm[vm_id]['vmi']
-
-            vn_fix_obj_list =[]
-            vmi_fix_uuid_list =[]
-
-            # Build the VN fixtures objects
-            for vn in vn_list:
-                vn_fix_obj_list.append(vn_fixtures[vn].obj)
-
-           # Build the VMI UUIDs
-            for vmi in vmi_list:
-                vmi_fix_uuid_list.append(vmi_fixtures[vmi].uuid)
-
-            # VM launch mode handling
-            # Distribute mode, generate the new random index
-            # Non Distribute mode, use previously generated index
-            # Default mode, Nova takes care of launching
-            if self.inputs.orchestrator == 'vcenter':
-                index = vm_index%compute_nodes_len
-                node_name = compute_nodes[index]
-                vm_fixture = self.create_vm(vn_objs=vn_fix_obj_list,
-                                        port_ids=vmi_fix_uuid_list,
-                                        node_name=node_name, image_name='ubuntu',
-                                        flavor='contrail_flavor_small')
-            else:
-                vm_node_name = vm[vm_id].get('node', None)
-                if vm_node_name is not None:
-                    node_name = vm_node_name
-                elif launch_mode == 'distribute':
-                    index = vm_index%compute_nodes_len
-                    node_name = self.inputs.compute_names[index]
-                elif launch_mode == 'non-distribute':
-                    node_name = self.inputs.compute_names[index]
-                elif launch_mode == 'default':
-                    node_name=None
-
-                vm_fixture = self.create_vm(vn_objs=vn_fix_obj_list,
-                                            port_ids=vmi_fix_uuid_list,
-                                            node_name=node_name, image_name=image_name)
-            vm_fixtures[vm_id] = vm_fixture
-            vm_index = vm_index + 1
-
-
-        for vm_fixture in list(vm_fixtures.values()):
-            assert vm_fixture.wait_till_vm_is_up()
-
-        return vm_fixtures
-
 
     def cleanup_test_max_vm_flows_vrouter_config(self, compute_fixtures):
         for cmp_fix in compute_fixtures:
-            cmp_fix.set_per_vm_flow_limit(100)
+            self.logger.info('resetting max_vm_flows on %s' % cmp_fix.ip)
+            cmp_fix.set_per_vm_flow_limit(100.0)
         return True
 
+    def create_flows(self,
+                     src_ip,
+                     dst_ip,
+                     flow_count,
+                     vm_fix,
+                     sport=DEFAULT_SRC_PORT,
+                     dport_start=DEFAULT_DST_PORT_START):
+        '''
+        runs udp traffic (scapy) to effect specified flow entries
+        '''
 
-    def cleanup_flow_timeout_vrouter_config(self, compute_fixtures):
-        for cmp_fix in compute_fixtures:
-            cmp_fix.set_flow_aging_time(cmp_fix.default_values['DEFAULT']['flow_cache_timeout'])
-        return True
+        if flow_count % 2:
+            raise Exception('odd number of flows cannot be created')
+        # one stream of traffic generate two flow entries, one for
+        # each direction
+        flow_count //= 2
+        dport_end = dport_start + flow_count - 1
+        dport_range = (dport_start, dport_end)
 
+        # start scapy based script to run traffic
+        params = {}
+        params['ip'] = {'src': src_ip , 'dst': dst_ip}
+        params['udp'] = {'sport': sport, 'dport': dport_range}
+        params['count'] = 1
+        params['interval'] = 0
+        params['mode'] = 'L3'
+        scapy_obj = ScapyTraffic(vm_fix, **params)
+        scapy_obj.start()
 
+        sleep_time = flow_count // 100
+        sleep_time = 5 if sleep_time < 5 else sleep_time
+        self.logger.info("Started Traffic...for %d secs..." % sleep_time)
+        time.sleep(sleep_time)
+
+        # scapy_obj.stop() not required, scapy creates traffic in the
+        # specifid port range and quits
+        return dport_range[1]-dport_range[0]+1
+
+    def get_total_flow_count(self,
+                             vrf_id,
+                             metadata_ip,
+                             vrouter_fixture,
+                             source_ip=None,
+                             dest_ip=None):
+        '''
+        returns the count of flows matching specified source & destination
+        '''
+
+        flow_table = vrouter_fixture.get_flow_table()
+
+        if dest_ip == None:
+            (ff_count, rf_count) = vrouter_fixture.get_flow_count(
+                flow_table=flow_table,
+                refresh=False,
+                source_ip=source_ip,
+                proto='udp',
+                vrf_id=vrf_id
+                )
+        elif source_ip == None:
+            (ff_count, rf_count) = vrouter_fixture.get_flow_count(
+                flow_table=flow_table,
+                refresh=False,
+                dest_ip=dest_ip,
+                proto='udp',
+                vrf_id=vrf_id
+                )
+        else:
+            (ff_count, rf_count) = vrouter_fixture.get_flow_count(
+                flow_table=flow_table,
+                refresh=False,
+                source_ip=source_ip,
+                dest_ip=dest_ip,
+                proto='udp',
+                vrf_id=vrf_id
+                )
+        self.logger.info("Flow Count Forward: %d  Reverse: %d" % (ff_count,
+                            rf_count))
+
+        # dns flow entries
+        (ff_dns_count, rf_dns_count) = vrouter_fixture.get_flow_count(
+                flow_table=flow_table,
+                refresh=False,
+                source_ip=source_ip or dest_ip,
+                dest_port=53,
+                proto='udp',
+                vrf_id=vrf_id
+            )
+        self.logger.info("DNS Flow Count Forward: %d  Reverse: %d" % (
+                            ff_dns_count, rf_dns_count))
+
+        # metadata flow entries
+        (ff_meta_ip, rf_meta_ip) = vrouter_fixture.get_flow_count(
+                flow_table=flow_table,
+                refresh=False,
+                dest_ip=metadata_ip
+            )
+        self.logger.info("Meta Data Flow Count Forward: %d  Reverse: %d" % (
+                            ff_meta_ip, rf_meta_ip))
+
+        total_flow_count = ff_count + rf_count + ff_dns_count + rf_dns_count + ff_meta_ip + rf_meta_ip
+        return total_flow_count
+
+    def verify_max_flows_limit(self,
+                               src,
+                               dst,
+                               flow_count,
+                               verify_at,
+                               expected_flow_count):
+        src_compute = self.computes[src.vm_node_ip]
+        dst_compute = self.computes[dst.vm_node_ip]
+
+        if verify_at == 'src':
+            verify_at_compute = src_compute
+            vrf_id = src_compute.get_vrf_id(src.vn_fq_name)
+            local_ip = src.get_local_ip()
+            query_src_ip = src.vm_ip
+            query_dst_ip = dst.vm_ip
+        elif verify_at == 'dst':
+            verify_at_compute = dst_compute
+            vrf_id = dst_compute.get_vrf_id(dst.vn_fq_name)
+            local_ip = dst.get_local_ip()
+            query_src_ip = dst.vm_ip
+            query_dst_ip = src.vm_ip
+
+        # cache flow count prior to traffic generation
+        prior_flow_count = self.get_total_flow_count(
+                source_ip=query_src_ip,
+                dest_ip=query_dst_ip,
+                vrf_id=vrf_id,
+                metadata_ip=local_ip,
+                vrouter_fixture=verify_at_compute
+                )
+        traffic_count = self.create_flows(
+                src_ip=src.vm_ip,
+                dst_ip=dst.vm_ip,
+                flow_count=flow_count,
+                vm_fix=src
+                )
+        # flow count after traffic
+        total_flow_count = self.get_total_flow_count(
+                source_ip=query_src_ip,
+                dest_ip=query_dst_ip,
+                vrf_id=vrf_id,
+                metadata_ip=local_ip,
+                vrouter_fixture=verify_at_compute
+                )
+        self.logger.info('flow count: sent(%d) pre-exists(%d) seen(%d)' %(
+                         traffic_count * 2, prior_flow_count, total_flow_count))
+
+        # adjust total flows seen based on prior flow count
+        # since its possible that the pre-existing flows timeout, before
+        # create_flows completed
+        diff = abs(total_flow_count - expected_flow_count)
+        if diff and diff <= prior_flow_count:
+            total_flow_count = expected_flow_count
+        return total_flow_count
+
+    def verify_vms_and_traffic(self,
+                               vm_pairs,
+                               sport=DEFAULT_SRC_PORT,
+                               dport=DEFAULT_DST_PORT_START):
+        '''
+        wait for vms & verify udp traffic between them succeeds
+        '''
+
+        proto='udp'
+        count=100
+        for sender_vm, receiver_vm in vm_pairs:
+            self.logger.info('verify vms %s, %s' % (sender_vm.name,
+                            receiver_vm.name))
+            assert sender_vm.wait_till_vm_is_up(refresh=True), \
+                    'vm %s not up!' % sender_vm.name
+            assert receiver_vm.wait_till_vm_is_up(refresh=True), \
+                    'vm %s not up!' % receiver_vm.name
+
+            self.logger.info('verify traffic between %s %s' % (sender_vm.name,
+                            receiver_vm.name))
+            stream = Stream(sport=sport, dport=dport, proto=proto,
+                            src=sender_vm.vm_ip, dst=receiver_vm.vm_ip)
+            profile_kwargs = {'stream': stream, 'count': count}
+            profile = StandardProfile(**profile_kwargs)
+
+            send_node = Host(sender_vm.vm_node_ip,
+                    self.inputs.host_data[sender_vm.vm_node_ip]['username'],
+                    self.inputs.host_data[sender_vm.vm_node_ip]['password'])
+            recv_node = Host(receiver_vm.vm_node_ip,
+                    self.inputs.host_data[receiver_vm.vm_node_ip]['username'],
+                    self.inputs.host_data[receiver_vm.vm_node_ip]['password'])
+            send_host = Host(sender_vm.local_ip,
+                    sender_vm.vm_username, sender_vm.vm_password)
+            recv_host = Host(receiver_vm.local_ip,
+                    receiver_vm.vm_username, receiver_vm.vm_password)
+
+            sender = Sender("send%s" % proto, profile, send_node, send_host,
+                            self.inputs.logger)
+            receiver = Receiver("recv%s" % proto, profile, recv_node, recv_host,
+                            self.inputs.logger)
+
+            # TODO: hack, to be removed when ubuntu-traffic-py3 image is updated
+            # copy the fixed listener.py into the VM
+            receiver.copy_file_to_vm(trafficdir + '/traffic/core/listener.py')
+            receiver_vm.run_cmd_on_vm(['cp /tmp/listener.py /usr/lib/python3.6/traffic/core/'], as_sudo=True)
+
+            receiver.start()
+            sender.start()
+            time.sleep(5)
+            sender.stop()
+            receiver.stop()
+            self.logger.info('Results of traffic %s -> %s' % (sender_vm.name,
+                            receiver_vm.name))
+            self.logger.info("Sent: %s; Received: %s", sender.sent,
+                             receiver.recv)
+            assert sender.sent == receiver.recv, \
+                    "Failed Traffic between VMs %s-%s" % (sender_vm.vm_name,
+                        receiver_vm.vm_name)
