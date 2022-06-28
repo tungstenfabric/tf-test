@@ -58,6 +58,17 @@ class PodmanWrapper(DockerWrapper):
         self.inputs = inputs
         self.tool = 'podman'
 
+    def action_on_container(self, host, event, container_name, timeout):
+        if container_name == 'contrail_vrouter_agent' and event in {'stop', 'start'}:
+            cmd = 'systemctl %s tripleo_contrail_vrouter_agent.service' % event
+            cmd = cmd + ' --no-pager -l'
+            self.inputs.run_cmd_on_server(host, cmd, pty=True, as_sudo=True)
+            return
+        timeout = '-t %s' % timeout if timeout else ''
+        timeout = '' if event == 'start' else timeout
+        cmd = self.tool + ' %s %s %s' % (event, container_name, timeout)
+        self.inputs.run_cmd_on_server(host, cmd, pty=True, as_sudo=True)
+
 class CtrWrapper:
     
 
