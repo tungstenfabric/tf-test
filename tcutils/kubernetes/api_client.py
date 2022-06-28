@@ -512,7 +512,7 @@ class Client(object):
         '''
         Dirty WA https://github.com/kubernetes-incubator/client-python/issues/18
         '''
-        default_backend = obj.spec.backend
+        default_backend = obj.spec.default_backend
         if default_backend:
             default_backend.service_port = int(default_backend.service.port.number)
         if obj.spec.rules:
