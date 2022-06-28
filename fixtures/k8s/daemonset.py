@@ -23,7 +23,7 @@ class DaemonSetFixture(fixtures.Fixture):
         self.vnc_api_h = connections.vnc_lib
         self.metadata = {} if metadata is None else metadata
         self.spec = {} if spec is None else spec
-        self.v1_beta_h = self.k8s_client.v1_beta_h
+        self.v1_networking = self.k8s_client.v1_networking
         self.apps_v1_h = self.k8s_client.apps_v1_h
         self.already_exists = None
 

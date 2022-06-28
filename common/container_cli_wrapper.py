@@ -32,8 +32,7 @@ class DockerWrapper:
 
     def action_on_service(self, host, event, service):
         issue_cmd = 'service %s %s' % (service, event)
-        self.logger.info('%s %s.service on %s - %s %s' %(event, service, self.host_data[host]['name'],issue_cmd, 'on '+container if container else 'host'))
-        self.run_cmd_on_server(host, issue_cmd, username, password, pty=True, container=container)
+        self.inputs.run_cmd_on_server(host, issue_cmd, pty=True, as_sudo=True, container=service)
 
     def action_on_container(self, host, event, container_name, timeout):
         timeout = '-t %s' % timeout if timeout else ''
