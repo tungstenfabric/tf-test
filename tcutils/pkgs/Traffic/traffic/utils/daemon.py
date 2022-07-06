@@ -6,7 +6,7 @@ import os
 import sys
 import time
 import atexit
-from signal import SIGTERM
+from signal import SIGKILL
 
 try:
     # Running from the source repo "test".
@@ -124,7 +124,7 @@ class Daemon(object):
         # Try killing the daemon process
         try:
             while 1:
-                os.kill(pid, SIGTERM)
+                os.kill(pid, SIGKILL)
                 time.sleep(0.1)
         except OSError as err:
             err = str(err)
