@@ -212,8 +212,8 @@ class trafficTestFixture(fixtures.Fixture):
                 self.receiver[i].poll()
                 self.sender[i].poll()
                 if self.stream_proto == 'tcp' or self.stream_proto == 'udp':
-                    st[i]['sent'] = self.sender[i].sent
-                    st[i]['recv'] = self.receiver[i].recv
+                    st[i]['sent'] = self.sender[i].sent if self.sender[i].sent else 0
+                    st[i]['recv'] = self.receiver[i].recv if self.receiver[i].recv else 0
                 elif self.stream_proto == 'icmp' or self.stream_proto == 'icmpv6':
                     st[i]['sent'] = self.sender[i].sent
                     st[i]['recv'] = self.sender[i].recv
