@@ -732,7 +732,7 @@ class PbbEvpnTestBase(BaseVrouterTest):
             self.logger.warn("B-MAC in agent is not as expected: %s "
                 "got: %s" % (bmac, route['path_list'][0] ['nh']['pbb_bmac']))
         elif (nh_type == 'interface') and (EUI(route['path_list'][0]['nh'][
-                'mac']) != EUI(bmac)):
+                'mac'][0]) != EUI(bmac)):
             result = False
             self.logger.warn("B-MAC in agent is not as expected: %s "
                 "got: %s" % (bmac, route['path_list'][0] ['nh']['mac']))
