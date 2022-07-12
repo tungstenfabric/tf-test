@@ -745,6 +745,11 @@ class TestInputs(with_metaclass(Singleton, object)):
         self.web_server_report_path = webserver_configs.get('report_path')
         self.web_server_log_path = webserver_configs.get('log_path')
         self.web_root = webserver_configs.get('web_root')
+        #Server_Manager Related details
+        server_manager_configs = test_configs.get('server_manager') or {}
+        self.server_manager = server_manager_configs.get('ip')
+        self.server_manager_user = server_manager_configs.get('username')
+        self.server_manager_password = server_manager_configs.get('password')
         # Mail Setup
         mailserver_configs = test_configs.get('mail_server') or {}
         self.smtpServer = mailserver_configs.get('server')
