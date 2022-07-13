@@ -1,4 +1,4 @@
-FROM centos:7.4.1708
+FROM centos:7.9.2009
 
 ARG SITE_MIRROR
 
@@ -18,6 +18,8 @@ RUN \
     yum install -y unzip vim tcpdump ant git ipmitool gcc python-devel \
       patch sshpass bzip2 wget sudo pexpect ant-junit libXpm libXrender \
       gtk2 nss GConf2 openssl python3 python3-devel && \
+    yum update -y -x "centos-release*" -x "coreutils*" -x "net-snmp-libs" && \
+    yum -y update-minimal --security --sec-severity=Important --sec-severity=Critical && \
     pip install -r /indirect_requirements.txt -r /requirements.txt && \
     pip3 install -r /indirect_requirements3.txt -r /requirements3.txt && \
     yum clean all -y && \
