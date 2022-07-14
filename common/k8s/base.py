@@ -1659,7 +1659,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         ls_cmd = 'ls /tmp/python3.5'
         if not pod:
             with settings(warn_only=True):
-                output = local(ls_cmd, capture=True)
+                output = self.inputs.run_cmd_on_server(self.inputs.server_manager, ls_cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
         else:
             output = pod.run_cmd_on_pod(ls_cmd)
 
@@ -1667,7 +1667,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             rm_cmd = 'rm -rf /tmp/python3.5'
             if not pod:
                 with settings(warn_only=True):
-                    output = local(rm_cmd, capture=True)
+                    output = self.inputs.run_cmd_on_server(self.inputs.server_manager, rm_cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
                     self.logger.info('[local] scp cmd Passed')
             else:
                 pod.run_cmd_on_pod(rm_cmd)
@@ -1701,7 +1701,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
                     ##New changes .get and count
                     if (os.environ.get('TEST_TAGS') == 'openshift_1'):
                        cmd = "scp -l 1 -i ~/.ssh/helper_rsa core@%s:/usr/bin/podman /tmp/ > /dev/null 2>&1 &" %(ip,val)
-                    output = local(cmd, capture=True)
+                    output = self.inputs.run_cmd_on_server(self.inputs.server_manager, cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
             else:
                 output = pod.run_cmd_on_pod_with_tty(cmd, tty=False)
     # end do_scp
@@ -1715,7 +1715,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         output = None
         if not pod:
             with settings(warn_only=True):
-                output = local(cmd, capture=True)
+                output = self.inputs.run_cmd_on_server(self.inputs.server_manager, cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
         else:
             output = pod.run_cmd_on_pod(cmd)
         return expectation == ('scp -l' in output)
