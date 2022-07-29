@@ -265,8 +265,8 @@ _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP = {
 # Separate container names for Operator deployer
 _CONTRAIL_SERVICES_OPERATOR_CONTAINER_MAP = {
     # Vrouter
-    'vrouter-nodemgr': ['k8s_nodemanager_vrouter1-vrouter'],
-    'agent': ['k8s_vrouteragent_vrouter1-vrouter'],
+    'vrouter-nodemgr': ['k8s_nodemanager_vrouter1-vrouter', 'contrail_vrouter_agent_nodemgr'],
+    'agent': ['k8s_vrouteragent_vrouter1-vrouter', 'contrail_vrouter_agent'],
     # Control
     'control': ['k8s_control_control1-control'],
     'named': ['k8s_named_control1-control'],
