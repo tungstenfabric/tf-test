@@ -43,7 +43,7 @@ class TestVrfScale(GenericTestBase):
         
         host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
         cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
-                --password %s"%(self.inputs.cfgm_ips[1], host_data['username'],
+                --password %s"%(self.inputs.compute_ips[0], host_data['username'],
                                 host_data['password'])
         try:
             output= subprocess.check_output(cmd, shell=True)
@@ -59,6 +59,24 @@ class TestVrfScale(GenericTestBase):
         total_vrf = self.verify_scale_objects(object_type='vrf')
         assert (total_vrf/scale_number)*100 < 90, 'Not able to scale expected number of VRFs'
         self.logger.info('Total Vns scaled successfully')
+        self.logger.info('==> Running Clean-up <==')
+        host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
+        cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
+                --password %s --cleanup"%(self.inputs.compute_ips[0], host_data['username'],
+                                host_data['password'])
+        try:
+            output= subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError:
+            pass
+        
+        cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
+                --n_vns %s --n_vms %s --cleanup"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
+                                                       n_vns, n_vms)
+        try:
+            output= subprocess.check_output(cmd, shell=True)
+            self.logger.info(output)
+        except subprocess.CalledProcessError:
+            pass
         
 
     @test.attr(type=['scale_vrf'])
@@ -87,7 +105,7 @@ class TestVrfScale(GenericTestBase):
         
         host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
         cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
-                --password %s"%(self.inputs.cfgm_ips[1], host_data['username'],
+                --password %s"%(self.inputs.compute_ips[0], host_data['username'],
                                 host_data['password'])
         try:
             output= subprocess.check_output(cmd, shell=True)
@@ -104,6 +122,24 @@ class TestVrfScale(GenericTestBase):
         total_vrf = self.verify_scale_objects(object_type='vrf')
         assert (total_vrf/scale_number)*100 < 90, 'Not able to scale expected number of VRFs'
         self.logger.info('Total Vns scaled successfully')
+        self.logger.info('==> Running Clean-up <==')
+        host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
+        cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
+                --password %s --cleanup"%(self.inputs.compute_ips[0], host_data['username'],
+                                host_data['password'])
+        try:
+            output= subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError:
+            pass
+        
+        cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
+                --n_vns %s --n_vms %s --cleanup"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
+                                                       n_vns, n_vms)
+        try:
+            output= subprocess.check_output(cmd, shell=True)
+            self.logger.info(output)
+        except subprocess.CalledProcessError:
+            pass
 
     @test.attr(type=['scale_vrf'])
     @preposttest_wrapper
@@ -131,7 +167,7 @@ class TestVrfScale(GenericTestBase):
         
         host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
         cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
-                --password %s"%(self.inputs.cfgm_ips[1], host_data['username'],
+                --password %s"%(self.inputs.compute_ips[0], host_data['username'],
                                 host_data['password'])
         try:
             output= subprocess.check_output(cmd, shell=True)
@@ -148,6 +184,24 @@ class TestVrfScale(GenericTestBase):
         total_vrf = self.verify_scale_objects(object_type='vrf')
         assert (total_vrf/scale_number)*100 < 90, 'Not able to scale expected number of VMs'
         self.logger.info('Total Vns scaled successfully')
+        self.logger.info('==> Running Clean-up <==')
+        host_data = self.inputs.host_data[self.inputs.cfgm_ips[1]]
+        cmd = "python tools/scale/activate-fakevm.py --computes %s --username %s \
+                --password %s --cleanup"%(self.inputs.compute_ips[0], host_data['username'],
+                                host_data['password'])
+        try:
+            output= subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError:
+            pass
+        
+        cmd = "python tools/scale/scale_fake_vms.py --api_server_ip %s --keystone_ip %s \
+                --n_vns %s --n_vms %s --cleanup"%(self.inputs.cfgm_ips[0], self.inputs.cfgm_ips[0],
+                                                       n_vns, n_vms)
+        try:
+            output= subprocess.check_output(cmd, shell=True)
+            self.logger.info(output)
+        except subprocess.CalledProcessError:
+            pass
 
 
     @retry(tries=3)
