@@ -76,7 +76,7 @@ class BaseMacIpLearningTest(GenericTestBase):
         interface = output.split()[0]
         cmd_kernel = "sudo timeout 30 tcpdump -nei %s ip | grep BFD" % (tap_interface)
         cmd_dpdk = "sudo contrail-tools timeout 30 vifdump -i %s | grep BFD" % (interface)
-        if self.inputs.host_data[host]['roles'].get('vrouter').get('AGENT_MODE') == 'dpdk':
+        if self.inputs.host_data[ip]['roles'].get('vrouter').get('AGENT_MODE') == 'dpdk':
             self.logger.info("Starting tcpdump to capture the BFD packets on %s in server %s" % (interface, ip))
             out, err = execute_cmd_out(session, cmd_dpdk, self.logger)
             result = False
