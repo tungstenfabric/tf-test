@@ -160,6 +160,8 @@ class trafficTestFixture(fixtures.Fixture):
                 self.logger.info("rx vm - node %s, mdata_ip %s, vm_ip %s" %(
                                  self.rx_local_host.ip, self.recv_host.ip,
                                  self.dst_ips[index]))
+                receiver.copy_file_to_vm(trafficdir + '/traffic/core/listener.py')
+                self.rx_vm_fixture.run_cmd_on_vm(['cp /tmp/listener.py /usr/lib/python3.6/traffic/core/'], as_sudo=True) 
                 receiver.start()
                 self.logger.info("Starting %s traffic from %s to %s" %(
                                   self.stream_proto, self.src_ips[index],

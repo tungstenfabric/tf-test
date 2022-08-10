@@ -87,12 +87,6 @@ class CaptureBase(Process):
 
             if p is None:
                 continue
-            if p == last_pkt:
-                last_pkt = None
-                # Sniff sniffs packet twice; workarund for it
-                # When time permits, we should debug this
-                log.debug("Duplicate, Skip counting this packet")
-                continue
             last_pkt = p
             log.debug(repr(p))
             # Discard the first ssh keepalive packet
