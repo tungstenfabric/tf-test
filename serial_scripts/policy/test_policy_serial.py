@@ -431,7 +431,7 @@ class TestSerialPolicy(BaseSerialPolicyTest):
                 vn_obj=vn1_fixture.obj,
                 vm_name=vn1_vm1_name,
                 flavor='contrail_flavor_small',
-                image_name='ubuntu-traffic'))
+                image_name='ubuntu-traffic-py3'))
         vm2_fixture = self.useFixture(
             VMFixture(
                 project_name=self.inputs.project_name,
@@ -439,7 +439,7 @@ class TestSerialPolicy(BaseSerialPolicyTest):
                 vn_obj=vn2_fixture.obj,
                 vm_name=vn1_vm2_name,
                 flavor='contrail_flavor_small',
-                image_name='ubuntu-traffic'))
+                image_name='ubuntu-traffic-py3'))
         assert vm1_fixture.verify_on_setup()
         assert vm2_fixture.verify_on_setup()
         vm1_fixture.wait_till_vm_is_up()
