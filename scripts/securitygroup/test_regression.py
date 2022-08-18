@@ -1095,8 +1095,12 @@ class SecurityGroupRegressionTests7(BaseSGTest, VerifySecGroup, ConfigPolicy):
             gw, src_vm_fix.vm_ip, src_vm_fix.vm_ip, dst_vm_fix.vm_ip)
         session, pcap = start_tcpdump_for_vm_intf(
             self, src_vm_fix, src_vn_fq_name, filters=filters)
-        cmds = ['ifconfig eth0 mtu 3000', cmd_ping,
-                'ifconfig eth0 mtu 1500']
+        output = src_vm_fix.run_cmd_on_vm(
+            cmds=['''netstat -anr  |grep ^0.0.0.0 | awk '{ print $8 }' '''],
+            as_sudo=True)
+        gw_intf = list(output.values())[0].split('\r\n')[-1]
+        cmds = ['ifconfig %s mtu 3000' % gw_intf, cmd_ping,
+                'ifconfig %s mtu 1500' % gw_intf]
         output = src_vm_fix.run_cmd_on_vm(
             cmds=cmds,
             as_sudo=True,
@@ -1137,8 +1141,12 @@ class SecurityGroupRegressionTests7(BaseSGTest, VerifySecGroup, ConfigPolicy):
 
         session, pcap = start_tcpdump_for_vm_intf(
             self, vm1_fixture, src_vn_fq_name, filters=filters)
-        cmds = ['ifconfig eth0 mtu 3000', cmd_ping,
-                'ifconfig eth0 mtu 1500']
+        output = vm1_fixture.run_cmd_on_vm(
+            cmds=['''netstat -anr  |grep ^0.0.0.0 | awk '{ print $8 }' '''],
+            as_sudo=True)
+        gw_intf = list(output.values())[0].split('\r\n')[-1]
+        cmds = ['ifconfig %s mtu 3000' % gw_intf, cmd_ping,
+                'ifconfig %s mtu 1500' % gw_intf]
         output = vm1_fixture.run_cmd_on_vm(
             cmds=cmds,
             as_sudo=True,
