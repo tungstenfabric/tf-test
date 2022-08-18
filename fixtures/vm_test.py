@@ -2581,22 +2581,29 @@ class VMFixture(fixtures.Fixture):
             cmds=[ 'rm -f %s;ls -la;%s' % (filename, nc_l[0]) ]
             dest_vm_fixture.run_cmd_on_vm(cmds=cmds, as_sudo=True, as_daemon=True)
             dest_vm_fixture.run_cmd_on_vm(cmds=[nc_l[1]], as_sudo=True, as_daemon=True)
+            result=False
+            for trial in range(5):
+                self.nc_send_file_to_ip(filename, dest_vm_ip, size=size,
+                    local_port=local_port, remote_port=listen_port,
+                    nc_options=nc_options, retry=retry)
 
-        self.nc_send_file_to_ip(filename, dest_vm_ip, size=size,
-            local_port=local_port, remote_port=listen_port,
-            nc_options=nc_options, retry=retry)
+                msg1 = 'File transfer verification for file size %s failed on the VM %s' % (size, dest_vm_fixture.vm_name)
+                msg2 = 'File transfer verification for file size %s passed on the VM %s' % (size, dest_vm_fixture.vm_name)
 
-        msg1 = 'File transfer verification for file size %s failed on the VM %s' % (size, dest_vm_fixture.vm_name)
-        msg2 = 'File transfer verification for file size %s passed on the VM %s' % (size, dest_vm_fixture.vm_name)
-        if receiver:
-            # Check if file exists on dest VM
-            if dest_vm_fixture.verify_file_size_on_vm(filename, size=size, expectation=expectation):
-                self.logger.info(msg2)
-                return True
-            else:
-                self.logger.info(msg1)
-                return False
-        return True
+                # Check if file exists on dest VM
+                if dest_vm_fixture.verify_file_size_on_vm(filename, size=size, expectation=expectation):
+                    self.logger.info(msg2)
+                    result=True
+                    break
+                else:
+                    self.logger.info(msg1)
+                    result=False
+            return result
+        else:
+            self.nc_send_file_to_ip(filename, dest_vm_ip, size=size,
+                local_port=local_port, remote_port=listen_port,
+                nc_options=nc_options, retry=retry)
+            return True
 
     # end nc_file_transfer
 

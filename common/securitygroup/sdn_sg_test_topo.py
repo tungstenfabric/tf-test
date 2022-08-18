@@ -182,6 +182,8 @@ class sdn_4vn_xvm_config(object):
                },
                get_sg_rule('egress',af=self.af_test,
                 proto='any')]
+        if self.af_test == 'v6':
+            self.sg_rules[self.sg_list[4]][0]['ethertype']='IPv6'
 
         ##
         # Define traffic profile.
@@ -570,6 +572,8 @@ class sdn_topo_icmp_error_handling(object):
                  'src_ports': [{'start_port': 0, 'end_port': -1}],
                  'dst_ports': [{'start_port': 0, 'end_port': -1}],
                  'dst_addresses': [{'security_group': 'local'}],}]
+        if self.af_test == 'v6':
+            self.sg_rules[self.sg_list[0]][1]['ethertype']='IPv6'
 
         return self
         # end build_topo
