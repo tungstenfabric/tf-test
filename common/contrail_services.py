@@ -315,6 +315,7 @@ _CONTRAIL_SERVICES_OPERATOR_CONTAINER_MAP = {
     'mysql': ['clustercheck'],
     'redis': ['k8s_redis_redis1-redis', 'contrail-external-redis'],
     'stunnel': ['k8s_stunnel_redis1-redis', 'contrail-external-stunnel'],
+    'contrail-kube-manager': ['contrail-kube-manager', 'kubemanager'],
 }
 
 CONTRAIL_PODS_SERVICES_MAP = {
