@@ -265,41 +265,41 @@ _CONTRAIL_SERVICES_RHOSP_CONTAINER_MAP = {
 # Separate container names for Operator deployer
 _CONTRAIL_SERVICES_OPERATOR_CONTAINER_MAP = {
     # Vrouter
-    'vrouter-nodemgr': ['k8s_nodemanager_vrouter1-vrouter'],
-    'agent': ['k8s_vrouteragent_vrouter1-vrouter'],
+    'vrouter-nodemgr': ['k8s_nodemanager_vrouter1-vrouter', 'contrail_vrouter_agent_nodemgr','contrail-nodemgr'],
+    'agent': ['k8s_vrouteragent_vrouter1-vrouter', 'contrail_vrouter_agent'],
     # Control
-    'control': ['k8s_control_control1-control'],
-    'named': ['k8s_named_control1-control'],
-    'dns': ['k8s_dns_control1-control'],
-    'control-nodemgr': ['k8s_nodemanager_control1-control'],
+    'control': ['k8s_control_control1-control','contrail-controller-control-control'],
+    'named': ['k8s_named_control1-control','contrail-controller-control-named'],
+    'dns': ['k8s_dns_control1-control','contrail-controller-control-dns'],
+    'control-nodemgr': ['k8s_nodemanager_control1-control','contrail-nodemgr'],
     # Analytics Alarm
-    'alarmgen': ['k8s_analytics-alarm-gen_analyticsalarm1-analyticsalarm'],
-    'analytics-alarm-nodemgr': ['k8s_nodemanager_analyticsalarm1-analyticsalarm'],
-    'kafka': ['kafka_analyticsalarm1-analyticsalarm'],
+    'alarmgen': ['k8s_analytics-alarm-gen_analyticsalarm1-analyticsalarm','contrail-analytics-alarm-gen'],
+    'analytics-alarm-nodemgr': ['k8s_nodemanager_analyticsalarm1-analyticsalarm','contrail-nodemgr'],
+    'kafka': ['kafka_analyticsalarm1-analyticsalarm','contrail-external-kafka'],
     # Analytics Database
-    'analytics-cassandra': ['k8s_cassandra_analyticsdb1-cassandra'],
-    'analyticsdb-nodemgr': ['k8s_nodemanager_analyticsdb1-cassandra'],
-    'query-engine': ['k8s_queryengine_queryengine1-queryengine'],
+    'analytics-cassandra': ['k8s_cassandra_analyticsdb1-cassandra','contrail-external-cassandra'],
+    'analyticsdb-nodemgr': ['k8s_nodemanager_analyticsdb1-cassandra','contrail-nodemgr'],
+    'query-engine': ['k8s_queryengine_queryengine1-queryengine','contrail-analytics-query-engine'],
     # Analytics
-    'analytics-api': ['k8s_analyticsapi_analytics1-analytics'],
-    'collector': ['k8s_collector_analytics1-analytics'],
-    'analytics-nodemgr': ['k8s_nodemanager_analytics1-analytics'],
+    'analytics-api': ['k8s_analyticsapi_analytics1-analytics','contrail-analytics-api'],
+    'collector': ['k8s_collector_analytics1-analytics','contrail-analytics-collector'],
+    'analytics-nodemgr': ['k8s_nodemanager_analytics1-analytics','contrail-nodemgr'],
     # Config Database
-    'config-cassandra': ['k8s_cassandra_configdb1-cassandra'],
-    'config-rabbitmq': ['k8s_rabbitmq_rabbitmq1-rabbitmq'],
-    'config-zookeeper': ['k8s_zookeeper_zookeeper1-zookeeper'],
-    'configdb-nodemgr': ['k8s_nodemanager_configdb1-cassandra'],
+    'config-cassandra': ['k8s_cassandra_configdb1-cassandra','contrail-external-cassandra'],
+    'config-rabbitmq': ['k8s_rabbitmq_rabbitmq1-rabbitmq','contrail-external-rabbitmq'],
+    'config-zookeeper': ['k8s_zookeeper_zookeeper1-zookeeper','contrail-external-zookeeper'],
+    'configdb-nodemgr': ['k8s_nodemanager_configdb1-cassandra','contrail-nodemgr'],
     # WebUI
-    'webui': ['k8s_webuiweb_webui1-webui'],
-    'webui-middleware': ['k8s_webuijob_webui1-webui'],
+    'webui': ['k8s_webuiweb_webui1-webui','contrail-controller-webui-web'],
+    'webui-middleware': ['k8s_webuijob_webui1-webui','contrail-controller-webui-job'],
     # Analytics SNMP
-    'snmp-collector': ['k8s_analytics-snmp-collector_analyticssnmp1-analyticssnmp'],
-    'snmp-topology': ['k8s_analytics-snmp-topology_analyticssnmp1-analyticssnmp'],
-    'analytics-snmp-nodemgr': ['k8s_nodemanager_analyticssnmp1-analyticssnmp'],
+    'snmp-collector': ['k8s_analytics-snmp-collector_analyticssnmp1-analyticssnmp','contrail-analytics-snmp-collector'],
+    'snmp-topology': ['k8s_analytics-snmp-topology_analyticssnmp1-analyticssnmp','contrail-analytics-snmp-topology'],
+    'analytics-snmp-nodemgr': ['k8s_nodemanager_analyticssnmp1-analyticssnmp','contrail-nodemgr'],
     # Config
-    'api-server': ['k8s_api_config1-config'],
-    'schema': ['k8s_schematransformer_config1-config'],
-    'svc-monitor': ['k8s_servicemonitor_config1-config'],
+    'api-server': ['k8s_api_config1-config','contrail-controller-config-api'],
+    'schema': ['k8s_schematransformer_config1-config','contrail-controller-config-schema'],
+    'svc-monitor': ['k8s_servicemonitor_config1-config','contrail-controller-config-svcmonitor'],
     'device-manager': ['k8s_devicemanager_config1-config'],
     'config-nodemgr': ['k8s_nodemanager_config1-config'],
     # missing-entries
@@ -313,8 +313,8 @@ _CONTRAIL_SERVICES_OPERATOR_CONTAINER_MAP = {
     'keystone': ['keystone'],
     'neutron': ['neutron_api'],
     'mysql': ['clustercheck'],
-    'redis': ['k8s_redis_redis1-redis'],
-    'stunnel': ['k8s_stunnel_redis1-redis'],
+    'redis': ['k8s_redis_redis1-redis', 'contrail-external-redis'],
+    'stunnel': ['k8s_stunnel_redis1-redis', 'contrail-external-stunnel'],
 }
 
 CONTRAIL_PODS_SERVICES_MAP = {
