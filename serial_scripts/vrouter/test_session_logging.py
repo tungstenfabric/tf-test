@@ -54,7 +54,7 @@ class SessionLogging(SessionLoggingBase):
         self._create_resources(test_type='inter-node')
 
         underlay_proto = UNDERLAY_PROTO[
-            self.connections.read_vrouter_config_encap()[0]]
+            self.connections.read_vrouter_config_encap()[1]]
         proto_list = [17, 1, 6]
         self.enable_logging_on_compute(self.client_fixture.vm_node_ip,
             log_type=AGENT_LOG)
