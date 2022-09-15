@@ -298,11 +298,12 @@ class TestRouterSNAT(BaseNeutronTest):
                 router_dict['id'],
                 self.public_vn_obj.public_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn1_fixture)
+        project = self.inputs.project_name
         def validate():
             assert self.verify_snat(vm1_fixture)
             assert self.verify_snat_with_fip(self.public_vn_obj, \
                     vm2_fixture, vm1_fixture, connections= self.connections,
-                    inputs = self.inputs)
+                    inputs = self.inputs, project=project)
         validate()
         self.validate_post_upgrade = validate
         return True
@@ -585,16 +586,20 @@ class TestRouterSNAT(BaseNeutronTest):
         assert self.verify_snat(vm2_fixture), "snat verification failed"
 
     def verify_snat_with_fip(self, public_vn_obj, public_vm_fix, \
-                            vm_fixture, connections, inputs):
+                            vm_fixture, connections, inputs, project=None):
         fip_fixture = public_vn_obj.fip_fixture
         ext_vn_fixture = public_vn_obj.public_vn_fixture
         result = True
         assert fip_fixture.verify_on_setup()
-        fip_id = fip_fixture.create_and_assoc_fip(
-                ext_vn_fixture.vn_id, vm_fixture.vm_id)
+        if project:
+            project_obj = fip_fixture.assoc_project(project)
+            fip_id = fip_fixture.create_and_assoc_fip(
+                ext_vn_fixture.vn_id, vm_fixture.vm_id, project_obj)
+        else:
+            fip_id = fip_fixture.create_and_assoc_fip(
+                ext_vn_fixture.vn_id, vm_fixture.vm_id)        
         fip = vm_fixture.vnc_lib_h.floating_ip_read(
             id=fip_id).get_floating_ip_address()
-
 
         if not public_vm_fix.ping_with_certainty(fip):
             result = result and False
