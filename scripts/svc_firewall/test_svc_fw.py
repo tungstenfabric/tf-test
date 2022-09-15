@@ -63,6 +63,7 @@ class TestSvcRegr(BaseSvc_FwTest, VerifySvcFirewall, ECMPVerify):
             errmsg = "Ping to third VM %s from Left VM failed" % vm_ip
             assert left_vm_fixture.ping_with_certainty(vm_ip, count='3'), errmsg
 
+
     @preposttest_wrapper
     @skip_because(address_family='v6')
     def test_svc_in_network_nat_private_to_public(self):
@@ -129,6 +130,7 @@ class TestSvcRegr(BaseSvc_FwTest, VerifySvcFirewall, ECMPVerify):
         return self.verify_svc_chain(**kwargs)
 
     @preposttest_wrapper
+    @skip_because(address_family='v6')
     def test_svc_in_network_nat_private_to_public_move_svm_to_new_svc(self):
         """
         Description: Verify svm can be moved to new service instance
