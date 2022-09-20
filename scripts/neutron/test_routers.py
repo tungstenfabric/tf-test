@@ -286,10 +286,10 @@ class TestRouterSNAT(BaseNeutronTest):
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
         vn1_fixture.verify_on_setup()
         vm1_fixture = self.create_vm(vn1_fixture, vm1_name,
-                                         image_name='ubuntu')
+                                         image_name='ubuntu-sshpass')
         vm1_fixture.wait_till_vm_is_up()
         vm2_fixture = self.create_vm(self.public_vn_obj.public_vn_fixture, vm2_name,
-                                         image_name='ubuntu')
+                                         image_name='ubuntu-sshpass')
         vm2_fixture.wait_till_vm_is_up()
 
         router_name = get_random_name('router1')
@@ -452,6 +452,7 @@ class TestRouterSNAT(BaseNeutronTest):
                     project_name=project_name1,
                     connections=proj_connection1,
                     vn_obj=vn1_fixture.obj,
+                    image_name='ubuntu-sshpass',
                     vm_name=vm1_name))
         vm1_fixture.wait_till_vm_is_up()
 
@@ -468,6 +469,7 @@ class TestRouterSNAT(BaseNeutronTest):
                     project_name=project_name,
                     connections=proj_connection,
                     vn_obj=vn2_fixture.obj,
+                    image_name='ubuntu-sshpass',
                     vm_name=vm2_name))
         vm2_fixture.wait_till_vm_is_up()
         vm3_fixture = self.useFixture(
@@ -475,6 +477,7 @@ class TestRouterSNAT(BaseNeutronTest):
                     project_name=self.admin_inputs.project_name,
                     connections=self.admin_connections,
                     vn_obj=self.public_vn_obj.public_vn_fixture.obj,
+                    image_name='ubuntu-sshpass',
                     vm_name=vm3_name))
         vm3_fixture.wait_till_vm_is_up()
 
@@ -491,12 +494,13 @@ class TestRouterSNAT(BaseNeutronTest):
                 router_dict['id'],
                 self.public_vn_obj.public_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn2_fixture)
+        project = self.inputs.project_name1
         assert self.verify_snat(vm2_fixture)
         assert self.verify_snat_with_fip(self.public_vn_obj, vm3_fixture,
-                    vm1_fixture, connections= self.admin_connections, inputs = self.admin_inputs)
+                    vm1_fixture, connections= self.admin_connections, inputs = self.admin_inputs, project=project)
 
         assert self.verify_snat_with_fip(self.public_vn_obj, vm3_fixture,
-                    vm1_fixture, connections= self.admin_connections, inputs = self.admin_inputs)
+                    vm1_fixture, connections= self.admin_connections, inputs = self.admin_inputs, project=project)
 
     @preposttest_wrapper
     def test_basic_snat_behavior_with_subnet_attach_detach(self):
@@ -509,9 +513,9 @@ class TestRouterSNAT(BaseNeutronTest):
         vn1_fixture = self.create_vn(vn1_name, vn1_subnets)
         vn1_fixture.verify_on_setup()
         vm1_fixture = self.create_vm(vn1_fixture, vm1_name,
-                                         image_name='ubuntu')
+                                         image_name='ubuntu-sshpass')
         vm2_fixture = self.create_vm(self.public_vn_obj.public_vn_fixture, vm2_name,
-                                         image_name='ubuntu')
+                                         image_name='ubuntu-sshpass')
         vm1_fixture.wait_till_vm_is_up()
         vm2_fixture.wait_till_vm_is_up()
 
@@ -521,10 +525,11 @@ class TestRouterSNAT(BaseNeutronTest):
             router_dict['id'],
             self.public_vn_obj.public_vn_fixture.vn_id)
         self.add_vn_to_router(router_dict['id'], vn1_fixture)
+        project = self.inputs.project_name
         assert self.verify_snat(vm1_fixture)
         assert self.verify_snat_with_fip(self.public_vn_obj,
                 vm2_fixture, vm1_fixture, connections= self.connections,
-                inputs = self.inputs)
+                inputs = self.inputs, project=project)
 
         self.delete_vn_from_router(router_dict['id'], vn1_fixture)
 
@@ -532,13 +537,13 @@ class TestRouterSNAT(BaseNeutronTest):
         assert self.verify_snat_with_fip(self.public_vn_obj, vm2_fixture,
                                              vm1_fixture,
                                              connections=self.connections,
-                                             inputs = self.inputs)
+                                             inputs = self.inputs, project=project)
 
         self.add_vn_to_router(router_dict['id'], vn1_fixture, cleanup=False)
         assert self.verify_snat(vm1_fixture)
         assert self.verify_snat_with_fip(self.public_vn_obj,
                     vm2_fixture, vm1_fixture, connections= self.connections,
-                    inputs = self.inputs)
+                    inputs = self.inputs, project=project)
 
     @preposttest_wrapper
     def test_basic_snat_behavior_with_different_vns(self):

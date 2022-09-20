@@ -2206,10 +2206,10 @@ class VMFixture(fixtures.Fixture):
         timeout = math.floor(40 * float(delay_factor))
 
         try:
-            i = 'timeout %d scp -o StrictHostKeyChecking=no %s %s@[%s]:' % (
-                timeout, file, dest_vm_username, vm_ip)
+            i = 'timeout %d sshpass -p %s scp -o StrictHostKeyChecking=no %s %s@[%s]:' % (
+                timeout, dest_vm_username, file, dest_vm_username, vm_ip)
             cmd_outputs = self.run_cmd_on_vm(
-                cmds=[i], timeout=timeout + 10)
+                cmds=[i], timeout=timeout + 10, as_sudo=True)
             self.logger.debug(cmd_outputs)
         except Exception as e:
             self.logger.exception(
