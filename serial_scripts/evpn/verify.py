@@ -310,8 +310,8 @@ class VerifyEvpnCases(object):
         self.logger.info('waiting to get tcpdump started')
         sleep(10)
         self.send_l2_traffic(vn_l2_vm1_fixture,iface='eth1')
-        result1 = verify_tcpdump_count(self, session1, pcap1, exp_count=10,mac=self.mac2)
-        result2 = verify_tcpdump_count(self, session2, pcap2, exp_count=10,mac=self.mac2)
+        result1 = verify_tcpdump_count(self, session1, pcap1, exp_count=10,mac=self.mac2,raw_count=True)
+        result2 = verify_tcpdump_count(self, session2, pcap2, exp_count=10,mac=self.mac2,raw_count=True)
         result = result1 and result2
         assert result,'Failed to send multicast traffic'
     # End verify_l2_multicast_traffic
@@ -429,7 +429,7 @@ class VerifyEvpnCases(object):
         session,pcap = vn_l2_vm2_fixture.start_tcpdump(filters=filters,interface=tap_intf)
         sleep(20)
         self.send_l2_traffic(vn_l2_vm1_fixture,iface='eth1')
-        result = verify_tcpdump_count(self, session, pcap, exp_count=10,mac=self.mac2)
+        result = verify_tcpdump_count(self, session, pcap, exp_count=10,mac=self.mac2,raw_count=True)
 
         return result
     # End verify_change_of_l2_vn_forwarding_mode
@@ -532,7 +532,7 @@ class VerifyEvpnCases(object):
         self.logger.info('waiting to get tcpdump started')
         sleep(20)
         self.send_l2_traffic(vn_l2_vm1_fixture,iface='eth1')
-        result = verify_tcpdump_count(self, session, pcap, exp_count=10,mac=self.mac2)
+        result = verify_tcpdump_count(self, session, pcap, exp_count=10,mac=self.mac2,raw_count=True)
 
         #for bug-id 1514703
         #check ping working between l2 vms
@@ -766,7 +766,8 @@ class VerifyEvpnCases(object):
         self.logger.info('waiting to get tcpdump started')
         sleep(10)
         self.send_l2_traffic(vn_l2_vm1_fixture,iface='eth1')
-        result = verify_tcpdump_count(self, session, pcap, exp_count=10,mac=self.mac2)
+        sleep(10)
+        result = verify_tcpdump_count(self, session, pcap, exp_count=10,mac=self.mac2,raw_count=True)
         comp_vm1_ip = vn_l2_vm1_fixture.vm_node_ip
         comp_vm2_ip = vn_l2_vm2_fixture.vm_node_ip
 
