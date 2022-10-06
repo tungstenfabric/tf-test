@@ -364,6 +364,8 @@ class ASN4Base(test_v1.BaseTestCase_v1):
                         (test_group_name, test_bgp_group_name, family))
         cmds.append("set groups %s protocols bgp group %s local-as %d" %
                     (test_group_name, test_bgp_group_name, mx_asn))
+        cmds.append("set groups %s protocols bgp group %s local-as loops 2" %
+                    (test_group_name, test_bgp_group_name))
         cmds.append("set groups %s protocols bgp group %s peer-as %d" %
                     (test_group_name, test_bgp_group_name, peer_as))
         for peer_ip in peer_ips:

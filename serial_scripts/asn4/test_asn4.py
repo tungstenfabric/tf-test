@@ -726,7 +726,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
             'juniper', mx_config['control_ip'], 'root', 'c0ntrail123')
         output_dict = {}
         for control_ip in peer_ips:
-            cmd = 'show route receive-protocol bgp %s table %s' % (
+            cmd = 'show route receive-protocol bgp %s table %s all' % (
                 control_ip, mx_config['ri_name'])
             output_dict[control_ip] = conn.handle.cli(cmd)
         route_seen_dict = {}
@@ -851,7 +851,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
         mx_config['test_group_name'] = topology_info['test_group_name']
         mx_config['test_bgp_proto_group_name'] = topology_info['test_bgp_proto_group_name']
         mx_config['ri_name'] = topology_info['test_ri_name']
-        mx_config["vrf_interface"] = mx_config['mx_vrf_interfaces'][0] + ".0"
+        mx_config["vrf_interface"] = mx_config['mx_vrf_interfaces'][0]
         mx_config["rd"] = mx_control_ip_address[0].split("/")[0] + ":100"
         mx_config['control_ip'] = mx_tunnel_ip
         mx_config['mx_control_ip_address'] = topology_info['mx_control_ip_address']
@@ -990,7 +990,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
         mx_config['test_group_name'] = topology_info['test_group_name']
         mx_config['test_bgp_proto_group_name'] = topology_info['test_bgp_proto_group_name']
         mx_config['ri_name'] = topology_info['test_ri_name']
-        mx_config["vrf_interface"] = mx_config['mx_vrf_interfaces'][0] + ".0"
+        mx_config["vrf_interface"] = mx_config['mx_vrf_interfaces'][0]
         mx_config["rd"] = mx_control_ip_address[0].split("/")[0] + ":100"
         mx_config['control_ip'] = mx_tunnel_ip
         mx_config['mx_control_ip_address'] = topology_info['mx_control_ip_address']
@@ -1165,7 +1165,7 @@ class TestAsn4(ASN4Base, BaseBGPaaS, LocalASBase):
         mx_config['test_group_name'] = topology_info['test_group_name']
         mx_config['test_bgp_proto_group_name'] = topology_info['test_bgp_proto_group_name']
         mx_config['ri_name'] = topology_info['test_ri_name']
-        mx_config["vrf_interface"] = mx_config['mx_vrf_interfaces'][0] + ".0"
+        mx_config["vrf_interface"] = mx_config['mx_vrf_interfaces'][0]
         mx_config["rd"] = mx_control_ip_address[0].split("/")[0] + ":100"
         mx_config['control_ip'] = mx_tunnel_ip
         mx_config['mx_control_ip_address'] = topology_info['mx_control_ip_address']

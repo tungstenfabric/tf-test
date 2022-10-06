@@ -93,7 +93,7 @@ class PhysicalDeviceFixture(vnc_api_test.VncLibFixture):
         self.dm_managed = obj.physical_router_vnc_managed
         self.hw_inventorys = [entry['uuid'] for entry in
             obj.get_hardware_inventorys() or []]
-        self.node_profile = obj.get_node_profile_refs()[0]['uuid']
+        #self.node_profile = obj.get_node_profile_refs()[0]['uuid']
 #        creds = obj.get_physical_router_user_credentials()
 #        self.ssh_username = creds.username
 #        self.ssh_password = creds.password
