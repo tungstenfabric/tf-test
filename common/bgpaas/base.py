@@ -327,7 +327,7 @@ class BaseBGPaaS(BaseNeutronTest, BaseHC):
                static_route_cmd += "route %s %s;\n"%(rt["network"],rt["nexthop"])
            static_route_cmd += "}\n"
         if not export_filter_cmds:
-           export_filter = "export where source = RTS_STATIC;\n"
+           export_filter = "export where source = RTS_STATIC;\n export all;\n"
            export_filter_fn = ""
         else:
            export_filter = export_filter_cmds[0]
