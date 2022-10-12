@@ -150,12 +150,12 @@ class TestBGPaaS(BaseBGPaaS):
            assert False,"BGP session with Controller is not seen"
 
         community_str = "%d:%d"%(community_asn,community_num)
-        community_not_seen = False
+        community_not_seen = True
         for cn in self.inputs.bgp_control_ips:
             entries = cn_inspect_handle[cn].get_cn_route_table_entry(prefix="0.0.0.0/0",table="inet.0",ri_name=vn_fixture.ri_name) or []
             for entry in entries:
-                if community_str not in entry["communities"]:
-                   community_not_seen = True
+                if community_str in entry["communities"]:
+                   community_not_seen = False
                    break
 
         if not community_not_seen:
