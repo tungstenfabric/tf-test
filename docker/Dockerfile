@@ -19,7 +19,7 @@ COPY ./ /contrail-test/
 RUN \
     source /etc/os-release && \
     source /functions.sh && \
-    if [[ "$ID" == 'rhel' ]] ; then \
+    if [[ "$ID" == 'rhel' && "$VERSION_ID" == '8.4' ]] ; then \
       yum module enable -y javapackages-tools ; \
     fi && \
     source /functions.sh && \
