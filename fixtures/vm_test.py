@@ -1213,7 +1213,7 @@ class VMFixture(fixtures.Fixture):
     def reset_state(self, state):
         self.vm_obj.reset_state(state)
 
-    @retry(delay=1, tries=20)
+    @retry(delay=1, tries=50)
     def ping_vm_from_host(self, vn_fq_name, timeout=2):
         ''' Ping the VM metadata IP from the host
         '''
@@ -2012,7 +2012,7 @@ class VMFixture(fixtures.Fixture):
                 is_tap_thr = self.analytics_obj.verify_vm_list_in_vrouter_uve(
                     vm_uuid=self.vm_id,
                     vn_fq_name=intf['vn_name'],
-                    vrouter=self.vm_host,
+                    vrouter=compute,
                     tap=self.tap_interface)
             except PermissionDenied:
                 if not self.admin_connections:
@@ -2021,7 +2021,7 @@ class VMFixture(fixtures.Fixture):
                 is_tap_thr = admin_analytics_obj.verify_vm_list_in_vrouter_uve(
                     vm_uuid=self.vm_id,
                     vn_fq_name=intf['vn_name'],
-                    vrouter=self.vm_host,
+                    vrouter=compute,
                     tap=self.tap_interface)
 
             if is_tap_thr:
@@ -2159,7 +2159,7 @@ class VMFixture(fixtures.Fixture):
                  try:
                      self.analytics_obj.verify_vm_not_in_opserver(
                          self.vm_id,
-                         self.get_host_of_vm(),
+                         compute,
                          vn_fq_name)
                  except PermissionDenied:
                      if not self.admin_connections:
@@ -2167,7 +2167,7 @@ class VMFixture(fixtures.Fixture):
                      admin_analytics_obj = self.admin_connections.analytics_obj
                      admin_analytics_obj.verify_vm_not_in_opserver(
                          self.vm_id,
-                         self.get_host_of_vm(),
+                         compute,
                          vn_fq_name)
              # Trying a workaround for Bug 452
         # end if
@@ -2621,7 +2621,7 @@ class VMFixture(fixtures.Fixture):
     def get_console_output(self):
         return self.orch.get_console_output(self.vm_obj)
 
-    @retry(delay=5, tries=25)
+    @retry(delay=5, tries=100)
     def wait_for_ssh_on_vm(self, port='22'):
         self.logger.debug('Waiting to SSH to VM %s, IP %s, Port %s' % (self.vm_name,
                                                                        self.vm_ip, port))
