@@ -2897,10 +2897,10 @@ class TestBasicVMVNx(BaseVnVmTest):
         create_result = True
         vn_fixture = self.create_vn(orch=self.orchestrator)
         vm1_fixture = self.create_vm(vn_fixture=vn_fixture,
-            image_name='ubuntu',
+            image_name='ubuntu-sshpass',
             orch=self.orchestrator)
         vm2_fixture = self.create_vm(vn_fixture=vn_fixture,
-            image_name='ubuntu')
+            image_name='ubuntu-sshpass')
         assert vm1_fixture.wait_till_vm_is_up()
         assert vm2_fixture.wait_till_vm_is_up()
         for size in scp_test_file_sizes:
