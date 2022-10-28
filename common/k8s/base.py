@@ -1648,35 +1648,42 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
             self.logger.error("Pod {} is not in Running or Succeeded state".format(pod.metadata.name))
             return False
         return True
+
     @retry(delay=2, tries=10)
     def validate_scp(self, pod, ip, expectation=True, port=22):
         """
         Copy python3.5 binary from server pod to client pod.
         Check if it gets copied.
         """
-        self.do_scp(pod, ip, port)
-        ls_cmd = 'ls /tmp/python3.5'
-        if not pod:
-            with settings(warn_only=True):
-                output = self.inputs.run_cmd_on_server(self.inputs.server_manager, ls_cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
-        else:
-            output = pod.run_cmd_on_pod(ls_cmd)
+        ret_val = False
+        copied_file_names = self.do_scp(pod, ip, port)
 
-        if 'No such file or directory' not in output:
-            rm_cmd = 'rm -rf /tmp/python3.5'
+        for file_name in copied_file_names:
+            ls_cmd = f'ls /tmp/{file_name}'
             if not pod:
                 with settings(warn_only=True):
-                    output = self.inputs.run_cmd_on_server(self.inputs.server_manager, rm_cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
-                    self.logger.info('[local] scp cmd Passed')
+                    output = self.inputs.run_cmd_on_server(self.inputs.server_manager, ls_cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
             else:
-                pod.run_cmd_on_pod(rm_cmd)
-                self.logger.info('[Pod %s] scp cmd Passed.' % (pod.name))
-            ret_val = True
-        else:
-            self.logger.info('scp cmd failed.')
-            ret_val = False
+                output = pod.run_cmd_on_pod(ls_cmd)
+
+            if 'No such file or directory' not in output:
+                rm_cmd = f'rm -rf /tmp/{file_name}'
+                if not pod:
+                    with settings(warn_only=True):
+                        output = self.inputs.run_cmd_on_server(self.inputs.server_manager, rm_cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
+                        self.logger.info('[local] scp cmd Passed')
+                else:
+                    pod.run_cmd_on_pod(rm_cmd)
+                    self.logger.info('[Pod %s] scp cmd Passed.' % (pod.name))
+                ret_val = True
+            else:
+                self.logger.info('scp cmd failed.')
+                ret_val = False
+                break
+
         return ret_val == expectation
     # end validate_scp
+
     def do_scp(self, pod, ip, port=22, limit_rate=False, old_count=0,session_count=1):
         """
         This function will copy python3.5 binary from server pod to client pod
@@ -1684,25 +1691,31 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         This will allow us to have flow for longer time so that scale up/down
         can be tested and we can verify that flow is not deleted.
         """
+        copied_file_names=[]
         ## added for loop for count
         for val in range(old_count,session_count):
-            val = get_random_name()
+            local_name = get_random_name()
             if limit_rate:
                 cmd = "sshpass -p Passw0rd scp -l 1 -o StrictHostKeyChecking=no "\
                         "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
-                        "root@%s:/usr/bin/python3.5 /tmp/%s > /dev/null 2>&1 &" %(port, ip, val)
+                        "root@%s:/usr/bin/python3.5 /tmp/%s > /dev/null 2>&1 &" %(port, ip, local_name)
             else:
                 cmd = "sshpass -p Passw0rd scp -o StrictHostKeyChecking=no "\
                         "-o ServerAliveInterval=5 -o ServerAliveCountMax=2 -P %s "\
-                        "root@%s:/usr/bin/python3.5 /tmp/%s" % (port, ip, val)
+                        "root@%s:/usr/bin/python3.5 /tmp/%s" % (port, ip, local_name)
             if not pod:
                 with settings(warn_only=True):
                     ##New changes .get and count
                     if (os.environ.get('TEST_TAGS') == 'openshift_1'):
-                       cmd = "scp -l 1 -i ~/.ssh/helper_rsa core@%s:/usr/bin/podman /tmp/ > /dev/null 2>&1 &" %(ip,val)
+                       cmd = "scp -l 1 -i ~/.ssh/helper_rsa core@%s:/usr/bin/podman /tmp/%s > /dev/null 2>&1 &" %(ip,local_name)
                     output = self.inputs.run_cmd_on_server(self.inputs.server_manager, cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
             else:
                 output = pod.run_cmd_on_pod_with_tty(cmd, tty=False)
+
+            # Will be needed to validate for the presence of files copied from remote to local
+            copied_file_names.append(local_name)
+
+        return copied_file_names
     # end do_scp
 
     @retry(delay=2, tries=10)
