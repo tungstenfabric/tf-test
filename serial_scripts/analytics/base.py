@@ -576,12 +576,12 @@ class BaseSanityResource(with_metaclass(Singleton, fixtures.Fixture)):
         compute_1 = host_list[0]
         self.vn1_vm1_fixture=self.useFixture(VMFixture(project_name= self.inputs.project_name,
                                 connections= self.connections, vn_obj= self.vn1_fixture.obj,
-                                vm_name= self.vn1_vm1_name,image_name='ubuntu-traffic-py3',
+                                vm_name= self.vn1_vm1_name,image_name='cirros-traffic',
                 flavor='contrail_flavor_medium', node_name=compute_1))
 
         self.vn1_vm2_fixture=self.useFixture(VMFixture(project_name= self.inputs.project_name,
                                 connections= self.connections, vn_obj= self.vn1_fixture.obj,
-                                vm_name= self.vn1_vm2_name , image_name='ubuntu-traffic-py3',
+                                vm_name= self.vn1_vm2_name , image_name='cirros-traffic',
                 flavor='contrail_flavor_medium'))
 
         self.verify_sanity_common_objects()
@@ -628,16 +628,16 @@ class BaseResource(with_metaclass(Singleton, BaseSanityResource)):
             compute_2 = host_list[1]
         self.vn2_vm2_fixture=self.useFixture(VMFixture(project_name= self.inputs.project_name,
                             connections= self.connections, vn_obj= self.vn2_fixture.obj,
-                            vm_name= self.vn2_vm2_name, image_name='ubuntu-traffic-py3',
+                            vm_name= self.vn2_vm2_name, image_name='cirros-traffic',
                             node_name=compute_2))
         self.fvn_vm1_fixture=self.useFixture(VMFixture(project_name= self.inputs.project_name,
                                 connections= self.connections, vn_obj= self.fvn_fixture.obj,
-                                image_name='ubuntu-traffic-py3',
+                                image_name='cirros-traffic',
                                 vm_name= self.fvn_vm1_name))
         self.multi_intf_vm_fixture = self.useFixture(VMFixture(connections=self.connections,
                                      vn_objs=[self.vn1_fixture.obj , self.vn2_fixture.obj],
                                      vm_name='mltf_vm',
-                                     image_name='ubuntu-traffic-py3',
+                                     image_name='cirros-traffic',
                                      project_name=self.inputs.project_name))
 
         self.verify_common_objects()
