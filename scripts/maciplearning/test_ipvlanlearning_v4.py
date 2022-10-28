@@ -160,7 +160,6 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         #except CommandTimeout:
         #    pass
         
-    @test.attr(type=['sanity'])
     @preposttest_wrapper
     def test_ipvlan_bfd_health_check_crpd_l2mode(self):
         '''
@@ -263,7 +262,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
     # end ttest_bfd_health_check_crpd_l2mode
 
         
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_bfd_health_check_crpd_default_mode(self):
         '''
@@ -365,7 +364,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end ttest_bfd_health_check_crpd_l2mode
     
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_intra_vn_intra_compute_l2_mode(self):
 
@@ -520,7 +519,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end test_ipvlan_inter_vn_inter_compute_l2_mode
            
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_intra_vn_inter_compute_l2_mode(self):
         '''
@@ -668,7 +667,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end test_ipvlan_inter_vn_intra_compute_l2_mode
     
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_inter_vn_inter_compute_l2_mode(self):
         '''
@@ -986,7 +985,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end test_ipvlan_inter_vn_inter_compute_l2_mode
     
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_inter_vn_inter_compute_default_mode(self):
         '''
@@ -1146,7 +1145,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
     # end test_ipvlan_inter_vn_inter_compute_l2_mode
       
     
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_bfd_health_check_crpd_l2l3_mode(self):
         '''
@@ -1249,7 +1248,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end ttest_bfd_health_check_crpd_l2mode
     
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_intra_vn_intra_compute_l2l3_mode(self):
         '''
@@ -1555,7 +1554,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end test_ipvlan_inter_vn_intra_compute_l2_mode
     
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_inter_vn_inter_compute_l2l3_mode(self):
         '''
@@ -1719,7 +1718,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         return True
     # end test_ipvlan_inter_vn_inter_compute_l2_mode
         
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_inter_vn_intra_compute_l2l3_mode(self):
         '''
@@ -1880,7 +1879,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                 
         return True
     # end test_ipvlan_inter_vn_inter_compute_l2_mode
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_with_50(self):
         '''
@@ -1950,7 +1949,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         
         return True
     # end ttest_bfd_health_check_crpd_l2mode
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_with_GT_50_negative(self):
         '''
@@ -2040,7 +2039,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
                 
         return True
     # end test_negative_ipvlan_with_GT_50
-    @test.attr(type=['sanity'])
+    
     @preposttest_wrapper
     def test_ipvlan_health_check_detach(self):
         '''
