@@ -1077,8 +1077,7 @@ class VerifyEvpnCases(object):
                 as_sudo=True, timeout=60)
             # Scp file from EVPN_VN_L2_VM1 to EVPN_VN_L2_VM2 using
             # EVPN_VN_L2_VM2 vm's eth1 interface ip
-            cmd = '''timeout 40 sshpass -p "ubuntu" scp -o StrictHostKeyCheckingg
-            =no %s ubuntu@%s:''' % (filename, dest_vm_ip)
+            cmd = '''timeout 40 sshpass -p "ubuntu" scp -o StrictHostKeyChecking=no %s ubuntu@%s:''' % (filename, dest_vm_ip)
             vn_l2_vm1_fixture.run_cmd_on_vm(cmds=[cmd], as_sudo=True)
             vn_l2_vm1_fixture.run_cmd_on_vm(cmds=['sync'], as_sudo=True, timeout=60)
             # Verify if file size is same in destination vm
