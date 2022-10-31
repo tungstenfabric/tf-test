@@ -510,6 +510,7 @@ class BaseK8sTest(GenericTestBase, vnc_api_test.VncLibFixture):
         if not pod:
             with settings(warn_only=True):
                 output = self.inputs.run_cmd_on_server(self.inputs.server_manager, cmd,self.inputs.server_manager_user,self.inputs.server_manager_password)
+            pod_str = self.inputs.server_manager
         else:
             output = pod.run_cmd(cmd, shell='/bin/sh -l -c')
             pod_str = 'Pod %s' % (pod.name)
