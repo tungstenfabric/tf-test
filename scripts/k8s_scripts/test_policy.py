@@ -3544,7 +3544,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                                           labels=labels2)
         rules = [{'host': host1,
                   'http': {'paths': [{
-                                    'path':'/'+path1,'pathType': path_type,
+                                    'path':'/'+path1,'pathType': "ImplementationSpecific",
                                     'backend': { 'service_name': service_ns1.name,
                                                  'service_port': 80
                                                }
@@ -3553,7 +3553,7 @@ class TestNetworkPolicyServiceIngress(BaseK8sTest):
                  },
                  {'host': host2,
                   'http': {'paths': [{
-                                    'path': '/'+path2,'pathType': path_type,
+                                    'path': '/'+path2,'pathType': "ImplementationSpecific",
                                     'backend': { 'service_name': service_ns2.name,
                                                  'service_port': 80
                                                }
