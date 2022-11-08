@@ -2244,7 +2244,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         time.sleep(120)
         
         assert self.vm1_fixture.wait_till_vm_up()
-        time.sleep(30)
+        time.sleep(60)
         self.logger.info("checking evpn table for target IPvLAN MAC/IP")
         for i in range(number_of_container):
             evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
@@ -2363,7 +2363,7 @@ class TestIpVlanLearning(BaseVrouterTest, BaseMacIpLearningTest, BaseBGPaaS, Sta
         self.logger.info(" ====> Restarting containers on Controller <====")
         for service in restart_services:
             self.inputs.restart_container(self.inputs.cfgm_ips, service)
-        time.sleep(120)
+        time.sleep(150)
         
         for i in range(number_of_container):
             evpn_route = self.agent_inspect[vm1_node_ip].get_vna_evpn_route(
