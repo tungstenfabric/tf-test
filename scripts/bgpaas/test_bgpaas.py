@@ -1318,9 +1318,9 @@ class TestBGPaaS(BaseBGPaaS):
             self.config_aap(port, bgp_ip, mac='00:00:5e:00:01:01')
         self.logger.info('We will configure VRRP on the two vSRX')
         self.config_vrrp_on_vsrx(
-            src_vm=test_vm, dst_vm=bgpaas_vm1, vip=bgp_ip, priority='200', interface='ge-0/0/0')
+            src_vm=test_vm, dst_vm=bgpaas_vm1, vip=bgp_ip, priority='200', interface='ge-0/0/0' ,security_zone='trust')
         self.config_vrrp_on_vsrx(
-            src_vm=test_vm, dst_vm=bgpaas_vm2, vip=bgp_ip, priority='100', interface='ge-0/0/0')
+            src_vm=test_vm, dst_vm=bgpaas_vm2, vip=bgp_ip, priority='100', interface='ge-0/0/0' ,security_zone='trust')
         self.logger.info('Will wait for both the vSRXs to come up')
 
         assert self.vrrp_mas_chk(
