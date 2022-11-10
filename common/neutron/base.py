@@ -297,7 +297,7 @@ prefix_len=prefix_len, mac=mac, mode=aap_mode, left_vn_name=left_vn_name)
          # end config_aap
 
 
-    def config_vrrp_on_vsrx(self, src_vm=None, dst_vm=None, vip=None, priority='100', interface='ge-0/0/1'):
+    def config_vrrp_on_vsrx(self, src_vm=None, dst_vm=None, vip=None, priority='100', interface='ge-0/0/1' ,security_zone='left'):
         cmdList = []
         cmdList.append('deactivate security nat source rule-set TestNat')
         cmdList.append(
@@ -308,7 +308,7 @@ prefix_len=prefix_len, mac=mac, mode=aap_mode, left_vn_name=left_vn_name)
         vm_ip = dst_vm.vm_ips[int(interface[-1])]
         vsrx_vrrp_config = ['set interfaces ' + interface + ' unit 0 family inet address ' + vm_ip
                             + '/' + '24 vrrp-group 1 priority ' + priority + ' virtual-address ' + vip + ' accept-data',
-                           'set security zones security-zone trust interfaces ' + interface + ' host-inbound-traffic protocols all']
+                           'set security zones security-zone ' + security_zone + ' interfaces ' + interface + ' host-inbound-traffic protocols all']
         cmdList = cmdList + vsrx_vrrp_config
         cmd_string = (';').join(cmdList)
         assert self.set_config_via_netconf(src_vm, dst_vm,
