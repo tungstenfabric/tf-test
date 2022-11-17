@@ -549,8 +549,3 @@ class FatFlowIpv6(FatFlow):
     @preposttest_wrapper
     def test_fat_flow_lbaasv2(self):
         raise self.skipTest("Skipping Test. LBaas is NOT supported for IPv6")
-
-    @test.attr(type=['cb_sanity', 'sanity'])
-    def test_fat_flow_intra_vn_inter_node(self):
-        self.inputs.set_af('dual')
-        super(FatFlowIpv6, self).test_fat_flow_intra_vn_inter_node()
