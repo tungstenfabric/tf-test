@@ -273,32 +273,6 @@ class FatFlowAggrIpv6(FatFlowAggr):
         self.inputs.set_af('dual')
         super(FatFlowAggrIpv6, self).test_fat_flow_aggr_dest_icmp_intra_vn_inter_node()
 
-    @test.attr(type=['sanity','dev_reg'])
-    @preposttest_wrapper
-    def test_fat_flow_aggr_dest_udp_inter_vn_inter_node(self):
-        """
-        Description: Verify fat flow prefix aggr dest (IPv6) for intra-vn inter-node
-        Steps:
-            1. Create 2 VNs with IPv6 subnets and launch 3 VMs.2 client VMs in VN1 on same node
-               and server VM in VN2 on different node.
-               Client 1 in subnet 1, Client 2 in the next subnet.
-               Policy p1 configured to allow udp traffic between VN1 and VN2.
-            2. On server VM, config fat flow aggr prefix dest IPv6 len 125 for UDP port 55.
-            3. From both the client VMs, send ICMP6 traffic to the server VM twice with diff. src ports
-        Pass criteria:
-            1. On the remote CN, expect 2 pairs ( 1 for client 1, 1 for client 2)
-               of IPv6 fat flows with prefix aggregated for the src IPs
-               (VM to fabric, Prefix Aggr Dest: Aggregation happens for SRC IPs)
-            2. On client VM compute nodes, expect 4 pairs of IPv6 flows and on server compute,
-               expect 2 pairs of IPv6 flows
-            3. On server compute node, flow's source port should be 0 for fat flows
-
-        Maintainer: Ankitja@juniper.net
-
-        """
-        self.inputs.set_af('dual')
-        super(FatFlowAggrIpv6, self).test_fat_flow_aggr_dest_udp_inter_vn_inter_node()
-
     @test.attr(type=['dev_reg'])
     @preposttest_wrapper
     def test_fat_flow_aggr_dest_ignore_src_udp_inter_vn_inter_node(self):
