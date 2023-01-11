@@ -12,6 +12,7 @@ from vm_test import *
 from policy_test import *
 from multiple_vn_vm_test import *
 from tcutils.wrappers import preposttest_wrapper
+from .base import *
 
 sys.path.append(os.path.realpath('tcutils/pkgs/Traffic'))
 from traffic.core.stream import Stream
@@ -27,7 +28,7 @@ import test
 import pprint
 
 class AnalyticsTestSanityWithMin(
-        base.AnalyticsBaseTest,
+        AnalyticsBaseTest,
         VerifySvcChain):
     '''
     Sanity tests with minimum resource objects created during setUpClass
@@ -246,7 +247,7 @@ class AnalyticsTestSanityWithMin(
 # end class AnalyticsTestSanityWithMin
 
 class AnalyticsTestSanityWithResource(
-        base.AnalyticsBaseTest,
+        AnalyticsBaseTest,
         VerifySvcChain):
 
     @classmethod

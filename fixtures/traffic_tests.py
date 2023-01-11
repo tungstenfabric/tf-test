@@ -32,7 +32,7 @@ class trafficTestFixture(fixtures.Fixture):
         rx_vm_fixture=None, stream_proto='udp', vm_fip_info=None,
         packet_size=100, cfg_profile='ContinuousProfile', start_sport=8000,
         total_single_instance_streams=20, chksum=False, pps=100, fip=None,
-        tx_vn_fixture=None, rx_vn_fixture=None, af=None):
+        tx_vn_fixture=None, rx_vn_fixture=None, af=None, size_count=0):
         ''' Start traffic based on inputs given..
         Return {'status': True, 'msg': None} if traffic started successfully..else return {'status': False, 'msg': err_msg}..
         Details on inputs:
@@ -121,7 +121,7 @@ class trafficTestFixture(fixtures.Fixture):
         for index in range(len(self.dst_ips)):
             name = name + '_dst' + str(index) + '_'
             for i in range(num_streams):
-                self.name = name + self.stream_proto + str(i)
+                self.name = name + self.stream_proto + str(i) + str(size_count)
                 self.dport = start_port + i
                 m = "Send protocol %s traffic to port %s" % (
                     self.stream_proto, self.dport)
