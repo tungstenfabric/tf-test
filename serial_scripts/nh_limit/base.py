@@ -57,13 +57,13 @@ class TestNHLimit(GenericTestBase):
             if agent_mode == 'dpdk':
                 if mpls_limit is not None:
                     nh_mpls_limit_cmd = '''sed -i '/DPDK_COMMAND_ADDITIONAL_ARGS/ i DPDK_COMMAND_ADDITIONAL_ARGS="--vr_nexthops= --vr_mpls_labels="' entrypoint.sh'''
-                    updated_cmd = nh_mpls_limit_cmd[:71] + nh_limit + \
-                        nh_mpls_limit_cmd[71:89] + \
-                        mpls_limit + nh_mpls_limit_cmd[89:]
+                    updated_cmd = nh_mpls_limit_cmd[:85] + nh_limit + \
+                        nh_mpls_limit_cmd[85:103] + \
+                        mpls_limit + nh_mpls_limit_cmd[103:104] + nh_mpls_limit_cmd[104:]
                 else:
                     nh_limit_cmd = '''sed -i '/DPDK_COMMAND_ADDITIONAL_ARGS/ i DPDK_COMMAND_ADDITIONAL_ARGS="--vr_nexthops="' entrypoint.sh'''
                     updated_cmd = nh_limit_cmd[:71] + \
-                        nh_limit + nh_limit_cmd[71:]
+                            nh_limit_cmd[71:85] + nh_limit + nh_limit_cmd[85:86] + nh_limit_cmd[86:]
                 cmds = ['docker cp vrouter_vrouter-agent-dpdk_1:/entrypoint.sh .',
                         'cp entrypoint.sh entrypoint_backup.sh', updated_cmd]
                 for cmd in cmds:

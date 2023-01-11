@@ -1208,7 +1208,9 @@ class TestBasicVMVN3(BaseVnVmTest):
         proto = 'udp'
         packet_sizes = [40, 64, 254, 748, 1350]
         cmd_to_increase_mtu = ['ifconfig eth0 mtu 16436']
+        size_count = -1
         for packet_size in packet_sizes:
+            size_count += 1
             if packet_size > 1400:
                 self.logger.info('Increasing the MTU of the eth0 of VM')
                 vm1_fixture.run_cmd_on_vm(cmds=cmd_to_increase_mtu,
@@ -1226,7 +1228,7 @@ class TestBasicVMVN3(BaseVnVmTest):
                 startStatus[proto] = traffic_obj[proto].startTraffic(
                     num_streams=total_streams[proto], start_port=dpi,
                     tx_vm_fixture=vm1_fixture, rx_vm_fixture=vm2_fixture,
-                    stream_proto=proto, packet_size=packet_size)
+                    stream_proto=proto, packet_size=packet_size, size_count=size_count)
                 self.logger.info("Status of start traffic : %s, %s, %s" %
                                  (proto, vm1_fixture.vm_ip, startStatus[proto]))
                 if startStatus[proto]['status'] != True:
