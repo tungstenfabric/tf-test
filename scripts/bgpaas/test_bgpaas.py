@@ -783,9 +783,10 @@ class TestBGPaaS(BaseBGPaaS):
 
 
     @preposttest_wrapper
-    def test_bgpaas_md5(self):
+    def unsupported_test_bgpaas_md5(self):
         """
         Description: Verify md5 for bgpaas bgp session
+        this test case is not supported as per bug : https://contrail-jws.atlassian.net/browse/CEM-12823
         Test Steps:
            1. Configure authentication method to md5 and configure key in bgpaas service
            2. Verify BGP session dont come up , when authentication key is not configured in vsrx.
