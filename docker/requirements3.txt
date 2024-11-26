@@ -70,7 +70,7 @@ oslo.context==2.23.0
 oslo.i18n==3.25.1
 oslo.log==3.45.2
 oslo.serialization==2.29.2
-oslo.utils==3.42.1
+oslo.utils==4.10.1
 paramiko==2.10.1
 pbr==5.4.4
 pexpect==4.7.0
