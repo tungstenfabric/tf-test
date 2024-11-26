@@ -15,7 +15,7 @@ chardet==3.0.4
 cliff==2.18.0
 cmd2==0.8.9
 configparser==4.0.2
-cryptography==3.3.2
+cryptography==39.0.1
 debtcollector==1.22.0
 decorator==4.4.2
 dictdiffer==0.8.1
